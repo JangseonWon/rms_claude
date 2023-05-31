@@ -2,6 +2,7 @@ rootProject.name = "rms"
 include("gateway")
 include("entity")
 include("service")
+include("order")
 
 pluginManagement {
     repositories {

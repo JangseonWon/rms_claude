@@ -12,7 +12,6 @@ import com.gcgenome.rms.entity.QServiceSampleType.serviceSampleType
 import com.gcgenome.rms.repo.ServiceRepository
 import com.querydsl.core.types.Expression
 import com.querydsl.core.types.Projections
-import com.querydsl.core.types.dsl.Expressions
 import com.querydsl.sql.SQLQuery
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
@@ -54,7 +53,6 @@ class Dao(
         service.name.`as`("name")
     )
 
-    // 거래처 연관 검사 목록을 가져온 후, extension, sample_type+sample_type_extension을 쿼리하여 빌드한다.
     fun findByUserService(userId: String): Flux<Service_> = repo.query {
         it.select(toServices()).fromServiceAndOrganization().where(organizationService.userId.eq(userId))
     }.all().collectList().flatMap {

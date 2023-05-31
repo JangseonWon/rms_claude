@@ -38,6 +38,10 @@ spring:
           uri: lb://rms-service
           predicates:
             - Path=/api/services, /api/services/**
+        - id: rms-order
+          uri: lb://rms-order
+          predicates:
+            - Path=/api/orders, /api/orders/**
   r2dbc:
     url: r2dbc:postgresql://libra:5432/report_service
     username: report_service

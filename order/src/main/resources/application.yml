@@ -1,6 +1,6 @@
 spring:
   application:
-    name: rms-service
+    name: rms-order
   main:
     web-application-type: reactive
   cloud:
@@ -31,7 +31,7 @@ spring:
               - PATCH
               - DELETE
   r2dbc:
-    url: r2dbc:postgresql://libra:5432/report_service
+    url: r2dbc:postgresql://libra:5432/report_service?schema=rms
     username: report_service
     password: rs1004!@
     pool:
@@ -41,7 +41,3 @@ spring:
       validation-query: SELECT 1
 server:
   port: 0
-
-logging:
-  level:
-    io.r2dbc.postgresql.QUERY: TRACE # for queries
