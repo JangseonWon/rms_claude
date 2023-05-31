@@ -34,7 +34,6 @@ class AuthenticateFilter(
 
     private fun exchange(exchange: ServerWebExchange, chain: GatewayFilterChain, auth: Authentication): Mono<Void> {
         var exchange = exchange
-        println("======================here")
         if (auth.isAuthenticated && auth.principal != null) {
             val request = exchange.request.mutate().header("X-USER-ID", auth.principal.toString()).build()
             exchange = exchange.mutate().request(request).build()
