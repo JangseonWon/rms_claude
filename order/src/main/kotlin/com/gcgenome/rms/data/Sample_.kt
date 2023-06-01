@@ -13,9 +13,9 @@ data class Sample_(
     val note: String?,
     val department: String?,
     val ward: String?,
-    val physician: String?
+    val physician: String?,
+    var extensions: List<Extension_> = emptyList()
 ){
     var id: UUID? = null
     var state: String? = null
-    lateinit var extensions: List<Extension_>
 }
