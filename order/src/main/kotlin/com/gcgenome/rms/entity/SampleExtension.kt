@@ -11,7 +11,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 @Schema("rms")
-@Table("sample_extension")
+@Table(name = "sample_extension", schema = "rms")
 data class SampleExtension(
     @Column("sample_id") val sampleId: UUID,
     @Column("extension_id") val extensionId: String,

@@ -7,7 +7,7 @@ import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
 
 @Schema("rms")
-@Table("organization")
+@Table(name = "organization", schema = "rms")
 data class Organization (
     @Column("id") val id: String,
     @Column("user_id") val userId: String,
