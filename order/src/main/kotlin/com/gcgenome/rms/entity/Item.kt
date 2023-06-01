@@ -9,7 +9,8 @@ import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
 import java.util.UUID
 
-@Table("rms.item")
+@Schema("rms")
+@Table(name = "item", schema = "rms")
 data class Item(
     @Id @Column("id") val _id: UUID,
     @Column("service_id") val serviceId: String?,

@@ -10,7 +10,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 @Schema("rms")
-@Table("sample")
+@Table(name = "sample", schema = "rms")
 data class Sample(
     @Id @Column("id") val _id:UUID,
     @Column("sample_type_id") val sampleTypeId: String,

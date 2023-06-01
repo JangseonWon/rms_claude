@@ -1,11 +1,13 @@
 package com.gcgenome.rms.entity
 
+import com.infobip.spring.data.jdbc.annotation.processor.Schema
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
 import java.util.*
 
-@Table("rms.user")
+@Schema("rms")
+@Table(name = "user", schema = "rms")
 data class User(
     @Id @Column("id") val id: String,
     @Column("authority") val authority: String,

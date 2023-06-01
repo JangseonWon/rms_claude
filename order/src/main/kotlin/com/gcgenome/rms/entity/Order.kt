@@ -1,12 +1,13 @@
 package com.gcgenome.rms.entity
 
+import com.infobip.spring.data.jdbc.annotation.processor.Schema
 import org.springframework.data.annotation.Id
 import org.springframework.data.domain.Persistable
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
 import java.util.UUID
-
-@Table("rms.order")
+@Schema("rms")
+@Table(name = "order", schema = "rms")
 data class Order(
     @Id @Column("id") val _id: UUID,
     @Column("user_id") val userId: String,
