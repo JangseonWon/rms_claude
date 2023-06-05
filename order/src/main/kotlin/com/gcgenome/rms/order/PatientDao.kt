@@ -23,11 +23,11 @@ class PatientDao(
     fun savePatient(userId: String, dto: Patient_): Mono<Patient_> = patientRepo.save(map(userId, dto)).map { entity->map(dto, entity) }
 
     private fun map(userId: String, dto: Patient_) = Patient(
-        serial = dto.serial,
+        serial = dto.serial!!,
         organizationId = userId,
         userId = userId,
-        sex = dto.sex,
-        name = dto.name,
+        sex = dto.sex!!,
+        name = dto.name!!,
         birthYear = dto.birthYear,
         birthMonth = dto.birthMonth,
         birthDay = dto.birthDay
@@ -38,8 +38,9 @@ class PatientDao(
         name = entity.name,
         birthYear = entity.birthYear,
         birthMonth = entity.birthMonth,
-        birthDay = entity.birthDay
-    ).apply {
+        birthDay = entity.birthDay,
         samples = dto.samples
+    ).apply {
+
     }
 }

@@ -19,11 +19,15 @@ class Handler(
         return orderdao.saveOrder(userId, dto)
             .flatMap {
                 Flux.fromIterable(dto.items)
-                    .flatMap { item->itemDao.saveItem(it.id!!, item) }
-                    .flatMap { item->patientDao.findPatient(userId, item.patient).switchIfEmpty(patientDao.savePatient(userId, item.patient)) }
-                    .flatMap { patient ->
-                        Flux.fromIterable(patient.samples)
-                            .flatMap { sample -> sampleDao.saveSample(userId, patient, sample) }
+                    .flatMap { item->
+                        patientDao.findPatient(userId, item.patient).switchIfEmpty(patientDao.savePatient(userId, item.patient)).map { item }
+                    }
+                    .flatMap { item->
+                        itemDao.saveItem(userId, it.id!!, item)
+                    }
+                    .flatMap { item ->
+                        Flux.fromIterable(item.patient.samples)
+                            .flatMap { sample -> sampleDao.saveSample(userId, item, item.patient, sample) }
                             .flatMap { sample ->
                                 Flux.fromIterable(sample.extensions)
                                     .flatMap { extension -> extensionDao.saveExtension(sample, extension) }
@@ -32,10 +36,14 @@ class Handler(
                     .then(
                         Mono.just(
                             it.apply {
-                                this.items = dto.items
+                                items = dto.items
                             }
                         )
                     )
             }
+    }
+
+    fun findOrders(userId: String): Flux<Order_> {
+        return orderdao.findOrders(userId)
     }
 }

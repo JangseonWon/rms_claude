@@ -1,5 +1,6 @@
 package com.gcgenome.rms.order
 
+import com.gcgenome.rms.data.Item_
 import com.gcgenome.rms.data.Patient_
 import com.gcgenome.rms.data.Sample_
 import com.gcgenome.rms.entity.Sample
@@ -12,12 +13,12 @@ import java.util.*
 class SampleDao(
     val sampleRepo: SampleRepository
 ) {
-    fun saveSample(userId: String, patientDto: Patient_, sampleDto: Sample_): Mono<Sample_> = sampleRepo.save(map(userId, patientDto, sampleDto)).map { entity->map(sampleDto, entity) }
+    fun saveSample(userId: String, item: Item_, patientDto: Patient_, sampleDto: Sample_): Mono<Sample_> = sampleRepo.save(map(userId, item, patientDto, sampleDto)).map { entity->map(sampleDto, entity) }
 
-    fun map(userId: String, patientDto: Patient_, sampleDto: Sample_) = Sample(
+    fun map(userId: String, item: Item_, patientDto: Patient_, sampleDto: Sample_) = Sample(
         _id = UUID.randomUUID(),
         sampleTypeId = sampleDto.typeId!!,
-        patientSerial = patientDto.serial,
+        patientSerial = patientDto.serial!!,
         organizationId = userId,
         userId = userId,
         serial = sampleDto.serial,
@@ -27,10 +28,12 @@ class SampleDao(
         state = sampleDto.state,
         department = sampleDto.department,
         ward = sampleDto.ward,
-        physician = sampleDto.physician
+        physician = sampleDto.physician,
+        itemId = item.id!!
     )
     private fun map(sampleDto: Sample_, entity: Sample) = Sample_(
         typeId = entity.sampleTypeId,
+        registrationAt = entity.registrationAt.toString(),
         organizationId = entity. organizationId,
         serial = entity.serial,
         age = entity.age,
@@ -38,9 +41,9 @@ class SampleDao(
         note = entity.note,
         department = entity.department,
         ward = entity.ward,
-        physician = entity.physician
+        physician = entity.physician,
+        extensions = sampleDto.extensions
     ).apply {
         id = entity._id
-        extensions = sampleDto.extensions
     }
 }

@@ -24,7 +24,8 @@ data class Sample(
     @Column("state") val state: String?,
     @Column("department") val department: String?,
     @Column("ward") val ward: String?,
-    @Column("physician") val physician: String?
+    @Column("physician") val physician: String?,
+    @Column("item_id") val itemId: UUID
 ):Persistable<UUID>{
     @CreatedDate
     @Column("registration_at") lateinit var registrationAt: LocalDate

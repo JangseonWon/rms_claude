@@ -1,6 +1,6 @@
 package com.gcgenome.rms.order
 
-import com.gcgenome.rms.data.Items_
+import com.gcgenome.rms.data.Item_
 import com.gcgenome.rms.entity.Item
 import com.gcgenome.rms.repo.ItemRepository
 import org.springframework.stereotype.Repository
@@ -11,21 +11,21 @@ import java.util.*
 class ItemDao(
     val itemRepo: ItemRepository,
 ) {
-    fun saveItem(orderId: UUID, dto: Items_): Mono<Items_> = itemRepo.save(map(orderId, dto)).map { entity->map(dto, entity) }
+    fun saveItem(userId:String, orderId: UUID, dto: Item_): Mono<Item_> = itemRepo.save(map(userId, orderId, dto)).map { entity->map(dto, entity) }
 
-    private fun map(orderId: UUID, dto: Items_) = Item(
+    private fun map(userId: String, orderId: UUID, dto: Item_) = Item(
         _id = UUID.randomUUID(),
         serviceId = dto.service,
         orderId = orderId,
-        patientSerial = null,
-        organizationId = null,
-        userId = null,
+        patientSerial = dto.patient?.serial,
+        organizationId = userId,
+        userId = userId,
     )
-    private fun map(dto: Items_,entity: Item): Items_ = Items_(
+    private fun map(dto: Item_, entity: Item): Item_ = Item_(
         service = entity.serviceId!!,
-    ).apply {
+        orderAt = entity.orderAt.toString(),
         patient = dto.patient
+    ).apply {
         id = entity._id
-        orderAt = entity.orderAt
     }
 }
