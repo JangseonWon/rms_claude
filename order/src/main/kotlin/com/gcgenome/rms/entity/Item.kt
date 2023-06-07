@@ -14,8 +14,8 @@ import java.util.UUID
 data class Item(
     @Id @Column("id") val _id: UUID,
     @Column("service_id") val serviceId: String?,
-    @Column("order_id") val orderId: UUID?,
-    @Column("patient_serial") val patientSerial: String?,
+    @Column("order_id") val orderId: UUID,
+    @Column("patient_serial") val patientSerial: String,
     @Column("organization_id") val organizationId: String?,
     @Column("user_id") val userId: String?
 ): Persistable<UUID> {
