@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 )
 data class Patient_(
     @JsonProperty("serial")
-    val serial:String?,
+    val serial:String,
     @JsonProperty("sex")
     val sex:String?,
     @JsonProperty("name")

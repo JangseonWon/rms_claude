@@ -1,5 +1,6 @@
 package com.gcgenome.rms.order
 
+import com.gcgenome.rms.data.CancelOrder_
 import com.gcgenome.rms.data.Patient_
 import com.gcgenome.rms.entity.Patient
 import com.gcgenome.rms.entity.QPatient.patient
@@ -22,6 +23,10 @@ class PatientDao(
 
     fun savePatient(userId: String, dto: Patient_): Mono<Patient_> = patientRepo.save(map(userId, dto)).map { entity->map(dto, entity) }
 
+    fun deletePatient(sampleId: UUID, itemId: UUID, orderId: UUID, mrn: String): Mono<CancelOrder_> =
+        patientRepo.deleteBySerial(mrn)
+            .then(Mono.just(CancelOrder_(sampleId, "의뢰 취소 되었습니다.")
+            .apply {this.itemId=itemId; this.orderId=orderId}))
     private fun map(userId: String, dto: Patient_) = Patient(
         serial = dto.serial!!,
         organizationId = userId,

@@ -1,6 +1,7 @@
 package com.gcgenome.rms.order
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.gcgenome.rms.data.CancelOrder_
 import com.gcgenome.rms.data.Item_
 import com.gcgenome.rms.data.Order_
 import com.gcgenome.rms.entity.Order
@@ -67,6 +68,16 @@ class OrderDao(
     }
     fun saveOrder(userId: String, dto: Order_): Mono<Order_> =
         orderRepo.save(map(userId, dto)).map(this::map)
+
+    fun findOrder(ordersId: UUID): Mono<Order> {
+        return orderRepo.findOne(item.orderId.eq(ordersId))
+    }
+
+    fun deleteOrder(sampleId: UUID, itemId: UUID, orderId: UUID): Mono<CancelOrder_> =
+        orderRepo.findById(orderId).flatMap { order -> orderRepo.delete(order)
+            .then(Mono.just(CancelOrder_(sampleId, "의뢰 취소 되었습니다.")
+            .apply {this.itemId=itemId; this.orderId=orderId}))
+        }
 
     private fun map(userId: String, dto: Order_) = Order(
         _id = UUID.randomUUID(),

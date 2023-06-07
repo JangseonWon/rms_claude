@@ -1,6 +1,7 @@
 package com.gcgenome.rms.order
 
 import com.gcgenome.rms.SecurityContextRepository
+import com.gcgenome.rms.data.CancelOrder_
 import com.gcgenome.rms.data.Order_
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -9,7 +10,7 @@ import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.router
 import reactor.core.publisher.Mono
-
+import java.util.*
 
 @Configuration("com.gcgenome.rms.order.Router")
 class Router (private val handler: Handler) {
@@ -17,6 +18,7 @@ class Router (private val handler: Handler) {
     fun route() = router {
         PUT("/api/orders", ::orders)
         GET("/api/orders", ::findOrders)
+        DELETE("/api/samples/{sample-id}", ::cancels)
     }
     private fun orders(request: ServerRequest): Mono<ServerResponse> {
         return request
@@ -33,5 +35,15 @@ class Router (private val handler: Handler) {
                 ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
                     .body(handler.findOrders(it.principal), Order_::class.java)
             }
+    }
+    private fun cancels(request: ServerRequest): Mono<ServerResponse> {
+        val sampleIdString = request.pathVariable("sample-id")
+        val sampleId = UUID.fromString(sampleIdString)
+        return request
+            .principal()
+            .cast(SecurityContextRepository.UserAuthentication::class.java)
+            .flatMap { handler.cancel(sampleId) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(it), CancelOrder_::class.java) }
     }
 }
