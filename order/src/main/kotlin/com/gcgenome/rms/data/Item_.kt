@@ -10,13 +10,12 @@ import java.util.UUID
     JsonSubTypes.Type(Patient_::class, name = "patient")
 )
 data class Item_(
+    @JsonProperty("id")
+    var id: UUID? = null,
     @JsonProperty("service")
     val service: String,
     @JsonProperty("order_at")
     var orderAt: String?,
     @JsonProperty("patient")
     var patient: Patient_
-){
-    @JsonProperty("id")
-    var id: UUID? = null
-}
+)

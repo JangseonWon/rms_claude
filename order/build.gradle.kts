@@ -18,10 +18,11 @@ dependencies {
     implementation(libs.bundles.r2dbc.postgres)
     implementation(libs.bundles.r2dbc.querydsl)
     kapt(libs.bundles.r2dbc.querydsl)
+    implementation(libs.spring.gateway)
     implementation("org.jooq:jooq:3.18.2")
     implementation("org.jooq:jooq-codegen:3.18.2")
     implementation("org.jooq:jooq-meta:3.18.2")
-    implementation(libs.spring.gateway)
+    jooqGenerator("org.postgresql:postgresql:42.6.0")
 }
 configurations { all { exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging") } }
 dependencyManagement { imports { mavenBom(libs.spring.cloud.bom.get().toString()) } }

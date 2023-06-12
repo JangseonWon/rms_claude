@@ -9,6 +9,8 @@ import java.util.*
     JsonSubTypes.Type(Extension_::class, name = "extensions")
 )
 data class Sample_(
+    @JsonProperty("id")
+    var id: UUID? = null,
     @JsonProperty("type_id")
     val typeId: String?,
     @JsonProperty("registration_at")
@@ -29,11 +31,8 @@ data class Sample_(
     val ward: String?,
     @JsonProperty("physician")
     val physician: String?,
-    @JsonProperty("extensions")
-    var extensions: List<Extension_>? = emptyList()
-){
-    @JsonProperty("id")
-    var id: UUID? = null
     @JsonProperty("state")
-    var state: String? = null
-}
+    var state: String? = null,
+    @JsonProperty("extensions")
+    var extensions: List<Extension_>?
+)

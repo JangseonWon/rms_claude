@@ -1,27 +1,117 @@
 package com.gcgenome.rms.order
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.gcgenome.lims.tables.references.*
 import com.gcgenome.rms.data.CancelOrder_
-import com.gcgenome.rms.data.Item_
 import com.gcgenome.rms.data.Order_
 import com.gcgenome.rms.entity.Order
 import com.gcgenome.rms.entity.QItem.item
-import com.gcgenome.rms.entity.QOrder.order
-import com.gcgenome.rms.entity.QPatient.patient
-import com.gcgenome.rms.entity.QSample.sample
 import com.gcgenome.rms.repo.OrderRepository
-import com.querydsl.core.types.Projections
-import com.querydsl.core.types.dsl.Expressions
+import org.jooq.DSLContext
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.toMono
+import java.time.LocalDateTime
 import java.util.*
+
 
 @Repository("com.gcgenome.rms.order.OrderDao")
 class OrderDao(
-    val orderRepo: OrderRepository
+    val orderRepo: OrderRepository,
+    val dslContext: DSLContext
 ) {
+    fun saveOrder(userId: String, dto: Order_): Mono<Order_> {
+        return Mono.from(dslContext.transactionPublisher{ trx ->
+            Flux.from(
+                Flux.fromIterable(dto.items).flatMap { item ->
+                    trx.dsl()
+                        .insertInto(PATIENT)
+                        .columns(PATIENT.ORGANIZATION_ID, PATIENT.SERIAL, PATIENT.USER_ID, PATIENT.BIRTH_DAY, PATIENT.BIRTH_MONTH, PATIENT.BIRTH_YEAR, PATIENT.NAME, PATIENT.SEX)
+                        .values(userId, item.patient.serial, userId, item.patient.birthDay?.toByte(), item.patient.birthMonth?.toByte(), item.patient.birthYear?.toShort(), item.patient.name, item.patient.sex)
+                        .onDuplicateKeyUpdate()
+                        .set(PATIENT.BIRTH_DAY, item.patient.birthDay?.toByte())
+                        .set(PATIENT.BIRTH_MONTH, item.patient.birthMonth?.toByte())
+                        .set(PATIENT.BIRTH_YEAR, item.patient.birthYear?.toShort())
+                        .returning()
+                }.toMono()
+            ).flatMap {
+                trx.dsl()
+                    .insertInto(ORDER)
+                    .columns(ORDER.ID, ORDER.CREDIT, ORDER.OUTSOURCING_COST, ORDER.PRICE, ORDER.TEST, ORDER.USER_ID)
+                    .values(UUID.randomUUID(), dto.credit, dto.outsourcingCost, dto.price, dto.test, userId)
+                    .returningResult(ORDER.ID)
+            }.flatMap { orderId ->
+                dto.id = orderId.value1()
+                Flux.fromIterable(dto.items).flatMap { item ->
+                    val itemId =trx.dsl()
+                        .insertInto(ITEM)
+                        .columns(ITEM.ID, ITEM.ORDER_AT, ITEM.ORDER_ID, ITEM.ORGANIZATION_ID, ITEM.PATIENT_SERIAL, ITEM.USER_ID, ITEM.SERVICE_ID)
+                        .values(UUID.randomUUID(), LocalDateTime.now(), orderId.value1(), userId, item.patient.serial, userId, item.service)
+                        .returningResult(ITEM.ID)
+                    Flux.fromIterable(item.patient.samples!!).zipWith(itemId).flatMap { itemSample ->
+                        item.id = itemSample.t2.value1()
+                        val sampleId = trx.dsl()
+                            .insertInto(SAMPLE)
+                            .columns(
+                                SAMPLE.ID,
+                                SAMPLE.ORGANIZATION_ID,
+                                SAMPLE.PATIENT_SERIAL,
+                                SAMPLE.USER_ID,
+                                SAMPLE.SAMPLE_TYPE_ID,
+                                SAMPLE.AGE,
+                                SAMPLE.DEPARTMENT,
+                                SAMPLE.NOTE,
+                                SAMPLE.REGISTRATION_AT,
+                                SAMPLE.SAMPLING,
+                                SAMPLE.SERIAL,
+                                SAMPLE.STATE,
+                                SAMPLE.WARD,
+                                SAMPLE.PHYSICIAN,
+                                SAMPLE.ITEM_ID)
+                            .values(
+                                UUID.randomUUID(),
+                                userId,
+                                item.patient.serial,
+                                userId,
+                                itemSample.t1.typeId,
+                                itemSample.t1.age,
+                                itemSample.t1.department,
+                                itemSample.t1.note,
+                                LocalDateTime.now(),
+                                itemSample.t1.sampling!!.atStartOfDay(),
+                                itemSample.t1.serial,
+                                "REQUEST",
+                                itemSample.t1.ward,
+                                itemSample.t1.physician,
+                                itemSample.t2.value1(),
+                            ).returningResult(SAMPLE.ID)
+                        itemSample.t1.extensions?.let {
+                            itemSample.t1.id = itemSample.t2.value1()
+                            Flux.fromIterable(it).zipWith(sampleId).flatMap { sampleExtension ->
+                                trx.dsl()
+                                    .insertInto(SAMPLE_EXTENSION)
+                                    .columns(SAMPLE_EXTENSION.EXTENSION_ID, SAMPLE_EXTENSION.SAMPLE_ID, SAMPLE_EXTENSION.VALUE)
+                                    .values(sampleExtension.t1.id, sampleExtension.t2.value1(), sampleExtension.t1.value)
+                            }
+                        }?: run {
+                            itemSample.t1.id = itemSample.t2.value1()
+                            sampleId.toMono()
+                        }
+                    }
+                }
+            }
+        }).map { dto }
+    }
+
     fun findOrders(userId: String): Flux<Order_> {
+        val query = dslContext.select(ORDER.ID).from(ORDER)
+        return Flux.from(query).map { record ->
+            Order_(
+                id = record.getValue("id", UUID::class.java)
+            )
+        }
+    }
+    /*fun findOrders(userId: String): Flux<Order_> {
         return orderRepo.query {
             it.select(Projections.constructor(
                 Order_::class.java,
@@ -56,18 +146,7 @@ class OrderDao(
                 .orderBy(order._id.asc())
         }.all().map(this::map)
 
-    }
-
-    private fun map(dto: Order_) = Order_(
-        test = dto.test,
-        credit = dto.credit,
-        price = dto.price,
-        outsourcingCost = dto.outsourcingCost
-    ).apply {
-        items = ObjectMapper().readValue(dto.item!!, Array<Item_>::class.java).toList()
-    }
-    fun saveOrder(userId: String, dto: Order_): Mono<Order_> =
-        orderRepo.save(map(userId, dto)).map(this::map)
+    }*/
 
     fun findOrder(ordersId: UUID): Mono<Order> {
         return orderRepo.findOne(item.orderId.eq(ordersId))
@@ -77,24 +156,5 @@ class OrderDao(
         orderRepo.findById(orderId).flatMap { order -> orderRepo.delete(order)
             .then(Mono.just(CancelOrder_(sampleId, "의뢰 취소 되었습니다.")
             .apply {this.itemId=itemId; this.orderId=orderId}))
-        }
-
-    private fun map(userId: String, dto: Order_) = Order(
-        _id = UUID.randomUUID(),
-        userId = userId,
-        test = dto.test,
-        credit = dto.credit,
-        price = dto.price,
-        outsourcingCost = dto.outsourcingCost
-    )
-    private fun map(entity: Order) =
-        Order_(
-            test = entity.test,
-            credit = entity.credit,
-            price = entity.price,
-            outsourcingCost = entity.outsourcingCost
-        ).apply {
-            id = entity._id
-            items = emptyList()
         }
 }
