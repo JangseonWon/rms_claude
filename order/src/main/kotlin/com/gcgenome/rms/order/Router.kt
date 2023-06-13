@@ -25,7 +25,7 @@ class Router (private val handler: Handler) {
             .principal()
             .cast(SecurityContextRepository.UserAuthentication::class.java)
             .zipWith(request.bodyToMono(Order_::class.java))
-            .flatMap { handler.order(it.t1.principal, it.t2) }
+            .flatMap { handler.insertOrder(it.t1.principal, it.t2) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), Order_::class.java) }
     }
 

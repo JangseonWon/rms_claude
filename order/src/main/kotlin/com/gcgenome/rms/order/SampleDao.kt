@@ -1,13 +1,16 @@
 package com.gcgenome.rms.order
 
+import com.gcgenome.lims.tables.references.SAMPLE
 import com.gcgenome.rms.data.CancelOrder_
 import com.gcgenome.rms.data.Item_
 import com.gcgenome.rms.data.Patient_
 import com.gcgenome.rms.data.Sample_
 import com.gcgenome.rms.entity.Sample
 import com.gcgenome.rms.repo.SampleRepository
+import org.jooq.Configuration
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Mono
+import java.time.LocalDateTime
 import java.util.*
 
 @Repository("com.gcgenome.rms.order.SampleDao")
@@ -15,7 +18,41 @@ class SampleDao(
     val sampleRepo: SampleRepository,
     val extensionDao: ExtensionDao
 ) {
-    fun saveSample(userId: String, item: Item_, patientDto: Patient_, sampleDto: Sample_): Mono<Sample_> = sampleRepo.save(map(userId, item, patientDto, sampleDto)).map { entity->map(sampleDto, entity) }
+    fun insertSample(trx: Configuration, patientSerial: String, userId: String, itemId: UUID, sample: Sample_) = trx.dsl()
+        .insertInto(SAMPLE)
+        .columns(
+            SAMPLE.ID,
+            SAMPLE.ORGANIZATION_ID,
+            SAMPLE.PATIENT_SERIAL,
+            SAMPLE.USER_ID,
+            SAMPLE.SAMPLE_TYPE_ID,
+            SAMPLE.AGE,
+            SAMPLE.DEPARTMENT,
+            SAMPLE.NOTE,
+            SAMPLE.REGISTRATION_AT,
+            SAMPLE.SAMPLING,
+            SAMPLE.SERIAL,
+            SAMPLE.STATE,
+            SAMPLE.WARD,
+            SAMPLE.PHYSICIAN,
+            SAMPLE.ITEM_ID)
+        .values(
+            UUID.randomUUID(),
+            userId,
+            patientSerial,
+            userId,
+            sample.typeId,
+            sample.age,
+            sample.department,
+            sample.note,
+            LocalDateTime.now(),
+            sample.sampling!!.atStartOfDay(),
+            sample.serial,
+            "REQUEST",
+            sample.ward,
+            sample.physician,
+            itemId,
+        ).returning()
     fun deleteSample(sampleId: UUID): Mono<CancelOrder_> =
         sampleRepo.findById(sampleId)
             .flatMap { sample ->
@@ -42,36 +79,4 @@ class SampleDao(
     }
 
     fun findSample(sampleId: UUID): Mono<Sample> = sampleRepo.findById(sampleId)
-
-    fun map(userId: String, item: Item_, patientDto: Patient_, sampleDto: Sample_) = Sample(
-        _id = UUID.randomUUID(),
-        sampleTypeId = sampleDto.typeId!!,
-        patientSerial = patientDto.serial!!,
-        organizationId = userId,
-        userId = userId,
-        serial = sampleDto.serial,
-        age = sampleDto.age,
-        sampling = sampleDto.sampling!!,
-        note = sampleDto.note,
-        state = sampleDto.state,
-        department = sampleDto.department,
-        ward = sampleDto.ward,
-        physician = sampleDto.physician,
-        itemId = item.id!!
-    )
-    private fun map(sampleDto: Sample_, entity: Sample) = Sample_(
-        typeId = entity.sampleTypeId,
-        registrationAt = entity.registrationAt.toString(),
-        organizationId = entity. organizationId,
-        serial = entity.serial,
-        age = entity.age,
-        sampling = entity.sampling,
-        note = entity.note,
-        department = entity.department,
-        ward = entity.ward,
-        physician = entity.physician,
-        extensions = sampleDto.extensions
-    ).apply {
-        id = entity._id
-    }
 }
