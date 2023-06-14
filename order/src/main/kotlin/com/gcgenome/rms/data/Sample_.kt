@@ -2,19 +2,26 @@ package com.gcgenome.rms.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
-@JsonSubTypes(
-    JsonSubTypes.Type(Extension_::class, name = "extensions")
-)
+@JsonSubTypes(JsonSubTypes.Type(Extension_::class, name = "extensions"))
 data class Sample_(
     @JsonProperty("id")
-    var id: UUID? = null,
+    var id: UUID?,
     @JsonProperty("type_id")
     val typeId: String?,
     @JsonProperty("registration_at")
-    var registrationAt: String?,
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    val registrationAt: LocalDateTime?,
     @JsonProperty("organization_id")
     val organizationId: String?,
     @JsonProperty("serial")
@@ -22,6 +29,8 @@ data class Sample_(
     @JsonProperty("age")
     val age: Int?,
     @JsonProperty("sampling")
+    @JsonDeserialize(using = LocalDateDeserializer::class)
+    @JsonSerialize(using = LocalDateSerializer::class)
     val sampling: LocalDate?,
     @JsonProperty("note")
     val note: String?,
@@ -32,7 +41,7 @@ data class Sample_(
     @JsonProperty("physician")
     val physician: String?,
     @JsonProperty("state")
-    var state: String? = null,
+    val state: String?,
     @JsonProperty("extensions")
-    var extensions: List<Extension_>?
+    val extensions: List<Extension_>?
 )

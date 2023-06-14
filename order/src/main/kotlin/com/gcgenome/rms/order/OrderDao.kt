@@ -42,8 +42,29 @@ class OrderDao(
                     key("name").value(PATIENT.NAME),
                     key("birth_year").value(PATIENT.BIRTH_YEAR),
                     key("birth_month").value(PATIENT.BIRTH_MONTH),
-                    key("birth_day").value(PATIENT.BIRTH_DAY)
-                ))
+                    key("birth_day").value(PATIENT.BIRTH_DAY),
+                    key("samples").value(
+                        select(
+                            jsonArrayAgg(jsonObject(
+                                key("id").value(SAMPLE.ID),
+                                key("registration_at").value(SAMPLE.REGISTRATION_AT),
+                                key("serial").value(SAMPLE.SERIAL),
+                                key("type_id").value(SAMPLE.SAMPLE_TYPE_ID),
+                                key("age").value(SAMPLE.AGE),
+                                key("sampling").value(SAMPLE.SAMPLING),
+                                key("note").value(SAMPLE.NOTE),
+                                key("extensions").value(
+                                    select(
+                                        jsonArrayAgg(jsonObject(
+                                            key("id").value(SAMPLE_EXTENSION.EXTENSION_ID),
+                                            key("value").value(SAMPLE_EXTENSION.VALUE)
+                                        ))
+                                    ).from(SAMPLE_EXTENSION).where(SAMPLE.ID.eq(SAMPLE_EXTENSION.SAMPLE_ID))
+                                )
+                            ))
+                        ).from(SAMPLE).where(ITEM.ID.eq(SAMPLE.ITEM_ID))
+                    )
+                )),
             )).`as`("items")
         ).from(ORDER)
             .join(ITEM).on(ORDER.ID.eq(ITEM.ORDER_ID))
