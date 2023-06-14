@@ -54,34 +54,4 @@ class Handler(
     fun findOrders(userId: String): Flux<Order_> {
         return orderDao.findOrders(userId)
     }
-
-    fun cancel(sampleId: UUID): Mono<CancelOrder_> {
-        return sampleDao.countSample(sampleId).flatMap {
-            if (it > 1) {
-                sampleDao.deleteSample(sampleId)
-            }
-            else {
-                sampleDao.findSample(sampleId)
-                    .flatMap { sample -> itemDao.findItem(sample.itemId) }
-                    .flatMap { item -> itemDao.countItem(item.id)
-                        .flatMap { orderCount ->
-                            if(orderCount > 1 ) {
-                                sampleDao.deleteSample(sampleId)
-                                    .then(itemDao.deleteItem(sampleId, item.id))
-                            } else {
-                                itemDao.countMrn(item.patientSerial).flatMap { mrnCount ->
-                                    if (mrnCount > 1) {
-                                        sampleDao.deleteSample(sampleId)
-                                            .then(itemDao.deleteItem(sampleId, item.id))
-                                            .then(orderDao.deleteOrder(sampleId,item.id,item.orderId))
-                                    } else{ sampleDao.deleteSample(sampleId)
-                                        .then(itemDao.deleteItem(sampleId, item.id))
-                                        .then(orderDao.deleteOrder(sampleId,item.id,item.orderId))
-                                        .then(patientDao.deletePatient(sampleId, item.id, item.orderId, item.patientSerial))
-                                    }}
-                            }
-                        }}
-            }
-        }
-    }
 }

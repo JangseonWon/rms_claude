@@ -18,7 +18,6 @@ class Router (private val handler: Handler) {
     fun route() = router {
         PUT("/api/orders", ::orders)
         GET("/api/orders", ::findOrders)
-        DELETE("/api/samples/{sample-id}", ::cancels)
     }
     private fun orders(request: ServerRequest): Mono<ServerResponse> {
         return request
@@ -35,15 +34,5 @@ class Router (private val handler: Handler) {
                 ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
                     .body(handler.findOrders(it.principal), Order_::class.java)
             }
-    }
-    private fun cancels(request: ServerRequest): Mono<ServerResponse> {
-        val sampleIdString = request.pathVariable("sample-id")
-        val sampleId = UUID.fromString(sampleIdString)
-        return request
-            .principal()
-            .cast(SecurityContextRepository.UserAuthentication::class.java)
-            .flatMap { handler.cancel(sampleId) }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                .body(Mono.just(it), CancelOrder_::class.java) }
     }
 }

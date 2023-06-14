@@ -2,21 +2,16 @@ package com.gcgenome.rms.order
 
 import com.gcgenome.lims.tables.references.*
 import com.gcgenome.rms.data.*
-import com.gcgenome.rms.entity.Order
-import com.gcgenome.rms.entity.QItem.item
-import com.gcgenome.rms.repo.OrderRepository
 import org.jooq.Configuration
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.*
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
 import java.util.*
 
 
 @Repository("com.gcgenome.rms.order.OrderDao")
 class OrderDao(
-    val orderRepo: OrderRepository,
     val dslContext: DSLContext
 ) {
     fun insertOrder(trx: Configuration, userId: String, order: Order_) = trx.dsl()
@@ -74,12 +69,4 @@ class OrderDao(
             ).groupBy(ORDER.ID)
         return Flux.from(query).map(Order_::toModel)
     }
-    fun findOrder(ordersId: UUID): Mono<Order> {
-        return orderRepo.findOne(item.orderId.eq(ordersId))
-    }
-    fun deleteOrder(sampleId: UUID, itemId: UUID, orderId: UUID): Mono<CancelOrder_> =
-        orderRepo.findById(orderId).flatMap { order -> orderRepo.delete(order)
-            .then(Mono.just(CancelOrder_(sampleId, "의뢰 취소 되었습니다.")
-            .apply {this.itemId=itemId; this.orderId=orderId}))
-        }
 }
