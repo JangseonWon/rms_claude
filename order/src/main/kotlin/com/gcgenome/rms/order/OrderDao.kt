@@ -72,16 +72,7 @@ class OrderDao(
                 .and(ITEM.ORGANIZATION_ID.eq(PATIENT.ORGANIZATION_ID)
                     .and(ITEM.USER_ID.eq(PATIENT.USER_ID)))
             ).groupBy(ORDER.ID)
-        return Flux.from(query).map { record ->
-            Order_(
-                id = record.getValue("id", UUID::class.java),
-                test = record.getValue("test", Boolean::class.java),
-                credit = record.getValue("credit", Boolean::class.java),
-                price = record.getValue("price", Int::class.java),
-                outsourcingCost = record.getValue("outsourcing_cost", Int::class.java),
-                items = record.getValue("items", Array<Item_>::class.java).toList()
-            )
-        }
+        return Flux.from(query).map(Order_::toModel)
     }
     fun findOrder(ordersId: UUID): Mono<Order> {
         return orderRepo.findOne(item.orderId.eq(ordersId))
