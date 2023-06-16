@@ -15,5 +15,6 @@ interface ItemDao {
         .values(UUID.randomUUID(), LocalDateTime.now(), orderId, userId, item.patient.serial, userId, item.service)
         .returning()
 
-
+    fun DSLContext.selectItemById(itemId: UUID) =
+        selectFrom(ITEM).where(ITEM.ID.eq(itemId))
 }

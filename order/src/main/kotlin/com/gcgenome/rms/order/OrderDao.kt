@@ -57,11 +57,11 @@ interface OrderDao{
                 )),
             )).`as`("items")
         ).from(ORDER)
-            .join(ORDER).on(ORDER.ID.eq(ITEM.ORDER_ID))
+            .join(ITEM).on(ORDER.ID.eq(ITEM.ORDER_ID))
             .join(PATIENT).on(ITEM.PATIENT_SERIAL.eq(PATIENT.SERIAL)
                 .and(ITEM.ORGANIZATION_ID.eq(PATIENT.ORGANIZATION_ID)
                     .and(ITEM.USER_ID.eq(PATIENT.USER_ID)))
-            ).where(ORDER.ID.eq(orderId))
+            ).where(ORDER.ID.eq(orderId)).groupBy(ORDER.ID)
     fun DSLContext.selectOrders(userId: String): Flux<Order_> {
         val query = select(
             ORDER.ID,
