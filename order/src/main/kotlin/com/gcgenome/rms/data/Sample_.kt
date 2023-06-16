@@ -8,6 +8,9 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
+import com.gcgenome.lims.tables.records.SampleRecord
+import com.gcgenome.lims.tables.references.SAMPLE
+import org.jooq.Record1
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -44,4 +47,23 @@ data class Sample_(
     val state: String?,
     @JsonProperty("extensions")
     val extensions: List<Extension_>?
-)
+){
+    companion object {
+        fun toModel(record: Record1<SampleRecord>) =
+            Sample_(
+                id = record.get(SAMPLE.ID),
+                typeId = record.get(SAMPLE.SAMPLE_TYPE_ID),
+                registrationAt = record.get(SAMPLE.REGISTRATION_AT),
+                organizationId = record.get(SAMPLE.ORGANIZATION_ID),
+                serial = record.get(SAMPLE.SERIAL),
+                age = record.get(SAMPLE.AGE),
+                sampling = record.get(SAMPLE.SAMPLING)?.toLocalDate(),
+                note = record.get(SAMPLE.NOTE),
+                department = record.get(SAMPLE.DEPARTMENT),
+                ward = record.get(SAMPLE.WARD),
+                physician = record.get(SAMPLE.PHYSICIAN),
+                state = record.get(SAMPLE.STATE),
+                extensions = record.getValue("extensions", Array<Extension_>::class.java).toList()
+            )
+    }
+}

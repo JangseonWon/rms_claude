@@ -2,17 +2,15 @@ package com.gcgenome.rms.order
 
 import com.gcgenome.lims.tables.references.SAMPLE
 import com.gcgenome.rms.data.Sample_
-import org.jooq.Configuration
-import org.springframework.stereotype.Repository
+import org.jooq.DSLContext
 import java.time.LocalDateTime
 import java.util.*
 
-@Repository("com.gcgenome.rms.order.SampleDao")
-class SampleDao(
-    val extensionDao: ExtensionDao
-) {
-    fun insertSample(trx: Configuration, patientSerial: String, userId: String, itemId: UUID, sample: Sample_) = trx.dsl()
-        .insertInto(SAMPLE)
+interface SampleDao {
+    fun DSLContext.selectSampleById(sampleId: UUID) =
+        select(SAMPLE).from(SAMPLE).where(SAMPLE.ID.eq(sampleId))
+    fun DSLContext.insertSample(patientSerial: String, userId: String, itemId: UUID, sample: Sample_) =
+        insertInto(SAMPLE)
         .columns(
             SAMPLE.ID,
             SAMPLE.ORGANIZATION_ID,
@@ -44,6 +42,6 @@ class SampleDao(
             "REQUEST",
             sample.ward,
             sample.physician,
-            itemId,
+            itemId
         ).returning()
 }

@@ -14,7 +14,7 @@ data class Item_(
     @JsonProperty("id")
     var id: UUID?,
     @JsonProperty("service")
-    val service: String,
+    val service: String?,
     @JsonProperty("order_at")
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
