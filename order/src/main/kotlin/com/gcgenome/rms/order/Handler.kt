@@ -21,29 +21,25 @@ class Handler(
         return Mono.from(dslContext.transactionPublisher{ trx ->
             trx.dsl().run {
                 Flux.from(
-                    Flux.fromIterable(dto.items).flatMap { insertPatient(userId, it.patient) }
-                        .toMono().then(Mono.from(insertOrder(userId, dto)))
-                ).flatMap { orderId ->
-                    dto.id = orderId.getValue(ORDER.ID)!!
+                    Flux.fromIterable(dto.items)
+                        .flatMap { Mono.from(insertPatient(userId, it.patient)) }
+                        .then(Mono.from(insertOrder(userId, dto)))
+                ).flatMap { order ->
                     Flux.fromIterable(dto.items).flatMap {
-                        val item = insertItem(userId, orderId.value1()!!, it)
+                        val item = insertItem(userId, order.value1()!!, it)
                         Flux.fromIterable(it.patient.samples!!).zipWith(item).flatMap { itemSample ->
-                            it.id = itemSample.t2.value1()
-                            val sampleId = insertSample(it.patient.serial, userId, itemSample.t2.getValue(ITEM.ID)!!, itemSample.t1 )
-                            itemSample.t1.extensions?.let {
-                                itemSample.t1.id = itemSample.t2.value1()
-                                Flux.fromIterable(it).zipWith(sampleId).flatMap { sampleExtension ->
-                                    insertSampleExtension(sampleExtension.t1, sampleExtension.t2.getValue(SAMPLE.ID)!!)
+                            Mono.from(insertSample(it.patient.serial, userId, itemSample.t2.getValue(ITEM.ID)!!, itemSample.t1))
+                                .flatMap {sample ->
+                                    Flux.fromIterable(itemSample.t1.extensions ?: listOf())
+                                        .flatMap { extension ->
+                                            insertSampleExtension(extension, sample.id!!)
+                                        }.toMono()
                                 }
-                            }?: run {
-                                itemSample.t1.id = itemSample.t2.value1()
-                                sampleId.toMono()
                             }
-                        }
-                    }
+                    }.then(Mono.from(selectOrderById(order.get(ORDER.ID)!!)))
                 }
             }
-        }).map { dto }
+        }).map(Order_::toModel)
     }
 
     fun findOrders(userId: String): Flux<Order_> {
