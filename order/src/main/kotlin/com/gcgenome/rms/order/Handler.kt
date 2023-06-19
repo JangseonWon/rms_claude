@@ -54,11 +54,9 @@ class Handler(
                             .then(
                                 Mono.from(insertSample(dto.patient.serial, userId, it.value1().getValue(SAMPLE.ITEM_ID)!!, dto.patient.sample!!))
                                     .flatMap { record ->
-                                        dto.patient.sample.extensions?.let { it1 ->
-                                            Flux.fromIterable(it1).flatMap { extension ->
-                                                Mono.from(insertSampleExtension(extension, record.id!!))
-                                            }.toMono()
-                                        }?: run{ Mono.empty() }
+                                        Flux.fromIterable(dto.patient.sample.extensions ?: listOf()).flatMap { extension ->
+                                            Mono.from(insertSampleExtension(extension, record.id!!))
+                                        }.toMono()
                                     }
                             ).then (
                                 Mono.from(selectItemById(it.value1().getValue(SAMPLE.ITEM_ID)!!))
