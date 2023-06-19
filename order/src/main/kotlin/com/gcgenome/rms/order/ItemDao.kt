@@ -17,4 +17,9 @@ interface ItemDao {
 
     fun DSLContext.selectItemById(itemId: UUID) =
         selectFrom(ITEM).where(ITEM.ID.eq(itemId))
+
+    fun DSLContext.updateItemById(item: Item_) =
+        update(ITEM)
+            .set(ITEM.ORDER_AT, LocalDateTime.now())
+            .set(ITEM.SERVICE_ID, item.service)
 }

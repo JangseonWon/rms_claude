@@ -18,7 +18,7 @@ data class Order_(
     @JsonProperty("outsourcing_cost")
     val outsourcingCost:Int?,
     @JsonProperty("items")
-    val items: List<Item_>
+    val items: List<Item_>?
 ){
     companion object {
         fun toModel(record: Record6<UUID?, Boolean?, Boolean?, Int?, Int?, JSON?>) =

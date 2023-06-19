@@ -21,7 +21,7 @@ class Handler(
         return Mono.from(dslContext.transactionPublisher{ trx ->
             trx.dsl().run {
                 Flux.from(
-                    Flux.fromIterable(dto.items)
+                    Flux.fromIterable(dto.items!!)
                         .flatMap { Mono.from(insertPatient(userId, it.patient)) }
                         .then(Mono.from(insertOrder(userId, dto)))
                 ).flatMap { order ->
@@ -50,7 +50,7 @@ class Handler(
             trx.dsl().run {
                 Mono.from(selectSampleById(sampleId))
                     .flatMap {
-                        Mono.from(updatePatient(userId, dto.patient))
+                        Mono.from(updatePatientById(userId, dto.patient))
                             .then(
                                 Mono.from(insertSample(dto.patient.serial, userId, it.value1().getValue(SAMPLE.ITEM_ID)!!, dto.patient.sample!!))
                                     .flatMap { record ->
@@ -67,6 +67,33 @@ class Handler(
                                     }
                             )
                     }
+            }
+        }).map(Order_::toModel)
+    }
+
+    fun updateOrder(userId: String, dto: Order_): Mono<Order_> {
+        return Mono.from(dslContext.transactionPublisher { trx ->
+            trx.dsl().run{
+                Mono.from(updateOrderById(dto))
+                    .then(Flux.fromIterable(dto.items ?: listOf())
+                        .flatMap{item ->
+                            Mono.from(updateItemById(item))
+                                .then(Mono.from(updatePatientById(userId, item.patient)))
+                                .then(
+                                    Flux.fromIterable(item.patient.samples ?: listOf()).flatMap { sample->
+                                        Mono.from(updateSampleById(sample))
+                                            .then(
+                                                Flux.fromIterable(sample.extensions ?: listOf()).flatMap {extension ->
+                                                    Mono.from(deleteSampleExtensionBySampleId(sample.id!!))
+                                                        .then(
+                                                            Mono.from(insertSampleExtension(extension, sample.id!!))
+                                                        )
+                                                }.toMono()
+                                            )
+                                    }.toMono()
+                                )
+                        }.toMono()
+                    ).then(Mono.from(selectOrderById(dto.id!!)))
             }
         }).map(Order_::toModel)
     }

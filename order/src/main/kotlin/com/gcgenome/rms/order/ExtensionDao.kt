@@ -11,4 +11,7 @@ interface ExtensionDao{
         .columns(SAMPLE_EXTENSION.EXTENSION_ID, SAMPLE_EXTENSION.SAMPLE_ID, SAMPLE_EXTENSION.VALUE)
         .values(sampleExtension.id, sampleId, sampleExtension.value)
         .returning()
+
+    fun DSLContext.deleteSampleExtensionBySampleId(sampleId:UUID) =
+        deleteFrom(SAMPLE_EXTENSION).where(SAMPLE_EXTENSION.SAMPLE_ID.eq(sampleId))
 }

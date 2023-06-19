@@ -9,6 +9,14 @@ import java.util.*
 
 
 interface OrderDao{
+
+    fun DSLContext.updateOrderById(order: Order_) =
+        update(ORDER)
+            .set(ORDER.CREDIT, order.credit)
+            .set(ORDER.OUTSOURCING_COST, order.outsourcingCost)
+            .set(ORDER.PRICE, order.price)
+            .set(ORDER.TEST, order.test)
+            .where(ORDER.ID.eq(order.id))
     fun DSLContext.insertOrder(userId: String, order: Order_) =
         insertInto(ORDER)
         .columns(ORDER.ID, ORDER.CREDIT, ORDER.OUTSOURCING_COST, ORDER.PRICE, ORDER.TEST, ORDER.USER_ID)

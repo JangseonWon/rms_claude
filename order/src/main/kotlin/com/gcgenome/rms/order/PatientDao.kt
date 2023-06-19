@@ -15,8 +15,10 @@ interface PatientDao{
         .set(PATIENT.BIRTH_YEAR, patient.birthYear?.toShort())
         .returning()
 
-    fun DSLContext.updatePatient(userId:String, patient: Patient_) =
+    fun DSLContext.updatePatientById(userId:String, patient: Patient_) =
         update(PATIENT)
+            .set(PATIENT.SEX, patient.sex)
+            .set(PATIENT.NAME, patient.name)
             .set(PATIENT.BIRTH_DAY, patient.birthDay?.toByte())
             .set(PATIENT.BIRTH_MONTH, patient.birthMonth?.toByte())
             .set(PATIENT.BIRTH_YEAR, patient.birthYear?.toShort())

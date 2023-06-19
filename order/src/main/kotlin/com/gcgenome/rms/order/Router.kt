@@ -20,7 +20,7 @@ class Router (private val handler: Handler) {
     fun route() = router {
         PUT("/api/orders", ::orders)
         GET("/api/orders", ::findOrders)
-        //PATCH("/api/orders", ::updateOrders)
+        PATCH("/api/orders", ::updateOrders)
         PATCH("/api/orders/samples/{sampleId}", :: addSample)
     }
     private fun orders(request: ServerRequest): Mono<ServerResponse> {
@@ -49,6 +49,14 @@ class Router (private val handler: Handler) {
             .cast(SecurityContextRepository.UserAuthentication::class.java)
             .zipWith(request.bodyToMono(Item_::class.java))
             .flatMap { handler.addSample(it.t1.principal, sampleId, it.t2) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), Order_::class.java) }
+    }
+    private fun updateOrders(request: ServerRequest): Mono<ServerResponse> {
+        return request
+            .principal()
+            .cast(SecurityContextRepository.UserAuthentication::class.java)
+            .zipWith(request.bodyToMono(Order_::class.java))
+            .flatMap { handler.updateOrder(it.t1.principal, it.t2) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), Order_::class.java) }
     }
 }
