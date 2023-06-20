@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
-import org.springframework.web.reactive.function.server.bodyToMono
 import org.springframework.web.reactive.function.server.router
 import reactor.core.publisher.Mono
 import java.util.*
@@ -21,6 +20,7 @@ class Router (private val handler: Handler) {
         PUT("/api/orders", ::orders)
         GET("/api/orders", ::findOrders)
         PATCH("/api/orders", ::updateOrders)
+        DELETE("/api/samples/{sample-id}", ::cancels)
         PATCH("/api/orders/samples/{sampleId}", :: addSample)
     }
     private fun orders(request: ServerRequest): Mono<ServerResponse> {
@@ -58,5 +58,14 @@ class Router (private val handler: Handler) {
             .zipWith(request.bodyToMono(Order_::class.java))
             .flatMap { handler.updateOrder(it.t1.principal, it.t2) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), Order_::class.java) }
+    }
+    private fun cancels(request: ServerRequest): Mono<ServerResponse> {
+        val sampleIdString = request.pathVariable("sample-id")
+        val sampleId = UUID.fromString(sampleIdString)
+        return request.principal()
+            .cast(SecurityContextRepository.UserAuthentication::class.java)
+            .flatMap { handler.cancelOrder(sampleId) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(it), CancelOrder_::class.java) }
     }
 }

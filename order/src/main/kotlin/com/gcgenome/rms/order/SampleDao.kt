@@ -3,6 +3,9 @@ package com.gcgenome.rms.order
 import com.gcgenome.lims.tables.references.SAMPLE
 import com.gcgenome.rms.data.Sample_
 import org.jooq.DSLContext
+import org.jooq.impl.DSL.count
+import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.toMono
 import java.time.LocalDateTime
 import java.util.*
 
@@ -55,4 +58,25 @@ interface SampleDao {
             sample.physician,
             itemId
         ).returning()
+
+    fun DSLContext.deleteSample(sampleId: UUID) =
+        deleteFrom(SAMPLE).where(SAMPLE.ID.eq(sampleId)).toMono()
+
+    fun DSLContext.findSampleValue(sampleId: UUID): Mono<Pair<String, UUID>> {
+        val query = select(SAMPLE.STATE, SAMPLE.ITEM_ID).from(SAMPLE).where(SAMPLE.ID.eq(sampleId))
+
+        return Mono.from(query).map { record ->
+            val state = record.getValue(SAMPLE.STATE, String::class.java)
+            val itemId = record.getValue(SAMPLE.ITEM_ID, UUID::class.java)
+            Pair(state, itemId)
+        }
+    }
+
+    fun DSLContext.countSampleInItem(itemId: UUID): Mono<Int> =
+        Mono.from( select(count(SAMPLE.ITEM_ID).`as`("count")).from(SAMPLE).where(SAMPLE.ITEM_ID.eq(itemId)) )
+            .map { r-> r.getValue("count", Int::class.java)}
+    fun DSLContext.countSample(itemId: UUID): Mono<Int> =
+        Mono.from( select(count(SAMPLE.ITEM_ID).`as`("count")).from(SAMPLE).where(SAMPLE.ITEM_ID.eq(itemId)) )
+            .map { r-> r.getValue("count", Int::class.java)}
+
 }

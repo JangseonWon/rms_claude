@@ -1,10 +1,11 @@
 package com.gcgenome.rms.order
 
 import com.gcgenome.lims.tables.references.*
-import com.gcgenome.rms.data.*
+import com.gcgenome.rms.data.Order_
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.*
 import reactor.core.publisher.Flux
+import reactor.kotlin.core.publisher.toMono
 import java.util.*
 
 
@@ -55,7 +56,7 @@ interface OrderDao{
                                     select(
                                         jsonArrayAgg(jsonObject(
                                             key("id").value(SAMPLE_EXTENSION.EXTENSION_ID),
-                                            key("value").value(SAMPLE_EXTENSION.VALUE)
+                                            key("value").value(SAMPLE_EXTENSION.VALUE.name)
                                         ))
                                     ).from(SAMPLE_EXTENSION).where(SAMPLE.ID.eq(SAMPLE_EXTENSION.SAMPLE_ID))
                                 )
@@ -131,5 +132,6 @@ interface OrderDao{
 
         return Flux.from(query).map(Order_::toModel)
     }
-
+    fun DSLContext.deleteOrder(orderId: UUID) =
+        deleteFrom(ORDER).where(ORDER.ID.eq(orderId)).toMono()
 }

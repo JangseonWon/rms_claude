@@ -3,6 +3,7 @@ package com.gcgenome.rms.order
 import com.gcgenome.lims.tables.references.PATIENT
 import com.gcgenome.rms.data.Patient_
 import org.jooq.DSLContext
+import reactor.kotlin.core.publisher.toMono
 
 interface PatientDao{
     fun DSLContext.insertPatient(userId: String, patient: Patient_) =
@@ -23,4 +24,7 @@ interface PatientDao{
             .set(PATIENT.BIRTH_MONTH, patient.birthMonth?.toByte())
             .set(PATIENT.BIRTH_YEAR, patient.birthYear?.toShort())
             .where(PATIENT.ORGANIZATION_ID.eq(userId).and(PATIENT.USER_ID.eq(userId).and(PATIENT.SERIAL.eq(patient.serial))))
+
+    fun DSLContext.deletePatient(mrn: String) =
+        deleteFrom(PATIENT).where(PATIENT.SERIAL.eq(mrn)).toMono()
 }
