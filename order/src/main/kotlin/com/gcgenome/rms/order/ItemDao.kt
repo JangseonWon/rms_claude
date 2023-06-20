@@ -11,10 +11,12 @@ import java.util.*
 
 interface ItemDao {
     fun DSLContext.insertItem(userId: String, orderId: UUID, item:Item_) =
-        insertInto(ITEM)
-        .columns(ITEM.ID, ITEM.ORDER_AT, ITEM.ORDER_ID, ITEM.ORGANIZATION_ID, ITEM.PATIENT_SERIAL, ITEM.USER_ID, ITEM.SERVICE_ID)
-        .values(UUID.randomUUID(), LocalDateTime.now(), orderId, userId, item.patient.serial, userId, item.service)
-        .returning()
+        Mono.from(
+            insertInto(ITEM)
+            .columns(ITEM.ID, ITEM.ORDER_AT, ITEM.ORDER_ID, ITEM.ORGANIZATION_ID, ITEM.PATIENT_SERIAL, ITEM.USER_ID, ITEM.SERVICE_ID)
+            .values(UUID.randomUUID(), LocalDateTime.now(), orderId, userId, item.patient.serial, userId, item.service)
+            .returning()
+        )
 
     fun DSLContext.selectItemById(itemId: UUID) =
         selectFrom(ITEM).where(ITEM.ID.eq(itemId))
@@ -29,9 +31,11 @@ interface ItemDao {
     }
 
     fun DSLContext.updateItemById(item: Item_) =
-        update(ITEM)
-            .set(ITEM.ORDER_AT, LocalDateTime.now())
-            .set(ITEM.SERVICE_ID, item.service)
+        Mono.from(
+            update(ITEM)
+                .set(ITEM.ORDER_AT, LocalDateTime.now())
+                .set(ITEM.SERVICE_ID, item.service)
+        )
     fun DSLContext.countItemInOrder(orderId: UUID): Mono<Int> =
         Mono.from( select(DSL.count(ITEM.ORDER_ID).`as`("count")).from(ITEM).where(ITEM.ORDER_ID.eq(orderId)) )
             .map { r-> r.getValue("count", Int::class.java)}

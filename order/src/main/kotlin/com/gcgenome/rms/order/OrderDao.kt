@@ -5,6 +5,7 @@ import com.gcgenome.rms.data.Order_
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.*
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import java.util.*
 
@@ -12,17 +13,22 @@ import java.util.*
 interface OrderDao{
 
     fun DSLContext.updateOrderById(order: Order_) =
-        update(ORDER)
-            .set(ORDER.CREDIT, order.credit)
-            .set(ORDER.OUTSOURCING_COST, order.outsourcingCost)
-            .set(ORDER.PRICE, order.price)
-            .set(ORDER.TEST, order.test)
-            .where(ORDER.ID.eq(order.id))
+        Mono.from(
+            update(ORDER)
+                .set(ORDER.CREDIT, order.credit)
+                .set(ORDER.OUTSOURCING_COST, order.outsourcingCost)
+                .set(ORDER.PRICE, order.price)
+                .set(ORDER.TEST, order.test)
+                .where(ORDER.ID.eq(order.id))
+                .returning()
+        )
     fun DSLContext.insertOrder(userId: String, order: Order_) =
-        insertInto(ORDER)
-        .columns(ORDER.ID, ORDER.CREDIT, ORDER.OUTSOURCING_COST, ORDER.PRICE, ORDER.TEST, ORDER.USER_ID)
-        .values(UUID.randomUUID(), order.credit, order.outsourcingCost, order.price, order.test, userId)
-        .returning()
+        Mono.from(
+            insertInto(ORDER)
+            .columns(ORDER.ID, ORDER.CREDIT, ORDER.OUTSOURCING_COST, ORDER.PRICE, ORDER.TEST, ORDER.USER_ID)
+            .values(UUID.randomUUID(), order.credit, order.outsourcingCost, order.price, order.test, userId)
+            .returning()
+        )
 
     fun DSLContext.selectOrderById(orderId: UUID) =
         select(

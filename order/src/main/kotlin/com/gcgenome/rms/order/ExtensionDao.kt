@@ -10,13 +10,15 @@ import java.util.*
 
 interface ExtensionDao{
     fun DSLContext.insertSampleExtension(sampleExtension: Extension_, sampleId: UUID) =
-        insertInto(SAMPLE_EXTENSION)
-        .columns(SAMPLE_EXTENSION.EXTENSION_ID, SAMPLE_EXTENSION.SAMPLE_ID, SAMPLE_EXTENSION.VALUE)
-        .values(sampleExtension.id, sampleId, sampleExtension.value)
-        .returning()
+        Mono.from(
+            insertInto(SAMPLE_EXTENSION)
+            .columns(SAMPLE_EXTENSION.EXTENSION_ID, SAMPLE_EXTENSION.SAMPLE_ID, SAMPLE_EXTENSION.VALUE)
+            .values(sampleExtension.id, sampleId, sampleExtension.value)
+            .returning()
+        )
 
     fun DSLContext.deleteSampleExtensionBySampleId(sampleId:UUID) =
-        deleteFrom(SAMPLE_EXTENSION).where(SAMPLE_EXTENSION.SAMPLE_ID.eq(sampleId))
+        deleteFrom(SAMPLE_EXTENSION).where(SAMPLE_EXTENSION.SAMPLE_ID.eq(sampleId)).toMono()
 
     fun DSLContext.countExtension(sampleId: UUID): Mono<Int> =
         Mono.from(

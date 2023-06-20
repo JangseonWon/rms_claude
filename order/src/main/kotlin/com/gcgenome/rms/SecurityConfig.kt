@@ -43,6 +43,7 @@ class SecurityConfig (
                 Mono.fromRunnable { swe.response.statusCode = HttpStatus.FORBIDDEN }
             }.and().securityContextRepository(securityContextRepository)
             .authorizeExchange()
+            .pathMatchers("/swagger-resources/**", "/swagger-ui.html", "/v2/api-docs", "/webjars/**", "/v3/api-docs/**").permitAll()
             .pathMatchers(HttpMethod.OPTIONS).permitAll()
             .anyExchange().authenticated()
             .and().build()

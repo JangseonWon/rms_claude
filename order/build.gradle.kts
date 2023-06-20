@@ -17,6 +17,7 @@ dependencies {
     implementation(libs.bundles.kotlin.webflux)
     implementation(libs.bundles.r2dbc.postgres)
     implementation(libs.bundles.r2dbc.querydsl)
+    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.4")
     kapt(libs.bundles.r2dbc.querydsl)
     implementation(libs.spring.gateway)
     implementation("org.jooq:jooq:3.18.2")
