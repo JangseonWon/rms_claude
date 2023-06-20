@@ -1,18 +1,22 @@
 package com.gcgenome.rms.order
 
+import com.gcgenome.lims.tables.records.SampleRecord
 import com.gcgenome.lims.tables.references.SAMPLE
 import com.gcgenome.rms.data.Sample_
 import org.jooq.DSLContext
+import org.jooq.Record1
 import org.jooq.impl.DSL.count
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.publisher.toMono
 import java.time.LocalDateTime
 import java.util.*
 
 interface SampleDao {
-    fun DSLContext.selectSampleById(sampleId: UUID) =
-        select(SAMPLE).from(SAMPLE).where(SAMPLE.ID.eq(sampleId))
-    fun DSLContext.updateSampleById(sample: Sample_) =
+    fun DSLContext.selectSampleById(sampleId: UUID): Flux<SampleRecord> =
+        Flux.from(selectFrom(SAMPLE).where(SAMPLE.ID.eq(sampleId)))
+    fun DSLContext.updateSampleById(sample: Sample_): Mono<SampleRecord> =
         Mono.from(
             update(SAMPLE)
                 .set(SAMPLE.SERIAL, sample.serial)
@@ -26,7 +30,7 @@ interface SampleDao {
                 .where(SAMPLE.ID.eq(sample.id))
                 .returning()
         )
-    fun DSLContext.insertSample(patientSerial: String, userId: String, itemId: UUID, sample: Sample_) =
+    fun DSLContext.insertSample(patientSerial: String, userId: String, itemId: UUID, sample: Sample_): Mono<SampleRecord> =
         Mono.from(
             insertInto(SAMPLE)
             .columns(
@@ -64,8 +68,10 @@ interface SampleDao {
             ).returning()
         )
 
-    fun DSLContext.deleteSample(sampleId: UUID) =
-        deleteFrom(SAMPLE).where(SAMPLE.ID.eq(sampleId)).toMono()
+    fun DSLContext.deleteSample(sampleId: UUID): Mono<SampleRecord> =
+        deleteFrom(SAMPLE).where(SAMPLE.ID.eq(sampleId))
+            .returning()
+            .toMono()
 
     fun DSLContext.findSampleValue(sampleId: UUID): Mono<Pair<String, UUID>> {
         val query = select(SAMPLE.STATE, SAMPLE.ITEM_ID).from(SAMPLE).where(SAMPLE.ID.eq(sampleId))

@@ -37,33 +37,28 @@ class Handler(
                                         }.toMono()
                                 }
                             }
-                    }.then(Mono.from(selectOrderById(order.get(ORDER.ID)!!)))
+                    }.then(selectOrderById(order.get(ORDER.ID)!!))
                 }
             }
         }).map(Order_::toModel)
     }
 
     fun findOrders(userId: String): Flux<Order_> {
-        return dslContext.dsl().selectOrders(userId)
+        return dslContext.dsl().selectOrders(userId).map(Order_::toModel)
     }
     fun addSample(userId: String, sampleId: UUID, dto: Item_): Mono<Order_> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
-                Mono.from(selectSampleById(sampleId))
-                .flatMap {
+                selectSampleById(sampleId).flatMap {sampleRecord ->
                     updatePatientById(userId, dto.patient)
                         .then(
-                            insertSample(dto.patient.serial, userId, it.getValue(SAMPLE.ITEM_ID)!!, dto.patient.sample!!)
-                                .flatMap { record ->
-                                    Flux.fromIterable(dto.patient.sample.extensions ?: listOf()).flatMap { extension ->
-                                        insertSampleExtension(extension, record.id!!)
-                                    }.toMono()
-                                }
+                            insertSample(dto.patient.serial, userId, sampleRecord.getValue(SAMPLE.ITEM_ID)!!, dto.patient.sample!!).flatMap { insertSampleRecord ->
+                                Flux.fromIterable(dto.patient.sample.extensions ?: listOf())
+                                    .flatMap { insertSampleExtension(it, insertSampleRecord.id!!) }.toMono()
+                            }
                         ).then (
-                            Mono.from(selectItemById(it.getValue(SAMPLE.ITEM_ID)!!))
-                                .flatMap {record ->
-                                    Mono.from(selectOrderById(record.orderId!!))
-                                }
+                            selectItemById(sampleRecord.getValue(SAMPLE.ITEM_ID)!!)
+                                .flatMap { selectOrderById(it.orderId!!) }.toMono()
                         )
                 }
             }

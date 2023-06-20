@@ -1,5 +1,6 @@
 package com.gcgenome.rms.order
 
+import com.gcgenome.lims.tables.records.SampleExtensionRecord
 import com.gcgenome.lims.tables.references.SAMPLE_EXTENSION
 import com.gcgenome.rms.data.Extension_
 import org.jooq.DSLContext
@@ -9,7 +10,7 @@ import reactor.kotlin.core.publisher.toMono
 import java.util.*
 
 interface ExtensionDao{
-    fun DSLContext.insertSampleExtension(sampleExtension: Extension_, sampleId: UUID) =
+    fun DSLContext.insertSampleExtension(sampleExtension: Extension_, sampleId: UUID): Mono<SampleExtensionRecord> =
         Mono.from(
             insertInto(SAMPLE_EXTENSION)
             .columns(SAMPLE_EXTENSION.EXTENSION_ID, SAMPLE_EXTENSION.SAMPLE_ID, SAMPLE_EXTENSION.VALUE)
@@ -17,8 +18,8 @@ interface ExtensionDao{
             .returning()
         )
 
-    fun DSLContext.deleteSampleExtensionBySampleId(sampleId:UUID) =
-        deleteFrom(SAMPLE_EXTENSION).where(SAMPLE_EXTENSION.SAMPLE_ID.eq(sampleId)).toMono()
+    fun DSLContext.deleteSampleExtensionBySampleId(sampleId:UUID): Mono<SampleExtensionRecord> =
+        Mono.from(deleteFrom(SAMPLE_EXTENSION).where(SAMPLE_EXTENSION.SAMPLE_ID.eq(sampleId)).returning())
 
     fun DSLContext.countExtension(sampleId: UUID): Mono<Int> =
         Mono.from(

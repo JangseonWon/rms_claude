@@ -20,7 +20,7 @@ interface PatientDao{
                 .returning()
         )
 
-    fun DSLContext.updatePatientById(userId:String, patient: Patient_) =
+    fun DSLContext.updatePatientById(userId:String, patient: Patient_): Mono<PatientRecord> =
         Mono.from(
             update(PATIENT)
                 .set(PATIENT.SEX, patient.sex)
@@ -29,6 +29,7 @@ interface PatientDao{
                 .set(PATIENT.BIRTH_MONTH, patient.birthMonth?.toByte())
                 .set(PATIENT.BIRTH_YEAR, patient.birthYear?.toShort())
                 .where(PATIENT.ORGANIZATION_ID.eq(userId).and(PATIENT.USER_ID.eq(userId).and(PATIENT.SERIAL.eq(patient.serial))))
+                .returning()
         )
 
     fun DSLContext.deletePatient(mrn: String) =
