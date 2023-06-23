@@ -1,7 +1,7 @@
 package com.gcgenome.rms.order
 
 import com.gcgenome.lims.tables.references.USER
-import com.gcgenome.rms.data.User_
+import com.gcgenome.rms.data.User
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Mono
@@ -11,10 +11,10 @@ import java.util.*
 class UserDao(
     private val dslContext: DSLContext,
 ){
-    fun selectUser(userId: String): Mono<User_> =
+    fun selectUser(userId: String): Mono<User> =
         Mono.from(dslContext.selectFrom(USER).where(USER.ID.eq(userId)))
         .map {
-            User_(
+            User(
                 id = it.get(USER.ID)!!,
                 authority = it.get(USER.AUTHORITY)!!,
                 department = it.get(USER.DEPARTMENT),

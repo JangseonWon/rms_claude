@@ -1,6 +1,6 @@
 package com.gcgenome.rms
 
-import com.gcgenome.rms.data.User_
+import com.gcgenome.rms.data.User
 import com.gcgenome.rms.order.UserDao
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
@@ -21,11 +21,11 @@ class SecurityContextRepository(
             .flatMap (userDao::selectUser)
             .map { u -> SecurityContextImpl(UserAuthentication(u)) }
     }
-    class UserAuthentication(val user: User_): Authentication {
+    class UserAuthentication(val user: User): Authentication {
         override fun getName(): String = user.name
         override fun getAuthorities(): Collection<GrantedAuthority> = emptyList()
         override fun getCredentials(): Any = TODO("Not yet implemented")
-        override fun getDetails(): User_ = user
+        override fun getDetails(): User = user
         override fun getPrincipal(): String = user.id
         override fun isAuthenticated(): Boolean = true
         override fun setAuthenticated(isAuthenticated: Boolean) = TODO("Not yet implemented")

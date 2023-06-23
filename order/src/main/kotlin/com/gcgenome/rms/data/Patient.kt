@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 
 
 @JsonSubTypes(
-    JsonSubTypes.Type(Sample_::class, name = "sample"),
-    JsonSubTypes.Type(Sample_::class, name = "samples")
+    JsonSubTypes.Type(Sample::class, name = "sample"),
+    JsonSubTypes.Type(Sample::class, name = "samples")
 )
-data class Patient_(
+data class Patient(
     @JsonProperty("serial")
     val serial:String,
     @JsonProperty("sex")
@@ -21,8 +21,10 @@ data class Patient_(
     val birthMonth:Int?,
     @JsonProperty("birth_day")
     val birthDay:Int?,
+    @JsonProperty("organization")
+    val organization: Organization?,
     @JsonProperty("sample")
-    val sample: Sample_?,
+    val sample: Sample?,
     @JsonProperty("samples")
-    val samples: List<Sample_>?
+    val samples: List<Sample>?
 )

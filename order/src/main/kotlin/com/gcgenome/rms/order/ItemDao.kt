@@ -1,20 +1,20 @@
 package com.gcgenome.rms.order
 
+import com.gcgenome.lims.tables.records.ItemRecord
 import com.gcgenome.lims.tables.references.ITEM
-import com.gcgenome.rms.data.Item_
+import com.gcgenome.rms.data.Item
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
-import java.time.LocalDateTime
 import java.util.*
 
 interface ItemDao {
-    fun DSLContext.insertItem(userId: String, orderId: UUID, item:Item_) =
+    fun DSLContext.insertItem(userId: String, orderId: UUID, organizationId: String, item:Item): Mono<ItemRecord> =
         Mono.from(
             insertInto(ITEM)
-            .columns(ITEM.ID, ITEM.ORDER_AT, ITEM.ORDER_ID, ITEM.ORGANIZATION_ID, ITEM.PATIENT_SERIAL, ITEM.USER_ID, ITEM.SERVICE_ID)
-            .values(UUID.randomUUID(), LocalDateTime.now(), orderId, userId, item.patient.serial, userId, item.service)
+            .columns(ITEM.ID, ITEM.ORDER_ID, ITEM.ORGANIZATION_ID, ITEM.PATIENT_SERIAL, ITEM.USER_ID, ITEM.SERVICE_ID)
+            .values(UUID.randomUUID(), orderId, organizationId, item.patient.serial, userId, item.service)
             .returning()
         )
 
@@ -30,10 +30,9 @@ interface ItemDao {
         }
     }
 
-    fun DSLContext.updateItemById(item: Item_) =
+    fun DSLContext.updateItemById(item: Item) =
         Mono.from(
             update(ITEM)
-                .set(ITEM.ORDER_AT, LocalDateTime.now())
                 .set(ITEM.SERVICE_ID, item.service)
         )
     fun DSLContext.countItemInOrder(orderId: UUID): Mono<Int> =

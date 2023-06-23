@@ -40,4 +40,4 @@ spring:
       max-idle-time: 30m
       validation-query: SELECT 1
 server:
-  port: 0
+  port: 9295

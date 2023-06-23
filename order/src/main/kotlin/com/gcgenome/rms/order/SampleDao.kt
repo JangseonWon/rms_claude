@@ -1,7 +1,7 @@
 package com.gcgenome.rms.order
 
 import com.gcgenome.lims.tables.references.SAMPLE
-import com.gcgenome.rms.data.Sample_
+import com.gcgenome.rms.data.Sample
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.count
 import reactor.core.publisher.Mono
@@ -12,10 +12,11 @@ import java.util.*
 interface SampleDao {
     fun DSLContext.selectSampleById(sampleId: UUID) =
         select(SAMPLE).from(SAMPLE).where(SAMPLE.ID.eq(sampleId))
-    fun DSLContext.updateSampleById(sample: Sample_) =
+    fun DSLContext.updateSampleById(sample: Sample) =
         Mono.from(
             update(SAMPLE)
-                .set(SAMPLE.SERIAL, sample.serial)
+                .set(SAMPLE.GENOME_BARCODE, sample.genomeBarcode)
+                .set(SAMPLE.SAMPLE_BARCODE, sample.sampleBarcode)
                 .set(SAMPLE.SAMPLE_TYPE_ID, sample.typeId)
                 .set(SAMPLE.AGE, sample.age)
                 .set(SAMPLE.SAMPLING, sample.sampling?.atStartOfDay())
@@ -26,11 +27,15 @@ interface SampleDao {
                 .where(SAMPLE.ID.eq(sample.id))
                 .returning()
         )
-    fun DSLContext.insertSample(patientSerial: String, userId: String, itemId: UUID, sample: Sample_) =
+    fun DSLContext.insertSample(patientSerial: String, userId: String, itemId: UUID, sample: Sample, organizationId: String?) =
         Mono.from(
             insertInto(SAMPLE)
             .columns(
                 SAMPLE.ID,
+                SAMPLE.CREATE_AT,
+                SAMPLE.LAST_MODIFY_AT,
+                SAMPLE.GENOME_BARCODE,
+                SAMPLE.SAMPLE_BARCODE,
                 SAMPLE.ORGANIZATION_ID,
                 SAMPLE.PATIENT_SERIAL,
                 SAMPLE.USER_ID,
@@ -40,14 +45,17 @@ interface SampleDao {
                 SAMPLE.NOTE,
                 SAMPLE.REGISTRATION_AT,
                 SAMPLE.SAMPLING,
-                SAMPLE.SERIAL,
                 SAMPLE.STATE,
                 SAMPLE.WARD,
                 SAMPLE.PHYSICIAN,
                 SAMPLE.ITEM_ID)
             .values(
                 UUID.randomUUID(),
-                userId,
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                sample.genomeBarcode,
+                sample.sampleBarcode,
+                organizationId ?: userId,
                 patientSerial,
                 userId,
                 sample.typeId,
@@ -56,7 +64,6 @@ interface SampleDao {
                 sample.note,
                 LocalDateTime.now(),
                 sample.sampling!!.atStartOfDay(),
-                sample.serial,
                 "REQUEST",
                 sample.ward,
                 sample.physician,

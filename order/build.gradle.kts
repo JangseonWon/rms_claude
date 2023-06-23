@@ -17,12 +17,12 @@ dependencies {
     implementation(libs.bundles.kotlin.webflux)
     implementation(libs.bundles.r2dbc.postgres)
     implementation(libs.bundles.r2dbc.querydsl)
-    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.4")
     kapt(libs.bundles.r2dbc.querydsl)
     implementation(libs.spring.gateway)
     implementation("org.jooq:jooq:3.18.2")
     implementation("org.jooq:jooq-codegen:3.18.2")
     implementation("org.jooq:jooq-meta:3.18.2")
+    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.4")
     jooqGenerator("org.postgresql:postgresql:42.6.0")
 }
 configurations { all { exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging") } }

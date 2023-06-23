@@ -3,7 +3,7 @@ package com.gcgenome.rms.data
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.util.*
 
-data class User_(
+data class User(
     @JsonProperty("id")
     val id: String,
     @JsonProperty("authority")
