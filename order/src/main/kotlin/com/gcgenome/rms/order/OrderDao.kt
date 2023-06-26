@@ -2,6 +2,7 @@ package com.gcgenome.rms.order
 
 import com.gcgenome.lims.tables.references.*
 import com.gcgenome.rms.data.Order
+import com.gcgenome.rms.data.Order_
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.*
 import reactor.core.publisher.Flux
@@ -34,7 +35,6 @@ interface OrderDao{
 
     fun DSLContext.selectOrderById(orderId: UUID) =
         select(
-            ORDER.ID,
             ORDER.CREATE_AT,
             ORDER.LAST_MODIFY_AT,
             ORDER.TEST,
@@ -103,7 +103,6 @@ interface OrderDao{
 
     fun DSLContext.selectOrderNotINOrganization(orderId: UUID) =
         select(
-            ORDER.ID,
             ORDER.CREATE_AT,
             ORDER.LAST_MODIFY_AT,
             ORDER.TEST,
@@ -156,9 +155,8 @@ interface OrderDao{
                     .and(ITEM.USER_ID.eq(PATIENT.USER_ID)))
             ).where(ORDER.ID.eq(orderId)).groupBy(ORDER.ID)
 
-    fun DSLContext.selectOrders(userId: String): Flux<Order> {
+    fun DSLContext.selectOrders(userId: String): Flux<Order_> {
         val query = select(
-            ORDER.ID,
             ORDER.CREATE_AT,
             ORDER.LAST_MODIFY_AT,
             ORDER.TEST,

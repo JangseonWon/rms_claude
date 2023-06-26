@@ -6,6 +6,7 @@ import com.gcgenome.lims.tables.references.SAMPLE
 import com.gcgenome.rms.data.CancelOrder
 import com.gcgenome.rms.data.Item
 import com.gcgenome.rms.data.Order
+import com.gcgenome.rms.data.Order_
 import org.jooq.DSLContext
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
@@ -17,7 +18,7 @@ import java.util.*
 class Handler(
     val dslContext: DSLContext
 ): PatientDao, OrderDao, OrganizationDao, ItemDao, ExtensionDao, SampleDao {
-    fun insertOrder(userId: String, dto: Order): Mono<Order> {
+    fun insertOrder(userId: String, dto: Order): Mono<Order_> {
         return Mono.from(dslContext.transactionPublisher{ trx ->
             trx.dsl().run {
                 Flux.from(
@@ -49,13 +50,14 @@ class Handler(
                     )
                 }
             }
-        }).map(Order::toModel)
+        }).map(
+            Order::toModel)
     }
 
-    fun findOrders(userId: String): Flux<Order> {
+    fun findOrders(userId: String): Flux<Order_> {
         return dslContext.dsl().selectOrders(userId)
     }
-    fun addSample(userId: String, sampleId: UUID, dto: Item): Mono<Order> {
+    fun addSample(userId: String, sampleId: UUID, dto: Item): Mono<Order_> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
                 Mono.from(selectSampleById(sampleId))
@@ -88,7 +90,7 @@ class Handler(
         }).map(Order::toModel)
     }
 
-    fun updateOrder(userId: String, dto: Order): Mono<Order> {
+    fun updateOrder(userId: String, dto: Order): Mono<Order_> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run{
                 updateOrderById(dto)
@@ -166,7 +168,6 @@ class Handler(
                                                                         .then(deleteOrder(orderId))
                                                                         .map {
                                                                             cancelFinish.itemId = itemId
-                                                                            cancelFinish.orderId = orderId
                                                                             cancelFinish
                                                                         }
                                                                 } else {
@@ -177,7 +178,6 @@ class Handler(
                                                                         .then(deletePatient(mrn))
                                                                         .map {
                                                                             cancelFinish.itemId = itemId
-                                                                            cancelFinish.orderId = orderId
                                                                             cancelFinish
                                                                         }
                                                                 }

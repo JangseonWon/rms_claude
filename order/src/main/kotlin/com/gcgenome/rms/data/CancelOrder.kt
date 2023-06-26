@@ -7,6 +7,5 @@ data class CancelOrder (
 
     val message: String
 ){
-    var orderId: UUID? = null
     var itemId: UUID? = null
 }

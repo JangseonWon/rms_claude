@@ -26,23 +26,4 @@ interface OrganizationDao {
                 .where(ORGANIZATION.ID.eq(organization?.id ?: userId))
                 .returning()
         )
-
-    /*fun DSLContext.updateOrganizationById(userId:String, organization: Organization_): Mono<Int> =
-        Mono.from(
-            update(ORGANIZATION)
-                .set(ORGANIZATION.ID, organization.id )
-                .set(ORGANIZATION.NAME, organization.name )
-                .set(ORGANIZATION.TYPE, organization.type )
-                .set(ORGANIZATION.USER_ID, userId )
-                .set(ORGANIZATION.REGISTRATION_NUMBER, organization.registrationNumber )
-                .set(ORGANIZATION.NURSING_NUMBER, organization.nursingNumber )
-                .set(ORGANIZATION.BRANCH_ID, organization.branchCode )
-                .set(ORGANIZATION.BRANCH_NAME, organization.branchName )
-                .where(ORGANIZATION.ID.eq(organization.id ?: userId))
-        )
-
-    fun DSLContext.countOrganization(organizationId: String?): Mono<Int> =
-        Mono.from( select(DSL.count(ORGANIZATION.ID).`as`("count")).from(ORGANIZATION).where(ORGANIZATION.ID.eq(organizationId)) )
-            .map { r-> r.getValue("count", Int::class.java)}*/
-
 }

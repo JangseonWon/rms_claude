@@ -5,15 +5,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
-import com.gcgenome.lims.tables.references.ORDER
-import org.jooq.JSON
-import org.jooq.Record7
 import java.time.LocalDateTime
-import java.util.*
 
-data class Order(
-    @JsonProperty("id")
-    var id: UUID?,
+data class Order_ (
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("create_at")
@@ -32,17 +26,4 @@ data class Order(
     val outsourcingCost:Int?,
     @JsonProperty("items")
     val items: List<Item>?
-){
-    companion object {
-        fun toModel(record: Record7<LocalDateTime?, LocalDateTime?, Boolean?, Boolean?, Int?, Int?, JSON?>) =
-            Order_(
-                createAt = record.get(ORDER.CREATE_AT),
-                lastModifyAt = record.get(ORDER.LAST_MODIFY_AT),
-                test = record.getValue(ORDER.TEST),
-                credit = record.getValue(ORDER.CREDIT),
-                price = record.getValue(ORDER.PRICE),
-                outsourcingCost = record.getValue(ORDER.OUTSOURCING_COST),
-                items = record.getValue("items", Array<Item>::class.java).toList()
-            )
-    }
-}
+)
