@@ -1,8 +1,10 @@
 package com.gcgenome.rms.order
 
+import com.gcgenome.lims.tables.records.SampleRecord
 import com.gcgenome.lims.tables.references.SAMPLE
 import com.gcgenome.rms.data.Sample
 import org.jooq.DSLContext
+import org.jooq.SelectConditionStep
 import org.jooq.impl.DSL.count
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
@@ -10,8 +12,8 @@ import java.time.LocalDateTime
 import java.util.*
 
 interface SampleDao {
-    fun DSLContext.selectSampleById(sampleId: UUID) =
-        select(SAMPLE).from(SAMPLE).where(SAMPLE.ID.eq(sampleId))
+    fun DSLContext.selectSampleById(sampleId: UUID): Mono<SampleRecord> =
+        Mono.from(selectFrom(SAMPLE).where(SAMPLE.ID.eq(sampleId)))
     fun DSLContext.updateSampleById(sample: Sample) =
         Mono.from(
             update(SAMPLE)
@@ -27,7 +29,7 @@ interface SampleDao {
                 .where(SAMPLE.ID.eq(sample.id))
                 .returning()
         )
-    fun DSLContext.insertSample(patientSerial: String, userId: String, itemId: UUID, sample: Sample, organizationId: String?) =
+    fun DSLContext.insertSample(patientSerial: String, userId: String, itemId: UUID, sample: Sample, organizationId: String?): Mono<SampleRecord> =
         Mono.from(
             insertInto(SAMPLE)
             .columns(
@@ -64,7 +66,7 @@ interface SampleDao {
                 sample.note,
                 LocalDateTime.now(),
                 sample.sampling!!.atStartOfDay(),
-                "REQUEST",
+                "NEW",
                 sample.ward,
                 sample.physician,
                 itemId

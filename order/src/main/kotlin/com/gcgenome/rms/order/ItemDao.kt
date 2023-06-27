@@ -30,10 +30,11 @@ interface ItemDao {
         }
     }
 
-    fun DSLContext.updateItemById(item: Item) =
+    fun DSLContext.updateItemById(itemId: UUID, item: Item) =
         Mono.from(
             update(ITEM)
                 .set(ITEM.SERVICE_ID, item.service)
+                .where(ITEM.ID.eq(itemId))
         )
     fun DSLContext.countItemInOrder(orderId: UUID): Mono<Int> =
         Mono.from( select(DSL.count(ITEM.ORDER_ID).`as`("count")).from(ITEM).where(ITEM.ORDER_ID.eq(orderId)) )

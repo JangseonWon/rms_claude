@@ -71,7 +71,7 @@ class Router (private val handler: Handler) {
                     .response(org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder().responseCode("500").description("예기치 못한 원인: 서버 내부 에러"))
                     .response(org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder().responseCode("503").description("서비스 제공 불가: 서버가 동작하지 않음"))
             }
-            .PATCH("/api/orders", ::updateOrders.toHandlerFunction()) {
+            .PATCH("/api/orders/items/{item-id}", ::updateOrders.toHandlerFunction()) {
                 it.operationId("updateOrders")
                     .description("의뢰 수정 API")
                     .parameter(Builder.parameterBuilder().name("X-USER-ID").description("사용자 ID").required(true).`in`(ParameterIn.HEADER))
@@ -171,11 +171,13 @@ class Router (private val handler: Handler) {
 
 
     private fun updateOrders(request: ServerRequest): Mono<ServerResponse> {
+        val itemIdString = request.pathVariable("item-id")
+        val itemId = UUID.fromString(itemIdString)
         return request
             .principal()
             .cast(SecurityContextRepository.UserAuthentication::class.java)
-            .zipWith(request.bodyToMono(Order::class.java))
-            .flatMap { handler.updateOrder(it.t1.principal, it.t2) }
+            .zipWith(request.bodyToMono(Item::class.java))
+            .flatMap { handler.updateOrder(it.t1.principal, itemId ,it.t2) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), Order::class.java) }
     }
 

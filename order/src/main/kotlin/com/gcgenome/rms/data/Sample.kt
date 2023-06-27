@@ -53,7 +53,9 @@ data class Sample(
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     val registrationAt: LocalDateTime?,
     @JsonProperty("organization_id")
-    val organizationId: String?
+    val organizationId: String?,
+    @JsonProperty("item_id")
+    var itemId: UUID?,
 ){
     /*companion object {
         fun toModel(record: Record1<SampleRecord>) =

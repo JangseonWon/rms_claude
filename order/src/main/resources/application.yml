@@ -39,5 +39,9 @@ spring:
       max-size: 500
       max-idle-time: 30m
       validation-query: SELECT 1
+logging:
+  level:
+    io.r2dbc.postgresql.QUERY: TRACE
+#    io.r2dbc.postgresql.PARAM: TRACE
 server:
   port: 9295
