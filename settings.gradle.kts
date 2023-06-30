@@ -3,6 +3,7 @@ include("gateway")
 include("entity")
 include("service")
 include("order")
+include("user")
 
 pluginManagement {
     repositories {

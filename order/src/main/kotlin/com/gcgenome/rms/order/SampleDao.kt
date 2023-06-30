@@ -6,17 +6,19 @@ import com.gcgenome.rms.data.Sample
 import org.jooq.DSLContext
 import org.jooq.SelectConditionStep
 import org.jooq.impl.DSL.count
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import java.time.LocalDateTime
 import java.util.*
 
 interface SampleDao {
-    fun DSLContext.selectSampleById(sampleId: UUID): Mono<SampleRecord> =
-        Mono.from(selectFrom(SAMPLE).where(SAMPLE.ID.eq(sampleId)))
-    fun DSLContext.updateSampleById(sample: Sample) =
+    fun DSLContext.selectSampleById(sampleId: UUID): Flux<SampleRecord> =
+        Flux.from(selectFrom(SAMPLE).where(SAMPLE.ID.eq(sampleId)))
+    fun DSLContext.updateSampleById(sample: Sample): Mono<SampleRecord> =
         Mono.from(
             update(SAMPLE)
+                .set(SAMPLE.REGISTRATION_AT, LocalDateTime.now())
                 .set(SAMPLE.GENOME_BARCODE, sample.genomeBarcode)
                 .set(SAMPLE.SAMPLE_BARCODE, sample.sampleBarcode)
                 .set(SAMPLE.SAMPLE_TYPE_ID, sample.typeId)

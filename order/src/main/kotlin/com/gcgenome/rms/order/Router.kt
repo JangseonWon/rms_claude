@@ -24,7 +24,7 @@ class Router (private val handler: Handler) {
     /*fun route() = router {
         PUT("/api/orders", ::orders)
         GET("/api/orders", ::findOrders)
-        PATCH("/api/orders", ::updateOrders)
+        PATCH("/api/orders/items/{item-id}", ::updateOrders)
         DELETE("/api/samples/{sample-id}", ::cancels)
         PATCH("/api/orders/samples/{sampleId}", :: addSample)
     }*/
@@ -73,7 +73,7 @@ class Router (private val handler: Handler) {
             }
             .PATCH("/api/orders/items/{item-id}", ::updateOrders.toHandlerFunction()) {
                 it.operationId("updateOrders")
-                    .description("의뢰 수정 API")
+                    .description("의뢰 품목 수정 API")
                     .parameter(Builder.parameterBuilder().name("X-USER-ID").description("사용자 ID").required(true).`in`(ParameterIn.HEADER))
                     .requestBody(
                         org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder()
