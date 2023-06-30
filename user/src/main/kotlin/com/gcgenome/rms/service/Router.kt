@@ -17,8 +17,8 @@ import java.util.*
 class Router (private val handler: Handler) {
     @Bean("com.gcgenome.rms.service.Router.Bean")
     fun route() = router {
-        PUT("/api/user", ::addUser)
-        PUT("/api/user/organization", ::addOrganization)
+        POST("/api/user", ::addUser)
+        POST("/api/user/organization", ::addOrganization)
         PUT("/api/organization/{organization-id}/service/{service-id}/user/{user-id}", ::addOrganizationService)
         DELETE("/api/user/{user-id}", ::deleteUser)
     }

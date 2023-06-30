@@ -7,7 +7,7 @@ import com.gcgenome.rms.data.Message
 import com.gcgenome.rms.data.Organization
 import com.gcgenome.rms.data.User
 import org.jooq.DSLContext
-import org.springframework.dao.DuplicateKeyException
+import org.jooq.exception.IntegrityConstraintViolationException
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 
@@ -16,24 +16,23 @@ class Handler(
     val dslContext: DSLContext,
     val userDao: UserDao
 ): OrganizationDao, OrganizationServiceDao {
-    val success = "추가 완료 되었습니다."
+    val addSuccess = "추가 완료 되었습니다."
+    val deleteSuccess = "삭제 완료 되었습니다."
 
     fun insertOrganizationService(authority: String?, organizationId: String, serviceId: String, userId: String): Mono<Message> {
         return withAdminAuthority(authority) {
             dslContext.dsl().insertOrganizationService(organizationId, serviceId, userId)
-                .map { Message.toModelOrgSer(it, success) }
-                .onErrorResume(DuplicateKeyException::class.java) {
-                    Mono.just(Message("중복된 값이 존재합니다.-이거 안됨"))
-                }
-                .onErrorResume(Exception::class.java) { Mono.just(Message("GC지놈 담당자에게 문의 바랍니다.")) }
+                .map { Message.toModelOrgSer(it, addSuccess) }
+                .onErrorResume(this::handleException)
         }
     }
 
     fun insertOrganization(userId: String, authority: String?, dto: Organization): Mono<Message> {
         return withAdminAuthority(authority) {
             dslContext.dsl().insertOrganization(userId, dto).map {
-                Message.toModelOrg(it, "추가 완료 되었습니다.")
+                Message.toModelOrg(it, addSuccess)
             }
+                .onErrorResume(this::handleException)
         }
     }
 
@@ -44,18 +43,10 @@ class Handler(
                 trx.dsl().run {
                     userDao.insertUser(dto).flatMap { userRecord ->
                         insertUserToOrganization(userRecord).map {
-                            Message.toModelUser(userRecord, "추가 완료 되었습니다.")
+                            Message.toModelUser(userRecord, addSuccess)
                         }
                     }
-                        .onErrorResume(DuplicateKeyException::class.java) {
-                            Mono.just(Message("중복된 값이 존재합니다.-이거 안됨"))
-                        }
-                        .onErrorResume { e ->
-                            val errorDetails = e.toString().substringAfterLast("; ").replace("\\\\", "")
-                            Mono.just(Message("GC지놈 담당자에게 문의 바랍니다.").apply { error = errorDetails })
-                        }
-                }
-
+                }.onErrorResume(this::handleException)
             })
         }
     }
@@ -64,8 +55,9 @@ class Handler(
         return withAdminAuthority(authority) {
             dslContext.dsl().deleteOrganization(userId)
                 .then(userDao.deleteUser(userId)).map{ userRecord ->
-                    Message.toModelUser(userRecord, "삭제 완료 되었습니다.")
+                    Message.toModelUser(userRecord, deleteSuccess)
                 }
+                .onErrorResume(this::handleException)
         }
     }
 
@@ -78,5 +70,12 @@ class Handler(
     }
     private fun hasAdminAuthority(authority: String?): Boolean {
         return authority == "ADMIN"
+    }
+
+    private fun handleException(exception: Throwable): Mono<Message> {
+        return when (exception) {
+            is IntegrityConstraintViolationException -> Mono.just(Message("중복된 값이 존재합니다."))
+            else -> Mono.just(Message("GC지놈 담당자에게 문의 바랍니다.").apply { error = exception.javaClass.name })
+        }
     }
 }
