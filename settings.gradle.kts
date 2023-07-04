@@ -5,13 +5,6 @@ include("service")
 include("order")
 include("user")
 
-pluginManagement {
-    repositories {
-        mavenCentral()
-        maven(url="https://repo.spring.io/release")
-        gradlePluginPortal()
-    }
-}
 
 dependencyResolutionManagement {
     versionCatalogs {
