@@ -5,6 +5,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.spring") version "1.8.22"
     id("com.google.cloud.tools.jib") version "3.3.2"
 }
+java.sourceCompatibility = JavaVersion.VERSION_17
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
