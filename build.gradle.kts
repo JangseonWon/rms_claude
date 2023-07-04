@@ -1,4 +1,5 @@
 plugins {
+    id("java")
     kotlin("jvm") version "1.8.22" apply false
     kotlin("kapt") version "1.8.22" apply false
 }
