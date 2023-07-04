@@ -3,6 +3,7 @@ plugins {
     id("org.springframework.boot") version "3.0.3"
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jetbrains.kotlin.plugin.spring") version "1.8.22"
+    id("com.google.cloud.tools.jib") version "3.3.2"
 }
 dependencies {
     implementation(libs.bundles.spring.client)
@@ -15,7 +16,12 @@ dependencies {
 configurations { all { exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging") } }
 dependencyManagement { imports { mavenBom(libs.spring.cloud.bom.get().toString()) } }
 kotlin.jvmToolchain(17)
-tasks.processResources {
-    if(project.gradle.startParameter.taskNames.contains("build")) exclude("application.yml")
+tasks {
+    processResources {
+        if(project.gradle.startParameter.taskNames.contains("build")) exclude("application.yml")
+    }
+    getByName<Jar>("jar") {
+        enabled = false
+    }
 }
 springBoot.mainClass.set("com.gcgenome.rms.ApplicationKt")
