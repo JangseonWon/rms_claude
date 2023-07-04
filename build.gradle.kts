@@ -1,17 +1,12 @@
 plugins {
-    kotlin("jvm") version "1.8.10" apply false
-    kotlin("kapt") version "1.8.10" apply false
+    kotlin("jvm") version "1.8.22" apply false
+    kotlin("kapt") version "1.8.22" apply false
 }
-group = "com.gcgenome"
-version = "1.0"
-
 subprojects {
     repositories {
+        maven("https://gitea.apps.lims.gcgenome.com/api/packages/LIMS/maven")
         mavenCentral()
-        mavenLocal()
-        maven{
-            url= uri("http://gemini/api/packages/LIMS/maven")
-            isAllowInsecureProtocol=true
-        }
     }
+    group = "com.gcgenome"
+    version = "1.0"
 }
