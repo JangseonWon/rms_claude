@@ -6,12 +6,20 @@ plugins {
     id("com.google.cloud.tools.jib") version "3.3.2"
 }
 dependencies {
-    implementation(libs.bundles.spring.client)
-    implementation(libs.bundles.kotlin.webflux)
-    implementation(libs.bundles.r2dbc.postgres)
-    implementation(libs.bundles.r2dbc.querydsl)
-    implementation(libs.bundles.jjwt.runtime)
-    implementation(libs.spring.gateway)
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+
+    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
+    implementation("org.springframework.boot:spring-boot-starter-log4j2")
+    implementation("org.postgresql:r2dbc-postgresql:1.0.0.RELEASE")
+    implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
+    implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
+    implementation("org.springframework.cloud:spring-cloud-starter-gateway")
+
 }
 configurations { all { exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging") } }
 dependencyManagement { imports { mavenBom(libs.spring.cloud.bom.get().toString()) } }
