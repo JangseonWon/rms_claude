@@ -24,6 +24,22 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-gateway")
 
 }
+
+jib {
+    from {
+        image = "docker.io/gradle:8.2.0-jdk17"
+    }
+    to {
+        image = "image-registry.openshift-image-registry.svc:5000/rms-test/gateway"
+    }
+    container {
+        environment = mapOf(
+            "LANG" to "C.UTF-8",
+            "TZ" to "Asia/Seoul",
+        )
+    }
+}
+
 configurations { all { exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging") } }
 dependencyManagement { imports { mavenBom(libs.spring.cloud.bom.get().toString()) } }
 tasks {
