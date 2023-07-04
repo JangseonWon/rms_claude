@@ -6,6 +6,7 @@ plugins {
     id("com.google.cloud.tools.jib") version "3.3.2"
 }
 java.sourceCompatibility = JavaVersion.VERSION_17
+java.targetCompatibility = JavaVersion.VERSION_17
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -24,8 +25,12 @@ dependencies {
 }
 configurations { all { exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging") } }
 dependencyManagement { imports { mavenBom(libs.spring.cloud.bom.get().toString()) } }
-kotlin.jvmToolchain(17)
 tasks {
+    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions {
+            jvmTarget = "17"
+        }
+    }
     processResources {
         if(project.gradle.startParameter.taskNames.contains("build")) exclude("application.yml")
     }
@@ -33,4 +38,3 @@ tasks {
         enabled = false
     }
 }
-springBoot.mainClass.set("com.gcgenome.rms.ApplicationKt")
