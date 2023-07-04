@@ -27,7 +27,7 @@ dependencies {
 
 jib {
     from {
-        image = "docker.io/gradle:8.2.0-jdk17"
+        image = "docker.io/gradle:7.6.1-jdk17"
     }
     to {
         image = "image-registry.openshift-image-registry.svc:5000/rms-test/gateway"
