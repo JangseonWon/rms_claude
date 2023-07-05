@@ -30,7 +30,7 @@ jib {
         image = "docker.io/gradle:7.6.1-jdk17"
     }
     to {
-        image = "image-registry.openshift-image-registry.svc:5000/rms-test/gateway"
+        image = "image-registry.apps.lims.gcgenome.com/rms-test/gateway"
     }
     container {
         environment = mapOf(
