@@ -38,6 +38,13 @@ jib {
             "TZ" to "Asia/Seoul",
         )
     }
+    extraDirectories {
+        paths {
+            path {
+                setFrom("config/application.yml")
+            }
+        }
+    }
 }
 
 configurations { all { exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging") } }
