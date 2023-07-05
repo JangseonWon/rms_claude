@@ -27,7 +27,7 @@ dependencies {
 
 jib {
     from {
-        image = "docker.io/gradle:7.6.1-jdk17"
+        image = "eclipse-temurin:17.0.7_7-jre-jammy"
     }
     to {
         image = "image-registry.apps.lims.gcgenome.com/rms-test/gateway"
