@@ -41,7 +41,7 @@ jib {
     extraDirectories {
         paths {
             path {
-                setFrom("config/application.yml")
+                setFrom("/app/config/application.yaml")
             }
         }
     }
