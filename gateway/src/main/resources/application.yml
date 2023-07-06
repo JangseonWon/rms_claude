@@ -70,4 +70,4 @@ security:
       token: /token
       token-key: 4
 server:
-  port: 8181
+  port: 8080
