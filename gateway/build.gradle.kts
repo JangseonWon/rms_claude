@@ -37,7 +37,4 @@ jib {
 configurations { all { exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging") } }
 dependencyManagement { imports { mavenBom(libs.spring.cloud.bom.get().toString()) } }
 kotlin.jvmToolchain(17)
-tasks.processResources {
-        println("gradle project task name: ${project.gradle.startParameter.taskNames}")
-        if(project.gradle.startParameter.taskNames.contains("build")) exclude("application.yml")
-}
+tasks.processResources { if(project.gradle.startParameter.taskNames.contains("jib")) exclude("application.yml") }
