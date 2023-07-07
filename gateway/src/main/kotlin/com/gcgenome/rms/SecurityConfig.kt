@@ -50,7 +50,7 @@ class SecurityConfig (
             }
             authorizeExchange {
                 authorize (pathMatchers(HttpMethod.POST,"/api/login"),permitAll)
-                authorize (pathMatchers(HttpMethod.GET,"/api/test"),permitAll)
+                authorize (pathMatchers(HttpMethod.GET,"/actuator/health/**","/api/test"),permitAll)
             }
 
         }
