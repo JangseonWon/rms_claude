@@ -10,14 +10,14 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             library("reflect", "org.jetbrains.kotlin", "kotlin-reflect").withoutVersion()
-            library("stdlib", "org.jetbrains.kotlin", "kotlin-stdlib").withoutVersion()
-            bundle("kotlin", listOf("reflect", "stdlib"))
+            library("stdlib-jdk8", "org.jetbrains.kotlin", "kotlin-stdlib-jdk8").withoutVersion()
+            bundle("kotlin", listOf("reflect", "stdlib-jdk8"))
 
             library("webflux", "org.springframework.boot", "spring-boot-starter-webflux").withoutVersion()
             library("kotlin-reactor", "io.projectreactor.kotlin", "reactor-kotlin-extensions").withoutVersion()
             library("kotlin-coroutines-reactor", "org.jetbrains.kotlinx", "kotlinx-coroutines-reactor").withoutVersion()
             library("kotlin-jackson", "com.fasterxml.jackson.module", "jackson-module-kotlin").withoutVersion()
-            bundle("kotlin-webflux", listOf("webflux", "reflect", "stdlib", "kotlin-reactor", "kotlin-coroutines-reactor", "kotlin-jackson"))
+            bundle("kotlin-webflux", listOf("webflux", "reflect", "stdlib-jdk8", "kotlin-reactor", "kotlin-coroutines-reactor", "kotlin-jackson"))
             library("spring-gateway", "org.springframework.cloud", "spring-cloud-starter-gateway").withoutVersion()
             library("spring-discovery", "org.springframework.cloud", "spring-cloud-starter-zookeeper-discovery").withoutVersion()
             library("spring-log4j2", "org.springframework.boot", "spring-boot-starter-log4j2").withoutVersion()
@@ -47,7 +47,9 @@ dependencyResolutionManagement {
             library("kotlin-test", "org.jetbrains.kotlin", "kotlin-test").withoutVersion()
             bundle("test", listOf("spring-boot-test", "mockk", "reactor-test", "kotlin-test"))
 
-            library("spring-cloud-bom", "org.springframework.cloud", "spring-cloud-dependencies").version { require("2022.0.1") }
+            library("spring-kubernetes-config", "org.springframework.cloud", "spring-cloud-starter-kubernetes-config").version { require("1.1.10.RELEASE") }
+
+            library("spring-cloud-bom", "org.springframework.cloud", "spring-cloud-dependencies").version { require("2022.0.3") }
 
             library("elemento-core", "org.jboss.elemento", "elemento-core").version { require("1.0.11") }
             library("elemental2-svg", "com.google.elemental2", "elemental2-svg").version { require("1.1.0") }
