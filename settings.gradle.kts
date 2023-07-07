@@ -20,6 +20,7 @@ dependencyResolutionManagement {
             bundle("kotlin-webflux", listOf("webflux", "reflect", "stdlib-jdk8", "kotlin-reactor", "kotlin-coroutines-reactor", "kotlin-jackson"))
             library("spring-gateway", "org.springframework.cloud", "spring-cloud-starter-gateway").withoutVersion()
             library("spring-discovery", "org.springframework.cloud", "spring-cloud-starter-zookeeper-discovery").withoutVersion()
+            library("spring-actuator", "org.springframework.boot", "spring-boot-starter-actuator").withoutVersion()
             library("spring-log4j2", "org.springframework.boot", "spring-boot-starter-log4j2").withoutVersion()
             library("spring-security", "org.springframework.boot", "spring-boot-starter-security").withoutVersion()
             // library("spring-hateoas", "org.springframework.boot", "spring-boot-starter-hateoas").withoutVersion()
@@ -47,7 +48,6 @@ dependencyResolutionManagement {
             library("kotlin-test", "org.jetbrains.kotlin", "kotlin-test").withoutVersion()
             bundle("test", listOf("spring-boot-test", "mockk", "reactor-test", "kotlin-test"))
 
-            library("spring-kubernetes-config", "org.springframework.cloud", "spring-cloud-starter-kubernetes-config").version { require("1.1.10.RELEASE") }
 
             library("spring-cloud-bom", "org.springframework.cloud", "spring-cloud-dependencies").version { require("2022.0.3") }
 
