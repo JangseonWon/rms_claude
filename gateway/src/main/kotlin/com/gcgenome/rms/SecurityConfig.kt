@@ -44,6 +44,7 @@ class SecurityConfig (
             .authorizeExchange()
             .pathMatchers(HttpMethod.OPTIONS).permitAll()
             .pathMatchers(HttpMethod.POST,"/api/login").permitAll()
+            .pathMatchers(HttpMethod.GET, "/api/test").permitAll()
             .anyExchange().authenticated()
             .and().build()
     }

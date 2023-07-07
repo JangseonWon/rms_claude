@@ -21,7 +21,10 @@ class Router(
     private var duration: Long = 0
 
     @Bean("com.gcgenome.rms.login.Router")
-    fun route() = router { POST("/api/login", ::login) }
+    fun route() = router {
+        POST("/api/login", ::login)
+        GET("/api/test", ::test)
+    }
 
     private fun login(request: ServerRequest): Mono<ServerResponse> {
         return request.bodyToMono(Login_::class.java).flatMap(handler::login)
@@ -30,5 +33,8 @@ class Router(
             .switchIfEmpty (ServerResponse.status(HttpStatus.NOT_FOUND).build())
             .onErrorResume(Exception::class.java) { ServerResponse.status(HttpStatus.UNAUTHORIZED).build() }
             .doOnError { e -> e.printStackTrace() }
+    }
+    private fun test(request: ServerRequest): Mono<ServerResponse> {
+        return ServerResponse.ok().bodyValue("API TEST SUCCESS")
     }
 }
