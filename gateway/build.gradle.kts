@@ -18,9 +18,7 @@ dependencies {
     implementation("org.postgresql:r2dbc-postgresql:1.0.1.RELEASE")
     implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
     implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
-
-    implementation(libs.spring.kubernetes.config)
-
+    implementation(libs.spring.actuator)
 
 }
 
