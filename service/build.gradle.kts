@@ -5,7 +5,7 @@ import org.jooq.meta.jaxb.SchemaMappingType
 plugins {
     kotlin("jvm")
     kotlin("kapt")
-    id("org.springframework.boot") version "3.0.3"
+    id("org.springframework.boot") version "3.1.1"
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jetbrains.kotlin.plugin.spring") version "1.8.10"
     id("nu.studer.jooq") version "8.1"

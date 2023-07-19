@@ -1,7 +1,7 @@
 package com.gcgenome.rms.order
 
-import com.gcgenome.lims.tables.records.ItemRecord
-import com.gcgenome.lims.tables.references.ITEM
+import com.gcgenome.rms.tables.records.ItemRecord
+import com.gcgenome.rms.tables.references.ITEM
 import com.gcgenome.rms.data.Item
 import org.jooq.DSLContext
 import org.jooq.impl.DSL

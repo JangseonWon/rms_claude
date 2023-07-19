@@ -1,6 +1,6 @@
 package com.gcgenome.rms.order
 
-import com.gcgenome.lims.tables.references.USER
+import com.gcgenome.rms.tables.references.USER
 import com.gcgenome.rms.data.User
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository

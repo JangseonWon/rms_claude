@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
-import com.gcgenome.lims.tables.references.ORDER
+import com.gcgenome.rms.tables.references.ORDER
 import org.jooq.JSON
 import org.jooq.Record8
 import java.time.LocalDateTime

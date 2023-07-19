@@ -1,6 +1,6 @@
 package com.gcgenome.rms.order
 
-import com.gcgenome.lims.tables.references.SAMPLE_EXTENSION
+import com.gcgenome.rms.tables.references.SAMPLE_EXTENSION
 import com.gcgenome.rms.data.Extension
 import org.jooq.DSLContext
 import org.jooq.impl.DSL

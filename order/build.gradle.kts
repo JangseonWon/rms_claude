@@ -4,10 +4,9 @@ import org.jooq.meta.jaxb.SchemaMappingType
 
 plugins {
     kotlin("jvm")
-    kotlin("kapt")
-    id("org.springframework.boot") version "3.0.3"
+    id("org.springframework.boot") version "3.1.1"
     id("io.spring.dependency-management") version "1.1.0"
-    id("org.jetbrains.kotlin.plugin.spring") version "1.8.10"
+    id("org.jetbrains.kotlin.plugin.spring") version "1.8.22"
     id("nu.studer.jooq") version "8.1"
 }
 java.sourceCompatibility = JavaVersion.VERSION_17
@@ -17,23 +16,17 @@ dependencies {
     implementation(libs.bundles.kotlin.webflux)
     implementation(libs.bundles.r2dbc.postgres)
     implementation(libs.bundles.r2dbc.querydsl)
-    kapt(libs.bundles.r2dbc.querydsl)
     implementation(libs.spring.gateway)
+    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.4")
     implementation("org.jooq:jooq:3.18.2")
     implementation("org.jooq:jooq-codegen:3.18.2")
     implementation("org.jooq:jooq-meta:3.18.2")
-    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.4")
     jooqGenerator("org.postgresql:postgresql:42.6.0")
 }
 configurations { all { exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging") } }
 dependencyManagement { imports { mavenBom(libs.spring.cloud.bom.get().toString()) } }
-
+kotlin.jvmToolchain(17)
 tasks {
-    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = "17"
-        }
-    }
     processResources {
         if(project.gradle.startParameter.taskNames.contains("build")) exclude("application.yml")
     }
@@ -59,7 +52,7 @@ jooq {
                     database.apply {
                         name = "org.jooq.meta.postgres.PostgresDatabase"
                         schemata = listOf(
-                            SchemaMappingType().withInputSchema("rms"),
+                            SchemaMappingType().withInputSchema("rms")
                         )
                     }
                     generate.apply {
@@ -70,7 +63,7 @@ jooq {
                         isFluentSetters = false
                     }
                     target.apply {
-                        packageName = "com.gcgenome.lims"
+                        packageName = "com.gcgenome.rms"
                         directory = "build/generated/jooq"
                     }
                     strategy.name = "org.jooq.codegen.DefaultGeneratorStrategy"

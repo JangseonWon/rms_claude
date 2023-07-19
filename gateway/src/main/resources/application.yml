@@ -48,15 +48,19 @@ spring:
           predicates:
             - Path=/api/orders, /api/orders/**
   r2dbc:
-    url: r2dbc:postgresql://libra:5432/report_service
-    username: report_service
-    password: rs1004!@
+    url: r2dbc:postgresql://172.19.216.212:5432/rms
+    username: postgres
+    password: snubi1004
     pool:
       initial-size: 100
       max-size: 500
       max-idle-time: 30m
       validation-query: SELECT 1
 management.endpoint.health.enabled: true
+logging:
+  level:
+    io.r2dbc.postgresql.QUERY: TRACE
+    io.r2dbc.postgresql.PARAM: TRACE
 security:
   oauth2:
     authorization:

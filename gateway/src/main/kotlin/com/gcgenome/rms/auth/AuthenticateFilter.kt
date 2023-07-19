@@ -1,6 +1,7 @@
 package com.gcgenome.rms.auth
 
-import com.gcgenome.rms.repo.UserRepository
+import com.gcgenome.rms.data.User
+import org.jooq.DSLContext
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cloud.gateway.filter.GatewayFilter
 import org.springframework.cloud.gateway.filter.GatewayFilterChain
@@ -17,9 +18,9 @@ import java.time.LocalDateTime
 @Component
 class AuthenticateFilter(
     private val securityContextRepository: SecurityContextRepository,
-    private val repo: UserRepository,
-    private val tokenFactory: TokenFactory
-) : AbstractGatewayFilterFactory<Any>() {
+    private val tokenFactory: TokenFactory,
+    private val dslContext: DSLContext
+) : AbstractGatewayFilterFactory<Any>(), Dao {
     @Value("\${security.oauth2.authorization.jwt.duration}")
     private val duration: Long = 0
 
@@ -41,7 +42,7 @@ class AuthenticateFilter(
                 val cast: TokenToAuthentication.UserAuthentication = auth
                 if (cast.expireDateTime.minusMinutes(5).isBefore(LocalDateTime.now())) {
                     return chain.filter(exchange)
-                        .then(repo.findById(cast.principal))
+                        .then(dslContext.selectUser(cast.principal).map(User::toDto))
                         .map(tokenFactory::publish)
                         .map { token -> ResponseCookie.from("Authorization", token).httpOnly(true).secure(true).maxAge(duration).build() }
                         .doOnNext { cookie -> exchange.response.addCookie(cookie) }

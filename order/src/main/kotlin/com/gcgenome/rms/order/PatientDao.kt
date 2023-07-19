@@ -1,7 +1,7 @@
 package com.gcgenome.rms.order
 
-import com.gcgenome.lims.tables.records.PatientRecord
-import com.gcgenome.lims.tables.references.PATIENT
+import com.gcgenome.rms.tables.records.PatientRecord
+import com.gcgenome.rms.tables.references.PATIENT
 import com.gcgenome.rms.data.Patient
 import org.jooq.DSLContext
 import reactor.core.publisher.Mono

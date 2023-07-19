@@ -2,7 +2,7 @@ package com.gcgenome.rms.auth
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.gcgenome.rms.data.Token_
-import com.gcgenome.rms.entity.User
+import com.gcgenome.rms.data.User
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.beans.factory.annotation.Value

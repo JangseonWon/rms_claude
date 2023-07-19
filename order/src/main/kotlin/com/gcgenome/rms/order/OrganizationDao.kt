@@ -1,7 +1,7 @@
 package com.gcgenome.rms.order
 
-import com.gcgenome.lims.tables.records.OrganizationRecord
-import com.gcgenome.lims.tables.references.ORGANIZATION
+import com.gcgenome.rms.tables.records.OrganizationRecord
+import com.gcgenome.rms.tables.references.ORGANIZATION
 import com.gcgenome.rms.data.Organization
 import org.jooq.DSLContext
 import reactor.core.publisher.Mono

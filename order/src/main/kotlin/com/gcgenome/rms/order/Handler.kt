@@ -1,8 +1,8 @@
 package com.gcgenome.rms.order
 
-import com.gcgenome.lims.tables.references.ITEM
-import com.gcgenome.lims.tables.references.ORDER
-import com.gcgenome.lims.tables.references.SAMPLE
+import com.gcgenome.rms.tables.references.ITEM
+import com.gcgenome.rms.tables.references.ORDER
+import com.gcgenome.rms.tables.references.SAMPLE
 import com.gcgenome.rms.data.CancelOrder
 import com.gcgenome.rms.data.Item
 import com.gcgenome.rms.data.Order

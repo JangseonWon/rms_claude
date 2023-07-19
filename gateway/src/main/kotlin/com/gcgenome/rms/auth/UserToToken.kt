@@ -1,7 +1,7 @@
 package com.gcgenome.rms.auth
 
 import com.gcgenome.rms.data.Token_
-import com.gcgenome.rms.entity.User
+import com.gcgenome.rms.data.User
 import java.util.*
 
 object UserToToken {
