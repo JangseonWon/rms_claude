@@ -74,3 +74,39 @@ spec:
     {{- end }}
   selector: {{- include "common.labels.matchLabels" . | nindent 4 }}
     app.kubernetes.io/component: zookeeper
+
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: zoonavigator
+  namespace: {{ template "zookeeper.namespace" . }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app: zoonavigator
+    app.kubernetes.io/instance: zoonavigator
+    app.kubernetes.io/name: zoonavigator
+    app.kubernetes.io/part-of: zookeeper
+    app.kubernetes.io/component: zookeeper
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- if or .Values.commonAnnotations .Values.service.annotations }}
+  annotations: {}
+spec:
+  clusterIP: ""
+  ipFamilies:
+    - IPv4
+  ports:
+    - name: 9000-tcp
+      protocol: TCP
+      port: 9000
+      targetPort: 9000
+  internalTrafficPolicy: Cluster
+  type: ClusterIP
+  ipFamilyPolicy: SingleStack
+  sessionAffinity: None
+  selector:
+    app: zoonavigator
+    deployment: zoonavigator

@@ -1,0 +1,55 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  annotations:
+    alpha.image.policy.openshift.io/resolve-names: '*'
+    app.openshift.io/route-disabled: 'false'
+    deployment.kubernetes.io/revision: '1'
+    image.openshift.io/triggers: >-
+      [{"from":{"kind":"ImageStreamTag","name":"zoonavigator:latest","namespace":"lims-test"},"fieldPath":"spec.template.spec.containers[?(@.name==\"zoonavigator\")].image","pause":"false"}]
+  name: zoonavigator
+  namespace: {{ template "zookeeper.namespace" . }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app: zoonavigator
+    app.kubernetes.io/instance: zoonavigator
+    app.kubernetes.io/name: zoonavigator
+    app.kubernetes.io/part-of: zookeeper
+    app.kubernetes.io/component: zookeeper
+    role: zookeeper
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zoonavigator
+  template:
+    metadata:
+      labels:
+        app: zoonavigator
+        deployment: zoonavigator
+    spec:
+      containers:
+        - name: zoonavigator
+          image: >-
+            image-registry.openshift-image-registry.svc:5000/lims-test/zoonavigator@sha256:92548872b448395e7bd77ece1912bfdbc68f6bbbb7836082539999c83a4c1db9
+          ports:
+            - containerPort: 9000
+              protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
