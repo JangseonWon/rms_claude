@@ -65,6 +65,7 @@ namespaceOverride: ""
 commonLabels:
   app.kubernetes.io/part-of: postgresql
   app.kubernetes.io/name: postgresql
+  network: 216-x
 ## @param commonAnnotations Common annotations to add to all resources (sub-charts are not considered). Evaluated as a template
 ##
 commonAnnotations: {}
@@ -1069,12 +1070,10 @@ pgpool:
   labels: {}
   ## @param pgpool.podLabels Labels to add to the pods. Evaluated as template
   ##
-  podLabels:
-    network: 216-x
+  podLabels: {}
   ## @param pgpool.serviceLabels Labels to add to the service. Evaluated as template
   ##
-  serviceLabels:
-    network: 216-x
+  serviceLabels: {}
   ## @param pgpool.serviceAnnotations Provide any additional annotations for Pgpool service
   ##
   serviceAnnotations:
