@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
         - name: zoonavigator
-          image: docker.io/elkozmon/zoonavigator
+          image: image-registry.openshift-image-registry.svc:5000/rms-test/zoonavigator2@sha256:92548872b448395e7bd77ece1912bfdbc68f6bbbb7836082539999c83a4c1db9
           ports:
             - containerPort: 9000
               protocol: TCP
