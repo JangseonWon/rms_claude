@@ -1126,8 +1126,7 @@ pgpool:
   ## @param pgpool.podAnnotations Additional pod annotations
   ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
   ##
-  podAnnotations:
-    app.openshift.io/connects-to: [{"apiVersion":"apps/v1","kind":"StatefulSet","name":"postgresql-ha-config-rms-postgresql"}]
+  podAnnotations: {}
   ## @param pgpool.priorityClassName Pod priority class
   ## Ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
   ##
