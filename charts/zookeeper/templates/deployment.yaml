@@ -27,6 +27,7 @@ spec:
       labels:
         app: zoonavigator
         deployment: zoonavigator
+        network: 216-x
     spec:
       containers:
         - name: zoonavigator
