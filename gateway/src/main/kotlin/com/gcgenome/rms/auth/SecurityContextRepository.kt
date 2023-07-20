@@ -32,7 +32,7 @@ class SecurityContextRepository(
             if(uuidPattern.matches(authHeader)) {
                 dslContext.selectUserByKey(UUID.fromString(authHeader))
                     .map(User::toDto)
-                    .map { SecurityContextImpl(UserAuthentication(it)) }
+                    .flatMap { this.authenticationManager.authenticate(UserAuthentication(it)).map(::SecurityContextImpl) }
             } else{
                 authentication(authHeader.substringAfter(" "))
                     .map<Mono<SecurityContext>> { authentication ->

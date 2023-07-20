@@ -1,6 +1,6 @@
 package com.gcgenome.rms.service
 
-import com.gcgenome.lims.tables.references.*
+import com.gcgenome.rms.tables.references.*
 import com.gcgenome.rms.data.Extension_
 import com.gcgenome.rms.data.SampleType_
 import com.gcgenome.rms.data.Service_

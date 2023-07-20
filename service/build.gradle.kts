@@ -50,16 +50,16 @@ jooq {
                 logging = Logging.WARN
                 jdbc.apply {
                     driver = "org.postgresql.Driver"
-                    url = "jdbc:postgresql://libra:5432/report_service"
-                    user = "report_service"
-                    password = "rs1004!@"
+                    url = "jdbc:postgresql://172.19.216.212:5432/rms"
+                    user = "postgres"
+                    password = "snubi1004"
                 }
                 generator.apply {
                     name = "org.jooq.codegen.KotlinGenerator"
                     database.apply {
                         name = "org.jooq.meta.postgres.PostgresDatabase"
                         schemata = listOf(
-                            SchemaMappingType().withInputSchema("rms"),
+                            SchemaMappingType().withInputSchema("public"),
                         )
                     }
                     generate.apply {
@@ -70,7 +70,7 @@ jooq {
                         isFluentSetters = false
                     }
                     target.apply {
-                        packageName = "com.gcgenome.lims"
+                        packageName = "com.gcgenome.rms"
                         directory = "build/generated/jooq"
                     }
                     strategy.name = "org.jooq.codegen.DefaultGeneratorStrategy"

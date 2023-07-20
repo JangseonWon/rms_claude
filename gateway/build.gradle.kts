@@ -65,7 +65,7 @@ jooq {
                     database.apply {
                         name = "org.jooq.meta.postgres.PostgresDatabase"
                         schemata = listOf(
-                            SchemaMappingType().withInputSchema("rms")
+                            SchemaMappingType().withInputSchema("public")
                         )
                     }
                     generate.apply {
