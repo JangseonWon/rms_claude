@@ -7,10 +7,9 @@ plugins {
     id("org.springframework.boot") version "3.1.1"
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jetbrains.kotlin.plugin.spring") version "1.8.22"
+    id("com.google.cloud.tools.jib") version "3.3.2"
     id("nu.studer.jooq") version "8.1"
 }
-java.sourceCompatibility = JavaVersion.VERSION_17
-java.targetCompatibility = JavaVersion.VERSION_17
 dependencies {
     implementation(libs.bundles.spring.client)
     implementation(libs.bundles.kotlin.webflux)
@@ -23,17 +22,19 @@ dependencies {
     implementation("org.jooq:jooq-meta:3.18.2")
     jooqGenerator("org.postgresql:postgresql:42.6.0")
 }
+jib {
+    from { image = "eclipse-temurin:17.0.7_7-jre-jammy" }
+    container { environment = mapOf(
+            "LANG" to "C.UTF-8",
+            "TZ" to "Asia/Seoul",
+        )
+    }
+}
+
 configurations { all { exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging") } }
 dependencyManagement { imports { mavenBom(libs.spring.cloud.bom.get().toString()) } }
 kotlin.jvmToolchain(17)
-tasks {
-    processResources {
-        if(project.gradle.startParameter.taskNames.contains("build")) exclude("application.yml")
-    }
-    getByName<Jar>("jar") {
-        enabled = false
-    }
-}
+tasks.processResources { if(project.gradle.startParameter.taskNames.contains("jib")) exclude("application.yml") }
 jooq {
     version.set("3.18.2")
     edition.set(JooqEdition.OSS)
@@ -43,9 +44,9 @@ jooq {
                 logging = Logging.WARN
                 jdbc.apply {
                     driver = "org.postgresql.Driver"
-                    url = "jdbc:postgresql://libra:5432/report_service"
-                    user = "report_service"
-                    password = "rs1004!@"
+                    url = "jdbc:postgresql://172.19.216.212:5432/rms"
+                    user = "postgres"
+                    password = "snubi1004"
                 }
                 generator.apply {
                     name = "org.jooq.codegen.KotlinGenerator"

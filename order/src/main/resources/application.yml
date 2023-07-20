@@ -31,9 +31,9 @@ spring:
               - PATCH
               - DELETE
   r2dbc:
-    url: r2dbc:postgresql://libra:5432/report_service?schema=rms
-    username: report_service
-    password: rs1004!@
+    url: r2dbc:postgresql://172.19.216.212:5432/rms
+    username: postgres
+    password: snubi1004
     pool:
       initial-size: 100
       max-size: 500
