@@ -1070,7 +1070,8 @@ pgpool:
   labels: {}
   ## @param pgpool.podLabels Labels to add to the pods. Evaluated as template
   ##
-  podLabels: {}
+  podLabels:
+    network: 216-x
   ## @param pgpool.serviceLabels Labels to add to the service. Evaluated as template
   ##
   serviceLabels: {}
