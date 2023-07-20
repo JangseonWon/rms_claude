@@ -1066,7 +1066,8 @@ pgpool:
   srCheckDatabase: postgres
   ## @param pgpool.labels Labels to add to the Deployment. Evaluated as template
   ##
-  labels: {}
+  labels:
+    network: 216-x
   ## @param pgpool.podLabels Labels to add to the pods. Evaluated as template
   ##
   podLabels: {}
