@@ -4,7 +4,6 @@ metadata:
   annotations:
     alpha.image.policy.openshift.io/resolve-names: '*'
     app.openshift.io/route-disabled: 'false'
-    deployment.kubernetes.io/revision: '1'
   name: zoonavigator
   namespace: {{ template "zookeeper.namespace" . }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
