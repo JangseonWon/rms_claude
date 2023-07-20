@@ -13,7 +13,7 @@ metadata:
   annotations:
     openshift.io/host.generated: 'true'
 spec:
-  host: zookeeper-rms-test.apps.lims.gcgenome.com
+  host: zookeeper-{{ template "zookeeper.namespace" . }}.apps.lims.gcgenome.com
   to:
     kind: Service
     name: zoonavigator
