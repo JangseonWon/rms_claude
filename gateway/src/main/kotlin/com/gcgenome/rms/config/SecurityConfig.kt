@@ -53,7 +53,7 @@ class SecurityConfig (
             }
             authorizeExchange {
                 authorize (pathMatchers(HttpMethod.OPTIONS, "/**"), permitAll)
-                authorize (pathMatchers(HttpMethod.GET,"/actuator/health/**","/api/test"),permitAll)
+                authorize (pathMatchers(HttpMethod.GET,"/actuator/health/**","/api/test", "/"),permitAll)
                 authorize (anyExchange, authenticated)
             }
         }
