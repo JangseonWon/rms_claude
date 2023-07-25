@@ -8,28 +8,6 @@ spring:
       connect-string: test:12181
       discovery:
         root: /rms
-    gateway:
-      globalcors:
-        corsConfigurations:
-          '[/**]':
-            allowedOrigins: "*"
-            allowedHeaders:
-              - Authentication
-              - AUTHORIZATION
-              - X-USER-ID
-              - Content-Type
-            exposedHeaders:
-              - X-Total-Count
-              - X-Total-Page
-              - X-Current-Page
-              - X-Frame-Options
-            allowedMethods:
-              - OPTIONS
-              - GET
-              - POST
-              - PUT
-              - PATCH
-              - DELETE
   r2dbc:
     url: r2dbc:postgresql://172.19.216.212:5432/rms?schema=public
     username: postgres
