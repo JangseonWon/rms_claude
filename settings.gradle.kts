@@ -4,6 +4,7 @@ include("entity")
 include("service")
 include("order")
 include("user")
+include("alis-api")
 
 
 dependencyResolutionManagement {
