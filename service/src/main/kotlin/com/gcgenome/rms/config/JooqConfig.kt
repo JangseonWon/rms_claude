@@ -1,4 +1,4 @@
-package com.gcgenome.rms
+package com.gcgenome.rms.config
 
 import io.r2dbc.spi.ConnectionFactory
 import org.jooq.DSLContext

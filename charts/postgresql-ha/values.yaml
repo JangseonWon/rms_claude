@@ -1338,7 +1338,7 @@ pgpool:
   ## connections limit to Pgpool-II from clients. Must be a positive integer. (PGPOOL_NUM_INIT_CHILDREN)
   ## ref: https://github.com/bitnami/containers/tree/main/bitnami/pgpool#configuration
   ##
-  numInitChildren: ""
+  numInitChildren: 100
   ## @param pgpool.reservedConnections Number of reserved connections. When zero, excess connection block. When non-zero, excess connections are refused with an error message.
   ## When this parameter is set to 1 or greater, incoming connections from clients are not accepted with error message
   ## "Sorry, too many clients already", rather than blocked if the number of current connections from clients is more than
@@ -1350,7 +1350,7 @@ pgpool:
   ## @param pgpool.maxPool The maximum number of cached connections in each child process (PGPOOL_MAX_POOL)
   ## ref: https://github.com/bitnami/containers/tree/main/bitnami/pgpool#configuration
   ##
-  maxPool: ""
+  maxPool: 500
   ## @param pgpool.childMaxConnections The maximum number of client connections in each child process (PGPOOL_CHILD_MAX_CONNECTIONS)
   ## ref: https://github.com/bitnami/containers/tree/main/bitnami/pgpool#configuration
   ##

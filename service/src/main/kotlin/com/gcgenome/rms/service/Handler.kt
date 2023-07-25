@@ -1,12 +1,15 @@
 package com.gcgenome.rms.service
 
-import com.gcgenome.rms.data.Service_
-import org.springframework.stereotype.Service
+import com.gcgenome.rms.data.Service
+import org.jooq.DSLContext
+import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 
-@Service("com.gcgenome.rms.service.Handler")
-class Handler(private val dao: Dao) {
-    fun list(userId: String): Flux<Service_> {
-        return dao.findByUserService(userId)
+@Component
+class Handler(
+    val dslContext: DSLContext
+):Dao {
+    fun list(userId: String): Flux<Service> {
+        return dslContext.selectUserService(userId)
     }
 }

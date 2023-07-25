@@ -1,4 +1,4 @@
-package com.gcgenome.rms
+package com.gcgenome.rms.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -11,12 +11,16 @@ import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
 import org.springframework.security.config.web.server.ServerHttpSecurity
+import org.springframework.security.config.web.server.invoke
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.context.ReactiveSecurityContextHolder
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.web.server.SecurityWebFilterChain
+import org.springframework.security.web.server.ServerAuthenticationEntryPoint
+import org.springframework.security.web.server.authorization.ServerAccessDeniedHandler
 import org.springframework.security.web.server.header.XFrameOptionsServerHttpHeadersWriter
+import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers
 import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
 import java.time.Duration
@@ -31,32 +35,25 @@ class SecurityConfig (
 ) {
     @Bean
     fun resourceFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain {
-        return http.cors().and()
-            .httpBasic().disable()
-            .csrf().disable()
-            .formLogin().disable()
-            .headers().frameOptions().mode(XFrameOptionsServerHttpHeadersWriter.Mode.SAMEORIGIN).and()
-            .exceptionHandling()
-            .authenticationEntryPoint { swe: ServerWebExchange, _: AuthenticationException ->
-                Mono.fromRunnable { swe.response.statusCode = HttpStatus.UNAUTHORIZED }
-            }.accessDeniedHandler { swe: ServerWebExchange, _: AccessDeniedException ->
-                Mono.fromRunnable { swe.response.statusCode = HttpStatus.FORBIDDEN }
-            }.and().securityContextRepository(securityContextRepository)
-            .authorizeExchange()
-            .pathMatchers(HttpMethod.OPTIONS).permitAll()
-            .anyExchange().authenticated()
-            .and().build()
-    }
-
-    @Bean
-    fun auditorProvider(): ReactiveAuditorAware<String> {
-        return ReactiveAuditorAware {
-            ReactiveSecurityContextHolder.getContext()
-                .timeout(Duration.ofSeconds(1))
-                .map { obj: SecurityContext -> obj.authentication }
-                .filter { obj: Authentication -> obj.isAuthenticated }
-                .map { obj: Authentication -> obj.principal }
-                .map { obj: Any? -> String::class.java.cast(obj) }
+        http.securityContextRepository(securityContextRepository)
+        return http {
+            cors { }
+            httpBasic { disable() }
+            csrf { disable() }
+            formLogin { disable() }
+            headers { frameOptions { mode = XFrameOptionsServerHttpHeadersWriter.Mode.SAMEORIGIN } }
+            exceptionHandling {
+                authenticationEntryPoint = ServerAuthenticationEntryPoint { exchange, _ ->
+                    Mono.fromRunnable { exchange.response.statusCode = HttpStatus.UNAUTHORIZED }
+                }
+                accessDeniedHandler = ServerAccessDeniedHandler { exchange, _ ->
+                    Mono.fromRunnable { exchange.response.statusCode = HttpStatus.FORBIDDEN }
+                }
+            }
+            authorizeExchange {
+                authorize (ServerWebExchangeMatchers.pathMatchers(HttpMethod.GET, "/actuator/health/**"), permitAll)
+                authorize (anyExchange, authenticated)
+            }
         }
     }
 }

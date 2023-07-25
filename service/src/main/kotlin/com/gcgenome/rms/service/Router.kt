@@ -1,7 +1,7 @@
 package com.gcgenome.rms.service
 
-import com.gcgenome.rms.SecurityContextRepository
-import com.gcgenome.rms.data.Service_
+import com.gcgenome.rms.config.SecurityContextRepository
+import com.gcgenome.rms.data.Service
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import org.springdoc.core.fn.builders.parameter.Builder
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder
@@ -30,7 +30,7 @@ class Router (private val handler: Handler) {
                             ParameterIn.HEADER))
                     .response(org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder().responseCode("200").content(
                         org.springdoc.core.fn.builders.content.Builder.contentBuilder().mediaType(MediaType.APPLICATION_JSON_VALUE)
-                            .schema(org.springdoc.core.fn.builders.schema.Builder.schemaBuilder().implementation(Service_::class.java))
+                            .schema(org.springdoc.core.fn.builders.schema.Builder.schemaBuilder().implementation(Service::class.java))
                     ))
                     .response(org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder().responseCode("400").description("잘못된 접근: 필수 파라메터 누락, 타입 불일치, 잘못된 포맷 등"))
                     .response(org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder().responseCode("401").description("인증실패: 인증정보 누락"))
@@ -52,7 +52,7 @@ class Router (private val handler: Handler) {
             .cast(SecurityContextRepository.UserAuthentication::class.java)
             .flatMap {
                 ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                    .body(handler.list(it.principal), Service_::class.java)
+                    .body(handler.list(it.principal), Service::class.java)
             }
             .switchIfEmpty(ServerResponse.status(HttpStatus.NO_CONTENT).build())
             .onErrorResume { e ->
