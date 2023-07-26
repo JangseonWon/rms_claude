@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: {{ include "..fullname" . }}
   labels:
+    app.kubernetes.io/part-of: rms
     {{- include "..labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
