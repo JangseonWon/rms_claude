@@ -81,8 +81,7 @@ tolerations: []
 
 affinity: {}
 
-volumes:
-  name: config-volume
-  configMap:
-    name: rms-service-application
-    path: /app/resources
+application:
+  name: rms-service-application
+  path: /app/resources
+  configMap: config-volume

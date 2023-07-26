@@ -25,17 +25,17 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
-        - name: {{ .Values.volumes.name}}
+        - name: {{ .Values.application.configMap}}
           configMap:
-            name: {{ .Values.volumes.configMap.name}}
+            name: {{ .Values.application.name}}
       serviceAccountName: {{ include "..serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
           volumeMounts:
-            - name: {{ .Values.volumes.name}}
-              mountPath: {{ .Values.volumes.configMap.path}}
+            - name: {{ .Values.application.configMap}}
+              mountPath: {{ .Values.application.path}}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
