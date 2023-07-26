@@ -39,7 +39,7 @@ class RequestRouter(
     }
     @Bean("ServiceRouterLegacy")
     fun route() = router {
-        POST("/alis/requests", contentType(MediaType("application", "vnd.alis-api.v0", UTF_8)), ::requests)
+        POST("/api/alis/requests", contentType(MediaType("application", "vnd.alis-api.v0", UTF_8)), ::requests)
     }
 
     private fun requests(request: ServerRequest): Mono<ServerResponse> {

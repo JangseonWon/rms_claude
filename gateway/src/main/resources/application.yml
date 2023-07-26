@@ -47,6 +47,10 @@ spring:
           uri: lb://rms-order
           predicates:
             - Path=/api/orders, /api/orders/**
+        - id: rms-alis-api
+          uri: lb://rms-alis-api
+          predicates:
+            - Path=/api/alis/**
   r2dbc:
     url: r2dbc:postgresql://172.19.216.212:5432/rms
     username: postgres
