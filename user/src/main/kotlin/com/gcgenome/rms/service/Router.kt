@@ -11,7 +11,6 @@ import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.router
 import reactor.core.publisher.Mono
-import java.util.*
 
 @Configuration("com.gcgenome.rms.service.Router")
 class Router (private val handler: Handler) {
@@ -19,7 +18,7 @@ class Router (private val handler: Handler) {
     fun route() = router {
         POST("/api/user", ::addUser)
         POST("/api/user/organization", ::addOrganization)
-        PUT("/api/organization/{organization-id}/service/{service-id}/user/{user-id}", ::addOrganizationService)
+        PUT("/api/user/{user-id}/service/{service-id}", ::addUserService)
         DELETE("/api/user/{user-id}", ::deleteUser)
     }
 
@@ -44,17 +43,16 @@ class Router (private val handler: Handler) {
             .onErrorResume (ServerResponse.badRequest()::bodyValue)
     }
 
-    private fun addOrganizationService(request: ServerRequest): Mono<ServerResponse> {
-        val organizationId = request.pathVariable("organization-id")
-        val serviceId = request.pathVariable("service-id")
+    private fun addUserService(request: ServerRequest): Mono<ServerResponse> {
         val userId = request.pathVariable("user-id")
+        val serviceId = request.pathVariable("service-id")
         return request
             .principal()
             .cast(SecurityContextRepository.UserAuthentication::class.java)
             .flatMap {
                 ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                    .body(handler.insertOrganizationService(it.details.authority, organizationId, serviceId, userId),
-                        OrganizationService::class.java)
+                    .body(handler.insertUserService(it.details.authority, userId, serviceId),
+                        UserService::class.java)
             }
             .switchIfEmpty(ServerResponse.status(HttpStatus.NO_CONTENT).build())
             .onErrorResume(DuplicateKeyException::class.java) { ServerResponse.status(HttpStatus.CONFLICT).build() }

@@ -1,8 +1,8 @@
 package com.gcgenome.rms.service
 
 import com.gcgenome.rms.dao.OrganizationDao
-import com.gcgenome.rms.dao.OrganizationServiceDao
 import com.gcgenome.rms.dao.UserDao
+import com.gcgenome.rms.dao.UserServiceDao
 import com.gcgenome.rms.data.Message
 import com.gcgenome.rms.data.Organization
 import com.gcgenome.rms.data.User
@@ -15,13 +15,13 @@ import reactor.core.publisher.Mono
 class Handler(
     val dslContext: DSLContext,
     val userDao: UserDao
-): OrganizationDao, OrganizationServiceDao {
+): OrganizationDao, UserServiceDao {
     val addSuccess = "추가 완료 되었습니다."
     val deleteSuccess = "삭제 완료 되었습니다."
 
-    fun insertOrganizationService(authority: String?, organizationId: String, serviceId: String, userId: String): Mono<Message> {
+    fun insertUserService(authority: String?, userId: String, serviceId: String): Mono<Message> {
         return withAdminAuthority(authority) {
-            dslContext.dsl().insertOrganizationService(organizationId, serviceId, userId)
+            dslContext.dsl().insertUserService(userId, serviceId)
                 .map { Message.toModelOrgSer(it, addSuccess) }
                 .onErrorResume(this::handleException)
         }
