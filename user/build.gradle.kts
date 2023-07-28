@@ -8,6 +8,7 @@ plugins {
     id("org.springframework.boot") version "3.0.3"
     id("io.spring.dependency-management") version "1.1.0"
     id("org.jetbrains.kotlin.plugin.spring") version "1.8.10"
+    id("com.google.cloud.tools.jib") version "3.3.2"
     id("nu.studer.jooq") version "8.1"
 }
 java.sourceCompatibility = JavaVersion.VERSION_17
@@ -41,6 +42,18 @@ tasks {
         enabled = false
     }
 }
+jib {
+    from { image = "eclipse-temurin:17.0.7_7-jre-jammy" }
+    container { environment = mapOf(
+        "LANG" to "C.UTF-8",
+        "TZ" to "Asia/Seoul",
+    )}
+}
+
+configurations { all { exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging") } }
+dependencyManagement { imports { mavenBom(libs.spring.cloud.bom.get().toString()) } }
+kotlin.jvmToolchain(17)
+tasks.processResources { if(project.gradle.startParameter.taskNames.contains("jib")) exclude("application.yml") }
 jooq {
     version.set("3.18.2")
     edition.set(JooqEdition.OSS)
