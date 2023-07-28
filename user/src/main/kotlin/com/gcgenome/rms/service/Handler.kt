@@ -41,11 +41,8 @@ class Handler(
         return withAdminAuthority(authority) {
             Mono.from(dslContext.transactionPublisher { trx ->
                 trx.dsl().run {
-                    userDao.insertUser(dto).flatMap { userRecord ->
-                        insertUserToOrganization(userRecord).map {
-                            Message.toModelUser(userRecord, addSuccess)
-                        }
-                    }
+                    userDao.insertUser(dto)
+                        .map { Message.toModelUser(it, addSuccess) }
                 }.onErrorResume(this::handleException)
             })
         }
