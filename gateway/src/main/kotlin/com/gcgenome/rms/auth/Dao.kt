@@ -10,7 +10,7 @@ interface Dao {
     fun DSLContext.selectUser(id: String): Mono<UserRecord>{
         return Mono.from(selectFrom(USER).where(USER.ID.eq(id)))
     }
-    fun DSLContext.selectUserByIdAndKey(user: String?, key: UUID): Mono<UserRecord>{
-        return Mono.from(selectFrom(USER).where(USER.ID.eq(user).and(USER.KEY.eq(key))))
+    fun DSLContext.selectUserByKey(key: UUID): Mono<UserRecord>{
+        return Mono.from(selectFrom(USER).where(USER.KEY.eq(key)))
     }
 }

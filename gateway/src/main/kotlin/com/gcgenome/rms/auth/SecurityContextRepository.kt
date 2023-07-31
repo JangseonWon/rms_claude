@@ -30,8 +30,7 @@ class SecurityContextRepository(
         return if (authHeader != null) {
             val uuidPattern = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}".toRegex()
             if(uuidPattern.matches(authHeader)) {
-                val user = request.headers.getFirst("X-USER-ID")
-                dslContext.selectUserByIdAndKey(user, UUID.fromString(authHeader))
+                dslContext.selectUserByKey(UUID.fromString(authHeader))
                     .switchIfEmpty(Mono.empty())
                     .map(User::toDto)
                     .flatMap { this.authenticationManager.authenticate(UserAuthentication(it)).map(::SecurityContextImpl) }
