@@ -1,19 +1,32 @@
-package com.gcgenome.rms.order
+package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.tables.records.SampleRecord
 import com.gcgenome.rms.tables.references.SAMPLE
 import com.gcgenome.rms.data.Sample
 import org.jooq.DSLContext
+import org.jooq.impl.DSL
 import org.jooq.impl.DSL.count
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 interface SampleDao {
     fun DSLContext.selectSampleById(sampleId: UUID): Flux<SampleRecord> =
         Flux.from(selectFrom(SAMPLE).where(SAMPLE.ID.eq(sampleId)))
+
+    fun DSLContext.selectSamplePostfix(infix: Short): Mono<Int> {
+        val ofPattern = DateTimeFormatter.ofPattern("yyyyMMdd")
+        return Mono.from(
+            select(DSL.coalesce(DSL.max(SAMPLE.GENOME_BARCODE_POSTFIX), 5000))
+                .from(SAMPLE)
+                .where(SAMPLE.GENOME_BARCODE_PREFIX.eq(LocalDate.now().format(ofPattern).toInt()).and(SAMPLE.GENOME_BARCODE_INFIX.eq(infix))))
+            .mapNotNull { it.component1() }
+    }
+
     fun DSLContext.updateSampleById(sample: Sample): Mono<SampleRecord> =
         Mono.from(
             update(SAMPLE)
@@ -30,49 +43,37 @@ interface SampleDao {
                 .where(SAMPLE.ID.eq(sample.id))
                 .returning()
         )
-    fun DSLContext.insertSample(patientSerial: String, userId: String, itemId: UUID, sample: Sample, organizationId: String?): Mono<SampleRecord> =
-        Mono.from(
+    fun DSLContext.insertSample(patientSerial: String, userId: String, itemId: UUID, sample: Sample, organizationId: String?, code: Short, postfix: Int): Mono<SampleRecord> {
+        val ofPattern = DateTimeFormatter.ofPattern("yyyyMMdd")
+        return Mono.from(
             insertInto(SAMPLE)
-            .columns(
-                SAMPLE.ID,
-                SAMPLE.CREATE_AT,
-                SAMPLE.LAST_MODIFY_AT,
-                SAMPLE.GENOME_BARCODE,
-                SAMPLE.SAMPLE_BARCODE,
-                SAMPLE.ORGANIZATION_ID,
-                SAMPLE.PATIENT_SERIAL,
-                SAMPLE.USER_ID,
-                SAMPLE.SAMPLE_TYPE_ID,
-                SAMPLE.AGE,
-                SAMPLE.DEPARTMENT,
-                SAMPLE.NOTE,
-                SAMPLE.REGISTRATION_AT,
-                SAMPLE.SAMPLING,
-                SAMPLE.STATE,
-                SAMPLE.WARD,
-                SAMPLE.PHYSICIAN,
-                SAMPLE.ITEM_ID)
-            .values(
-                UUID.randomUUID(),
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                sample.genomeBarcode,
-                sample.sampleBarcode,
-                organizationId ?: userId,
-                patientSerial,
-                userId,
-                sample.typeId,
-                sample.age,
-                sample.department,
-                sample.note,
-                LocalDateTime.now(),
-                sample.sampling!!.atStartOfDay(),
-                "NEW",
-                sample.ward,
-                sample.physician,
-                itemId
-            ).returning()
+                .set(SAMPLE.ID, UUID.randomUUID())
+                .set(SAMPLE.CREATE_AT, LocalDateTime.now())
+                .set(SAMPLE.LAST_MODIFY_AT, LocalDateTime.now())
+                .set(SAMPLE.GENOME_BARCODE_PREFIX, LocalDate.now().format(ofPattern).toInt())
+                .set(SAMPLE.GENOME_BARCODE_INFIX, code)
+                .set(SAMPLE.GENOME_BARCODE_POSTFIX, postfix)
+                .set(SAMPLE.GENOME_BARCODE, "${LocalDate.now().format(ofPattern).toInt()}${code}${postfix}")
+                .set(SAMPLE.SAMPLE_BARCODE, sample.sampleBarcode)
+                .set(SAMPLE.ORGANIZATION_ID, organizationId ?: userId)
+                .set(SAMPLE.PATIENT_SERIAL, patientSerial)
+                .set(SAMPLE.USER_ID, userId)
+                .set(SAMPLE.SAMPLE_TYPE_ID, sample.typeId)
+                .set(SAMPLE.AGE, sample.age)
+                .set(SAMPLE.DEPARTMENT, sample.department)
+                .set(SAMPLE.NOTE, sample.note)
+                .set(SAMPLE.REGISTRATION_AT, LocalDateTime.now())
+                .set(SAMPLE.SAMPLING, sample.sampling!!.atStartOfDay())
+                .set(SAMPLE.STATE, "NEW")
+                .set(SAMPLE.WARD, sample.ward)
+                .set(SAMPLE.PHYSICIAN, sample.physician)
+                .set(SAMPLE.ITEM_ID, itemId)
+                .set(SAMPLE.EMP_ID, sample.empId)
+                .set(SAMPLE.EMP_NAME, sample.empName)
+                .set(SAMPLE.EMP_MOBILE, sample.empMobile)
+                .returning()
         )
+    }
 
     fun DSLContext.deleteSample(sampleId: UUID) =
         deleteFrom(SAMPLE).where(SAMPLE.ID.eq(sampleId)).toMono()

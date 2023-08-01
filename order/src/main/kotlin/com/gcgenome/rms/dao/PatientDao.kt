@@ -1,4 +1,4 @@
-package com.gcgenome.rms.order
+package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.tables.records.PatientRecord
 import com.gcgenome.rms.tables.references.PATIENT
@@ -8,17 +8,25 @@ import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 
 interface PatientDao{
-    fun DSLContext.insertPatient(organizationId: String, userId: String, patient: Patient): Mono<PatientRecord> =
-        Mono.from(
+    fun DSLContext.insertPatient(organizationId: String, userId: String, patient: Patient): Mono<PatientRecord> {
+        return Mono.from(
             insertInto(PATIENT)
-                .columns(PATIENT.ORGANIZATION_ID, PATIENT.SERIAL, PATIENT.USER_ID, PATIENT.BIRTH_DAY, PATIENT.BIRTH_MONTH, PATIENT.BIRTH_YEAR, PATIENT.NAME, PATIENT.SEX)
-                .values(organizationId, patient.serial, userId, patient.birthDay?.toByte(), patient.birthMonth?.toByte(), patient.birthYear?.toShort(), patient.name, patient.sex)
+                .set(PATIENT.ORGANIZATION_ID, organizationId)
+                .set(PATIENT.SERIAL, patient.serial)
+                .set(PATIENT.USER_ID, userId)
+                .set(PATIENT.BIRTH_DAY, patient.birthDay)
+                .set(PATIENT.BIRTH_MONTH, patient.birthMonth)
+                .set(PATIENT.BIRTH_YEAR, patient.birthYear)
+                .set(PATIENT.NAME, patient.name)
+                .set(PATIENT.SEX, patient.sex)
                 .onDuplicateKeyUpdate()
-                .set(PATIENT.BIRTH_DAY, patient.birthDay?.toByte())
-                .set(PATIENT.BIRTH_MONTH, patient.birthMonth?.toByte())
-                .set(PATIENT.BIRTH_YEAR, patient.birthYear?.toShort())
+                .set(PATIENT.BIRTH_DAY, patient.birthDay)
+                .set(PATIENT.BIRTH_MONTH, patient.birthMonth)
+                .set(PATIENT.BIRTH_YEAR, patient.birthYear)
                 .returning()
         )
+    }
+
     fun DSLContext.updatePatientById(userId:String, patient: Patient) =
         Mono.from(
             update(PATIENT)

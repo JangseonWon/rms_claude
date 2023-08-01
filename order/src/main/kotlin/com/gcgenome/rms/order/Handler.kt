@@ -1,11 +1,12 @@
 package com.gcgenome.rms.order
 
-import com.gcgenome.rms.tables.references.ITEM
-import com.gcgenome.rms.tables.references.ORDER
+import com.gcgenome.rms.dao.*
 import com.gcgenome.rms.tables.references.SAMPLE
 import com.gcgenome.rms.data.CancelOrder
 import com.gcgenome.rms.data.Item
 import com.gcgenome.rms.data.Order
+import com.gcgenome.rms.data.User
+import com.gcgenome.rms.tables.records.UserRecord
 import org.jooq.DSLContext
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
@@ -16,56 +17,41 @@ import java.util.*
 @Service("com.gcgenome.rms.order.Handler")
 class Handler(
     val dslContext: DSLContext
-): PatientDao, OrderDao, OrganizationDao, ItemDao, ExtensionDao, SampleDao {
+): PatientDao, OrderDao, OrganizationDao, ItemDao, ExtensionDao, SampleDao, UserDao {
     fun insertOrder(userId: String, dto: Order): Mono<Order> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
-                Flux.from(
-                    Flux.fromIterable(dto.items!!).flatMap {
-                        if (it.patient.organization != null) {
-                            insertOrganization(userId, it.patient.organization)
-                                .then(insertPatient(it.patient.organization!!.id ?: userId, userId, it.patient))
-                        } else {
-                            insertPatient(it.patient.organization?.id ?: userId, userId, it.patient)
-                        }
-                    }.then(insertOrder(userId, dto))
-                ).flatMap { order ->
-                    Flux.fromIterable(dto.items).flatMap {
-                        val item = insertItem(userId, order.value1()!!, it.patient.organization?.id ?: userId, it)
-                        Flux.fromIterable(it.patient.samples!!)
-                            .zipWith(item)
-                            .flatMap { itemSample ->
-                                insertSample(
-                                    it.patient.serial,
-                                    userId,
-                                    itemSample.t2.getValue(ITEM.ID)!!,
-                                    itemSample.t1,
-                                    it.patient.organization?.id ?: userId
-                                )
-                                    .flatMap { sample ->
-                                        Flux.fromIterable(itemSample.t1.extensions ?: listOf())
-                                            .flatMap { extension ->
-                                                insertSampleExtension(extension, sample.id!!)
-                                            }.toMono()
+                insertOrder(userId, dto).flatMap { orderRecord ->
+                    Flux.fromIterable(dto.items!!).flatMap { items ->
+                        insertOrganization(userId, items.patient.organization)
+                        .then(insertPatient(items.patient.organization?.id ?: userId, userId, items.patient))
+                        .then(insertItem(userId, orderRecord.id!!, items.patient.organization?.id ?: userId, items))
+                        .flatMap { itemRecord ->
+                            Flux.fromIterable(items.patient.samples!!).flatMap { sample ->
+                                selectUserById(userId).flatMap { userRecord ->
+                                    selectSamplePostfix(userRecord.code!!).flatMap { postfix ->
+                                        insertSample(items.patient.serial, userId, itemRecord.id!!, sample, items.patient.organization?.id ?: userId, userRecord.code!!, postfix+1)
+                                            .flatMap { sampleRecord ->
+                                                Flux.fromIterable(sample.extensions ?: listOf())
+                                                    .flatMap { extension -> insertSampleExtension(extension, sampleRecord.id!!) }
+                                                    .toMono()
+                                            }
                                     }
-                            }
-                    }.then(selectOrderById(order.get(ORDER.ID)!!))
+                                }
+                            }.toMono()
+                        }
+                    }.then(selectOrderById(orderRecord.id!!)).map(Order::toModel)
                 }
             }
-        }).map { record ->
-            if (dto.items?.firstOrNull()?.patient?.organization != null) {
-                Order.toModel(record)
-            } else {
-                Order.toModel(record, dto.items?.firstOrNull())
-            }
-        }
+        })
     }
 
     fun findOrders(userId: String): Flux<Order> {
         return dslContext.dsl().selectOrders(userId)
     }
     fun addSample(userId: String, sampleId: UUID, dto: Item): Mono<Order> {
-        return Mono.from(dslContext.transactionPublisher { trx ->
+        return Mono.empty()
+        /*return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
                 selectSampleById(sampleId).flatMap { sampleRecord ->
                     updatePatientById(userId, dto.patient)
@@ -103,7 +89,7 @@ class Handler(
             } else {
                 Order.toModel(record, dto)
             }
-        }
+        }*/
     }
 
     fun updateOrder(userId: String, itemId: UUID, dto: Item): Mono<Order> {

@@ -48,6 +48,12 @@ data class Sample(
     val extensions: List<Extension>?,
     @JsonProperty("state")
     val state: String?,
+    @JsonProperty("emp_id")
+    val empId: String?,
+    @JsonProperty("emp_name")
+    val empName: String?,
+    @JsonProperty("emp_mobile")
+    val empMobile: String?,
     @JsonProperty("registration_at")
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
@@ -56,26 +62,4 @@ data class Sample(
     val organizationId: String?,
     @JsonProperty("item_id")
     var itemId: UUID?,
-){
-    /*companion object {
-        fun toModel(record: Record1<SampleRecord>) =
-            Sample_(
-                id = record.get(SAMPLE.ID),
-                createAt = record.get(SAMPLE.CREATE_AT),
-                lastModifyAt = record.get(SAMPLE.LAST_MODIFY_AT),
-                age = record.get(SAMPLE.AGE),
-                sampling = record.get(SAMPLE.SAMPLING)?.toLocalDate(),
-                note = record.get(SAMPLE.NOTE),
-                genomeBarcode = record.get(SAMPLE.GENOME_BARCODE),
-                sampleBarcode = record.get(SAMPLE.SAMPLE_BARCODE),
-                typeId = record.get(SAMPLE.SAMPLE_TYPE_ID),
-                registrationAt = record.get(SAMPLE.REGISTRATION_AT),
-                organizationId = record.get(SAMPLE.ORGANIZATION_ID),
-                department = record.get(SAMPLE.DEPARTMENT),
-                ward = record.get(SAMPLE.WARD),
-                physician = record.get(SAMPLE.PHYSICIAN),
-                state = record.get(SAMPLE.STATE),
-                extensions = record.getValue("extensions", Array<Extension_>::class.java).toList()
-            )
-    }*/
-}
+)

@@ -56,6 +56,7 @@ data class Order(
             val items = itemRecords.map { itemRecord ->
                 val id = itemRecord.id
                 val service = itemRecord.service
+                val itemSerial = itemRecord.serial
 
                 val patientRecord = itemRecord.patient
                 val serial = patientRecord.serial
@@ -68,7 +69,7 @@ data class Order(
 
                 val patient = Patient(serial, sex, name, birthYear, birthMonth, birthDay,  samples)
 
-                Item(id, service, patient)
+                Item(id, service, itemSerial, patient)
             }
 
             return Order(createAt, lastModifyAt, test, credit, price, outsourcingCost, items)

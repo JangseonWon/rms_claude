@@ -1,4 +1,4 @@
-package com.gcgenome.rms.order
+package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.tables.records.OrderRecord
 import com.gcgenome.rms.tables.references.*
@@ -16,13 +16,21 @@ import java.util.*
 
 interface OrderDao{
 
-    fun DSLContext.insertOrder(userId: String, order: Order): Mono<OrderRecord> =
-        Mono.from(
+    fun DSLContext.insertOrder(userId: String, order: Order): Mono<OrderRecord> {
+        return Mono.from(
             insertInto(ORDER)
-            .columns(ORDER.ID, ORDER.CREATE_AT, ORDER.LAST_MODIFY_AT, ORDER.CREDIT, ORDER.OUTSOURCING_COST, ORDER.PRICE, ORDER.TEST, ORDER.USER_ID)
-            .values(UUID.randomUUID(), LocalDateTime.now(), LocalDateTime.now(), order.credit, order.outsourcingCost, order.price, order.test, userId)
-            .returning()
+                .set(ORDER.ID, UUID.randomUUID())
+                .set(ORDER.CREATE_AT, LocalDateTime.now())
+                .set(ORDER.LAST_MODIFY_AT, LocalDateTime.now())
+                .set(ORDER.CREDIT, order.credit)
+                .set(ORDER.OUTSOURCING_COST, order.outsourcingCost)
+                .set(ORDER.PRICE, order.price)
+                .set(ORDER.TEST, order.test)
+                .set(ORDER.USER_ID, userId)
+                .returning()
         )
+    }
+
 
     fun DSLContext.selectOrderById(orderId: UUID): Mono<Record8<UUID?, LocalDateTime?, LocalDateTime?, Boolean?, Boolean?, Int?, Int?, JSON?>> =
         Mono.from(

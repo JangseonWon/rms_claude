@@ -1,4 +1,4 @@
-package com.gcgenome.rms.order
+package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.tables.records.ItemRecord
 import com.gcgenome.rms.tables.references.ITEM
@@ -10,13 +10,20 @@ import reactor.kotlin.core.publisher.toMono
 import java.util.*
 
 interface ItemDao {
-    fun DSLContext.insertItem(userId: String, orderId: UUID, organizationId: String, item:Item): Mono<ItemRecord> =
-        Mono.from(
+    fun DSLContext.insertItem(userId: String, orderId: UUID, organizationId: String, item:Item): Mono<ItemRecord> {
+        return Mono.from(
             insertInto(ITEM)
-            .columns(ITEM.ID, ITEM.ORDER_ID, ITEM.ORGANIZATION_ID, ITEM.PATIENT_SERIAL, ITEM.USER_ID, ITEM.SERVICE_ID)
-            .values(UUID.randomUUID(), orderId, organizationId, item.patient.serial, userId, item.service)
-            .returning()
+                .set(ITEM.ID, UUID.randomUUID())
+                .set(ITEM.ORDER_ID, orderId)
+                .set(ITEM.ORGANIZATION_ID, organizationId)
+                .set(ITEM.PATIENT_SERIAL, item.patient.serial)
+                .set(ITEM.USER_ID, userId)
+                .set(ITEM.SERVICE_ID, item.service)
+                .set(ITEM.SERIAL, item.serial)
+                .returning()
         )
+    }
+
 
     fun DSLContext.selectItemById(itemId: UUID) =
         selectFrom(ITEM).where(ITEM.ID.eq(itemId))

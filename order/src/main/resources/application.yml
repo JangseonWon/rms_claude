@@ -42,6 +42,6 @@ spring:
 logging:
   level:
     io.r2dbc.postgresql.QUERY: TRACE
-#    io.r2dbc.postgresql.PARAM: TRACE
+    io.r2dbc.postgresql.PARAM: TRACE
 server:
-  port: 9295
+  port: 9090
