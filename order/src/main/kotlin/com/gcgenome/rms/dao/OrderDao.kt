@@ -45,6 +45,7 @@ interface OrderDao{
                 jsonArrayAgg(jsonObject(
                     key("id").value(ITEM.ID),
                     key("service").value(ITEM.SERVICE_ID),
+                    key("serial").value(ITEM.SERIAL),
                     key("patient").value(jsonObject(
                         key("serial").value(PATIENT.SERIAL),
                         key("sex").value(PATIENT.SEX),
@@ -80,6 +81,9 @@ interface OrderDao{
                                     key("department").value(SAMPLE.DEPARTMENT),
                                     key("ward").value(SAMPLE.WARD),
                                     key("physician").value(SAMPLE.PHYSICIAN),
+                                    key("emp_id").value(SAMPLE.EMP_ID),
+                                    key("emp_name").value(SAMPLE.EMP_NAME),
+                                    key("emp_mobile").value(SAMPLE.EMP_MOBILE),
                                     key("extensions").value(
                                         select(
                                             jsonArrayAgg(jsonObject(
@@ -115,6 +119,7 @@ interface OrderDao{
                 jsonObject(
                     key("id").value(ITEM.ID),
                     key("service").value(ITEM.SERVICE_ID),
+                    key("serial").value(ITEM.SERIAL),
                     key("patient").value(
                         jsonObject(
                             key("serial").value(PATIENT.SERIAL),
@@ -139,6 +144,9 @@ interface OrderDao{
                                             key("department").value(SAMPLE.DEPARTMENT),
                                             key("ward").value(SAMPLE.WARD),
                                             key("physician").value(SAMPLE.PHYSICIAN),
+                                            key("emp_id").value(SAMPLE.EMP_ID),
+                                            key("emp_name").value(SAMPLE.EMP_NAME),
+                                            key("emp_mobile").value(SAMPLE.EMP_MOBILE),
                                             key("extensions").value(
                                                 select(
                                                     jsonArrayAgg(
@@ -160,14 +168,8 @@ interface OrderDao{
             ).`as`("items")
         ).from(ORDER)
             .join(ITEM).on(ORDER.ID.eq(ITEM.ORDER_ID))
-            .join(PATIENT).on(
-                ITEM.PATIENT_SERIAL.eq(PATIENT.SERIAL)
-                    .and(
-                        ITEM.ORGANIZATION_ID.eq(PATIENT.ORGANIZATION_ID)
-                            .and(ITEM.USER_ID.eq(PATIENT.USER_ID))
-                    )
+            .join(PATIENT).on(ITEM.PATIENT_SERIAL.eq(PATIENT.SERIAL).and(ITEM.ORGANIZATION_ID.eq(PATIENT.ORGANIZATION_ID).and(ITEM.USER_ID.eq(PATIENT.USER_ID)))
             ).groupBy(ORDER.ID).orderBy(ORDER.ID)
-
         return Flux.from(query).map(Order::toModel)
     }
     fun DSLContext.deleteOrder(orderId: UUID) =
