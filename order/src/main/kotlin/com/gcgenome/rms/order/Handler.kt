@@ -1,12 +1,10 @@
 package com.gcgenome.rms.order
 
 import com.gcgenome.rms.dao.*
-import com.gcgenome.rms.tables.references.SAMPLE
 import com.gcgenome.rms.data.CancelOrder
 import com.gcgenome.rms.data.Item
 import com.gcgenome.rms.data.Order
-import com.gcgenome.rms.data.User
-import com.gcgenome.rms.tables.records.UserRecord
+import com.gcgenome.rms.exceptions.SampleNotFoundException
 import org.jooq.DSLContext
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
@@ -53,6 +51,7 @@ class Handler(
         return Mono.from(dslContext.transactionPublisher { trx->
             trx.dsl().run {
                 selectSampleById(sampleId)
+                    .switchIfEmpty(Mono.error(SampleNotFoundException(sampleId)))
                     .flatMap { selectItemById(it.itemId!!) }
                     .flatMap { selectOrderById(it.orderId!!) }
                     .map(Order::toModel)

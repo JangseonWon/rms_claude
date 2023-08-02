@@ -4,6 +4,7 @@ import com.gcgenome.rms.SecurityContextRepository
 import com.gcgenome.rms.data.CancelOrder
 import com.gcgenome.rms.data.Item
 import com.gcgenome.rms.data.Order
+import com.gcgenome.rms.exceptions.SampleNotFoundException
 import com.gcgenome.rms.swagger.request.RequestAddSample
 import com.gcgenome.rms.swagger.request.RequestOrder
 import com.gcgenome.rms.swagger.response.ResponseCancelOrder
@@ -13,6 +14,7 @@ import org.springdoc.core.fn.builders.parameter.Builder
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.server.*
 import reactor.core.publisher.Mono
@@ -179,10 +181,9 @@ class Router (private val handler: Handler) {
         return request
             .principal()
             .cast(SecurityContextRepository.UserAuthentication::class.java)
-            .flatMap {
-                ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                    .body(handler.findOrder(sampleId), Order::class.java)
-            }
+            .flatMap { handler.findOrder(sampleId) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it),Order::class.java) }
+            .onErrorResume (SampleNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("Reason phrase: ${e.message}") }
     }
     private fun addSample(request: ServerRequest): Mono<ServerResponse> {
         val sampleId = UUID.fromString(request.pathVariable("sampleId"))
