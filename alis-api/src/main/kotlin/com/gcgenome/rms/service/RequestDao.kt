@@ -13,8 +13,8 @@ interface RequestDao {
 
 class DefaultRequestDao(private val dslContext: DSLContext) : RequestDao, OrganizationDao {
     override fun selectRequestWithWhere(where: Condition): Flux<Request> {
-        val organizationA= ORGANIZATION.`as`("a")
-        val organizationB= ORGANIZATION.`as`("b")
+        val organizationMain= ORGANIZATION.`as`("organization_main")
+        val organizationSub= ORGANIZATION.`as`("organization_sub")
         val query = dslContext.select(
             SAMPLE.CREATE_AT,
             SAMPLE.GENOME_BARCODE,
@@ -38,15 +38,15 @@ class DefaultRequestDao(private val dslContext: DSLContext) : RequestDao, Organi
             ORDER.PRICE,
             ORDER.OUTSOURCING_COST,
             ITEM.SERVICE_ID,
-            organizationA.ID,
-            organizationA.USER_ID,
-            organizationA.NAME,
-            organizationA.REGISTRATION_NUMBER,
-            organizationA.NURSING_NUMBER,
-            organizationA.BRANCH_ID,
-            organizationA.BRANCH_NAME,
-            organizationA.TYPE,
-            organizationB.NAME
+            organizationSub.ID,
+            organizationSub.USER_ID,
+            organizationSub.NAME,
+            organizationSub.REGISTRATION_NUMBER,
+            organizationSub.NURSING_NUMBER,
+            organizationSub.BRANCH_ID,
+            organizationSub.BRANCH_NAME,
+            organizationSub.TYPE,
+            organizationMain.NAME
         )
             .from(SAMPLE)
             .join(SAMPLE_TYPE).on(SAMPLE.SAMPLE_TYPE_ID.eq(SAMPLE_TYPE.ID))
@@ -57,10 +57,10 @@ class DefaultRequestDao(private val dslContext: DSLContext) : RequestDao, Organi
                     .and(ITEM.ORGANIZATION_ID.eq(PATIENT.ORGANIZATION_ID))
                     .and(ITEM.USER_ID.eq(PATIENT.USER_ID))
             )
-            .join(organizationA).on(
-                PATIENT.ORGANIZATION_ID.eq(organizationA.ID)
-                    .and(PATIENT.USER_ID.eq(organizationA.USER_ID))
-            ).join(organizationB).on(organizationA.USER_ID.eq(organizationB.ID))
+            .join(organizationSub).on(
+                PATIENT.ORGANIZATION_ID.eq(organizationSub.ID)
+                    .and(PATIENT.USER_ID.eq(organizationSub.USER_ID))
+            ).join(organizationMain).on(organizationSub.USER_ID.eq(organizationMain.ID))
             .where(where)
             .groupBy(
                 SAMPLE.CREATE_AT,
@@ -85,20 +85,20 @@ class DefaultRequestDao(private val dslContext: DSLContext) : RequestDao, Organi
                 ORDER.PRICE,
                 ORDER.OUTSOURCING_COST,
                 ITEM.SERVICE_ID,
-                organizationA.ID,
-                organizationA.USER_ID,
-                organizationA.NAME,
-                organizationA.REGISTRATION_NUMBER,
-                organizationA.NURSING_NUMBER,
-                organizationA.BRANCH_ID,
-                organizationA.BRANCH_NAME,
-                organizationA.TYPE,
-                organizationB.NAME
+                organizationSub.ID,
+                organizationSub.USER_ID,
+                organizationSub.NAME,
+                organizationSub.REGISTRATION_NUMBER,
+                organizationSub.NURSING_NUMBER,
+                organizationSub.BRANCH_ID,
+                organizationSub.BRANCH_NAME,
+                organizationSub.TYPE,
+                organizationMain.NAME
             )
             .orderBy(SAMPLE.CREATE_AT.asc())
         return Flux.from(query).flatMap { record ->
-            val mainName = record.get(organizationB.NAME) as String
-            val subName = record.get(organizationA.NAME) as String
+            val mainName = record.get(organizationMain.NAME) as String
+            val subName = record.get(organizationSub.NAME) as String
             Mono.just(RequestMap(dslContext).mapToRequest(record, mainName, subName))
         }
     }
