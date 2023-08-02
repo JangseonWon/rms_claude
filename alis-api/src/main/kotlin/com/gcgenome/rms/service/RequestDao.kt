@@ -62,39 +62,6 @@ class DefaultRequestDao(private val dslContext: DSLContext) : RequestDao, Organi
                     .and(PATIENT.USER_ID.eq(organizationSub.USER_ID))
             ).join(organizationMain).on(organizationSub.USER_ID.eq(organizationMain.ID))
             .where(where)
-            .groupBy(
-                SAMPLE.CREATE_AT,
-                SAMPLE.GENOME_BARCODE,
-                SAMPLE.DEPARTMENT,
-                SAMPLE.SAMPLE_TYPE_ID,
-                SAMPLE.WARD,
-                SAMPLE.SAMPLING,
-                SAMPLE.PHYSICIAN,
-                SAMPLE.EMP_ID,
-                SAMPLE.EMP_NAME,
-                SAMPLE.EMP_MOBILE,
-                SAMPLE_TYPE.NAME,
-                PATIENT.NAME,
-                PATIENT.SERIAL,
-                PATIENT.BIRTH_YEAR,
-                PATIENT.BIRTH_MONTH,
-                PATIENT.BIRTH_DAY,
-                PATIENT.SEX,
-                ORDER.TEST,
-                ORDER.CREDIT,
-                ORDER.PRICE,
-                ORDER.OUTSOURCING_COST,
-                ITEM.SERVICE_ID,
-                organizationSub.ID,
-                organizationSub.USER_ID,
-                organizationSub.NAME,
-                organizationSub.REGISTRATION_NUMBER,
-                organizationSub.NURSING_NUMBER,
-                organizationSub.BRANCH_ID,
-                organizationSub.BRANCH_NAME,
-                organizationSub.TYPE,
-                organizationMain.NAME
-            )
             .orderBy(SAMPLE.CREATE_AT.asc())
         return Flux.from(query).flatMap { record ->
             val mainName = record.get(organizationMain.NAME) as String
