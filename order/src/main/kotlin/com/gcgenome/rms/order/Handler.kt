@@ -49,6 +49,16 @@ class Handler(
     fun findOrders(userId: String): Flux<Order> {
         return dslContext.dsl().selectOrders(userId)
     }
+    fun findOrder(sampleId: UUID): Mono<Order> {
+        return Mono.from(dslContext.transactionPublisher { trx->
+            trx.dsl().run {
+                selectSampleById(sampleId)
+                    .flatMap { selectItemById(it.itemId!!) }
+                    .flatMap { selectOrderById(it.orderId!!) }
+                    .map(Order::toModel)
+            }
+        })
+    }
     fun addSample(userId: String, sampleId: UUID, dto: Item): Mono<Order> {
         return Mono.empty()
         /*return Mono.from(dslContext.transactionPublisher { trx ->

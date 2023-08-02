@@ -24,6 +24,7 @@ class Router (private val handler: Handler) {
     /*fun route() = router {
         PUT("/api/orders", ::orders)
         GET("/api/orders", ::findOrders)
+        GET("/api/orders/samples/{sampleId}, findOrder)
         PATCH("/api/orders/items/{item-id}", ::updateOrders)
         DELETE("/api/samples/{sample-id}", ::cancels)
         PATCH("/api/orders/samples/{sampleId}", :: addSample)
@@ -32,6 +33,22 @@ class Router (private val handler: Handler) {
         val apiRoutes = SpringdocRouteBuilder.route()
             .GET("/api/orders", ::findOrders.toHandlerFunction()) {
                 it.operationId("findOrders")
+                    .description("의뢰 조회 API")
+                    .parameter(Builder.parameterBuilder().name("X-USER-ID").description("사용자 ID").required(true).`in`(ParameterIn.HEADER))
+                    .response(org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder().responseCode("200").content(
+                        org.springdoc.core.fn.builders.content.Builder.contentBuilder().mediaType(MediaType.APPLICATION_JSON_VALUE)
+                            .schema(org.springdoc.core.fn.builders.schema.Builder.schemaBuilder().implementation(ResponseOrder::class.java))
+                    ))
+                    .response(org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder().responseCode("400").description("잘못된 접근: 필수 파라메터 누락, 타입 불일치, 잘못된 포맷 등"))
+                    .response(org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder().responseCode("401").description("인증실패: 인증정보 누락"))
+                    .response(org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder().responseCode("403").description("인증실패: 인증정보 불일치"))
+                    .response(org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder().responseCode("404").description("잘못된 접근: 잘못된 URL"))
+                    .response(org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder().responseCode("405").description("잘못된 접근: 요청된 URL과 Method 불일치"))
+                    .response(org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder().responseCode("406").description("요청 처리 불가: 요청 처리 불가"))
+                    .response(org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder().responseCode("500").description("예기치 못한 원인: 서버 내부 에러"))
+                    .response(org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder().responseCode("503").description("서비스 제공 불가: 서버가 동작하지 않음"))
+            }.GET("/api/orders/samples/{sampleId}", ::findOrder.toHandlerFunction()) {
+                it.operationId("findOrder")
                     .description("의뢰 조회 API")
                     .parameter(Builder.parameterBuilder().name("X-USER-ID").description("사용자 ID").required(true).`in`(ParameterIn.HEADER))
                     .response(org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder().responseCode("200").content(
@@ -157,8 +174,16 @@ class Router (private val handler: Handler) {
                     .body(handler.findOrders(it.principal), Order::class.java)
             }
     }
-
-
+    private fun findOrder(request: ServerRequest): Mono<ServerResponse> {
+        val sampleId = UUID.fromString(request.pathVariable("sampleId"))
+        return request
+            .principal()
+            .cast(SecurityContextRepository.UserAuthentication::class.java)
+            .flatMap {
+                ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                    .body(handler.findOrder(sampleId), Order::class.java)
+            }
+    }
     private fun addSample(request: ServerRequest): Mono<ServerResponse> {
         val sampleId = UUID.fromString(request.pathVariable("sampleId"))
         return request
