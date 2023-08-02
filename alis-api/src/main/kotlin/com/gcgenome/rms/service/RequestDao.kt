@@ -1,17 +1,20 @@
-package com.gcgenome.rms.request
+package com.gcgenome.rms.service
 
-import com.gcgenome.lims.tables.references.*
+import com.gcgenome.rms.tables.references.*
 import com.gcgenome.rms.data.Request
 import org.jooq.Condition
 import org.jooq.DSLContext
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 
 interface RequestDao {
     fun selectRequestWithWhere(where: Condition): Flux<Request>
 }
 
-class DefaultRequestDao(private val dslContext: DSLContext) : RequestDao {
+class DefaultRequestDao(private val dslContext: DSLContext) : RequestDao, OrganizationDao {
     override fun selectRequestWithWhere(where: Condition): Flux<Request> {
+        val organizationA= ORGANIZATION.`as`("a")
+        val organizationB= ORGANIZATION.`as`("b")
         val query = dslContext.select(
             SAMPLE.CREATE_AT,
             SAMPLE.GENOME_BARCODE,
@@ -20,6 +23,9 @@ class DefaultRequestDao(private val dslContext: DSLContext) : RequestDao {
             SAMPLE.WARD,
             SAMPLE.SAMPLING,
             SAMPLE.PHYSICIAN,
+            SAMPLE.EMP_ID,
+            SAMPLE.EMP_NAME,
+            SAMPLE.EMP_MOBILE,
             SAMPLE_TYPE.NAME,
             PATIENT.NAME,
             PATIENT.SERIAL,
@@ -32,13 +38,15 @@ class DefaultRequestDao(private val dslContext: DSLContext) : RequestDao {
             ORDER.PRICE,
             ORDER.OUTSOURCING_COST,
             ITEM.SERVICE_ID,
-            ORGANIZATION.ID,
-            ORGANIZATION.NAME,
-            ORGANIZATION.REGISTRATION_NUMBER,
-            ORGANIZATION.NURSING_NUMBER,
-            ORGANIZATION.BRANCH_ID,
-            ORGANIZATION.BRANCH_NAME,
-            ORGANIZATION.TYPE
+            organizationA.ID,
+            organizationA.USER_ID,
+            organizationA.NAME,
+            organizationA.REGISTRATION_NUMBER,
+            organizationA.NURSING_NUMBER,
+            organizationA.BRANCH_ID,
+            organizationA.BRANCH_NAME,
+            organizationA.TYPE,
+            organizationB.NAME
         )
             .from(SAMPLE)
             .join(SAMPLE_TYPE).on(SAMPLE.SAMPLE_TYPE_ID.eq(SAMPLE_TYPE.ID))
@@ -49,10 +57,11 @@ class DefaultRequestDao(private val dslContext: DSLContext) : RequestDao {
                     .and(ITEM.ORGANIZATION_ID.eq(PATIENT.ORGANIZATION_ID))
                     .and(ITEM.USER_ID.eq(PATIENT.USER_ID))
             )
-            .join(ORGANIZATION).on(
-                PATIENT.ORGANIZATION_ID.eq(ORGANIZATION.ID)
-                    .and(PATIENT.USER_ID.eq(ORGANIZATION.USER_ID))
-            ).where(where)
+            .join(organizationA).on(
+                PATIENT.ORGANIZATION_ID.eq(organizationA.ID)
+                    .and(PATIENT.USER_ID.eq(organizationA.USER_ID))
+            ).join(organizationB).on(organizationA.USER_ID.eq(organizationB.ID))
+            .where(where)
             .groupBy(
                 SAMPLE.CREATE_AT,
                 SAMPLE.GENOME_BARCODE,
@@ -61,6 +70,9 @@ class DefaultRequestDao(private val dslContext: DSLContext) : RequestDao {
                 SAMPLE.WARD,
                 SAMPLE.SAMPLING,
                 SAMPLE.PHYSICIAN,
+                SAMPLE.EMP_ID,
+                SAMPLE.EMP_NAME,
+                SAMPLE.EMP_MOBILE,
                 SAMPLE_TYPE.NAME,
                 PATIENT.NAME,
                 PATIENT.SERIAL,
@@ -73,15 +85,21 @@ class DefaultRequestDao(private val dslContext: DSLContext) : RequestDao {
                 ORDER.PRICE,
                 ORDER.OUTSOURCING_COST,
                 ITEM.SERVICE_ID,
-                ORGANIZATION.ID,
-                ORGANIZATION.NAME,
-                ORGANIZATION.REGISTRATION_NUMBER,
-                ORGANIZATION.NURSING_NUMBER,
-                ORGANIZATION.BRANCH_ID,
-                ORGANIZATION.BRANCH_NAME,
-                ORGANIZATION.TYPE
+                organizationA.ID,
+                organizationA.USER_ID,
+                organizationA.NAME,
+                organizationA.REGISTRATION_NUMBER,
+                organizationA.NURSING_NUMBER,
+                organizationA.BRANCH_ID,
+                organizationA.BRANCH_NAME,
+                organizationA.TYPE,
+                organizationB.NAME
             )
             .orderBy(SAMPLE.CREATE_AT.asc())
-        return Flux.from(query).map(Request::mapToRequest)
+        return Flux.from(query).flatMap { record ->
+            val mainName = record.get(organizationB.NAME) as String
+            val subName = record.get(organizationA.NAME) as String
+            Mono.just(RequestMap(dslContext).mapToRequest(record, mainName, subName))
+        }
     }
 }

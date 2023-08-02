@@ -1,9 +1,10 @@
 package com.gcgenome.rms.request
 
-import com.gcgenome.lims.tables.references.ITEM
-import com.gcgenome.lims.tables.references.SAMPLE
+import com.gcgenome.rms.tables.references.ITEM
+import com.gcgenome.rms.tables.references.SAMPLE
 import com.gcgenome.rms.data.Body
 import com.gcgenome.rms.data.XMLQuery
+import com.gcgenome.rms.service.DefaultRequestDao
 import org.jooq.Condition
 import org.jooq.DSLContext
 import org.jooq.impl.DSL

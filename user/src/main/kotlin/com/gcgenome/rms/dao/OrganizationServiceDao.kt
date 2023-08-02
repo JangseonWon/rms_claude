@@ -1,7 +1,7 @@
 package com.gcgenome.rms.dao
 
-import com.gcgenome.lims.tables.records.UserServiceRecord
-import com.gcgenome.lims.tables.references.USER_SERVICE
+import com.gcgenome.rms.tables.records.UserServiceRecord
+import com.gcgenome.rms.tables.references.USER_SERVICE
 import org.jooq.DSLContext
 import reactor.core.publisher.Mono
 

@@ -1,6 +1,6 @@
 package com.gcgenome.rms.service
 
-import com.gcgenome.lims.tables.User.Companion.USER
+import com.gcgenome.rms.tables.User.Companion.USER
 import com.gcgenome.rms.data.User
 
 import org.jooq.DSLContext

@@ -1,6 +1,6 @@
 package com.gcgenome.rms.data
 
-import com.gcgenome.lims.tables.records.UserServiceRecord
+import com.gcgenome.rms.tables.records.UserServiceRecord
 
 data class UserService (
     val userId: String?,

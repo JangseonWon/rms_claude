@@ -66,7 +66,7 @@ jooq {
 						isFluentSetters = false
 					}
 					target.apply {
-						packageName = "com.gcgenome.lims"
+						packageName = "com.gcgenome.rms"
 						directory = "build/generated/jooq"
 					}
 					strategy.name = "org.jooq.codegen.DefaultGeneratorStrategy"

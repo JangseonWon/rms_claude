@@ -1,11 +1,13 @@
 package com.gcgenome.rms.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.gcgenome.lims.tables.records.OrganizationRecord
+import com.gcgenome.rms.tables.records.OrganizationRecord
 
 data class Organization(
     @JsonProperty("id")
     val id:String?,
+    @JsonProperty("user_id")
+    val userId:String?,
     @JsonProperty("name")
     val name:String?,
     @JsonProperty("type")
@@ -23,6 +25,7 @@ data class Organization(
         fun toModel(record: OrganizationRecord) =
             Organization(
                 id = record.getValue("id", String::class.java),
+                userId = record.getValue("user_id", String::class.java),
                 name = record.getValue("name", String::class.java),
                 type = record.getValue("type", String::class.java),
                 registrationNumber = record.getValue("registration_number", String::class.java),

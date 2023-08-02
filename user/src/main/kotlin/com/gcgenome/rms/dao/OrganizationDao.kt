@@ -1,8 +1,8 @@
 package com.gcgenome.rms.dao
 
-import com.gcgenome.lims.tables.records.OrganizationRecord
-import com.gcgenome.lims.tables.records.UserRecord
-import com.gcgenome.lims.tables.references.ORGANIZATION
+import com.gcgenome.rms.tables.records.OrganizationRecord
+import com.gcgenome.rms.tables.records.UserRecord
+import com.gcgenome.rms.tables.references.ORGANIZATION
 import com.gcgenome.rms.data.Organization
 import org.jooq.DSLContext
 import reactor.core.publisher.Flux
@@ -26,7 +26,7 @@ interface OrganizationDao {
             insertInto(ORGANIZATION)
                 .columns(ORGANIZATION.ID, ORGANIZATION.NAME, ORGANIZATION.TYPE, ORGANIZATION.USER_ID, ORGANIZATION.REGISTRATION_NUMBER,
                     ORGANIZATION.NURSING_NUMBER,ORGANIZATION.BRANCH_ID, ORGANIZATION.BRANCH_NAME)
-                .values(organization?.id, organization?.name, organization?.type, userId,
+                .values(organization?.id, organization?.name, organization?.type, organization?.userId,
                     organization?.registrationNumber, organization?.nursingNumber,
                     organization?.branchCode, organization?.branchName)
                 .returning()

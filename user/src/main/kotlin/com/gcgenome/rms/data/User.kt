@@ -1,7 +1,7 @@
 package com.gcgenome.rms.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.gcgenome.lims.tables.records.UserRecord
+import com.gcgenome.rms.tables.records.UserRecord
 import java.util.*
 
 data class User(

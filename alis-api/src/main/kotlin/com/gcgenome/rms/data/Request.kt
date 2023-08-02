@@ -2,11 +2,10 @@ package com.gcgenome.rms.data
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
-import com.fasterxml.jackson.dataformat.xml.annotation.*
-import com.gcgenome.lims.tables.references.*
-import org.jooq.Record
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlCData
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlText
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonPropertyOrder("reqdte", "reqno", "patnm", "hosno", "idno", "hosplc", "scdev", "sampcd", "hosloc", "reqtme", "mngno", "advyn", "emegyn", "samdte", "docnm", "itemcd", "canyn", "cstcd", "cstnm", "busno", "clicd", "itmamt", "stepri", "sampleno", "etc", "etcs", "brccd", "brcnm", "empno", "empnm", "mobile", "instype", "sampnm", "barcode")
@@ -40,9 +39,12 @@ data class Request (
     var etcs: Etcs? = Etcs(),
     var brccd: Brccd? = Brccd(),
     var brcnm: Brcnm? = Brcnm(),
+    var empno: Empno? = Empno(),
+    var empnm: Empnm? = Empnm(),
+    var mobile: Mobile? = Mobile(),
     var instype: Instype? = Instype(),
     var sampnm: Sampnm? = Sampnm(),
-){
+) {
     companion object{
         data class Reqdte(
             @field:JacksonXmlText
@@ -53,9 +55,22 @@ data class Request (
         data class Cstnm(
             @field:JacksonXmlCData
             @field:JacksonXmlText
-            val cstnm: String? = null,
+            val main: OrganizationMain? = null,
+            @field:JacksonXmlCData
+            @field:JacksonXmlText
+            val sub: OrganizationSub? = null,
             @field:JacksonXmlProperty(isAttribute = true)
             val description: String = "거래처명"
+        )
+        data class OrganizationMain(
+            @field:JacksonXmlCData
+            @field:JacksonXmlText
+            val main: String? = null
+        )
+        data class OrganizationSub(
+            @field:JacksonXmlCData
+            @field:JacksonXmlText
+            val sub: String? = null
         )
         data class Reqno(
             @field:JacksonXmlText
@@ -227,173 +242,29 @@ data class Request (
             @field:JacksonXmlProperty(isAttribute = true)
             val description: String = "영업소명"
         )
+        data class Empno (
+            @field:JacksonXmlText
+            val empno : String? = null,
+            @field:JacksonXmlProperty(isAttribute = true)
+            val description: String = "영업사원사번"
+        )
+        data class Empnm (
+            @field:JacksonXmlText
+            val empnm : String? = null,
+            @field:JacksonXmlProperty(isAttribute = true)
+            val description: String = "영업사원명"
+        )
+        data class Mobile (
+            @field:JacksonXmlText
+            val brcnm : String? = null,
+            @field:JacksonXmlProperty(isAttribute = true)
+            val description: String = "영업사원핸드폰번호"
+        )
         data class Instype (
             @field:JacksonXmlText
             val instype : String? = null,
             @field:JacksonXmlProperty(isAttribute = true)
             val description: String = "기관유형"
         )
-
-        fun mapToRequest(record: Record): Request {
-            val reqdte = Reqdte(
-                record.getValue(SAMPLE.CREATE_AT)?.toLocalDate().toString().replace("-",""),
-                "의뢰일자"
-            )
-            val reqno = Reqno(
-                record.get(SAMPLE.GENOME_BARCODE)?.replace("-",""),
-                "의뢰번호"
-            )
-            val patnm = Patnm(
-                record.get(PATIENT.NAME),
-                "환자명"
-            )
-            val hosno = Hosno(
-                record.get(PATIENT.SERIAL),
-                "등록번호"
-            )
-            val year = record.get(PATIENT.BIRTH_YEAR)
-            val month = record.get(PATIENT.BIRTH_MONTH)
-            val day = record.get(PATIENT.BIRTH_DAY)
-
-            val idnoValue = year.toString() + month.toString() + day.toString()
-
-            val idno = Idno(
-                idnoValue.toInt(),
-                "주민등록번호"
-            )
-
-            val sex = Sex(
-                record.get(PATIENT.SEX),
-                "성별"
-            )
-            val hosplc = Hosplc(
-                record.get(SAMPLE.DEPARTMENT),
-                "진료과"
-            )
-            val scdev = Scdev(
-                record.get(ORDER.TEST).toString() + "/" + record.get(ORDER.CREDIT),
-                "시검/외상 여부"
-            )
-            val sampcd = Sampcd(
-                record.get(SAMPLE.SAMPLE_TYPE_ID),
-                "검체코드"
-            )
-            val hosloc = Hosloc(
-                record.get(SAMPLE.WARD),
-                "병동"
-            )
-            val reqtme = Reqtme(
-                record.get(SAMPLE.CREATE_AT)?.toLocalTime()?.format(DateTimeFormatter.ofPattern("HH:mm")).toString(),
-                "의뢰시간"
-            )
-            val mngno = Mngno(
-                null,
-                "관리번호"
-            )
-            val advyn = Advyn(
-                YesOrNo.N,
-                "종검여부"
-            )
-            val emegyn = Emegyn(
-                YesOrNo.N,
-                "응급여부"
-            )
-            val samdte = Samdte(
-                record.get(SAMPLE.SAMPLING)?.toLocalDate().toString().replace("-",""),
-                "검체채취일"
-            )
-            val docnm = Docnm(
-                record.get(SAMPLE.PHYSICIAN),
-                "주치의"
-            )
-            val itemcd = Itemcd(
-                record.get(ITEM.SERVICE_ID),
-                "검사코드"
-            )
-            val canyn = Canyn(
-                YesOrNo.N,
-                "취소여부"
-            )
-            val cstcd = Cstcd(
-                record.get(ORGANIZATION.ID),
-                "거래처코드"
-            )
-            val cstnm = Cstnm(
-                record.get(ORGANIZATION.NAME),
-                "거래처명"
-            )
-            val busno = Busno(
-                record.get(ORGANIZATION.REGISTRATION_NUMBER),
-                "사업자번호"
-            )
-            val clicd = Clicd(
-                record.get(ORGANIZATION.NURSING_NUMBER),
-                "요양기관번호"
-            )
-            val itmamt = Itmamt(
-                record.get(ORDER.PRICE).toString(),
-                "검사금액"
-            )
-            val stepri = Stepri(
-                record.get(ORDER.OUTSOURCING_COST).toString(),
-                "의주의뢰가"
-            )
-            val sampleno = Sampleno(
-                record.get(SAMPLE.GENOME_BARCODE)?.substring(8)?.replace("-",""),
-                "검체번호"
-            )
-            val etc: MutableMap<String, Etc?> = mutableMapOf()
-            val etcs = Etcs()
-            val brccd = Brccd(
-                record.get(ORGANIZATION.BRANCH_ID),
-                "영업소코드"
-            )
-            val brcnm = Brcnm(
-                record.get(ORGANIZATION.BRANCH_NAME),
-                "영업소명"
-            )
-            val instype = Instype(
-                record.get(ORGANIZATION.TYPE),
-                "기관유형"
-            )
-            val sampnm = Sampnm(
-                record.get(SAMPLE_TYPE.NAME),
-                "검체명"
-            )
-
-            return Request(
-                reqdte = reqdte,
-                reqno = reqno,
-                    patnm = patnm,
-                    hosno = hosno,
-                    idno = idno,
-                    sex = sex,
-                    hosplc = hosplc,
-                    scdev = scdev,
-                    sampcd = sampcd,
-                    hosloc = hosloc,
-                    reqtme = reqtme,
-                    mngno = mngno,
-                    advyn = advyn,
-                    emegyn = emegyn,
-                    samdte = samdte,
-                    docnm = docnm,
-                    itemcd = itemcd,
-                    canyn = canyn,
-                    cstcd = cstcd,
-                    cstnm = cstnm,
-                    busno = busno,
-                    clicd = clicd,
-                    itmamt = itmamt,
-                    stepri = stepri,
-                    sampleno = sampleno,
-                    etc = etc,
-                    etcs = etcs,
-                    brccd = brccd,
-                    brcnm = brcnm,
-                    instype = instype,
-                    sampnm = sampnm,
-            )
-        }
     }
 }
