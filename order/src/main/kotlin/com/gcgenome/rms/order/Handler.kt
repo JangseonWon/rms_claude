@@ -38,7 +38,7 @@ class Handler(
                                 }
                             }.toMono()
                         }
-                    }.then(selectOrderById(orderRecord.id!!)).map(Order::toModel)
+                    }.then(selectOrderById(orderRecord.id!!, userId)).map(Order::toModel)
                 }
             }
         })
@@ -47,13 +47,13 @@ class Handler(
     fun findOrders(userId: String): Flux<Order> {
         return dslContext.dsl().selectOrders(userId)
     }
-    fun findOrder(sampleId: UUID): Mono<Order> {
+    fun findOrder(sampleId: UUID, userId: String): Mono<Order> {
         return Mono.from(dslContext.transactionPublisher { trx->
             trx.dsl().run {
                 selectSampleById(sampleId)
                     .switchIfEmpty(Mono.error(SampleNotFoundException(sampleId)))
                     .flatMap { selectItemById(it.itemId!!) }
-                    .flatMap { selectOrderById(it.orderId!!) }
+                    .flatMap { selectOrderById(it.orderId!!, userId) }
                     .map(Order::toModel)
             }
         })
@@ -116,7 +116,7 @@ class Handler(
                                     })
                         })
                     .then(Mono.from(selectItemById(itemId))).flatMap { item ->
-                        selectOrderById(item.orderId!!)
+                        selectOrderById(item.orderId!!, userId)
                     }
             }
         }).map { record ->

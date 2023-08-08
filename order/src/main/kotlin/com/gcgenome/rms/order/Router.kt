@@ -181,7 +181,7 @@ class Router (private val handler: Handler) {
         return request
             .principal()
             .cast(SecurityContextRepository.UserAuthentication::class.java)
-            .flatMap { handler.findOrder(sampleId) }
+            .flatMap { handler.findOrder(sampleId, it.principal) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it),Order::class.java) }
             .onErrorResume (SampleNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("Reason phrase: ${e.message}") }
     }
