@@ -23,6 +23,7 @@ class Router (private val handler: Handler) {
         DELETE("/api/user/{user-id}", ::deleteUser)
     }
     private fun findUser(request: ServerRequest): Mono<ServerResponse> {
+        println("=====================findUser()")
         return request
             .principal()
             .cast(SecurityContextRepository.UserAuthentication::class.java)
