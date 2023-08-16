@@ -25,6 +25,12 @@ dependencies {
     implementation("org.jooq:jooq-codegen:3.18.2")
     implementation("org.jooq:jooq-meta:3.18.2")
     jooqGenerator("org.postgresql:postgresql:42.6.0")
+
+    implementation("org.springframework.data:spring-data-ldap")
+    implementation("io.jsonwebtoken:jjwt-api:0.11.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
+
 }
 configurations { all { exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging") } }
 dependencyManagement { imports { mavenBom(libs.spring.cloud.bom.get().toString()) } }

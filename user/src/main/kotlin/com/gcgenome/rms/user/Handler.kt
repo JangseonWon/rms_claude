@@ -1,4 +1,4 @@
-package com.gcgenome.rms.service
+package com.gcgenome.rms.user
 
 import com.gcgenome.rms.dao.OrganizationDao
 import com.gcgenome.rms.dao.UserDao
@@ -13,11 +13,14 @@ import reactor.core.publisher.Mono
 
 @Service("com.gcgenome.rms.order.Handler")
 class Handler(
-    val dslContext: DSLContext,
-    val userDao: UserDao
-): OrganizationDao, UserServiceDao {
+    val dslContext: DSLContext
+): OrganizationDao, UserServiceDao, UserDao {
     val addSuccess = "추가 완료 되었습니다."
     val deleteSuccess = "삭제 완료 되었습니다."
+
+    fun selectUser(userId: String): Mono<User> {
+        return dslContext.dsl().selectUserById(userId).map(User::toModel)
+    }
 
     fun insertUserService(authority: String?, userId: String, serviceId: String): Mono<Message> {
         return withAdminAuthority(authority) {
@@ -41,7 +44,7 @@ class Handler(
         return withAdminAuthority(authority) {
             Mono.from(dslContext.transactionPublisher { trx ->
                 trx.dsl().run {
-                    userDao.insertUser(dto)
+                    insertUser(dto)
                         .map { Message.toModelUser(it, addSuccess) }
                 }.onErrorResume(this::handleException)
             })
@@ -50,11 +53,13 @@ class Handler(
 
     fun deleteUser(userId: String, authority: String?): Mono<Message> {
         return withAdminAuthority(authority) {
-            dslContext.dsl().deleteOrganization(userId)
-                .then(userDao.deleteUser(userId)).map{ userRecord ->
-                    Message.toModelUser(userRecord, deleteSuccess)
-                }
-                .onErrorResume(this::handleException)
+            Mono.from(dslContext.transactionPublisher {trx ->
+                trx.dsl().run {
+                    deleteOrganization(userId)
+                        .then(deleteUserById(userId))
+                        .map{ userRecord -> Message.toModelUser(userRecord, deleteSuccess) }
+                }.onErrorResume(this::handleException)
+            })
         }
     }
 

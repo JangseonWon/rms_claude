@@ -8,33 +8,19 @@ import org.springframework.stereotype.Repository
 import reactor.core.publisher.Mono
 import java.util.*
 
-@Repository("com.gcgenome.rms.order.UserDao")
-class UserDao(
-    private val dslContext: DSLContext,
-){
-    fun selectUser(userId: String): Mono<User> =
-        Mono.from(dslContext.selectFrom(USER).where(USER.ID.eq(userId)))
-            .map {
-                User(
-                    id = it.get(USER.ID)!!,
-                    authority = it.get(USER.AUTHORITY)!!,
-                    department = it.get(USER.DEPARTMENT),
-                    key = it.get(USER.KEY)!!,
-                    name = it.get(USER.NAME)!!,
-                    state = it.get(USER.STATE)!!
-                )
-            }
+interface UserDao{
+    fun DSLContext.selectUserById(userId: String): Mono<UserRecord> {
+        return Mono.from(selectFrom(USER).where(USER.ID.eq(userId)))
+    }
 
-    fun insertUser(dto: User): Mono<UserRecord> =
+    fun DSLContext.insertUser(dto: User): Mono<UserRecord> =
         Mono.from(
-            dslContext.insertInto(USER)
+            insertInto(USER)
                 .columns(USER.ID, USER.AUTHORITY, USER.DEPARTMENT, USER.KEY, USER.NAME, USER.PASSWORD, USER.STATE)
                 .values(dto.id, "USER", dto.department, UUID.randomUUID(), dto.name, dto.password, "ACTIVE")
                 .returning()
         )
 
-    fun deleteUser(userId: String): Mono<UserRecord> =
-        Mono.from(
-            dslContext.dsl().deleteFrom(USER).where(USER.ID.eq(userId)).returning()
-        )
+    fun DSLContext.deleteUserById(userId: String): Mono<UserRecord> =
+        Mono.from(deleteFrom(USER).where(USER.ID.eq(userId)).returning())
 }

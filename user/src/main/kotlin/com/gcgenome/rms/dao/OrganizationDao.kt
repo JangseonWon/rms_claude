@@ -33,7 +33,5 @@ interface OrganizationDao {
         )
 
     fun DSLContext.deleteOrganization(userId: String): Mono<OrganizationRecord> =
-        Mono.from(
-            deleteFrom(ORGANIZATION).where(ORGANIZATION.USER_ID.eq(userId)).returning()
-        )
+        Mono.from(deleteFrom(ORGANIZATION).where(ORGANIZATION.USER_ID.eq(userId)).returning())
 }

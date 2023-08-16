@@ -5,7 +5,6 @@ import com.gcgenome.rms.auth.SecurityContextRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.Order
-import org.springframework.data.domain.ReactiveAuditorAware
 import org.springframework.data.r2dbc.config.EnableR2dbcAuditing
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
@@ -13,16 +12,12 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
 import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.config.web.server.invoke
-import org.springframework.security.core.Authentication
-import org.springframework.security.core.context.ReactiveSecurityContextHolder
-import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.security.web.server.ServerAuthenticationEntryPoint
 import org.springframework.security.web.server.authorization.ServerAccessDeniedHandler
 import org.springframework.security.web.server.header.XFrameOptionsServerHttpHeadersWriter
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers
 import reactor.core.publisher.Mono
-import java.time.Duration
 
 @Configuration
 @Order(2)
@@ -52,9 +47,10 @@ class SecurityConfig (
                 }
             }
             authorizeExchange {
-                authorize (pathMatchers(HttpMethod.OPTIONS, "/**"), permitAll)
-                authorize (pathMatchers(HttpMethod.GET,"/actuator/health/**","/api/test", "/"),permitAll)
-                authorize (anyExchange, authenticated)
+                authorize(pathMatchers(HttpMethod.OPTIONS, "/**"), permitAll)
+                authorize(pathMatchers(HttpMethod.GET,"/actuator/health/**","/api/test", "/"),permitAll)
+                authorize(pathMatchers(HttpMethod.POST, "/api/user/login"),permitAll)
+                authorize(anyExchange, authenticated)
             }
         }
     }

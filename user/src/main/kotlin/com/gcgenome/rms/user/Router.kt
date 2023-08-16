@@ -1,4 +1,4 @@
-package com.gcgenome.rms.service
+package com.gcgenome.rms.user
 
 import com.gcgenome.rms.SecurityContextRepository
 import com.gcgenome.rms.data.*
@@ -16,10 +16,19 @@ import reactor.core.publisher.Mono
 class Router (private val handler: Handler) {
     @Bean("com.gcgenome.rms.service.Router.Bean")
     fun route() = router {
+        GET("/api/user", ::findUser)
         POST("/api/user", ::addUser)
         POST("/api/user/organization", ::addOrganization)
         PUT("/api/user/{user-id}/service/{service-id}", ::addUserService)
         DELETE("/api/user/{user-id}", ::deleteUser)
+    }
+    private fun findUser(request: ServerRequest): Mono<ServerResponse> {
+        return request
+            .principal()
+            .cast(SecurityContextRepository.UserAuthentication::class.java)
+            .zipWith(request.bodyToMono(User::class.java))
+            .flatMap { handler.selectUser(it.t1.principal) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), User::class.java) }
     }
 
     private fun addUser(request: ServerRequest): Mono<ServerResponse> {

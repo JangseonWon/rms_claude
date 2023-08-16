@@ -2,6 +2,7 @@ package com.gcgenome.rms
 
 import com.gcgenome.rms.dao.UserDao
 import com.gcgenome.rms.data.User
+import org.jooq.DSLContext
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.context.SecurityContext
@@ -13,16 +14,17 @@ import reactor.core.publisher.Mono
 
 @Component
 class SecurityContextRepository(
-    private val userDao: UserDao
-) : ServerSecurityContextRepository {
+    private val dslContext: DSLContext
+) : ServerSecurityContextRepository, UserDao {
     override fun save(exchange: ServerWebExchange, context: SecurityContext): Mono<Void> = Mono.empty()
     override fun load(exchange: ServerWebExchange): Mono<SecurityContext> {
         return Mono.justOrEmpty(exchange.request.headers.getFirst("X-USER-ID"))
-            .flatMap (userDao::selectUser)
+            .flatMap { dslContext.selectUserById(it)}
+            .map(User::toModel)
             .map { u -> SecurityContextImpl(UserAuthentication(u)) }
     }
     class UserAuthentication(val user: User): Authentication {
-        override fun getName(): String = user.name
+        override fun getName(): String = user.name!!
         override fun getAuthorities(): Collection<GrantedAuthority> = emptyList()
         override fun getCredentials() = TODO("Not yet implemented")
         override fun getDetails(): User = user
