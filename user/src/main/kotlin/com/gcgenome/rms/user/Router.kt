@@ -27,8 +27,7 @@ class Router (private val handler: Handler) {
         return request
             .principal()
             .cast(SecurityContextRepository.UserAuthentication::class.java)
-            .zipWith(request.bodyToMono(User::class.java))
-            .flatMap { handler.selectUser(it.t1.principal) }
+            .flatMap { handler.selectUser(it.principal) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), User::class.java) }
     }
 
