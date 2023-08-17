@@ -66,7 +66,7 @@ class Router (private val handler: Handler) {
                     .response(org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder().responseCode("500").description("예기치 못한 원인: 서버 내부 에러"))
                     .response(org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder().responseCode("503").description("서비스 제공 불가: 서버가 동작하지 않음"))
             }
-            .PUT("/api/orders", ::orders.toHandlerFunction()) {
+            .POST("/api/orders", ::orders.toHandlerFunction()) {
                 it.operationId("orders")
                     .description("의뢰 등록 API")
                     .parameter(Builder.parameterBuilder().name("X-USER-ID").description("사용자 ID").required(true).`in`(ParameterIn.HEADER))
