@@ -24,7 +24,6 @@ class Router (
     }
 
     private fun login(request: ServerRequest): Mono<ServerResponse> {
-        println("=====================login()")
         return request.bodyToMono(User::class.java)
             .flatMap { handler.login(it) }
             .map { token -> ResponseCookie.from("Authorization", token).httpOnly(true)/*.secure(true)*/.maxAge(duration).build() }

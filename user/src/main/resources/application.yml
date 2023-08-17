@@ -18,7 +18,7 @@ spring:
       max-idle-time: 30m
       validation-query: SELECT 1
   ldap:
-    urls: ldap://172.19.208.121:389
+    urls: ldap://172.19.201.121:389
     base: dc=ldap,dc=gcgenome,dc=net
     username: cn=admin,dc=ldap,dc=gcgenome,dc=net
     password: pmc1004!

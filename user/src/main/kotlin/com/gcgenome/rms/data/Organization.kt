@@ -20,19 +20,4 @@ data class Organization(
     val branchCode:String?,
     @JsonProperty("branch_name")
     val branchName:String?
-) {
-    companion object {
-        fun toModel(record: OrganizationRecord) =
-            Organization(
-                id = record.getValue("id", String::class.java),
-                userId = record.getValue("user_id", String::class.java),
-                name = record.getValue("name", String::class.java),
-                type = record.getValue("type", String::class.java),
-                registrationNumber = record.getValue("registration_number", String::class.java),
-                nursingNumber = record.getValue("nursing_number", String::class.java),
-                branchCode = record.getValue("branch_id", String::class.java),
-                branchName = record.getValue("branch_name", String::class.java)
-            )
-    }
-
-}
+)

@@ -18,7 +18,6 @@ class SecurityContextRepository(
 ) : ServerSecurityContextRepository, UserDao {
     override fun save(exchange: ServerWebExchange, context: SecurityContext): Mono<Void> = Mono.empty()
     override fun load(exchange: ServerWebExchange): Mono<SecurityContext> {
-        println("===============security load(): ${exchange.request.headers.getFirst("X-USER-ID")}")
         return Mono.justOrEmpty(exchange.request.headers.getFirst("X-USER-ID"))
             .flatMap { dslContext.selectUserById(it)}
             .map(User::toModel)
