@@ -5,6 +5,8 @@ import com.gcgenome.rms.data.CancelOrder
 import com.gcgenome.rms.data.Item
 import com.gcgenome.rms.data.Order
 import com.gcgenome.rms.exceptions.SampleNotFoundException
+import com.gcgenome.rms.exceptions.ServiceNotFoundException
+import com.gcgenome.rms.exceptions.ServiceSampleTypeNotFoundException
 import com.gcgenome.rms.swagger.request.RequestAddSample
 import com.gcgenome.rms.swagger.request.RequestOrder
 import com.gcgenome.rms.swagger.response.ResponseCancelOrder
@@ -17,12 +19,15 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.server.*
+import org.springframework.web.server.ServerWebInputException
 import reactor.core.publisher.Mono
 import java.util.*
 
-@Configuration("com.gcgenome.rms.order.Router")
-class Router (private val handler: Handler) {
-    @Bean("com.gcgenome.rms.order.Router.Bean")
+@Configuration
+class Router (
+    private val handler: Handler
+){
+    @Bean
     /*fun route() = router {
         PUT("/api/orders", ::orders)
         GET("/api/orders", ::findOrders)
@@ -164,6 +169,10 @@ class Router (private val handler: Handler) {
             .zipWith(request.bodyToMono(Order::class.java))
             .flatMap { handler.insertOrder(it.t1.principal, it.t2) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), Order::class.java) }
+            .onErrorResume (ServiceNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
+            .onErrorResume (ServiceSampleTypeNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
+            .onErrorResume(ServerWebInputException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("Request body type error.") }
+            .onErrorResume { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("Request body error: ${e.message}") }
     }
 
 

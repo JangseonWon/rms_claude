@@ -5,6 +5,8 @@ import com.gcgenome.rms.data.CancelOrder
 import com.gcgenome.rms.data.Item
 import com.gcgenome.rms.data.Order
 import com.gcgenome.rms.exceptions.SampleNotFoundException
+import com.gcgenome.rms.exceptions.ServiceNotFoundException
+import com.gcgenome.rms.exceptions.ServiceSampleTypeNotFoundException
 import org.jooq.DSLContext
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
@@ -15,18 +17,23 @@ import java.util.*
 @Service("com.gcgenome.rms.order.Handler")
 class Handler(
     val dslContext: DSLContext
-): PatientDao, OrderDao, OrganizationDao, ItemDao, ExtensionDao, SampleDao, UserDao {
+): PatientDao, OrderDao, OrganizationDao, ItemDao, ExtensionDao, SampleDao, UserDao, UserServiceDao, ServiceSampleTypeDao {
     fun insertOrder(userId: String, dto: Order): Mono<Order> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
                 insertOrder(userId, dto).flatMap { orderRecord ->
                     Flux.fromIterable(dto.items!!).flatMap { items ->
-                        insertOrganization(userId, items.patient.organization)
+                        selectUserServiceById(userId, items.service)
+                        .switchIfEmpty(Mono.error(ServiceNotFoundException(items.service)))
+                        .then(insertOrganization(userId, items.patient.organization))
                         .then(insertPatient(items.patient.organization?.id ?: userId, userId, items.patient))
                         .then(insertItem(userId, orderRecord.id!!, items.patient.organization?.id ?: userId, items))
                         .flatMap { itemRecord ->
                             Flux.fromIterable(items.patient.samples!!).flatMap { sample ->
-                                selectUserById(userId).flatMap { userRecord ->
+                                selectServiceSampleTypeById(sample.typeId, items.service)
+                                .switchIfEmpty(Mono.error(ServiceSampleTypeNotFoundException(sample.typeId, items.service)))
+                                .then(selectUserById(userId))
+                                .flatMap { userRecord ->
                                     selectSamplePostfix(userRecord.code!!).flatMap { postfix ->
                                         insertSample(items.patient.serial, userId, itemRecord.id!!, sample, items.patient.organization?.id ?: userId, userRecord.code!!, postfix+1)
                                             .flatMap { sampleRecord ->

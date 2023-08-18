@@ -37,7 +37,7 @@ data class Sample(
     @JsonProperty("sample_barcode")
     val sampleBarcode: String?,
     @JsonProperty("type")
-    val typeId: String?,
+    val typeId: String,
     @JsonProperty("department")
     val department: String?,
     @JsonProperty("ward")

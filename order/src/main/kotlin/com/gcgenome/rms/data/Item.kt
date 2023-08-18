@@ -9,11 +9,9 @@ data class Item(
     @JsonProperty("id")
     var id: UUID?,
     @JsonProperty("service")
-    val service: String?,
+    val service: String,
     @JsonProperty("serial")
     val serial: String?,
     @JsonProperty("patient")
     val patient: Patient
-
-
 )
