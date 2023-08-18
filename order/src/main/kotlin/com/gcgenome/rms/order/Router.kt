@@ -172,7 +172,7 @@ class Router (
             .flatMap { handler.insertOrder(it.t1.principal, it.t2) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), Order::class.java) }
             .onErrorResume (ServiceNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
-            .onErrorResume (ServiceSampleTypeNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
+            .onErrorResume (ServiceSampleTypeNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
             .onErrorResume(ServerWebInputException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("Request body type error.") }
             .onErrorResume { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("Request body error: ${e.message}") }
     }
