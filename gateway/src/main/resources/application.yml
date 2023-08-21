@@ -88,3 +88,4 @@ security:
       token-key: 4
 server:
   port: 8080
+  static: /static/

@@ -12,7 +12,6 @@ class Router() {
     @Bean("com.gcgenome.rms.test.Router")
     fun route() = router {
         GET("/api/test", ::test)
-        GET("/", ::test)
     }
     private fun test(request: ServerRequest): Mono<ServerResponse> {
         return ServerResponse.ok().bodyValue("API TEST SUCCESS")
