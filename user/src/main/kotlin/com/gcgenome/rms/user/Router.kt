@@ -16,11 +16,11 @@ import reactor.core.publisher.Mono
 class Router (private val handler: Handler) {
     @Bean("com.gcgenome.rms.service.Router.Bean")
     fun route() = router {
-        GET("/api/user", ::findUser)
-        POST("/api/user", ::addUser)
-        POST("/api/user/organization", ::addOrganization)
-        PUT("/api/user/{user-id}/service/{service-id}", ::addUserService)
-        DELETE("/api/user/{user-id}", ::deleteUser)
+        GET("/w-api/user", ::findUser)
+        POST("/w-api/user", ::addUser)
+        POST("/w-api/user/organization", ::addOrganization)
+        PUT("/w-api/user/{user-id}/service/{service-id}", ::addUserService)
+        DELETE("/w-api/user/{user-id}", ::deleteUser)
     }
     private fun findUser(request: ServerRequest): Mono<ServerResponse> {
         return request
