@@ -39,14 +39,10 @@ spring:
       default-filters:
         - AuthenticateFilter
       routes:
-        - id: rms-service
-          uri: lb://rms-service
+        - id: rms-api
+          uri: lb://rms-api
           predicates:
-            - Path=/api/services, /api/services/**
-        - id: rms-order
-          uri: lb://rms-order
-          predicates:
-            - Path=/api/orders, /api/orders/**
+            - Path=/api/**
         - id: rms-alis-api
           uri: lb://rms-alis-api
           predicates:
@@ -88,4 +84,3 @@ security:
       token-key: 4
 server:
   port: 8080
-  static: /static/
