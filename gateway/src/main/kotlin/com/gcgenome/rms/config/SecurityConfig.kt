@@ -50,7 +50,7 @@ class SecurityConfig (
                 authorize(pathMatchers( "/*.html", "/static/**", "/st/**"), permitAll)
                 authorize(pathMatchers(HttpMethod.OPTIONS, "/**"), permitAll)
                 authorize(pathMatchers(HttpMethod.GET,"/actuator/health/**","/api/test", "/", "/login"),permitAll)
-                authorize(pathMatchers(HttpMethod.POST, "/api/user/login"),permitAll)
+                authorize(pathMatchers(HttpMethod.POST, "/w-api/user/login"),permitAll)
                 authorize(anyExchange, authenticated)
             }
         }
