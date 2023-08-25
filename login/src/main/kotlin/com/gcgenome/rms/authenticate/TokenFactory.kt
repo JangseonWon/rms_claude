@@ -23,7 +23,6 @@ class TokenFactory(
     private val privateKey = keyPair.private
     fun publish(user: User): String {
         val iat = LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond()
-        //val payload: Token = UserToToken.map(iat, iat + duration, "request-test.gcgenome.com", "request-test.gcgenome.com", iat, user)
         val payload = Token(
             nbf = iat,
             exp = iat + duration,

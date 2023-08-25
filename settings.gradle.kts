@@ -6,6 +6,7 @@ include("order")
 include("user")
 include("alis-api")
 include("api")
+include("login")
 
 
 dependencyResolutionManagement {
@@ -25,7 +26,6 @@ dependencyResolutionManagement {
             library("spring-actuator", "org.springframework.boot", "spring-boot-starter-actuator").withoutVersion()
             library("spring-log4j2", "org.springframework.boot", "spring-boot-starter-log4j2").withoutVersion()
             library("spring-security", "org.springframework.boot", "spring-boot-starter-security").withoutVersion()
-            // library("spring-hateoas", "org.springframework.boot", "spring-boot-starter-hateoas").withoutVersion()
             library("spring-hateoas", "org.springframework.hateoas", "spring-hateoas").withoutVersion()
             library("spring-kafka", "org.springframework.cloud", "spring-cloud-starter-stream-kafka").withoutVersion()
             bundle("spring-client", listOf("spring-discovery", "spring-log4j2", "spring-security"))
@@ -39,10 +39,7 @@ dependencyResolutionManagement {
             library("r2dbc-postgres", "org.postgresql", "r2dbc-postgresql").version { require("1.0.0.RELEASE") }
             bundle("r2dbc-postgres", listOf("r2dbc", "r2dbc-postgres"))
             library("cassandra", "org.springframework.boot", "spring-boot-starter-data-cassandra").withoutVersion()
-            library("querydsl-core", "com.querydsl", "querydsl-core").withoutVersion()
-            library("querydsl-apt", "com.querydsl", "querydsl-apt").withoutVersion()
-            library("querydsl-r2dbc", "com.infobip", "infobip-spring-data-r2dbc-querydsl-boot-starter").version { require("8.1.1") }
-            bundle("r2dbc-querydsl", listOf("querydsl-core", "querydsl-apt", "querydsl-r2dbc"))
+
 
             library("spring-boot-test", "org.springframework.boot", "spring-boot-starter-test").withoutVersion()
             library("mockk", "io.mockk", "mockk").version { require("1.13.4") }
@@ -53,15 +50,15 @@ dependencyResolutionManagement {
 
             library("spring-cloud-bom", "org.springframework.cloud", "spring-cloud-dependencies").version { require("2022.0.3") }
 
-            library("elemento-core", "org.jboss.elemento", "elemento-core").version { require("1.0.11") }
-            library("elemental2-svg", "com.google.elemental2", "elemental2-svg").version { require("1.1.0") }
-            library("gwt-user", "org.gwtproject", "gwt-user").version { require("2.10.0") }
-            library("gwt-dev", "org.gwtproject", "gwt-dev").version { require("2.10.0") }
-            bundle("gwt", listOf("elemento-core", "elemental2-svg", "gwt-user"))
 
             library("lombok", "org.projectlombok", "lombok").version { require("1.18.26") }
             library("jackson-annotations", "com.fasterxml.jackson.core", "jackson-annotations").version { require("2.14.2") }
             library("jackson-datatype-jsr310", "com.fasterxml.jackson.datatype", "jackson-datatype-jsr310").version { require("2.14.2") }
+
+            library("jooq", "org.jooq", "jooq").version{ require("3.18.2") }
+            library("jooq-codegen", "org.jooq", "jooq-codegen").version{ require("3.18.2") }
+            library("jooq-meta", "org.jooq", "jooq-meta").version{ require("3.18.2") }
+            bundle("jooq", listOf("jooq", "jooq-codegen", "jooq-meta"))
         }
     }
 }

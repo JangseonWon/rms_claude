@@ -16,16 +16,19 @@ dependencies {
     implementation(libs.bundles.r2dbc.postgres)
     implementation(libs.spring.gateway)
     implementation(libs.bundles.jooq)
-    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.4")
     jooqGenerator("org.postgresql:postgresql:42.6.0")
+
+    implementation("org.springframework.data:spring-data-ldap")
+    implementation("io.jsonwebtoken:jjwt-api:0.11.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
 }
 jib {
     from { image = "eclipse-temurin:17.0.7_7-jre-jammy" }
     container { environment = mapOf(
-            "LANG" to "C.UTF-8",
-            "TZ" to "Asia/Seoul",
-        )
-    }
+        "LANG" to "C.UTF-8",
+        "TZ" to "Asia/Seoul",
+    )}
 }
 
 configurations { all { exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging") } }
@@ -50,7 +53,7 @@ jooq {
                     database.apply {
                         name = "org.jooq.meta.postgres.PostgresDatabase"
                         schemata = listOf(
-                            SchemaMappingType().withInputSchema("public")
+                            SchemaMappingType().withInputSchema("public"),
                         )
                     }
                     generate.apply {

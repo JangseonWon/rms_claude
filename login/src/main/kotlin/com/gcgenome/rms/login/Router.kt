@@ -20,7 +20,7 @@ class Router (
 ) {
     @Bean
     fun route() = router {
-        POST("/w-api/user/login", ::login)
+        POST("/w-api/login", ::login)
     }
 
     private fun login(request: ServerRequest): Mono<ServerResponse> {
