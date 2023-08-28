@@ -5,6 +5,7 @@ import com.gcgenome.rms.data.*
 import com.gcgenome.rms.exception.ManagerAuthenticationException
 import com.gcgenome.rms.exception.MatchUserException
 import com.gcgenome.rms.exception.UserNotFoundException
+import org.jooq.exception.IntegrityConstraintViolationException
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
@@ -12,6 +13,7 @@ import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.router
+import org.springframework.web.server.ServerWebInputException
 import reactor.core.publisher.Mono
 
 @Configuration
@@ -21,6 +23,7 @@ class Router (private val userHandler: Handler) {
         GET("/w-api/users", ::findUsers)
         GET("/w-api/users/{userId}", ::findUser)
         PATCH("/w-api/users/{userId}", ::updateUser)
+        POST("/w-api/users/{userId}", :: saveUser)
     }
     /*fun userRoute(): RouterFunction<ServerResponse> {
         return route().GET("/w-api/users", this::findUsers) { ops -> ops.beanClass(Handler::class.java).beanMethod("selectUsers") }.build()
@@ -49,6 +52,21 @@ class Router (private val userHandler: Handler) {
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), User::class.java) }
             .onErrorResume(MatchUserException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}") }
             .onErrorResume(UserNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
+    }
+    private fun saveUser(request: ServerRequest): Mono<ServerResponse> {
+        val userId = request.pathVariable("userId")
+        return principal(request)
+            .flatMap { userHandler.chkManager(it) }
+            .flatMap { request.bodyToMono(User::class.java) }
+            .flatMap { userHandler.insertUser(it) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), User::class.java) }
+            .onErrorResume { throwable->
+                when(throwable) {
+                    is IntegrityConstraintViolationException -> { ServerResponse.status(HttpStatus.NOT_ACCEPTABLE).bodyValue("중복된 ID가 있습니다.") }
+                    is ServerWebInputException -> { ServerResponse.status(HttpStatus.NOT_ACCEPTABLE).bodyValue("누락된 정보 또는 잘못입력된 정보가 있습니다.")}
+                    else -> { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: ${throwable}")}
+                }
+            }
     }
 
     private fun principal(request: ServerRequest, userId: String): Mono<UserAuthentication> {

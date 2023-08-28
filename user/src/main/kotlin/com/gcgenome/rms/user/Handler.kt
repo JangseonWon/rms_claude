@@ -1,13 +1,13 @@
 package com.gcgenome.rms.user
 
 import com.gcgenome.rms.config.SecurityContextRepository.UserAuthentication
+import com.gcgenome.rms.dao.OrganizationDao
 import com.gcgenome.rms.dao.UserDao
 import com.gcgenome.rms.data.User
 import com.gcgenome.rms.exception.ManagerAuthenticationException
 import com.gcgenome.rms.exception.MatchUserException
 import com.gcgenome.rms.exception.UserNotFoundException
 import org.jooq.DSLContext
-import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono
 @Service
 class Handler(
     val dslContext: DSLContext
-): UserDao {
+): UserDao, OrganizationDao {
     fun selectUsers(): Flux<User> {
         return dslContext.dsl().selectUsers().map(User::toModel)
     }
@@ -35,6 +35,16 @@ class Handler(
                             .map(User::toModel)
                     }
             })
+    }
+    fun insertUser(userDto: User): Mono<User> {
+        return Mono.from(dslContext.transactionPublisher { trx ->
+            trx.dsl().run {
+                insertUser(userDto)
+                    .flatMap { insertOrganization(userDto.id, userDto.organization!!) }
+                    .flatMap { selectUserById(userDto.id) }
+                    .map(User::toModel)
+            }
+        })
     }
 
     fun chkManager(authentication: UserAuthentication): Mono<UserAuthentication>{
