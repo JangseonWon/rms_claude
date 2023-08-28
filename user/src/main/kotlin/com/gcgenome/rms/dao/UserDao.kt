@@ -1,5 +1,6 @@
 package com.gcgenome.rms.dao
 
+import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.User
 import com.gcgenome.rms.tables.records.UserRecord
 import com.gcgenome.rms.tables.references.USER
@@ -8,8 +9,11 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 interface UserDao{
-    fun DSLContext.selectUsers(): Flux<UserRecord> {
-        return Flux.from(selectFrom(USER).orderBy(USER.ID))
+    fun DSLContext.selectUsers(query: Query): Flux<UserRecord> {
+        return Flux.from(selectFrom(USER).orderBy(USER.ID).limit(query.size).offset(query.page*query.size))
+    }
+    fun DSLContext.selectUsersCount(query: Query): Mono<Int> {
+        return Mono.from(selectCount().from(USER)).map { it.component1() }
     }
     fun DSLContext.selectUserById(userId: String): Mono<UserRecord> {
         return Mono.from(selectFrom(USER).where(USER.ID.eq(userId)))

@@ -33,8 +33,20 @@ class Router (private val userHandler: Handler) {
     private fun findUsers(request: ServerRequest): Mono<ServerResponse> {
         return principal(request)
             .flatMap { userHandler.chkManager(it) }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(userHandler.selectUsers(), User::class.java) }
-            .onErrorResume(ManagerAuthenticationException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}") }
+            .flatMap { request.bodyToMono(Query::class.java) }
+            .flatMap { userHandler.selectUsers(it) }
+            .flatMap {
+                ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                .header("X-Total_Count", it.totalCount.toString())
+                .header("X-Total_Count", it.totalPage.toString())
+                .header("X-Total_Count", it.currentPage.toString())
+                .body(it.data, User::class.java)
+            }.onErrorResume { throwable->
+                when(throwable) {
+                    is ManagerAuthenticationException -> { ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${throwable.message}") }
+                    else -> { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $throwable")}
+                }
+            }
     }
     private fun findUser(request: ServerRequest): Mono<ServerResponse> {
         val userId = request.pathVariable("userId")

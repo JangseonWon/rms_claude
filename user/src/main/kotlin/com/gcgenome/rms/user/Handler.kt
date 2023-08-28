@@ -3,21 +3,28 @@ package com.gcgenome.rms.user
 import com.gcgenome.rms.config.SecurityContextRepository.UserAuthentication
 import com.gcgenome.rms.dao.OrganizationDao
 import com.gcgenome.rms.dao.UserDao
+import com.gcgenome.rms.data.Page
+import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.User
 import com.gcgenome.rms.exception.ManagerAuthenticationException
 import com.gcgenome.rms.exception.MatchUserException
 import com.gcgenome.rms.exception.UserNotFoundException
 import org.jooq.DSLContext
 import org.springframework.stereotype.Service
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 @Service
 class Handler(
     val dslContext: DSLContext
 ): UserDao, OrganizationDao {
-    fun selectUsers(): Flux<User> {
-        return dslContext.dsl().selectUsers().map(User::toModel)
+    fun selectUsers(query: Query): Mono<Page<User>> {
+        val users = dslContext.dsl().selectUsers(query).map(User::toModel)
+        return dslContext.selectUsersCount(query)
+            .flatMap { totalCount ->
+                val totalPage = (totalCount + query.size - 1) / query.size
+                val page = Page(totalCount, totalPage, query.size, query.page, users)
+                Mono.just(page)
+            }
     }
     fun selectUserById(userId: String): Mono<User> {
         return dslContext.dsl()
