@@ -54,7 +54,7 @@ spring:
         - id: rms-user
           uri: lb://rms-user
           predicates:
-            - Path=/w-api/user/**
+            - Path=/w-api/users/**
   r2dbc:
     url: r2dbc:postgresql://172.19.216.212:5432/rms
     username: postgres

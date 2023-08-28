@@ -1,4 +1,4 @@
-package com.gcgenome.rms
+package com.gcgenome.rms.config
 
 import com.gcgenome.rms.dao.UserDao
 import com.gcgenome.rms.data.User
@@ -25,11 +25,14 @@ class SecurityContextRepository(
     }
     class UserAuthentication(val user: User): Authentication {
         override fun getName(): String = user.name!!
-        override fun getAuthorities(): Collection<GrantedAuthority> = emptyList()
+        override fun getAuthorities(): Collection<GrantedAuthority> {
+            val authorities = user.authority.split(",") // Assuming authorities are comma-separated
+            return authorities.map { UserGrantedAuthority(it) }
+        }
         override fun getCredentials() = TODO("Not yet implemented")
-        override fun getDetails(): User = user
+        override fun getDetails() = TODO("Not yet implemented")
         override fun getPrincipal(): String = user.id
-        override fun isAuthenticated(): Boolean = true
+        override fun isAuthenticated(): Boolean = user.state.equals("ACTIVE")
         override fun setAuthenticated(isAuthenticated: Boolean) = TODO("Not yet implemented")
     }
 }
