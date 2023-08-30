@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 data class Query(
     @JsonProperty("page")
     val page: Int,
-    @JsonProperty("limit")
+    @JsonProperty("size")
     val size: Int,
     @JsonProperty("sort_by")
     val sortBy: String?,

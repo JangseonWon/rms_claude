@@ -1,7 +1,6 @@
 package com.gcgenome.rms.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.gcgenome.rms.tables.records.UserRecord
 import java.util.*
 
 data class User(
@@ -22,20 +21,5 @@ data class User(
     @JsonProperty("password")
     val password: String?,
     @JsonProperty("organization")
-    val organization: Organization?
-) {
-    companion object {
-        fun toModel(user: UserRecord): User =
-            User(
-                id = user.id!!,
-                authority = user.authority!!,
-                department = user.department,
-                key = user.key,
-                name = user.name,
-                state = user.state,
-                code = user.code,
-                password = null,
-                organization = null
-            )
-    }
-}
+    val organization: Organization?,
+)

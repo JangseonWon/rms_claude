@@ -1,10 +1,12 @@
-package com.gcgenome.rms.user
+package com.gcgenome.rms.route
 
 import com.gcgenome.rms.config.SecurityContextRepository.UserAuthentication
 import com.gcgenome.rms.data.*
 import com.gcgenome.rms.exception.ManagerAuthenticationException
 import com.gcgenome.rms.exception.MatchUserException
 import com.gcgenome.rms.exception.UserNotFoundException
+import com.gcgenome.rms.service.UserHandler
+import com.gcgenome.rms.service.UserServiceHandler
 import org.jooq.exception.IntegrityConstraintViolationException
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -17,29 +19,28 @@ import org.springframework.web.server.ServerWebInputException
 import reactor.core.publisher.Mono
 
 @Configuration
-class Router (private val userHandler: Handler) {
+class Router (
+    private val userHandler: UserHandler,
+    private val userServiceHandler: UserServiceHandler
+) {
     @Bean
     fun route() = router {
-        GET("/w-api/users", ::findUsers)
+        POST("/w-api/users", ::findUsers)
         GET("/w-api/users/{userId}", ::findUser)
         PATCH("/w-api/users/{userId}", ::updateUser)
         POST("/w-api/users/{userId}", :: saveUser)
+        POST("/w-api/users/{userId}/items", :: findUserService)
     }
-    /*fun userRoute(): RouterFunction<ServerResponse> {
-        return route().GET("/w-api/users", this::findUsers) { ops -> ops.beanClass(Handler::class.java).beanMethod("selectUsers") }.build()
-            .and(route().GET("/w-api/users/{userId}", this::findUser) {ops -> ops.beanClass(Handler::class.java).beanMethod("selectUserById")}.build())
-            .and(route().PATCH("/w-api/users/{userId}", this::updateUser) {ops -> ops.beanClass(Handler::class.java).beanMethod("updateUserById")}.build())
-    }*/
     private fun findUsers(request: ServerRequest): Mono<ServerResponse> {
         return principal(request)
             .flatMap { userHandler.chkManager(it) }
             .flatMap { request.bodyToMono(Query::class.java) }
-            .flatMap { userHandler.selectUsers(it) }
+            .flatMap { userHandler.selectUsers(it.copy(page = it.page-1)) }
             .flatMap {
                 ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
                 .header("X-Total_Count", it.totalCount.toString())
                 .header("X-Total_Count", it.totalPage.toString())
-                .header("X-Total_Count", it.currentPage.toString())
+                .header("X-Current-Page", it.currentPage.toString())
                 .body(it.data, User::class.java)
             }.onErrorResume { throwable->
                 when(throwable) {
@@ -80,6 +81,18 @@ class Router (private val userHandler: Handler) {
                 }
             }
     }
+    private fun findUserService(request: ServerRequest): Mono<ServerResponse> {
+        val userId = request.pathVariable("userId")
+        return principal(request, userId)
+            .flatMap { request.bodyToMono(Query::class.java) }
+            .flatMap { userServiceHandler.selectUserServiceById(it.copy(page = it.page-1), userId) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                .header("X-Total_Count", it.totalCount.toString())
+                .header("X-Total_Count", it.totalPage.toString())
+                .header("X-Current-Page", it.currentPage.toString())
+                .body(it.data, Service::class.java )
+            }
+    }
 
     private fun principal(request: ServerRequest, userId: String): Mono<UserAuthentication> {
         return request.principal().cast(UserAuthentication::class.java)
@@ -88,5 +101,6 @@ class Router (private val userHandler: Handler) {
     private fun principal(request: ServerRequest): Mono<UserAuthentication> {
         return request.principal().cast(UserAuthentication::class.java)
     }
+
 }
 

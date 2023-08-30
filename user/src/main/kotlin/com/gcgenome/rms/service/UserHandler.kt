@@ -1,4 +1,4 @@
-package com.gcgenome.rms.user
+package com.gcgenome.rms.service
 
 import com.gcgenome.rms.config.SecurityContextRepository.UserAuthentication
 import com.gcgenome.rms.dao.OrganizationDao
@@ -10,15 +10,16 @@ import com.gcgenome.rms.exception.ManagerAuthenticationException
 import com.gcgenome.rms.exception.MatchUserException
 import com.gcgenome.rms.exception.UserNotFoundException
 import org.jooq.DSLContext
+import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 
-@Service
-class Handler(
+@Component
+class UserHandler(
     val dslContext: DSLContext
 ): UserDao, OrganizationDao {
     fun selectUsers(query: Query): Mono<Page<User>> {
-        val users = dslContext.dsl().selectUsers(query).map(User::toModel)
+        val users = dslContext.dsl().selectUsers(query)
         return dslContext.selectUsersCount(query)
             .flatMap { totalCount ->
                 val totalPage = (totalCount + query.size - 1) / query.size
@@ -30,7 +31,6 @@ class Handler(
         return dslContext.dsl()
                     .selectUserById(userId)
                     .switchIfEmpty(Mono.error(UserNotFoundException(userId)))
-                    .map(User::toModel)
     }
 
     fun updateUserById(userId: String, userDto: User): Mono<User> {
@@ -39,7 +39,6 @@ class Handler(
                         selectUserById(userId)
                             .switchIfEmpty(Mono.error(UserNotFoundException(userId)))
                             .flatMap { updateUserById(userId, userDto) }
-                            .map(User::toModel)
                     }
             })
     }
@@ -49,7 +48,6 @@ class Handler(
                 insertUser(userDto)
                     .flatMap { insertOrganization(userDto.id, userDto.organization!!) }
                     .flatMap { selectUserById(userDto.id) }
-                    .map(User::toModel)
             }
         })
     }

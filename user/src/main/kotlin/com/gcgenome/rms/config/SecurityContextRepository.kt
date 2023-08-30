@@ -20,7 +20,6 @@ class SecurityContextRepository(
     override fun load(exchange: ServerWebExchange): Mono<SecurityContext> {
         return Mono.justOrEmpty(exchange.request.headers.getFirst("X-USER-ID"))
             .flatMap { dslContext.selectUserById(it)}
-            .map(User::toModel)
             .map { u -> SecurityContextImpl(UserAuthentication(u)) }
     }
     class UserAuthentication(val user: User): Authentication {
