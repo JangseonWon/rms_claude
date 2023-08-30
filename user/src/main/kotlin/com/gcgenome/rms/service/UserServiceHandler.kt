@@ -9,6 +9,7 @@ import com.gcgenome.rms.data.Service
 import com.gcgenome.rms.data.UserService
 import com.gcgenome.rms.exception.ServiceNotFoundException
 import com.gcgenome.rms.exception.UserNotFoundException
+import com.gcgenome.rms.exception.UserServiceNotFoundException
 import org.jooq.DSLContext
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
@@ -34,6 +35,14 @@ class UserServiceHandler(
                     .flatMap { selectUserById(userId).switchIfEmpty(Mono.error(UserNotFoundException(userId))) }
                     .flatMap { insertUserService(userId, itemId) }
                     .flatMap { selectUserServiceById(userId, itemId) }
+            }
+        })
+    }
+    fun deleteUserService(userId: String, itemId: String): Mono<UserService> {
+        return Mono.from(dslContext.transactionPublisher { trx ->
+            trx.dsl().run {
+                selectUserServiceById(userId, itemId).switchIfEmpty(Mono.error(UserServiceNotFoundException(userId, itemId)))
+                    .flatMap { deleteUserService(userId, itemId) }
             }
         })
     }

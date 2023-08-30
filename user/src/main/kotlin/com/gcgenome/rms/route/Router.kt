@@ -2,10 +2,7 @@ package com.gcgenome.rms.route
 
 import com.gcgenome.rms.config.SecurityContextRepository.UserAuthentication
 import com.gcgenome.rms.data.*
-import com.gcgenome.rms.exception.ManagerAuthenticationException
-import com.gcgenome.rms.exception.MatchUserException
-import com.gcgenome.rms.exception.ServiceNotFoundException
-import com.gcgenome.rms.exception.UserNotFoundException
+import com.gcgenome.rms.exception.*
 import com.gcgenome.rms.service.UserHandler
 import com.gcgenome.rms.service.UserServiceHandler
 import org.jooq.exception.IntegrityConstraintViolationException
@@ -32,6 +29,7 @@ class Router (
         POST("/w-api/users/{userId}", :: saveUser)
         POST("/w-api/users/{userId}/items", :: findUserService)
         POST("/w-api/users/{userId}/items/{itemId}", ::saveUserItem)
+        DELETE("/w-api/users/{userId}/items/{itemId}", ::deleteUserItem)
     }
     private fun findUsers(request: ServerRequest): Mono<ServerResponse> {
         return principal(request)
@@ -108,6 +106,21 @@ class Router (
                     is IntegrityConstraintViolationException -> { ServerResponse.status(HttpStatus.NOT_ACCEPTABLE).bodyValue("해당 서비스는 등록되어있습니다.") }
                     is ServiceNotFoundException -> { ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
                     is UserNotFoundException -> { ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
+                    else -> { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: ${e}")}
+                }
+            }
+    }
+
+    private fun deleteUserItem(request: ServerRequest): Mono<ServerResponse> {
+        val userId = request.pathVariable("userId")
+        val itemId = request.pathVariable("itemId")
+        return principal(request)
+            .flatMap { userHandler.chkManager(it) }
+            .flatMap { userServiceHandler.deleteUserService(userId, itemId) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), UserService::class.java ) }
+            .onErrorResume { e->
+                when(e) {
+                    is UserServiceNotFoundException -> { ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
                     else -> { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: ${e}")}
                 }
             }
