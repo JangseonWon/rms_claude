@@ -2,6 +2,7 @@ package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.Service
+import com.gcgenome.rms.data.UserService
 import com.gcgenome.rms.tables.references.*
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.*
@@ -9,7 +10,19 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 interface UserServiceDao {
-    fun DSLContext.selectUserServiceById(query: Query, userId: String): Flux<Service> {
+
+    fun DSLContext.insertUserService(userId:String, itemId: String): Mono<UserService> {
+        return Mono.from(insertInto(USER_SERVICE)
+            .set(USER_SERVICE.USER_ID, userId)
+            .set(USER_SERVICE.SERVICE_ID, itemId)
+            .returning()
+        ).map { it.into(UserService::class.java) }
+    }
+    fun DSLContext.selectUserServiceById(userId: String, itemId: String): Mono<UserService> {
+        return Mono.from(selectFrom(USER_SERVICE).where(USER_SERVICE.USER_ID.eq(userId).and(USER_SERVICE.SERVICE_ID.eq(itemId))))
+            .map { it.into(UserService::class.java) }
+    }
+    fun DSLContext.selectUserServicesById(query: Query, userId: String): Flux<Service> {
         val query =
             select(
                 SERVICE.ID,

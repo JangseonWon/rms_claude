@@ -7,7 +7,5 @@ data class UserService (
     @JsonProperty("user_id")
     val userId: String?,
     @JsonProperty("service_id")
-    val serviceId: String?,
-    @JsonProperty("service")
-    val service: Service?
+    val serviceId: String?
 )

@@ -4,6 +4,7 @@ import com.gcgenome.rms.config.SecurityContextRepository.UserAuthentication
 import com.gcgenome.rms.data.*
 import com.gcgenome.rms.exception.ManagerAuthenticationException
 import com.gcgenome.rms.exception.MatchUserException
+import com.gcgenome.rms.exception.ServiceNotFoundException
 import com.gcgenome.rms.exception.UserNotFoundException
 import com.gcgenome.rms.service.UserHandler
 import com.gcgenome.rms.service.UserServiceHandler
@@ -30,6 +31,7 @@ class Router (
         PATCH("/w-api/users/{userId}", ::updateUser)
         POST("/w-api/users/{userId}", :: saveUser)
         POST("/w-api/users/{userId}/items", :: findUserService)
+        POST("/w-api/users/{userId}/items/{itemId}", ::saveUserItem)
     }
     private fun findUsers(request: ServerRequest): Mono<ServerResponse> {
         return principal(request)
@@ -73,11 +75,11 @@ class Router (
             .flatMap { request.bodyToMono(User::class.java) }
             .flatMap { userHandler.insertUser(it) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), User::class.java) }
-            .onErrorResume { throwable->
-                when(throwable) {
+            .onErrorResume { e->
+                when(e) {
                     is IntegrityConstraintViolationException -> { ServerResponse.status(HttpStatus.NOT_ACCEPTABLE).bodyValue("중복된 ID가 있습니다.") }
                     is ServerWebInputException -> { ServerResponse.status(HttpStatus.NOT_ACCEPTABLE).bodyValue("누락된 정보 또는 잘못입력된 정보가 있습니다.")}
-                    else -> { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: ${throwable}")}
+                    else -> { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: ${e}")}
                 }
             }
     }
@@ -91,6 +93,23 @@ class Router (
                 .header("X-Total_Count", it.totalPage.toString())
                 .header("X-Current-Page", it.currentPage.toString())
                 .body(it.data, Service::class.java )
+            }
+    }
+
+    private fun saveUserItem(request: ServerRequest): Mono<ServerResponse> {
+        val userId = request.pathVariable("userId")
+        val itemId = request.pathVariable("itemId")
+        return principal(request)
+            .flatMap { userHandler.chkManager(it) }
+            .flatMap { userServiceHandler.insertUserService(userId, itemId) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), UserService::class.java ) }
+            .onErrorResume { e->
+                when(e) {
+                    is IntegrityConstraintViolationException -> { ServerResponse.status(HttpStatus.NOT_ACCEPTABLE).bodyValue("해당 서비스는 등록되어있습니다.") }
+                    is ServiceNotFoundException -> { ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
+                    is UserNotFoundException -> { ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
+                    else -> { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: ${e}")}
+                }
             }
     }
 
