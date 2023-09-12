@@ -1,33 +1,11 @@
-annotations:
-  category: Database
-  licenses: Apache-2.0
 apiVersion: v2
-appVersion: 15.3.0
-dependencies:
-- name: common
-  repository: oci://registry-1.docker.io/bitnamicharts
-  tags:
-  - bitnami-common
-  version: 2.x.x
-description: This PostgreSQL cluster solution includes the PostgreSQL replication
-  manager, an open-source tool for managing replication and failover on PostgreSQL
-  clusters.
-home: https://bitnami.com
-icon: https://en.wikipedia.org/wiki/PostgreSQL#/media/File:Postgresql_elephant.svg
-keywords:
-- postgresql
-- repmgr
-- pgpool
-- postgres
-- database
-- sql
-- replication
-- cluster
-- high availability
-maintainers:
-- name: VMware, Inc.
-  url: https://github.com/bitnami/charts
+appVersion: v1.16.0
+type: application
 name: postgresql-ha
-sources:
-- https://github.com/bitnami/charts/tree/main/bitnami/postgresql-ha
-version: 11.7.9
+version: 11.9.2
+home: https://github.com/bitnami/charts/blob/main/bitnami/postgresql-ha
+icon: https://bitnami.com/assets/stacks/postgresql/img/postgresql-stack-220x234.png
+dependencies:
+  - name: postgresql-ha
+    version: 11.9.2
+    repository: https://charts.bitnami.com/bitnami
