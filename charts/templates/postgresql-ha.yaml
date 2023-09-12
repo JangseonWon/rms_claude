@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Namespace }}-postgresql-ha
+  namespace: openshift-gitops
+spec:
+  destination:
+    namespace: {{ .Release.Namespace }}
+    server: 'https://kubernetes.default.svc'
+  project: {{ .Release.Namespace }}
+  source:
+    path: charts/postgresql-ha
+    repoURL: 'https://gitea.apps.gcgenome.com/LIMS/rms.git'
+    targetRevision: {{ .Values.revision }}
+    helm:
+      values: |
+        postgresql-ha:
+{{ index .Values "postgresql-ha" | toYaml | indent 10 }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
