@@ -23,6 +23,4 @@ jobs:
           REGISTRY_URL: https://${{ secrets.REGISTRY_HOSTNAME }}
           REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
           REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
-          POSTGRES_USERNAME: ${{ secrets.POSTGRES_USERNAME }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
         run: ./gradlew gateway:jib
