@@ -16,4 +16,5 @@ jobs:
           cache: gradle
       - name: Build Module
         run: |
+          chmod +x ./gradlew
           ./gradlew :gateway:build
