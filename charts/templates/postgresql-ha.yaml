@@ -15,7 +15,6 @@ spec:
     helm:
       values: |
         postgresql-ha:
-{{ index .Values "postgresql-ha" | toYaml | indent 10 }}
           global:
             postgresql:
               database: rms
@@ -33,14 +32,39 @@ spec:
               version: 15.4.0
             podAnnotations:
               sidecar.istio.io/inject: 'true'
+            {{- if .Values.postgresql.postgresql }}
+            {{- with .Values.postgresql.postgresql.maxConnections }}
+            maxConnections: {{ . }}
+            {{- end }}
+            {{- end }}
           pgpool:
             podLabels:
               app: postgresql
               version: 4.4.4
             podAnnotations:
               sidecar.istio.io/inject: 'true'
+            {{- if .Values.postgresql.pgpool }}
+            {{- with .Values.postgresql.pgpool.numInitChildren }}
+            numInitChildren: {{ . }}
+            {{- end }}
+            {{- with .Values.postgresql.pgpool.childMaxConnections }}
+            childMaxConnections: {{ . }}
+            {{- end }}
+            {{- with .Values.postgresql.pgpool.serviceLabels }}
+            serviceLabels:
+              {{ toYaml . }}
+            {{- end }}
+            {{- with .Values.postgresql.pgpool.serviceAnnotations }}
+            serviceAnnotations:
+              {{ toYaml . }}
+            {{- end }}
+            {{- end }}
           serviceAccount:
             name: postgres
+          {{- with .Values.postgresql.persistence }}
+          persistence:
+            {{ toYaml . }}
+          {{- end }}
   syncPolicy:
     automated:
       prune: true
