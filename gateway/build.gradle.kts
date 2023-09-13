@@ -35,6 +35,14 @@ jib {
     from {
         image = "eclipse-temurin:17.0.7_7-jre-jammy"
     }
+    to{
+        image = "image-registry.openshift-image-registry.svc:5000/rms-test/rms-gateway"
+        tags = setOf("latest")
+        auth {
+            username = System.getenv("REGISTRY_USERNAME")
+            password = System.getenv("REGISTRY_PASSWORD")
+        }
+    }
     container {
         environment = mapOf(
             "LANG" to "C.UTF-8",
@@ -56,7 +64,7 @@ jooq {
                 logging = Logging.WARN
                 jdbc.apply {
                     driver = "org.postgresql.Driver"
-                    url = "jdbc:postgresql://172.19.216.212:5432/rms"
+                    url = "jdbc:postgresql://172.19.216.202:5432/rms"
                     user = "postgres"
                     password = "snubi1004"
                 }
