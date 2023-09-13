@@ -17,4 +17,4 @@ jobs:
       - name: Build Module
         run: |
           chmod +x ./gradlew
-          ./gradlew :gateway:build
+          ./gradlew gateway:build
