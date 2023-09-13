@@ -37,6 +37,10 @@ jib {
     }
     to{
         image = "image-registry.openshift-image-registry.svc:5000/rms-test/rms-gateway"
+        auth {
+            username = System.getenv("REGISTRY_USERNAME")
+            password = System.getenv("REGISTRY_PASSWORD")
+        }
     }
     container {
         environment = mapOf(
