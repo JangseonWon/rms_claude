@@ -9,13 +9,38 @@ spec:
     server: 'https://kubernetes.default.svc'
   project: {{ .Release.Namespace }}
   source:
-    path: charts/postgresql-ha
-    repoURL: 'https://gitea.apps.gcgenome.com/LIMS/rms.git'
-    targetRevision: {{ .Values.revision }}
+    chart: lims-postgresql-ha
+    repoURL: 'https://gitea.apps.gcgenome.com/api/packages/LIMS/helm'
+    targetRevision: 0.3.0
     helm:
       values: |
         postgresql-ha:
 {{ index .Values "postgresql-ha" | toYaml | indent 10 }}
+          global:
+            postgresql:
+              database: rms
+              existingSecret: postgresql
+            pgpool:
+              existingSecret: postgresql
+          commonLabels:
+            app.kubernetes.io/part-of: database
+            app.kubernetes.io/name: postgresql
+          commonAnnotations:
+            app.openshift.io/vcs-uri: 'https://github.com/bitnami/charts/tree/main/bitnami/postgresql-ha'
+          postgresql:
+            podLabels:
+              app: postgresql
+              version: 15.4.0
+            podAnnotations:
+              sidecar.istio.io/inject: 'true'
+          pgpool:
+            podLabels:
+              app: postgresql
+              version: 4.4.4
+            podAnnotations:
+              sidecar.istio.io/inject: 'true'
+          serviceAccount:
+            name: postgres
   syncPolicy:
     automated:
       prune: true
