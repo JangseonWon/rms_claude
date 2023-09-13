@@ -1,7 +1,7 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: {{ .Release.Namespace }}
+  name: rms-gateway
   labels:
     app: rms-gateway
     app.kubernetes.io/component: rms-gateway
