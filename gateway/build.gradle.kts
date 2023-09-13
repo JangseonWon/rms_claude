@@ -35,6 +35,9 @@ jib {
     from {
         image = "eclipse-temurin:17.0.7_7-jre-jammy"
     }
+    to{
+        image = "image-registry.openshift-image-registry.svc:5000/rms-test/rms-gateway"
+    }
     container {
         environment = mapOf(
             "LANG" to "C.UTF-8",
