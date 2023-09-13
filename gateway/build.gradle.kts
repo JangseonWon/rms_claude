@@ -37,6 +37,7 @@ jib {
     }
     to{
         image = "image-registry.openshift-image-registry.svc:5000/rms-test/rms-gateway"
+        tags = setOf(System.getenv("REGISTRY_TAG"), "latest")
         auth {
             username = System.getenv("REGISTRY_USERNAME")
             password = System.getenv("REGISTRY_PASSWORD")
