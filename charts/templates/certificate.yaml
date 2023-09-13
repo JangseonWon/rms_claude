@@ -1,14 +1,13 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: request.gcgenome.com-ca
+  name: {{ .Values.host }}-ca
   namespace: {{ .Release.Namespace }}
 spec:
-  commonName: request.gcgenome.com
+  commonName: {{ .Values.host }}
   dnsNames:
-    - request.gcgenome.com
-    - report.gcgenome.com
+    - {{ .Values.host }}
   issuerRef:
     kind: ClusterIssuer
     name: letsencrypt
-  secretName: request.gcgenome.com-ca
+  secretName: {{ .Values.host }}-ca

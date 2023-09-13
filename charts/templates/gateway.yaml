@@ -13,6 +13,6 @@ spec:
       protocol: HTTPS
     tls:
       mode: SIMPLE
-      credentialName: request.gcgenome.com-ca
+      credentialName: {{ .Values.host }}-ca
     hosts:
     - {{ .Values.host }}
