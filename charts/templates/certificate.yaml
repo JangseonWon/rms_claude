@@ -1,12 +1,12 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: {{ .Values.host }}-ca
+  name: a{{ .Values.host }}-ca
   namespace: {{ .Release.Namespace }}
 spec:
-  commonName: {{ .Values.host }}
+  commonName: a{{ .Values.host }}
   dnsNames:
-    - {{ .Values.host }}
+    - a{{ .Values.host }}
   issuerRef:
     kind: ClusterIssuer
     name: letsencrypt
