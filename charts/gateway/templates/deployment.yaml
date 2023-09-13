@@ -31,7 +31,7 @@ spec:
       containers:
         - name: rms-gateway
           image: >-
-            image-registry.openshift-image-registry.svc:5000/rms-test/rms-gateway:{{ .Values.version }}
+            image-registry.openshift-image-registry.svc:5000/rms-test/rms-gateway:{{ .Chart.AppVersion }}
           ports:
             - containerPort: 8080
               protocol: TCP

@@ -1,5 +1,5 @@
 kind: ConfigMap
-apiVersion: {{ .Values.version }}
+apiVersion: v1
 metadata:
   name: rms-gateway-application
   namespace: {{ .Release.Namespace }}
