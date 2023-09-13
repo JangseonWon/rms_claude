@@ -2,7 +2,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: request.gcgenome.com-ca
-  namespace: {{ .Release.Namespace }}
+  namespace: istio-system
 spec:
   commonName: request.gcgenome.com
   dnsNames:
