@@ -1,0 +1,74 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ .Release.Namespace }}
+  labels:
+    app: rms-gateway
+    app.kubernetes.io/component: rms-gateway
+    app.kubernetes.io/instance: rms-gateway
+    app.kubernetes.io/name: rms-gateway
+    app.kubernetes.io/part-of: rms
+    app.openshift.io/runtime: rms-gateway
+    app.openshift.io/runtime-namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: rms-gateway
+  template:
+    metadata:
+      labels:
+        app: rms-gateway
+        deployment: rms-gateway
+      annotations:
+        sidecar.istio.io/inject: 'true'
+    spec:
+      volumes:
+        - name: config-volume
+          configMap:
+            name: rms-gateway-application
+            defaultMode: 420
+      containers:
+        - name: rms-gateway
+          image: >-
+            image-registry.openshift-image-registry.svc:5000/rms-test/rms-gateway:{{ .Values.version }}
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+              scheme: HTTP
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+              scheme: HTTP
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          volumeMounts:
+            - name: config-volume
+              mountPath: /resources/application.yaml
+              subPath: application.yaml
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 3
+  progressDeadlineSeconds: 600

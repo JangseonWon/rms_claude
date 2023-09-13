@@ -1,0 +1,92 @@
+kind: ConfigMap
+apiVersion: {{ .Values.version }}
+metadata:
+  name: rms-gateway-application
+  namespace: {{ .Release.Namespace }}
+data:
+  application.yaml: |
+    spring:
+      application:
+        name: rms-gateway
+      main:
+        web-application-type: reactive
+      cloud:
+        kubernetes:
+          config:
+            sources:
+              - namespace: rms-test
+                name: rms-gateway
+        gateway:
+          globalcors:
+            corsConfigurations:
+              '[/**]':
+                allowedOrigins: "*"
+                allowedHeaders:
+                  - Authentication
+                  - AUTHORIZATION
+                  - X-USER-ID
+                  - Content-Type
+                exposedHeaders:
+                  - X-Total-Count
+                  - X-Total-Page
+                  - X-Current-Page
+                  - X-Frame-Options
+                allowedMethods:
+                  - OPTIONS
+                  - GET
+                  - POST
+                  - PUT
+                  - PATCH
+                  - DELETE
+          default-filters:
+            - AuthenticateFilter
+          routes:
+            - id: rms-api
+              uri: lb://rms-api
+              predicates:
+                - Path=/api/**
+            - id: rms-alis-api
+              uri: lb://rms-alis-api
+              predicates:
+                - Path=/api/alis/**
+            - id: rms-login
+              uri: lb://rms-login
+              predicates:
+                - Path=/w-api/login/**
+            - id: rms-user
+              uri: lb://rms-user
+              predicates:
+                - Path=/w-api/users/**
+      r2dbc:
+        url: r2dbc:postgresql://rms-test-postgresql-ha-pgpool.rms-test.svc.cluster.local:5432/rms
+        username: postgres
+        password: snubi1004
+        pool:
+          initial-size: 2
+          max-size: 10
+          max-idle-time: 30m
+          validation-query: SELECT 1
+    management.endpoint.health.enabled: true
+    logging:
+      level:
+        io.r2dbc.postgresql.QUERY: TRACE
+        io.r2dbc.postgresql.PARAM: TRACE
+    security:
+      oauth2:
+        authorization:
+          jwt:
+            public: -----BEGIN PUBLIC KEY-----MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAtdGhlOhsNuLiIY8LEH2iIlUL9BgFjexvcYLkBg3d+HHZPIdXrle9uPSnTReUaq0HHvpRmWHR4H/MtXmKvVXJQ1qyj5HksDpFTm2k8FRCMPtnghWSo2IAYdBzebLaxf++zmnEwiaM7imZJB9v+n+Snftk1XANbKeyoNWdzXicqCeZkf3hVP4KsPYb3/fGEqMfOCIcU16akQgJhTPQhQQy1QsgcXwAyrLI0vm3axVc+yp51TwC9kGrHlpLU7+gMKMkOXglU32TSd/Z4/bfW7JARDjKBAh0y5RrzWRWC4c/XcaSt+2CxivecnRIoALHW91e4h88gBolvegCd0oP1qq2hy/GzYtvFZ/4N1cSqTDzGrYe8gtzndz1+nOzByD+eq2RPSh/CmLCFtvPeanm9cwbRIldmliReP6io00mRHP7QjHuDONwMUtMjjiIS55HiUotp2bRMN2xy/oXnwhvMqItmX9QmWXUDRfT1fbIUqqg3TAEq+UrKCd5ScFEoJBP3/N1PFwrWJ5tWYNW7DrKhJNFTBdGgUnvEiiCOHwPImuGod2mL0sEfV8v6hILF8YlyJVNKatz3MiwhHjRzN+rZBs1r171DDFhLxb//3s/EnrrhIFadYsvouyJ3KEX4CiCyW/72hX132neu0x9DXH7ElEpj6Tpu62HHGscc8pn75gE2McCAwEAAQ::-----END PUBLIC KEY-----
+            secret: -----BEGIN RSA PRIVATE KEY-----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-----END RSA PRIVATE KEY-----
+            signature-algorithm: RS256
+            duration: 36000
+        client:
+          client-id: GCGENOME
+          client-secret: ee2b38bd-f038-4f4f-bfe1-524da17ba933
+        paths:
+          authorize: 1
+          check-token: 2
+          confirm: 3
+          token: /token
+          token-key: 4
+    server:
+      port: 8080
