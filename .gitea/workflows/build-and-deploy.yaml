@@ -4,6 +4,10 @@ on: [push]
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    env:
+      REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+      REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+      REGISTRY_TAG: test
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -19,8 +23,4 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build Module
-        env:
-          REGISTRY_URL: https://${{ secrets.REGISTRY_HOSTNAME }}
-          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
-          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
         run: ./gradlew gateway:jib
