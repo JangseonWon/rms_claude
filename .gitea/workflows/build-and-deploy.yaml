@@ -5,9 +5,8 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     env:
-      REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
-      REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
-      REGISTRY_TAG: test
+      REGISTRY_USERNAME: ${{ secrets.RMS_TEST_REGISTRY_USERNAME }}
+      REGISTRY_PASSWORD: ${{ secrets.RMS_TEST_REGISTRY_PASSWORD }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3

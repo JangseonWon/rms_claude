@@ -58,8 +58,7 @@ spec:
             failureThreshold: 3
           volumeMounts:
             - name: config-volume
-              mountPath: /resources/application.yaml
-              subPath: application.yaml
+              mountPath: /app/resources
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst
