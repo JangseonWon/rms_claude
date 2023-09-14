@@ -16,4 +16,3 @@ spec:
       credentialName: {{ .Values.host }}-ca
     hosts:
     - {{ .Values.host }}
-    - ee{{ .Values.host }}
