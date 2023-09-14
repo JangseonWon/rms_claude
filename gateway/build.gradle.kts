@@ -36,10 +36,11 @@ jib {
         image = "eclipse-temurin:17.0.7_7-jre-jammy"
     }
     to{
-        image = "image-registry.openshift-image-registry.svc:5000/rms-test/rms-gateway:latest"
+        image = "image-registry.openshift-image-registry.svc:5000/rms-test/rms-gateway"
+        tags = setOf(System.getenv("REGISTRY_TAG"), "latest")
         auth {
-            username = "sungty"
-            password = "219912ab!"
+            username = System.getenv("REGISTRY_USERNAME")
+            password = System.getenv("REGISTRY_PASSWORD")
         }
     }
     container {
