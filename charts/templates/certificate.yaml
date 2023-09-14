@@ -2,7 +2,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: {{ .Values.host }}-ca
-  namespace: {{ .Release.Namespace }}
+  namespace: istio-system
 spec:
   commonName: {{ .Values.host }}
   dnsNames:
