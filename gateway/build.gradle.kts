@@ -36,8 +36,8 @@ jib {
         image = "eclipse-temurin:17.0.7_7-jre-jammy"
     }
     to{
-        image = "image-registry.openshift-image-registry.svc:5000/rms-test/rms-gateway"
-        tags = setOf(System.getenv("REGISTRY_TAG"), "latest")
+        image = "image-registry.apps.gcgenome.com/rms-test/rms-gateway"
+        tags = setOf("latest")
         auth {
             username = System.getenv("REGISTRY_USERNAME")
             password = System.getenv("REGISTRY_PASSWORD")
