@@ -30,8 +30,6 @@ spec:
             podLabels:
               app: postgresql
               version: 15.4.0
-            podAnnotations:
-              sidecar.istio.io/inject: 'true'
             {{- if .Values.postgresql.postgresql }}
             {{- with .Values.postgresql.postgresql.maxConnections }}
             maxConnections: {{ . }}
@@ -41,8 +39,6 @@ spec:
             podLabels:
               app: postgresql
               version: 4.4.4
-            podAnnotations:
-              sidecar.istio.io/inject: 'true'
             {{- if .Values.postgresql.pgpool }}
             {{- with .Values.postgresql.pgpool.numInitChildren }}
             numInitChildren: {{ . }}
