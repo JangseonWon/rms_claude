@@ -9,11 +9,6 @@ spring:
         sources:
           - namespace: rms-test
             name: rms-gateway
-    zookeeper:
-      connect-string: test:12181
-      discovery:
-        root: /rms
-        register: false
     gateway:
       globalcors:
         corsConfigurations:

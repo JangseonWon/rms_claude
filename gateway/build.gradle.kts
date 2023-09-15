@@ -11,22 +11,13 @@ plugins {
     id("nu.studer.jooq") version "8.1"
 }
 dependencies {
-    implementation("org.springframework.cloud:spring-cloud-starter-gateway")
-    implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-webflux")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
-    implementation("org.postgresql:r2dbc-postgresql:1.0.1.RELEASE")
-    implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
-    implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
+    implementation(libs.bundles.kotlin.webflux)
+    implementation(libs.spring.gateway)
+    implementation(libs.spring.security)
+    implementation(libs.bundles.r2dbc.postgres)
+    implementation(libs.bundles.jjwt.runtime)
     implementation(libs.spring.actuator)
-
-    implementation("org.jooq:jooq:3.18.2")
-    implementation("org.jooq:jooq-codegen:3.18.2")
-    implementation("org.jooq:jooq-meta:3.18.2")
+    implementation(libs.bundles.jooq)
     jooqGenerator("org.postgresql:postgresql:42.6.0")
 }
 
@@ -64,8 +55,8 @@ jooq {
                 jdbc.apply {
                     driver = "org.postgresql.Driver"
                     url = "jdbc:postgresql://172.19.216.202:5432/rms"
-                    user = "postgres"
-                    password = "snubi1004"
+                    user = System.getenv("POSTGRES_USERNAME")
+                    password = System.getenv("POSTGRES_PASSWORD")
                 }
                 generator.apply {
                     name = "org.jooq.codegen.KotlinGenerator"
