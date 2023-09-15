@@ -21,6 +21,7 @@ dependencyResolutionManagement {
             library("kotlin-coroutines-reactor", "org.jetbrains.kotlinx", "kotlinx-coroutines-reactor").withoutVersion()
             library("kotlin-jackson", "com.fasterxml.jackson.module", "jackson-module-kotlin").withoutVersion()
             bundle("kotlin-webflux", listOf("webflux", "reflect", "stdlib-jdk8", "kotlin-reactor", "kotlin-coroutines-reactor", "kotlin-jackson"))
+
             library("spring-gateway", "org.springframework.cloud", "spring-cloud-starter-gateway").withoutVersion()
             library("spring-discovery", "org.springframework.cloud", "spring-cloud-starter-zookeeper-discovery").withoutVersion()
             library("spring-actuator", "org.springframework.boot", "spring-boot-starter-actuator").withoutVersion()
@@ -28,7 +29,7 @@ dependencyResolutionManagement {
             library("spring-security", "org.springframework.boot", "spring-boot-starter-security").withoutVersion()
             library("spring-hateoas", "org.springframework.hateoas", "spring-hateoas").withoutVersion()
             library("spring-kafka", "org.springframework.cloud", "spring-cloud-starter-stream-kafka").withoutVersion()
-            bundle("spring-client", listOf("spring-discovery", "spring-log4j2", "spring-security"))
+            bundle("spring-client", listOf("spring-log4j2", "spring-security"))
 
             library("jjwt-api", "io.jsonwebtoken", "jjwt-api").version { require("0.11.5") }
             library("jjwt-impl", "io.jsonwebtoken", "jjwt-impl").version { require("0.11.5") }
