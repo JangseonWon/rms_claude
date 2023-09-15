@@ -11,7 +11,7 @@ spec:
   source:
     chart: lims-postgresql-ha
     repoURL: 'https://gitea.apps.gcgenome.com/api/packages/LIMS/helm'
-    targetRevision: 0.3.0
+    targetRevision: 0.3.1
     helm:
       values: |
         postgresql-ha:
