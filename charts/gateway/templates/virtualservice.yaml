@@ -1,0 +1,23 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+spec:
+  gateways:
+    - gateway
+  hosts:
+    - request-test.gcgenome.com
+  http:
+    - match:
+        - port: 443
+          uri:
+            prefix: /test
+      route:
+        - destination:
+            host: rms-gateway.rms-test.svc.cluster.local
+            port:
+              number: 80
+    - match:
+        - uri:
+            prefix: /.well-known
+      route:
+        - destination:
+            host: cm-acme-http-solver-4kj48.rms-test.svc.cluster.local
