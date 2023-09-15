@@ -2,7 +2,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: rms-gateway
-  namespace: rms-gateway
+  namespace: rms-test
 spec:
   type: ClusterIP
   ports:
