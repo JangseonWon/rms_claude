@@ -15,13 +15,22 @@ dependencies {
     implementation(libs.bundles.kotlin.webflux)
     implementation(libs.bundles.r2dbc.postgres)
     implementation(libs.spring.gateway)
-    implementation("org.jooq:jooq:3.18.2")
-    implementation("org.jooq:jooq-codegen:3.18.2")
-    implementation("org.jooq:jooq-meta:3.18.2")
+    implementation(libs.bundles.jooq)
+    implementation("software.amazon.awssdk:s3:2.20.118")
+    implementation("software.amazon.awssdk:netty-nio-client:2.20.117")
     jooqGenerator("org.postgresql:postgresql:42.6.0")
+
 }
 jib {
     from { image = "eclipse-temurin:17.0.7_7-jre-jammy" }
+    to {
+        image = "image-registry.apps.gcgenome.com/rms-test/rms-api"
+        tags = setOf("latest")
+        auth {
+            username = System.getenv("REGISTRY_USERNAME")
+            password = System.getenv("REGISTRY_PASSWORD")
+        }
+    }
     container { environment = mapOf(
             "LANG" to "C.UTF-8",
             "TZ" to "Asia/Seoul",
@@ -42,9 +51,9 @@ jooq {
                 logging = Logging.WARN
                 jdbc.apply {
                     driver = "org.postgresql.Driver"
-                    url = "jdbc:postgresql://172.19.216.212:5432/rms"
-                    user = "postgres"
-                    password = "snubi1004"
+                    url = "jdbc:postgresql://172.19.216.202:5432/rms"
+                    user = System.getenv("POSTGRES_USERNAME")
+                    password = System.getenv("POSTGRES_PASSWORD")
                 }
                 generator.apply {
                     name = "org.jooq.codegen.KotlinGenerator"

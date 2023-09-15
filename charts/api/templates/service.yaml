@@ -1,7 +1,7 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: rms-gateway
+  name: rms-api
   namespace: rms-test
 spec:
   type: ClusterIP
@@ -11,5 +11,5 @@ spec:
       port: 80
       targetPort: 8080
   selector:
-    app: rms-gateway
-    deployment: rms-gateway
+    app: rms-api
+    deployment: rms-api

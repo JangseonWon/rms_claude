@@ -3,10 +3,9 @@ package com.gcgenome.rms.service
 import com.gcgenome.rms.dao.ServiceDao
 import com.gcgenome.rms.data.Service
 import org.jooq.DSLContext
-import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 
-@Component
+@org.springframework.stereotype.Service("com.gcgenome.rms.service.Handler")
 class Handler(
     val dslContext: DSLContext
 ):ServiceDao {

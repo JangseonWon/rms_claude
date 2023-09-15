@@ -11,6 +11,7 @@ import org.springframework.security.web.server.context.ServerSecurityContextRepo
 import org.springframework.stereotype.Component
 import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
+import java.util.*
 
 @Component
 class SecurityContextRepository(
@@ -18,9 +19,8 @@ class SecurityContextRepository(
 ) : ServerSecurityContextRepository, UserDao {
     override fun save(exchange: ServerWebExchange, context: SecurityContext): Mono<Void> = Mono.empty()
     override fun load(exchange: ServerWebExchange): Mono<SecurityContext> {
-        return Mono.justOrEmpty(exchange.request.headers.getFirst("X-USER-ID"))
-            .flatMap { dslContext.selectUserById(it)}
-            .map(User::toModel)
+        return Mono.justOrEmpty(exchange.request.headers.getFirst("Authorization"))
+            .flatMap { dslContext.selectUserByKey(UUID.fromString(it))}
             .map { u -> SecurityContextImpl(UserAuthentication(u)) }
     }
     class UserAuthentication(val user: User): Authentication {
