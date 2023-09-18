@@ -10,6 +10,12 @@ data:
         name: rms-api
       main:
         web-application-type: reactive
+      cloud:
+        kubernetes:
+          config:
+            sources:
+              - namespace: rms-test
+                name: rms-api
       r2dbc:
         url: r2dbc:postgresql://rms-test-postgresql-ha-pgpool.rms-test.svc.cluster.local:5432/rms
         username: postgres
