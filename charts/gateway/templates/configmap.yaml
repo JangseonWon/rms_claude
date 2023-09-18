@@ -10,12 +10,6 @@ data:
         name: rms-gateway
       main:
         web-application-type: reactive
-      cloud:
-        kubernetes:
-          config:
-            sources:
-              - namespace: rms-test
-                name: rms-gateway
         gateway:
           globalcors:
             corsConfigurations:
