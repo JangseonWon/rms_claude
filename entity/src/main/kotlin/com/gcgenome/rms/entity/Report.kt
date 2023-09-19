@@ -20,6 +20,6 @@ data class Report(
     val type: String,
     @Column(name = "value")
     val value: String,
-    @Column(name = "close_at")
-    val closeAt: LocalDateTime
+    @Column(name = "complete_at")
+    val completeAt: LocalDateTime
 )
