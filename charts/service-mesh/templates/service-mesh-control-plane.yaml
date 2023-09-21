@@ -1,0 +1,52 @@
+apiVersion: maistra.io/v2
+kind: ServiceMeshControlPlane
+metadata:
+  name: service-mesh
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/instance: istio
+spec:
+  addons:
+    grafana:
+      enabled: true
+    jaeger:
+      install:
+        storage:
+          type: Memory
+    kiali:
+      enabled: true
+    prometheus:
+      enabled: true
+  security:
+    manageNetworkPolicy: false
+  policy:
+    type: Istiod
+  profiles:
+    - default
+  telemetry:
+    type: Istiod
+  tracing:
+    sampling: 10000
+    type: Jaeger
+  version: v2.4
+  gateways:
+    ingress:
+      service:
+        metadata:
+          annotations:
+            metallb.universe.tf/loadBalancerIPs: {{ .Values.ip }}
+          labels:
+            network: {{ .Values.network }}
+        type: LoadBalancer
+        ports:
+          - name: status-port
+            port: 15020
+          - name: http2
+            port: 80
+            targetPort: 8080
+          - name: https
+            port: 443
+            targetPort: 8443
+          - name: postgres
+            port: 5432
+            protocol: TCP
