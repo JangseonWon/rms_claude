@@ -55,13 +55,33 @@ spec:
               {{ toYaml . }}
             {{- end }}
             {{- end }}
+          service:
+            type: ClusterIP
           serviceAccount:
             name: postgres
           {{- with .Values.postgresql.persistence }}
           persistence:
             {{ toYaml . }}
           {{- end }}
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
+
+---
+
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: postgres
+  namespace: {{ .Release.Namespace }}
+spec:
+  gateways:
+    - gateway-tcp
+  hosts:
+    - postgres.{{ .Values.host }}
+  tcp:
+    - match:
+        - port: 5432
+      route:
+        - destination:
+            host: {{ .Release.Namespace }}-postgresql-ha-pgpool
+            port:
+              number: 5432
+          weight: 100
