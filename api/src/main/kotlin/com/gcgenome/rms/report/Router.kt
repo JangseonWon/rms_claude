@@ -16,6 +16,7 @@ import org.springframework.web.reactive.function.server.router
 import reactor.core.publisher.Mono
 import java.time.LocalDate
 import java.time.LocalTime
+import java.time.format.DateTimeParseException
 import java.time.temporal.ChronoUnit
 import java.util.*
 
@@ -43,16 +44,21 @@ class Router(
                 .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Failed to search: ${e.message}") }
         }catch (e: NoSuchParamException){ ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
         catch (e: MaxAllowedDaysException) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}")}
+        catch (e: DateTimeParseException) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message} 날짜 형식이 맞지 않습니다. YYYY-MM-DD 형식으로 작성 부탁드립니다.")}
     }
     fun reportDownload(request: ServerRequest): Mono<ServerResponse> {
-        val reportId: UUID = UUID.fromString(request.pathVariable("reportId"))
-        return request.principal()
-            .cast(SecurityContextRepository.UserAuthentication::class.java)
-            .flatMap { handler.downloadReport(it.principal, reportId) }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_PDF).bodyValue(it.asByteArray()) }
-            .onErrorResume(CompletedReportException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_ACCEPTABLE).bodyValue("${e.message}")}
-            .onErrorResume(ReportNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
-            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Failed to download: ${e.message}") }
+        return try {
+            val reportId: UUID = UUID.fromString(request.pathVariable("reportId"))
+            request.principal()
+                .cast(SecurityContextRepository.UserAuthentication::class.java)
+                .flatMap { handler.downloadReport(it.principal, reportId) }
+                .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_PDF).bodyValue(it.asByteArray()) }
+                .onErrorResume(CompletedReportException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_ACCEPTABLE).bodyValue("${e.message}")}
+                .onErrorResume(ReportNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
+                .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Failed to download: ${e.message}") }
+        } catch (e: NumberFormatException) {
+            return ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("Invalid reportId: ${request.pathVariable("reportId")}")
+        }
     }
 
     fun reportUpload(request: ServerRequest): Mono<ServerResponse> {

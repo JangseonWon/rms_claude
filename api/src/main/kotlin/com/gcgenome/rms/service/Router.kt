@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono
 @Configuration("com.gcgenome.rms.service.Route")
 class Router (private val handler: Handler) {
     @Bean("com.gcgenome.rms.service.Route.Bean")
-    fun route() = router { GET("/api/services", contentType(MediaType("application", "vnd.request.v1", Charsets.UTF_8)), ::services) }
+    fun route() = router { GET("/api/services", contentType(MediaType("application", "vnd.api.v1", Charsets.UTF_8)), ::services) }
 
     private fun services(request: ServerRequest): Mono<ServerResponse> {
         return request
