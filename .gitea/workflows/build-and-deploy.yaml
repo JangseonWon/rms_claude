@@ -1,27 +1,27 @@
-name: Build and Deploy
-on: [push]
-
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    env:
-      REGISTRY_USERNAME: ${{ secrets.RMS_TEST_REGISTRY_USERNAME }}
-      REGISTRY_PASSWORD: ${{ secrets.RMS_TEST_REGISTRY_PASSWORD }}
-      POSTGRES_USERNAME: ${{ secrets.RMS_TEST_POSTGRES_USERNAME }}
-      POSTGRES_PASSWORD: ${{ secrets.RMS_TEST_POSTGRES_PASSWORD }}
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Set up Java
-        uses: actions/setup-java@v3
-        with:
-          java-version: 17
-          distribution: temurin
-          cache: gradle
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Build Module
-        run: ./gradlew api:jib
+#name: Build and Deploy
+#on: [push]
+#
+#jobs:
+#  build-and-deploy:
+#    runs-on: ubuntu-latest
+#    env:
+#      REGISTRY_USERNAME: ${{ secrets.RMS_TEST_REGISTRY_USERNAME }}
+#      REGISTRY_PASSWORD: ${{ secrets.RMS_TEST_REGISTRY_PASSWORD }}
+#      POSTGRES_USERNAME: ${{ secrets.RMS_TEST_POSTGRES_USERNAME }}
+#      POSTGRES_PASSWORD: ${{ secrets.RMS_TEST_POSTGRES_PASSWORD }}
+#    steps:
+#      - name: Checkout Repository
+#        uses: actions/checkout@v3
+#
+#      - name: Set up Java
+#        uses: actions/setup-java@v3
+#        with:
+#          java-version: 17
+#          distribution: temurin
+#          cache: gradle
+#
+#      - name: Grant execute permission for gradlew
+#        run: chmod +x gradlew
+#
+#      - name: Build Module
+#        run: ./gradlew api:jib

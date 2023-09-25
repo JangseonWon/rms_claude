@@ -4,6 +4,7 @@ import com.gcgenome.rms.dao.*
 import com.gcgenome.rms.data.CancelOrder
 import com.gcgenome.rms.data.Item
 import com.gcgenome.rms.data.Order
+import com.gcgenome.rms.data.Sample
 import com.gcgenome.rms.exceptions.SampleNotFoundException
 import com.gcgenome.rms.exceptions.ServiceNotFoundException
 import com.gcgenome.rms.exceptions.ServiceSampleTypeNotFoundException
@@ -30,14 +31,14 @@ class Handler(
                         .then(insertItem(userId, orderRecord.id!!, items.patient.organization?.id ?: userId, items))
                         .flatMap { itemRecord ->
                             Flux.fromIterable(items.patient.samples!!).flatMap { sample ->
-                                selectServiceSampleTypeById(sample.typeId, items.service)
-                                .switchIfEmpty(Mono.error(ServiceSampleTypeNotFoundException(sample.typeId, items.service)))
+                                selectServiceSampleTypeById(sample.sampleTypeId, items.service)
+                                .switchIfEmpty(Mono.error(ServiceSampleTypeNotFoundException(sample.sampleTypeId, items.service)))
                                 .then(selectUserById(userId))
                                 .flatMap { userRecord ->
                                     selectSamplePostfix(userRecord.code!!).flatMap { postfix ->
                                         insertSample(items.patient.serial, userId, itemRecord.id!!, sample, items.patient.organization?.id ?: userId, userRecord.code!!, postfix+1)
                                             .flatMap { sampleRecord ->
-                                                Flux.fromIterable(sample.extensions ?: listOf())
+                                                Flux.fromIterable(sample.extensions?.toList() ?: listOf())
                                                     .flatMap { extension -> insertSampleExtension(extension, sampleRecord.id!!) }
                                                     .toMono()
                                             }
@@ -53,6 +54,9 @@ class Handler(
 
     fun findOrders(userId: String): Flux<Order> {
         return dslContext.dsl().selectOrders(userId)
+    }
+    fun findSamples(userId: String): Flux<Sample> {
+        return dslContext.dsl().selectSampleByUserId(userId)
     }
     fun findOrder(sampleId: UUID, userId: String): Mono<Order> {
         return Mono.from(dslContext.transactionPublisher { trx->
@@ -117,7 +121,7 @@ class Handler(
                         Flux.fromIterable(dto.patient.samples ?: listOf()).flatMap { sample ->
                             updateSampleById(sample)
                                 .thenMany(
-                                    Flux.fromIterable(sample.extensions ?: listOf()).flatMap { extension ->
+                                    Flux.fromIterable(sample.extensions?.toList() ?: listOf()).flatMap { extension ->
                                         deleteSampleExtensionBySampleId(sample.id!!)
                                             .then(insertSampleExtension(extension, sample.id!!))
                                     })

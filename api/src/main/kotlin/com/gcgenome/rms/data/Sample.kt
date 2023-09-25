@@ -1,7 +1,6 @@
 package com.gcgenome.rms.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
@@ -12,7 +11,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-@JsonSubTypes(JsonSubTypes.Type(Extension::class, name = "extensions"))
 data class Sample(
     @JsonProperty("id")
     var id: UUID?,
@@ -37,7 +35,7 @@ data class Sample(
     @JsonProperty("sample_barcode")
     val sampleBarcode: String?,
     @JsonProperty("type")
-    val typeId: String,
+    val sampleTypeId: String,
     @JsonProperty("department")
     val department: String?,
     @JsonProperty("ward")
@@ -45,7 +43,7 @@ data class Sample(
     @JsonProperty("physician")
     val physician: String?,
     @JsonProperty("extensions")
-    val extensions: List<Extension>?,
+    val extensions: Array<Extension>?,
     @JsonProperty("state")
     val state: String?,
     @JsonProperty("emp_id")
@@ -62,4 +60,7 @@ data class Sample(
     val organizationId: String?,
     @JsonProperty("item_id")
     var itemId: UUID?,
+    @JsonProperty("reports")
+    val reports: Array<Report>?
+
 )

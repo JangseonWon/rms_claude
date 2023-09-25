@@ -4,6 +4,7 @@ import com.gcgenome.rms.config.SecurityContextRepository
 import com.gcgenome.rms.data.CancelOrder
 import com.gcgenome.rms.data.Item
 import com.gcgenome.rms.data.Order
+import com.gcgenome.rms.data.Sample
 import com.gcgenome.rms.exceptions.SampleNotFoundException
 import com.gcgenome.rms.exceptions.ServiceNotFoundException
 import com.gcgenome.rms.exceptions.ServiceSampleTypeNotFoundException
@@ -21,12 +22,13 @@ import java.util.*
 class Router (private val handler: Handler){
     @Bean("com.gcgenome.rms.order.Route.Bean")
     fun route() = router {
-        GET("/api/orders", contentType(MediaType("application", "vnd.request.v1", Charsets.UTF_8)), ::findOrders)
+        GET("/api/orders", contentType(MediaType("application", "vnd.api.v1", Charsets.UTF_8)), ::findOrders)
         GET("/api/orders/samples/{sampleId}", ::findOrder)
-        POST("/api/orders", contentType(MediaType("application", "vnd.request.v1+json", Charsets.UTF_8)), ::orders)
+        GET("/api/orders/samples", contentType(MediaType("application", "vnd.api.v1", Charsets.UTF_8)), :: findSamples)
+        POST("/api/orders", contentType(MediaType("application", "vnd.api.v1+json", Charsets.UTF_8)), ::orders)
         PATCH("/api/orders/items/{item-id}", ::updateOrders)
         PATCH("/api/orders/samples/{sampleId}", :: addSample)
-        DELETE("/api/orders/samples/{sample-id}", contentType(MediaType("application", "vnd.request.v1", Charsets.UTF_8)), ::cancels)
+        DELETE("/api/orders/samples/{sample-id}", contentType(MediaType("application", "vnd.api.v1", Charsets.UTF_8)), ::cancels)
     }
     private fun orders(request: ServerRequest): Mono<ServerResponse> {
         return request
@@ -51,6 +53,16 @@ class Router (private val handler: Handler){
                     .body(handler.findOrders(it.principal), Order::class.java)
             }
     }
+    private fun findSamples(request: ServerRequest): Mono<ServerResponse> {
+        return request
+            .principal()
+            .cast(SecurityContextRepository.UserAuthentication::class.java)
+            .flatMap {
+                ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                    .body(handler.findSamples(it.principal), Sample::class.java)
+            }
+    }
+
     private fun findOrder(request: ServerRequest): Mono<ServerResponse> {
         val sampleId = UUID.fromString(request.pathVariable("sampleId"))
         return request
