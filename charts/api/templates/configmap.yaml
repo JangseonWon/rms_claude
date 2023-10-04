@@ -16,13 +16,6 @@ data:
             sources:
               - namespace: rms-test
                 name: rms-api
-        aws:
-          credentials:
-            access-key: 8331SD7MTPDP6I16OJZT
-            secret-key: mjZJcgLb8dvOlrkEWCoc9g4xEm7TZFd0otGmhqDM
-          s3:
-            endpoint: https://s3.apps.gcgenome.com
-            bucket: bucket-86994bb8-28b7-4cbf-9842-4f314caae474
       r2dbc:
         url: r2dbc:postgresql://rms-test-postgresql-ha-pgpool.rms-test.svc.cluster.local:5432/rms
         username: postgres
@@ -32,5 +25,12 @@ data:
           max-size: 10
           max-idle-time: 30m
           validation-query: SELECT 1
+      aws:
+        credentials:
+          access-key: 8331SD7MTPDP6I16OJZT
+          secret-key: mjZJcgLb8dvOlrkEWCoc9g4xEm7TZFd0otGmhqDM
+        s3:
+          endpoint: https://s3.apps.gcgenome.com
+          bucket: bucket-86994bb8-28b7-4cbf-9842-4f314caae474
     server:
       port: 8080

@@ -29,7 +29,7 @@ import java.util.concurrent.CompletableFuture
 class Handler(
     val dslContext: DSLContext,
     val s3Client: S3AsyncClient,
-    @Value("\${cloud.aws.s3.bucket}")
+    @Value("\${aws.s3.bucket}")
     val bucketName: String
 ): ReportDao, SampleDao {
     fun findDownloadPath(reportId: UUID): Mono<String> {
