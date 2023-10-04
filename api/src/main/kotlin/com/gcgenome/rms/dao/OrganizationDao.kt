@@ -1,13 +1,12 @@
 package com.gcgenome.rms.dao
 
-import com.gcgenome.rms.tables.records.OrganizationRecord
 import com.gcgenome.rms.tables.references.ORGANIZATION
 import com.gcgenome.rms.data.Organization
 import org.jooq.DSLContext
 import reactor.core.publisher.Mono
 
 interface OrganizationDao {
-    fun DSLContext.insertOrganization(userId: String, organization: Organization?): Mono<OrganizationRecord> {
+    fun DSLContext.insertOrganization(userId: String, organization: Organization?): Mono<Organization> {
         return Mono.from(
             insertInto(ORGANIZATION)
                 .set(ORGANIZATION.ID, organization?.id?: userId)
@@ -28,6 +27,6 @@ interface OrganizationDao {
                 .set(ORGANIZATION.BRANCH_NAME, organization?.branchName)
                 .where(ORGANIZATION.ID.eq(organization?.id ?: userId))
                 .returning()
-        )
+        ).map { it.into(Organization::class.java) }
     }
 }

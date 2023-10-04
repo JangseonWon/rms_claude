@@ -1,25 +1,22 @@
 package com.gcgenome.rms.dao
 
-import com.gcgenome.rms.tables.records.SampleRecord
 import com.gcgenome.rms.tables.references.SAMPLE
 import com.gcgenome.rms.data.Sample
 import com.gcgenome.rms.data.SampleState
 import com.gcgenome.rms.tables.references.REPORT
 import com.gcgenome.rms.tables.references.SAMPLE_EXTENSION
 import org.jooq.DSLContext
-import org.jooq.impl.DSL
 import org.jooq.impl.DSL.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
 interface SampleDao {
-    fun DSLContext.selectSampleById(sampleId: UUID): Flux<SampleRecord> =
-        Flux.from(selectFrom(SAMPLE).where(SAMPLE.ID.eq(sampleId)))
+    fun DSLContext.selectSampleById(sampleId: UUID): Mono<Sample> =
+        Mono.from(selectFrom(SAMPLE).where(SAMPLE.ID.eq(sampleId))).map { it.into(Sample::class.java) }
 
     fun DSLContext.selectSampleByUserId(userId: String): Flux<Sample> {
         return Flux.from(selectFrom(SAMPLE).where(SAMPLE.USER_ID.eq(userId))).map { it.into(Sample::class.java) }
@@ -28,29 +25,12 @@ interface SampleDao {
     fun DSLContext.selectSamplePostfix(infix: Short): Mono<Int> {
         val ofPattern = DateTimeFormatter.ofPattern("yyyyMMdd")
         return Mono.from(
-            select(DSL.coalesce(DSL.max(SAMPLE.GENOME_BARCODE_POSTFIX), 5000))
+            select(coalesce(max(SAMPLE.GENOME_BARCODE_POSTFIX), 5000))
                 .from(SAMPLE)
                 .where(SAMPLE.GENOME_BARCODE_PREFIX.eq(LocalDate.now().format(ofPattern).toInt()).and(SAMPLE.GENOME_BARCODE_INFIX.eq(infix))))
             .mapNotNull { it.component1() }
     }
-
-    fun DSLContext.updateSampleById(sample: Sample): Mono<SampleRecord> =
-        Mono.from(
-            update(SAMPLE)
-                .set(SAMPLE.REGISTRATION_AT, LocalDateTime.now())
-                .set(SAMPLE.GENOME_BARCODE, sample.genomeBarcode)
-                .set(SAMPLE.SAMPLE_BARCODE, sample.sampleBarcode)
-                .set(SAMPLE.SAMPLE_TYPE_ID, sample.sampleTypeId)
-                .set(SAMPLE.AGE, sample.age)
-                .set(SAMPLE.SAMPLING, sample.sampling?.atStartOfDay())
-                .set(SAMPLE.NOTE, sample.note)
-                .set(SAMPLE.DEPARTMENT, sample.department)
-                .set(SAMPLE.WARD, sample.ward)
-                .set(SAMPLE.PHYSICIAN, sample.physician)
-                .where(SAMPLE.ID.eq(sample.id))
-                .returning()
-        )
-    fun DSLContext.insertSample(patientSerial: String, userId: String, itemId: UUID, sample: Sample, organizationId: String?, code: Short, postfix: Int): Mono<SampleRecord> {
+    fun DSLContext.insertSample(patientSerial: String, userId: String, itemId: UUID, sample: Sample, organizationId: String?, code: Short, postfix: Int): Mono<Sample> {
         val ofPattern = DateTimeFormatter.ofPattern("yyyyMMdd")
         return Mono.from(
             insertInto(SAMPLE)
@@ -79,7 +59,7 @@ interface SampleDao {
                 .set(SAMPLE.EMP_NAME, sample.empName)
                 .set(SAMPLE.EMP_MOBILE, sample.empMobile)
                 .returning()
-        )
+        ).map { it.into(Sample::class.java) }
     }
     fun DSLContext.selectSampleByCreateAt(userId: String, orderDateFrom: LocalDateTime, orderDateTo: LocalDateTime): Flux<Sample> {
         return Flux.from(
@@ -106,7 +86,7 @@ interface SampleDao {
                         jsonArrayAgg(jsonObject(
                             key("id").value(REPORT.ID),
                             key("create_at").value(REPORT.CREATE_AT),
-                            key("complete_at").value(REPORT.COMPLETE_AT),
+                            key("reported_at").value(REPORT.REPORTED_AT),
                             key("type").value(REPORT.TYPE),
                             key("value").value(REPORT.VALUE)
                         ))
@@ -121,8 +101,9 @@ interface SampleDao {
             .map { it.into(Sample::class.java) }
     }
 
-    fun DSLContext.deleteSample(sampleId: UUID) =
-        deleteFrom(SAMPLE).where(SAMPLE.ID.eq(sampleId)).toMono()
+    fun DSLContext.deleteSampleById(sampleId: UUID): Mono<Sample> {
+        return Mono.from(deleteFrom(SAMPLE).where(SAMPLE.ID.eq(sampleId)).returning()).map { it.into(Sample::class.java) }
+    }
 
     fun DSLContext.findSampleValue(sampleId: UUID): Mono<Pair<String, UUID>> {
         val query = select(SAMPLE.STATE, SAMPLE.ITEM_ID).from(SAMPLE).where(SAMPLE.ID.eq(sampleId))
@@ -136,12 +117,12 @@ interface SampleDao {
     fun DSLContext.updateSampleState(sampleId: UUID, state: SampleState): Mono<Sample> {
         return Mono.from(update(SAMPLE).set(SAMPLE.STATE, state.name).where(SAMPLE.ID.eq(sampleId)).returning()).map { it.into(Sample::class.java) }
     }
-
-    fun DSLContext.countSampleInItem(itemId: UUID): Mono<Int> =
-        Mono.from( select(count(SAMPLE.ITEM_ID).`as`("count")).from(SAMPLE).where(SAMPLE.ITEM_ID.eq(itemId)) )
+    fun DSLContext.countSampleInItem(itemId: UUID): Mono<Int> {
+        return Mono.from( select(count(SAMPLE.ITEM_ID).`as`("count")).from(SAMPLE).where(SAMPLE.ITEM_ID.eq(itemId)) )
             .map { r-> r.getValue("count", Int::class.java)}
-    fun DSLContext.countSample(itemId: UUID): Mono<Int> =
-        Mono.from( select(count(SAMPLE.ITEM_ID).`as`("count")).from(SAMPLE).where(SAMPLE.ITEM_ID.eq(itemId)) )
+    }
+    fun DSLContext.countSample(itemId: UUID): Mono<Int> {
+        return Mono.from( select(count(SAMPLE.ITEM_ID).`as`("count")).from(SAMPLE).where(SAMPLE.ITEM_ID.eq(itemId)) )
             .map { r-> r.getValue("count", Int::class.java)}
-
+    }
 }

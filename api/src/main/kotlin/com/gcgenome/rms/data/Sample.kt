@@ -14,6 +14,16 @@ import java.util.*
 data class Sample(
     @JsonProperty("id")
     var id: UUID?,
+    @JsonProperty("item_id")
+    val itemId: UUID?,
+    @JsonProperty("type")
+    val sampleTypeId: String,
+    @JsonProperty("patient_serial")
+    val patientSerial: String?,
+    @JsonProperty("organization_id")
+    val organizationId: String?,
+    @JsonProperty("userId")
+    val userId: String?,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("create_at")
@@ -34,8 +44,6 @@ data class Sample(
     val genomeBarcode: String?,
     @JsonProperty("sample_barcode")
     val sampleBarcode: String?,
-    @JsonProperty("type")
-    val sampleTypeId: String,
     @JsonProperty("department")
     val department: String?,
     @JsonProperty("ward")
@@ -56,10 +64,6 @@ data class Sample(
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     val registrationAt: LocalDateTime?,
-    @JsonProperty("organization_id")
-    val organizationId: String?,
-    @JsonProperty("item_id")
-    var itemId: UUID?,
     @JsonProperty("reports")
     val reports: Array<Report>?
 

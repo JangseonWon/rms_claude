@@ -61,7 +61,7 @@ class Handler(
             trx.dsl().run {
                 selectReportById(reportId, ReportType.PDF)
                     .switchIfEmpty(Mono.error(ReportNotFoundException(reportId)))
-                    .flatMap { report -> report.completeAt?.let { Mono.error(CompletedReportException()) } ?: Mono.just(report) }
+                    .flatMap { report -> report.reportedAt?.let { Mono.error(CompletedReportException()) } ?: Mono.just(report) }
                     .then(updateReportCompete(reportId))
                     .then(findDownloadPath(reportId))
                     .flatMap { path -> downloadFile(path)}

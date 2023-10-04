@@ -19,17 +19,4 @@ data class User(
     val state: String,
     @JsonProperty("code")
     val code: Short
-){
-    companion object {
-        fun toModel(user: UserRecord): User =
-            User(
-                id = user.id!!,
-                authority = user.authority!!,
-                department = user.department,
-                key = user.key!!,
-                name = user.name!!,
-                state = user.state!!,
-                code = user.code!!
-            )
-    }
-}
+)

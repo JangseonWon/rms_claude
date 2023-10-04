@@ -1,32 +1,31 @@
 package com.gcgenome.rms.dao
 
-import com.gcgenome.rms.tables.records.ItemRecord
 import com.gcgenome.rms.tables.references.ITEM
 import com.gcgenome.rms.data.Item
+import com.gcgenome.rms.tables.references.SAMPLE
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
 import java.util.*
 
 interface ItemDao {
-    fun DSLContext.insertItem(userId: String, orderId: UUID, organizationId: String, item:Item): Mono<ItemRecord> {
+    fun DSLContext.insertItem(userId: String, orderId: UUID, organizationId: String, item:Item): Mono<Item> {
         return Mono.from(
             insertInto(ITEM)
                 .set(ITEM.ID, UUID.randomUUID())
                 .set(ITEM.ORDER_ID, orderId)
                 .set(ITEM.ORGANIZATION_ID, organizationId)
-                .set(ITEM.PATIENT_SERIAL, item.patient.serial)
+                .set(ITEM.PATIENT_SERIAL, item.patient!!.serial)
                 .set(ITEM.USER_ID, userId)
-                .set(ITEM.SERVICE_ID, item.service)
+                .set(ITEM.SERVICE_ID, item.serviceId)
                 .set(ITEM.SERIAL, item.serial)
                 .returning()
-        )
+        ).map { it.into(Item::class.java) }
     }
 
-
-    fun DSLContext.selectItemById(itemId: UUID) =
-        selectFrom(ITEM).where(ITEM.ID.eq(itemId))
+    fun DSLContext.selectItemById(itemId: UUID): Mono<Item> {
+        return Mono.from(selectFrom(ITEM).where(ITEM.ID.eq(itemId))).map { it.into(Item::class.java) }
+    }
     fun DSLContext.findItemValue(itemId: UUID): Mono<Pair<UUID, String>> {
         val query = select(ITEM.ORDER_ID, ITEM.PATIENT_SERIAL).from(ITEM).where(ITEM.ID.eq(itemId))
 
@@ -36,21 +35,12 @@ interface ItemDao {
             Pair(orderId, mrn )
         }
     }
+    fun DSLContext.deleteItemById(itemId: UUID): Mono<Item> {
+        return Mono.from(
+            deleteFrom(ITEM)
+                .where(ITEM.ID.eq(itemId).and(ITEM.ID.notIn(select(SAMPLE.ITEM_ID).from(SAMPLE).where(SAMPLE.ITEM_ID.eq(itemId)))))
+                .returning()
+        ).map { it.into(Item::class.java) }
+    }
 
-    fun DSLContext.updateItemById(itemId: UUID, item: Item) =
-        Mono.from(
-            update(ITEM)
-                .set(ITEM.SERVICE_ID, item.service)
-                .where(ITEM.ID.eq(itemId))
-        )
-    fun DSLContext.countItemInOrder(orderId: UUID): Mono<Int> =
-        Mono.from( select(DSL.count(ITEM.ORDER_ID).`as`("count")).from(ITEM).where(ITEM.ORDER_ID.eq(orderId)) )
-            .map { r-> r.getValue("count", Int::class.java)}
-
-    fun DSLContext.countItemInMrn(mrn: String): Mono<Int> =
-        Mono.from( select(DSL.count(ITEM.PATIENT_SERIAL).`as`("count")).from(ITEM).where(ITEM.PATIENT_SERIAL.eq(mrn)) )
-            .map { r-> r.getValue("count", Int::class.java)}
-
-    fun DSLContext.deleteItem(itemId: UUID) =
-        deleteFrom(ITEM).where(ITEM.ID.eq(itemId)).toMono()
 }

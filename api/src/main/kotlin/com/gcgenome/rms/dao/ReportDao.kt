@@ -2,7 +2,6 @@ package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.Report
 import com.gcgenome.rms.data.ReportType
-import com.gcgenome.rms.tables.records.ReportRecord
 import com.gcgenome.rms.tables.references.REPORT
 import org.jooq.DSLContext
 import reactor.core.publisher.Mono
@@ -38,7 +37,7 @@ interface ReportDao {
     fun DSLContext.updateReportCompete(reportId: UUID): Mono<Report> {
         return Mono.from(
             update(REPORT)
-                .set(REPORT.COMPLETE_AT, LocalDateTime.now())
+                .set(REPORT.REPORTED_AT, LocalDateTime.now())
                 .returning()
         ).map { it.into(Report::class.java) }
     }

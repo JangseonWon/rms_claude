@@ -1,22 +1,18 @@
 package com.gcgenome.rms.dao
 
-import com.gcgenome.rms.tables.records.OrderRecord
 import com.gcgenome.rms.tables.references.*
 import com.gcgenome.rms.data.Order
 import org.jooq.DSLContext
-import org.jooq.JSON
-import org.jooq.Record8
 import org.jooq.impl.DSL.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
 import java.time.LocalDateTime
 import java.util.*
 
 
 interface OrderDao{
 
-    fun DSLContext.insertOrder(userId: String, order: Order): Mono<OrderRecord> {
+    fun DSLContext.insertOrder(userId: String, order: Order): Mono<Order> {
         return Mono.from(
             insertInto(ORDER)
                 .set(ORDER.ID, UUID.randomUUID())
@@ -28,12 +24,12 @@ interface OrderDao{
                 .set(ORDER.TEST, order.test)
                 .set(ORDER.USER_ID, userId)
                 .returning()
-        )
+        ).map { it.into(Order::class.java) }
     }
 
 
-    fun DSLContext.selectOrderById(orderId: UUID, userId: String): Mono<Record8<UUID?, LocalDateTime?, LocalDateTime?, Boolean?, Boolean?, Int?, Int?, JSON?>> =
-        Mono.from(
+    fun DSLContext.selectOrderById(orderId: UUID): Mono<Order> {
+        return Mono.from(
             select(
                 ORDER.ID,
                 ORDER.CREATE_AT,
@@ -96,7 +92,18 @@ interface OrderDao{
                                             ))
                                         ).from(SAMPLE_EXTENSION).where(SAMPLE.ID.eq(SAMPLE_EXTENSION.SAMPLE_ID))
                                     ),
-                                    key("state").value(SAMPLE.STATE)
+                                    key("state").value(SAMPLE.STATE),
+                                    key("reports").value(
+                                        select(
+                                            jsonArrayAgg(jsonObject(
+                                                key("id").value(REPORT.ID),
+                                                key("create_at").value(REPORT.CREATE_AT),
+                                                key("reported_at").value(REPORT.REPORTED_AT),
+                                                key("type").value(REPORT.TYPE),
+                                                key("value").value(REPORT.VALUE)
+                                            ))
+                                        ).from(REPORT).where(SAMPLE.ID.eq(REPORT.SAMPLE_ID))
+                                    )
                                 ))
                             ).from(SAMPLE).where(ITEM.ID.eq(SAMPLE.ITEM_ID))
                         )
@@ -107,11 +114,13 @@ interface OrderDao{
                 .join(PATIENT).on(ITEM.PATIENT_SERIAL.eq(PATIENT.SERIAL)
                     .and(ITEM.ORGANIZATION_ID.eq(PATIENT.ORGANIZATION_ID)
                         .and(ITEM.USER_ID.eq(PATIENT.USER_ID))))
-                .where(ORDER.ID.eq(orderId).and(ORDER.USER_ID.eq(userId))).groupBy(ORDER.ID)
-        )
+                .where(ORDER.ID.eq(orderId)).groupBy(ORDER.ID)
+        ).map { it.into(Order::class.java) }
+    }
+
 
     fun DSLContext.selectOrders(userId: String): Flux<Order> {
-        val query = select(
+        return Flux.from(select(
             ORDER.ID,
             ORDER.CREATE_AT,
             ORDER.LAST_MODIFY_AT,
@@ -187,9 +196,13 @@ interface OrderDao{
             .join(ITEM).on(ORDER.ID.eq(ITEM.ORDER_ID))
             .join(PATIENT).on(ITEM.PATIENT_SERIAL.eq(PATIENT.SERIAL).and(ITEM.ORGANIZATION_ID.eq(PATIENT.ORGANIZATION_ID).and(ITEM.USER_ID.eq(PATIENT.USER_ID))))
             .where(ORDER.USER_ID.eq(userId))
-            .groupBy(ORDER.ID).orderBy(ORDER.ID)
-        return Flux.from(query).map(Order::toModel)
+            .groupBy(ORDER.ID).orderBy(ORDER.ID)).map { it.into(Order::class.java) }
     }
-    fun DSLContext.deleteOrder(orderId: UUID) =
-        deleteFrom(ORDER).where(ORDER.ID.eq(orderId)).toMono()
+    fun DSLContext.deleteOrderById(orderId: UUID): Mono<Order> {
+        return Mono.from(
+            deleteFrom(ORDER)
+                .where(ORDER.ID.eq(orderId).and(ORDER.ID.notIn(select(ITEM.ORDER_ID).from(ITEM).where(ITEM.ORDER_ID.eq(orderId)))))
+                .returning()
+        ).map { it.into(Order::class.java) }
+    }
 }
