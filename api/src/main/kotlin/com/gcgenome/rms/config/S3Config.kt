@@ -13,14 +13,13 @@ import java.net.URI
 import java.time.Duration
 
 @Configuration
-class S3Config(
+class S3Config{
     @Value("\${cloud.aws.credentials.access-key}")
-    val accessKey: String,
+    private lateinit var accessKey: String
     @Value("\${cloud.aws.credentials.secret-key}")
-    val secretKey: String,
+    private lateinit var secretKey: String
     @Value("\${cloud.aws.s3.endpoint}")
-    val endpoint: String
-) {
+    private lateinit var endpoint: String
     @Bean
     fun s3Client(): S3AsyncClient {
         return S3AsyncClient.builder()
