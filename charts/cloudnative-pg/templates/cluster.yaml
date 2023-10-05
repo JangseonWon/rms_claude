@@ -1,0 +1,24 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postgresql
+spec:
+  imageName: ghcr.io/cloudnative-pg/postgresql:16
+  instances: 3
+  storage:
+    {{- with .Values.persistence.size }}
+    size: {{ . | quote }}
+    {{- end }}
+    {{- with .Values.persistence.storageClass }}
+    storageClass: {{ . | quote }}
+    {{- end }}
+  postgresql:
+    parameters:
+      timezone: "Asia/Seoul"
+  superuserSecret:
+    name: postgresql
+  bootstrap:
+    initdb:
+      database: rms
+      owner: postgres
+      encoding: UTF8
