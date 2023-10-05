@@ -32,6 +32,7 @@ spec:
   servers:
     - hosts:
         - postgres.{{ .Values.host }}
+        - pg.{{ .Values.host }}
       port:
         number: 5432
         name: postgres

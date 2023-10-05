@@ -1,0 +1,19 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: postgresql
+  namespace: {{ .Release.Namespace }}
+spec:
+  gateways:
+    - gateway-tcp
+  hosts:
+    - pg.{{ .Values.host }}
+  tcp:
+    - match:
+        - port: 5432
+      route:
+        - destination:
+            host: pooler
+            port:
+              number: 5432
+          weight: 100
