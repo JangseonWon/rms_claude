@@ -19,8 +19,6 @@ spec:
     name: postgresql
   bootstrap:
     initdb:
-      postInitTemplateSQL:
-        - CREATE EXTENSION tds_fdw;
       database: rms
       owner: postgres
       encoding: UTF8
