@@ -32,12 +32,6 @@ class Handler(
     @Value("\${aws.s3.bucket}")
     val bucketName: String
 ): ReportDao, SampleDao {
-    fun findDownloadPath(reportId: UUID): Mono<String> {
-        return dslContext.dsl().selectReportById(reportId, ReportType.PDF)
-            .switchIfEmpty(Mono.error(ReportNotFoundException(reportId)))
-            .mapNotNull { it.path }
-    }
-
     fun downloadFile(path: String): Mono<ResponseBytes<GetObjectResponse>> {
         val getObjectRequest = GetObjectRequest.builder().bucket(bucketName).key(path).build()
         return Mono.fromFuture { s3Client.getObject(getObjectRequest, AsyncResponseTransformer.toBytes()) }
@@ -53,18 +47,22 @@ class Handler(
         return Mono.fromFuture {file}
     }
     fun findReports(userId: String, orderDateFrom: LocalDateTime, orderDateTo: LocalDateTime): Flux<Sample> {
-        return dslContext.dsl().selectSampleByCreateAt(userId, orderDateFrom, orderDateTo)
+        return dslContext.selectSampleByCreateAt(userId, orderDateFrom, orderDateTo)
     }
 
     fun downloadReport(userId: String, reportId: UUID): Mono<ResponseBytes<GetObjectResponse>> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
-                selectReportById(reportId, ReportType.PDF)
+                selectReportById(reportId)
                     .switchIfEmpty(Mono.error(ReportNotFoundException(reportId)))
                     .flatMap { report -> report.reportedAt?.let { Mono.error(CompletedReportException()) } ?: Mono.just(report) }
-                    .then(updateReportCompete(reportId))
-                    .then(findDownloadPath(reportId))
-                    .flatMap { path -> downloadFile(path)}
+                    .then(updateReportReportedAt(reportId))
+                    .flatMap { report ->
+                        when (report.type) {
+                            ReportType.PDF -> updateSampleState(report.sampleId!!, SampleState.REPORTED).then(downloadFile(report.path!!))
+                            else -> downloadFile(report.path!!)
+                        }
+                    }
             }
         })
     }
