@@ -36,16 +36,6 @@ class Handler(
         val getObjectRequest = GetObjectRequest.builder().bucket(bucketName).key(path).build()
         return Mono.fromFuture { s3Client.getObject(getObjectRequest, AsyncResponseTransformer.toBytes()) }
     }
-
-    fun savePdf(): Mono<CompletableFuture<PutObjectResponse>> {
-        val file = CompletableFuture.supplyAsync {
-            s3Client.putObject(
-                PutObjectRequest.builder().bucket(bucketName).key("hello.txt").build(),
-                AsyncRequestBody.fromBytes("hello".toByteArray())
-            )
-        }
-        return Mono.fromFuture {file}
-    }
     fun findReports(userId: String, orderDateFrom: LocalDateTime, orderDateTo: LocalDateTime): Flux<Sample> {
         return dslContext.selectSampleByCreateAt(userId, orderDateFrom, orderDateTo)
     }

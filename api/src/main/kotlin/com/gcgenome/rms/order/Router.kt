@@ -19,12 +19,10 @@ import java.util.*
 class Router (private val handler: Handler){
     @Bean("com.gcgenome.rms.order.Route.Bean")
     fun route() = router {
-        GET("/api/orders", contentType(MediaType("application", "vnd.api.v1", Charsets.UTF_8)), ::findOrders)
         POST("/api/orders", contentType(MediaType("application", "vnd.api.v1+json", Charsets.UTF_8)), ::orders)
         GET("/api/orders/samples/{sampleId}", contentType(MediaType("application", "vnd.api.v1", Charsets.UTF_8)), ::findOrder)
         PUT("/api/orders/samples/{sampleId}", contentType(MediaType("application", "vnd.api.v1+json", Charsets.UTF_8)), :: addSample)
         PUT("/api/orders/items/{itemId}", contentType(MediaType("application", "vnd.api.v1+json", Charsets.UTF_8)), :: addItem)
-        GET("/api/orders/samples", contentType(MediaType("application", "vnd.api.v1", Charsets.UTF_8)), :: findSamples)
         DELETE("/api/orders/samples/{sampleId}", contentType(MediaType("application", "vnd.api.v1", Charsets.UTF_8)), ::deleteSample)
     }
     private fun orders(request: ServerRequest): Mono<ServerResponse> {
@@ -37,26 +35,6 @@ class Router (private val handler: Handler){
             .onErrorResume (ServiceSampleTypeNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
             .onErrorResume(ServerWebInputException::class.java) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("Request body type error.") }
             .onErrorResume { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("Request body error: ${e.message}") }
-    }
-
-
-    private fun findOrders(request: ServerRequest): Mono<ServerResponse> {
-        return request
-            .principal()
-            .cast(SecurityContextRepository.UserAuthentication::class.java)
-            .flatMap {
-                ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                    .body(handler.findOrders(it.principal), Order::class.java)
-            }
-    }
-    private fun findSamples(request: ServerRequest): Mono<ServerResponse> {
-        return request
-            .principal()
-            .cast(SecurityContextRepository.UserAuthentication::class.java)
-            .flatMap {
-                ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                    .body(handler.findSamples(it.principal), Sample::class.java)
-            }
     }
 
     private fun findOrder(request: ServerRequest): Mono<ServerResponse> {

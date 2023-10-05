@@ -26,15 +26,6 @@ interface ItemDao {
     fun DSLContext.selectItemById(itemId: UUID): Mono<Item> {
         return Mono.from(selectFrom(ITEM).where(ITEM.ID.eq(itemId))).map { it.into(Item::class.java) }
     }
-    fun DSLContext.findItemValue(itemId: UUID): Mono<Pair<UUID, String>> {
-        val query = select(ITEM.ORDER_ID, ITEM.PATIENT_SERIAL).from(ITEM).where(ITEM.ID.eq(itemId))
-
-        return Mono.from(query).map { record ->
-            val orderId = record.getValue(ITEM.ORDER_ID, UUID::class.java)
-            val mrn = record.getValue(ITEM.PATIENT_SERIAL, String::class.java)
-            Pair(orderId, mrn )
-        }
-    }
     fun DSLContext.deleteItemById(itemId: UUID): Mono<Item> {
         return Mono.from(
             deleteFrom(ITEM)

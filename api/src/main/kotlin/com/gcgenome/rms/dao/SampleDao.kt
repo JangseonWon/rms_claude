@@ -18,10 +18,6 @@ interface SampleDao {
     fun DSLContext.selectSampleById(sampleId: UUID): Mono<Sample> =
         Mono.from(selectFrom(SAMPLE).where(SAMPLE.ID.eq(sampleId))).map { it.into(Sample::class.java) }
 
-    fun DSLContext.selectSampleByUserId(userId: String): Flux<Sample> {
-        return Flux.from(selectFrom(SAMPLE).where(SAMPLE.USER_ID.eq(userId))).map { it.into(Sample::class.java) }
-    }
-
     fun DSLContext.selectSamplePostfix(infix: Short): Mono<Int> {
         val ofPattern = DateTimeFormatter.ofPattern("yyyyMMdd")
         return Mono.from(
@@ -104,25 +100,7 @@ interface SampleDao {
     fun DSLContext.deleteSampleById(sampleId: UUID): Mono<Sample> {
         return Mono.from(deleteFrom(SAMPLE).where(SAMPLE.ID.eq(sampleId)).returning()).map { it.into(Sample::class.java) }
     }
-
-    fun DSLContext.findSampleValue(sampleId: UUID): Mono<Pair<String, UUID>> {
-        val query = select(SAMPLE.STATE, SAMPLE.ITEM_ID).from(SAMPLE).where(SAMPLE.ID.eq(sampleId))
-
-        return Mono.from(query).map { record ->
-            val state = record.getValue(SAMPLE.STATE, String::class.java)
-            val itemId = record.getValue(SAMPLE.ITEM_ID, UUID::class.java)
-            Pair(state, itemId)
-        }
-    }
     fun DSLContext.updateSampleState(sampleId: UUID, state: SampleState): Mono<Sample> {
         return Mono.from(update(SAMPLE).set(SAMPLE.STATE, state.name).where(SAMPLE.ID.eq(sampleId)).returning()).map { it.into(Sample::class.java) }
-    }
-    fun DSLContext.countSampleInItem(itemId: UUID): Mono<Int> {
-        return Mono.from( select(count(SAMPLE.ITEM_ID).`as`("count")).from(SAMPLE).where(SAMPLE.ITEM_ID.eq(itemId)) )
-            .map { r-> r.getValue("count", Int::class.java)}
-    }
-    fun DSLContext.countSample(itemId: UUID): Mono<Int> {
-        return Mono.from( select(count(SAMPLE.ITEM_ID).`as`("count")).from(SAMPLE).where(SAMPLE.ITEM_ID.eq(itemId)) )
-            .map { r-> r.getValue("count", Int::class.java)}
     }
 }

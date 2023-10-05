@@ -48,13 +48,6 @@ class Handler(
             }
         })
     }
-
-    fun findOrders(userId: String): Flux<Order> {
-        return dslContext.dsl().selectOrders(userId)
-    }
-    fun findSamples(userId: String): Flux<Sample> {
-        return dslContext.dsl().selectSampleByUserId(userId)
-    }
     fun findOrder(sampleId: UUID, userId: String): Mono<Order> {
         return Mono.from(dslContext.transactionPublisher { trx->
             trx.dsl().run {
