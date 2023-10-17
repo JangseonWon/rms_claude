@@ -5,6 +5,7 @@ include("service")
 include("order")
 include("user")
 include("alis-api")
+include("alis-sync")
 include("api")
 include("login")
 

@@ -30,7 +30,6 @@ class Router(
         GET("/api/reports", contentType(MediaType("application", "vnd.api.v1", Charsets.UTF_8)), ::findReports)
         GET("/api/reports/{reportId}", contentType(MediaType("application", "vnd.api.v1", Charsets.UTF_8)), ::reportDownload)
         POST("/api/reports/samples/{sampleId}", contentType(MediaType("application", "vnd.api.v1+json")), ::reportUpload)
-        //POST("/api/reports/upload", ::upload)
     }
     fun findReports(request: ServerRequest): Mono<ServerResponse> {
         return try{
@@ -68,10 +67,5 @@ class Router(
             .zipWith(request.bodyToMono(Report::class.java))
             .flatMap { handler.saveReport(sampleId, it.t2) }
             .flatMap { ServerResponse.ok().build() }
-    }
-    fun upload(request: ServerRequest): Mono<ServerResponse> {
-        return handler.savePdf()
-            .flatMap { ServerResponse.ok().build() }
-            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Failed to upload: ${e.message}") }
     }
 }

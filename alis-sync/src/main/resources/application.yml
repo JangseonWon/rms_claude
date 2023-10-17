@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: alis-sync
+  main:
+    web-application-type: reactive
+  cloud:
+    zookeeper:
+      connect-string: test:12181
+      discovery:
+        root: /rms
+  r2dbc:
+    url: r2dbc:postgresql://172.19.208.223:5432/rms
+    username: postgres
+    password: snubi1004
+    pool:
+      initial-size: 2
+      max-size: 10
+      max-idle-time: 30m
+      validation-query: SELECT 1
+logging:
+  level:
+    io.r2dbc.postgresql.QUERY: TRACE
+    io.r2dbc.postgresql.PARAM: TRACE
+server:
+  port: 9090
+

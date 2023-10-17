@@ -1,7 +1,6 @@
 package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.Report
-import com.gcgenome.rms.data.ReportType
 import com.gcgenome.rms.tables.references.REPORT
 import org.jooq.DSLContext
 import reactor.core.publisher.Mono
@@ -9,8 +8,8 @@ import java.time.LocalDateTime
 import java.util.*
 
 interface ReportDao {
-    fun DSLContext.selectReportById(reportId: UUID, type: ReportType): Mono<Report>{
-        return Mono.from(selectFrom(REPORT).where(REPORT.ID.eq(reportId).and(REPORT.TYPE.eq(type.name))))
+    fun DSLContext.selectReportById(reportId: UUID): Mono<Report>{
+        return Mono.from(selectFrom(REPORT).where(REPORT.ID.eq(reportId)))
             .map { it.into(Report::class.java) }
     }
     fun DSLContext.saveReport(sampleId: UUID, reportDto: Report): Mono<Report> {
@@ -34,10 +33,11 @@ interface ReportDao {
         ).map { it.into(Report::class.java) }
     }
 
-    fun DSLContext.updateReportCompete(reportId: UUID): Mono<Report> {
+    fun DSLContext.updateReportReportedAt(reportId: UUID): Mono<Report> {
         return Mono.from(
             update(REPORT)
                 .set(REPORT.REPORTED_AT, LocalDateTime.now())
+                .where(REPORT.ID.eq(reportId))
                 .returning()
         ).map { it.into(Report::class.java) }
     }
