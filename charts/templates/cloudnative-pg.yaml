@@ -24,4 +24,8 @@ spec:
           - name: "persistence.storageClass"
             value: {{ . | quote }}
           {{- end }}
+        values: |
+          {{- with .Values.postgresql.tolerations }}
+          tolerations: {{ toYaml .  | nindent 10 }}
+          {{- end }}
   revisionHistoryLimit: 0
