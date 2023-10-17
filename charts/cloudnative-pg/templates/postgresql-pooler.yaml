@@ -1,7 +1,7 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Pooler
 metadata:
-  name: pooler
+  name: postgresql-pooler
 spec:
   cluster:
     name: postgresql

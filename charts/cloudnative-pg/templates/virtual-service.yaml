@@ -7,7 +7,7 @@ spec:
   gateways:
     - gateway-tcp
   hosts:
-    - pg.{{ .Values.host }}
+    - postgres.{{ .Values.host }}
   tcp:
     - match:
         - port: 5432

@@ -2,8 +2,26 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: postgresql
+  namespace: {{ .Release.Namespace }}
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:16
+  imageName: image-registry.openshift-image-registry.svc:5000/library/cloudnative-pg-postgres:16.0
+  backup:
+    barmanObjectStore:
+      destinationPath: 's3://bucket-bbcc8f67-9489-456d-91da-c70cf282dc5f/backup'
+      endpointURL: 'https://s3.apps.gcgenome.com'
+      s3Credentials:
+        accessKeyId:
+          key: access-key
+          name: s3-credentials
+        inheritFromIAMRole: false
+        secretAccessKey:
+          key: secret-key
+          name: s3-credentials
+      wal:
+        compression: bzip2
+        maxParallel: 8
+    retentionPolicy: 3m
+    target: prefer-standby
   instances: 3
   storage:
     {{- with .Values.persistence.size }}
@@ -12,6 +30,10 @@ spec:
     {{- with .Values.persistence.storageClass }}
     storageClass: {{ . | quote }}
     {{- end }}
+  {{- with .Values.tolerations }}
+  affinity:
+    tolerations: {{ toYaml . | nindent 4 }}
+  {{- end }}
   postgresql:
     parameters:
       timezone: "Asia/Seoul"
