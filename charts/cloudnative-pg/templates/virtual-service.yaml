@@ -13,7 +13,7 @@ spec:
         - port: 5432
       route:
         - destination:
-            host: pooler
+            host: postgresql-pooler
             port:
               number: 5432
           weight: 100
