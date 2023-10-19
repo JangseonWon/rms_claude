@@ -2,7 +2,6 @@ package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.Item
 import com.gcgenome.rms.data.RmsOrder
-import com.gcgenome.rms.tables.references.ALIS_ORDER
 import com.gcgenome.rms.tables.references.ITEM
 import org.jooq.DSLContext
 import reactor.core.publisher.Mono
@@ -20,12 +19,6 @@ interface ItemDao {
                 .set(ITEM.SERVICE_ID, rmsOrder.serviceId)
                 .set(ITEM.SERIAL, rmsOrder.serial)
                 .returning()
-        ).map { it.into(Item::class.java) }
-    }
-
-    fun DSLContext.checkItem(id: UUID, serviceId: String): Mono<Item> {
-        return Mono.from(
-            selectFrom(ITEM).where(ITEM.ID.eq(id).and(ITEM.SERVICE_ID.eq(serviceId)))
         ).map { it.into(Item::class.java) }
     }
 }

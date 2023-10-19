@@ -18,7 +18,7 @@ data class AlisOrder (
     val birth: String?,
     val sex: String?,
     val organizationUserId: String?,
-    val organizationSubId: String,
+    val organizationSubId: String?,
     val branchCode: String?,
     val branchName: String?,
     val registrationNumber: String?,

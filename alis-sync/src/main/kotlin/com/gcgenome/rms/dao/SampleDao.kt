@@ -2,6 +2,7 @@ package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.RmsOrder
 import com.gcgenome.rms.data.Sample
+import com.gcgenome.rms.tables.references.ITEM
 import com.gcgenome.rms.tables.references.SAMPLE
 import org.jooq.DSLContext
 import reactor.core.publisher.Mono
@@ -39,9 +40,12 @@ interface SampleDao {
         ).map { it.into(Sample::class.java) }
     }
 
-    fun DSLContext.checkSample(genomeBarcode: String): Mono<Sample> {
+    fun DSLContext.checkSampleByServiceId(genomeBarcode: String, serviceId: String): Mono<Sample> {
         return Mono.from(
-            selectFrom(SAMPLE).where(SAMPLE.GENOME_BARCODE.eq(genomeBarcode))
+            select(SAMPLE)
+                .from(SAMPLE)
+                .join(ITEM).on(SAMPLE.ITEM_ID.eq(ITEM.ID))
+                .where(SAMPLE.GENOME_BARCODE.eq(genomeBarcode).and(ITEM.SERVICE_ID.eq(serviceId)))
         ).map { it.into(Sample::class.java) }
     }
 
