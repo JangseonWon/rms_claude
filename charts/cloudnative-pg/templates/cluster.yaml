@@ -50,6 +50,7 @@ spec:
         - '--locale-provider=icu'
         - '--icu-locale=ko'
       postInitSQL:
+        - CREATE EXTENSION IF NOT EXISTS tds_fdw;
         - CREATE SERVER alis_svr FOREIGN DATA WRAPPER tds_fdw
           OPTIONS (servername '172.19.208.202', port '14032', database 'LC32_GCGENOME', msg_handler 'notice');
         - CREATE USER MAPPING FOR postgres SERVER alis_svr OPTIONS (username 'postgres', password 'postgres');
