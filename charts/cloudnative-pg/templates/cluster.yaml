@@ -46,5 +46,9 @@ spec:
       database: rms
       owner: postgres
       encoding: UTF8
-      localeCType: ko_KR.UTF-8
-      localeCollate: ko_KR.UTF-8
+      localeCollate: 'ko_KR'
+      localeCType: 'ko_KR'
+      postInitSQL:
+        - CREATE SERVER alis_svr FOREIGN DATA WRAPPER tds_fdw
+          OPTIONS (servername '172.19.208.202', port '14032', database 'LC32_GCGENOME', msg_handler 'notice');
+        - CREATE USER MAPPING FOR postgres SERVER alis_svr OPTIONS (username 'sa', password 'pmc1004!');
