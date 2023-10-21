@@ -46,3 +46,5 @@ spec:
       database: rms
       owner: postgres
       encoding: UTF8
+      localeCType: ko_KR.UTF-8
+      localeCollate: ko_KR.UTF-8
