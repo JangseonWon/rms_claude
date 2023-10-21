@@ -76,7 +76,7 @@ spec:
           volumeMounts:
             - name: config-volume
               mountPath: /app/resources/application.yaml
-              subPath: application.yaml
+              subPath: application.yml
             - name: postgres-config
               mountPath: /app/resources/postgresql.yaml
               subPath: postgresql.yaml
