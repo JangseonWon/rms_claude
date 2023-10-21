@@ -16,7 +16,7 @@ data class Sample(
     val genomeBarcodePostfix: Int,
     val genomeBarcodePrefix: Int,
     val sampleBarcode: String?,
-    val sampleTypeId: String,
+    val sampleTypeId: String?,
     val department: String?,
     val ward: String?,
     val physician: String?,

@@ -52,9 +52,9 @@ data class RmsOrder (
     companion object {
         fun toModel (alisOrder: AlisOrder): RmsOrder {
             val labsCheck = alisOrder.organizationId == "G010000"
-            val year = alisOrder.birth?.substring(0,2)?.toInt()
-            val month = alisOrder.birth?.substring(2,4)?.toByte()
-            val day = alisOrder.birth?.substring(4,6)?.toByte()
+            val year = alisOrder.birth?.takeIf { it.isNotBlank() }?.substring(0, 2)?.toInt()
+            val month = alisOrder.birth?.takeIf { it.isNotBlank() }?.substring(2,4)?.toByte()
+            val day = alisOrder.birth?.takeIf { it.isNotBlank() }?.substring(4,6)?.toByte()
             val fullYear = if (year != null) {
                 if (year in 0..30) { 2000 + year } else { 1900 + year } } else { null }
             val ofPattern = DateTimeFormatter.ofPattern("yyyyMMdd")
@@ -85,7 +85,7 @@ data class RmsOrder (
                 outsourcingCost = cost,
                 price = alisOrder.price,
                 type = alisOrder.type,
-                sampleTypeId = alisOrder.sampleTypeId,
+                sampleTypeId = if (alisOrder.sampleTypeId == "" || alisOrder.sampleTypeId == null) null else alisOrder.sampleTypeId,
                 sampleBarcode = alisOrder.sampleBarcode,
                 patientName = alisOrder.patientName,
                 patientAge = alisOrder.patientAge,

@@ -18,14 +18,8 @@ interface PatientDao{
                 .set(PATIENT.BIRTH_YEAR, rmsOrder.birthYear)
                 .set(PATIENT.NAME, rmsOrder.patientName)
                 .set(PATIENT.SEX, rmsOrder.patientSex)
-                .onDuplicateKeyUpdate()
-                .set(PATIENT.BIRTH_DAY, rmsOrder.birthDay)
-                .set(PATIENT.BIRTH_MONTH, rmsOrder.birthMonth)
-                .set(PATIENT.BIRTH_YEAR, rmsOrder.birthYear)
-                .set(PATIENT.NAME, rmsOrder.patientName)
-                .set(PATIENT.SEX, rmsOrder.patientSex)
+                .onDuplicateKeyIgnore()
                 .returning()
         ).map { it.into(Patient::class.java) }
     }
-
 }

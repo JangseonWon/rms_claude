@@ -1,19 +1,15 @@
 package com.gcgenome.rms.job
 
 import com.gcgenome.rms.dao.*
-import com.gcgenome.rms.data.Item
 import com.gcgenome.rms.data.RmsOrder
-import com.gcgenome.rms.data.RmsSampleExtension
 import com.gcgenome.rms.data.Sample
 import org.jooq.DSLContext
-import org.jooq.Publisher
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
-import java.time.Duration
 
 @Service
 class ScheduleService (
@@ -24,59 +20,52 @@ class ScheduleService (
     @Scheduled(fixedDelay = 1000L*60*60)
     fun executeScheduledTask() {
         logger.info("schedule start")
-        val sample = dataSyncBatch()
-        logger.info("sampleId: ${sample.block()}" )
+        dataSyncBatch()
+        .doOnSuccess { sample -> logger.info("BATCH SUCCESS: ${sample}") }
+        .subscribe()
     }
 
     fun dataSyncBatch(): Mono<Void> {
-        for(i: Int in 1..13){
-            logger.info("===============================$i page")
-            val sample = alisDatabaseSync(i, 20)
-            logger.info("sampleId: ${sample.block()}" )
-            Thread.sleep(5000)
-        }
-        return Mono.empty()
-        /*return Mono.from(dslContext.transactionPublisher { trx ->
-            trx.dsl().run {
-                selectAlisOrderCount().flatMap { dataCount ->
-                    val limitCount = 5
-                    val batchCount = (dataCount / limitCount) + 1
-                    Flux.range(0, batchCount)
-                        .flatMap { page -> alisDatabaseSync(page, limitCount) }
-                        .delayElements(Duration.ofSeconds(1)).then()
-                }
+        val fromDate = "2023-01-02T00:00:00"
+        val toDate = "2023-01-02T23:00:00"
+        val limit = 20
+
+        return dslContext.selectAlisOrderCount(fromDate, toDate)
+            .flatMap { count ->
+                logger.info("count : $count")
+                val batchCount = count / limit + if (count % limit == 0) 0 else 1
+                Flux.range(1, batchCount)
+                    .flatMap { i -> alisDatabaseSync(i, limit, fromDate, toDate)
+                        .doOnSuccess { logger.info("TOTAL COUNT : $count / BATCH COUNT : $batchCount / CURRENT COUNT : $i") } }
+                    .then()
             }
-        })*/
     }
 
-    fun alisDatabaseSync(page: Int, limitCount: Int): Mono<Item> {
+    fun alisDatabaseSync(page: Int, limit: Int, fromDate: String, toDate: String): Mono<Sample> {
         logger.info("fun start")
         return Mono.from(dslContext.transactionPublisher{ trx ->
             trx.dsl().run {
                 logger.info("alis query start")
-                    selectAlisOrderTest(page, limitCount).flatMap { alisOrder ->
-                        val rmsOrder = RmsOrder.toModel(alisOrder)
-                        logger.info("${rmsOrder.createAt}:${rmsOrder.genomeBarcode}:${rmsOrder.patientName} Data Check")
-                        checkSample(rmsOrder.genomeBarcode)
-                            .flatMap { sample -> checkItem(sample.itemId, rmsOrder.serviceId) }
-                            .delayElement(Duration.ofMillis(100))
-                            .switchIfEmpty(insertUser(rmsOrder)
-                                .then(insertOrganization(rmsOrder))
-                                .then(insertPatient(rmsOrder))
-                                .then(insertOrder(rmsOrder))
-                                .then(insertItem(rmsOrder))
-                                .then(insertSample(rmsOrder))
-                                .then(selectSampleExtension(rmsOrder.createAt, rmsOrder.orderNumber)
-                                    .flatMap {  sampleExtension ->
-                                        logger.info("========================= sampleExtension order_number: ${sampleExtension.orderNumber}")
-                                        insertSampleExtension(sampleExtension, rmsOrder.sampleId)
-                                    }
-                                    .delayElements(Duration.ofMillis(100))
-                                    .toMono()
-                                ).then(checkItem(rmsOrder.sampleId, rmsOrder.serviceId))
+                selectAlisOrder(page - 1, limit, fromDate, toDate).flatMap { alisOrder ->
+                    val rmsOrder = RmsOrder.toModel(alisOrder)
+                    checkSampleByServiceId(rmsOrder.genomeBarcode, rmsOrder.serviceId)
+                        .flatMap {
+                            checkSampleByServiceId(rmsOrder.genomeBarcode, rmsOrder.serviceId)
+                            }.switchIfEmpty(insertUser(rmsOrder)
+                            .then(insertOrganization(rmsOrder))
+                            .then(insertPatient(rmsOrder))
+                            .then(insertOrder(rmsOrder))
+                            .then(insertItem(rmsOrder))
+                            .then(insertSample(rmsOrder))
+                            .then(selectSampleExtension(rmsOrder.createAt, rmsOrder.orderNumber)
+                                .flatMap {  sampleExtension ->
+                                    insertSampleExtension(sampleExtension, rmsOrder.sampleId)
+                                }.toMono()
+                            ).then(checkSampleByServiceId(rmsOrder.genomeBarcode, rmsOrder.serviceId))
                         )
-                    }
+                }
             }
         })
     }
+
 }

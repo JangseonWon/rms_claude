@@ -18,14 +18,7 @@ interface OrganizationDao {
                 .set(ORGANIZATION.NURSING_NUMBER, rmsOrder.nursingNumber)
                 .set(ORGANIZATION.BRANCH_ID, rmsOrder.branchId)
                 .set(ORGANIZATION.BRANCH_NAME, rmsOrder.branchName)
-                .onDuplicateKeyUpdate()
-                .set(ORGANIZATION.NAME, rmsOrder.organizationName)
-                .set(ORGANIZATION.TYPE, rmsOrder.type)
-                .set(ORGANIZATION.REGISTRATION_NUMBER, rmsOrder.registrationNumber)
-                .set(ORGANIZATION.NURSING_NUMBER, rmsOrder.nursingNumber)
-                .set(ORGANIZATION.BRANCH_ID, rmsOrder.branchId)
-                .set(ORGANIZATION.BRANCH_NAME, rmsOrder.branchName)
-                .where(ORGANIZATION.ID.eq(rmsOrder.organizationId).and(ORGANIZATION.USER_ID.eq(rmsOrder.userId)))
+                .onDuplicateKeyIgnore()
                 .returning()
         ).map { it.into(Organization::class.java) }
     }

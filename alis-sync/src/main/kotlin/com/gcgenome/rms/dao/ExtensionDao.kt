@@ -2,7 +2,7 @@ package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.AlisSampleExtension
 import com.gcgenome.rms.data.RmsSampleExtension
-import com.gcgenome.rms.tables.references.ALIS_EXTENSION_VALUE
+import com.gcgenome.rms.tables.references.ALIS_EXTENSION_VALUE_MV
 import com.gcgenome.rms.tables.references.SAMPLE_EXTENSION
 import org.jooq.DSLContext
 import reactor.core.publisher.Flux
@@ -17,17 +17,20 @@ interface ExtensionDao{
                 .set(SAMPLE_EXTENSION.EXTENSION_ID, sampleExtension.extensionCode)
                 .set(SAMPLE_EXTENSION.SAMPLE_ID, sampleId)
                 .set(SAMPLE_EXTENSION.VALUE, sampleExtension.extensionValue)
-                .onDuplicateKeyUpdate()
-                .set(SAMPLE_EXTENSION.VALUE, sampleExtension.extensionValue)
+                .onDuplicateKeyIgnore()
                 .returning()
         ).map { it.into(RmsSampleExtension::class.java) }
     }
     fun DSLContext.selectSampleExtension(orderDate: LocalDateTime, orderNumber: Int): Flux<AlisSampleExtension> {
         return Flux.from(
-            selectFrom(ALIS_EXTENSION_VALUE).where(ALIS_EXTENSION_VALUE.ORDER_DATE.eq(orderDate).and(
-                ALIS_EXTENSION_VALUE.ORDER_NUMBER.eq(orderNumber))))
+            selectFrom(ALIS_EXTENSION_VALUE_MV).where(ALIS_EXTENSION_VALUE_MV.ORDER_DATE.eq(orderDate).and(
+                ALIS_EXTENSION_VALUE_MV.ORDER_NUMBER.eq(orderNumber))))
             .map { it.into(AlisSampleExtension::class.java)}
     }
 
-
+    fun DSLContext.refreshAlisExtensionValue(): Mono<Int> {
+        return Mono.fromCallable{
+            execute("refresh materialized view alis_extension_value_mv")
+        }.map { result -> result as Int }
+    }
 }

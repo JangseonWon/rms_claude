@@ -1,13 +1,13 @@
 package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.RmsOrder
-import com.gcgenome.rms.tables.records.UserRecord
+import com.gcgenome.rms.data.User
 import com.gcgenome.rms.tables.references.USER
 import org.jooq.DSLContext
 import reactor.core.publisher.Mono
 
 interface UserDao{
-    fun DSLContext.insertUser(rmsOrder: RmsOrder): Mono<UserRecord> {
+    fun DSLContext.insertUser(rmsOrder: RmsOrder): Mono<User> {
         return Mono.from(
             insertInto(USER)
                 .set(USER.ID, rmsOrder.organizationUserId)
@@ -15,9 +15,8 @@ interface UserDao{
                 .set(USER.NAME, rmsOrder.organizationName)
                 .set(USER.STATE, "ACTIVATE")
                 .set(USER.CODE, rmsOrder.userCode)
-                .onDuplicateKeyUpdate()
-                .set(USER.AUTHORITY, "USER")
+                .onDuplicateKeyIgnore()
                 .returning()
-        )
+        ).map { it.into(User::class.java) }
     }
 }
