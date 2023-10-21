@@ -6,8 +6,9 @@ metadata:
 spec:
   imageName: image-registry.openshift-image-registry.svc:5000/library/cloudnative-pg-postgres:16.0
   backup:
+    {{- with .Values.bucket }}
     barmanObjectStore:
-      destinationPath: 's3://bucket-bbcc8f67-9489-456d-91da-c70cf282dc5f/backup'
+      destinationPath: 's3://{{ . }}/backup'
       endpointURL: 'https://s3.apps.gcgenome.com'
       s3Credentials:
         accessKeyId:
@@ -22,6 +23,7 @@ spec:
         maxParallel: 8
     retentionPolicy: 3m
     target: prefer-standby
+  {{- end }}
   instances: 3
   storage:
     {{- with .Values.persistence.size }}
