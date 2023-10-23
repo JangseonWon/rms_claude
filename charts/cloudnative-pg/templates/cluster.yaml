@@ -6,8 +6,9 @@ metadata:
 spec:
   imageName: image-registry.openshift-image-registry.svc:5000/library/cloudnative-pg-postgres:16.0
   backup:
+    {{- with .Values.bucket }}
     barmanObjectStore:
-      destinationPath: 's3://bucket-bbcc8f67-9489-456d-91da-c70cf282dc5f/backup'
+      destinationPath: 's3://{{ . }}/backup'
       endpointURL: 'https://s3.apps.gcgenome.com'
       s3Credentials:
         accessKeyId:
@@ -22,6 +23,7 @@ spec:
         maxParallel: 8
     retentionPolicy: 3m
     target: prefer-standby
+  {{- end }}
   instances: 3
   storage:
     {{- with .Values.persistence.size }}
@@ -44,3 +46,14 @@ spec:
       database: rms
       owner: postgres
       encoding: UTF8
+      localeCollate: UTF-8
+      localeCType: UTF-8
+      options:
+        - '--locale-provider=icu'
+        - '--icu-locale=ko'
+      postInitSQL:
+        - SET search_path TO rms;
+        - CREATE EXTENSION IF NOT EXISTS tds_fdw;
+        - CREATE SERVER alis_svr FOREIGN DATA WRAPPER tds_fdw
+          OPTIONS (servername '172.19.208.202', port '14032', database 'LC32_GCGENOME', msg_handler 'notice');
+        - CREATE USER MAPPING FOR postgres SERVER alis_svr OPTIONS (username 'postgres', password 'postgres');

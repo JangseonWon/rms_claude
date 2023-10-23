@@ -7,7 +7,7 @@ data:
   postgresql.yaml: |
     spring:
       r2dbc:
-        url: r2dbc:postgresql://pooler:5432/rms
+        url: r2dbc:postgresql://postgresql-pooler:5432/rms
         username: ${postgres.username}
         password: ${postgres.password}
         pool:

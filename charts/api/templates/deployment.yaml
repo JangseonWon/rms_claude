@@ -30,6 +30,10 @@ spec:
           configMap:
             name: rms-api-application
             defaultMode: 420
+        - name: postgres-config
+          configMap:
+            name: postgresql
+            defaultMode: 420
       containers:
         - name: rms-api
           image: >-
@@ -58,9 +62,24 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             failureThreshold: 3
+          env:
+            - name: postgres.username
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-app
+                  key: username
+            - name: postgres.password
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-app
+                  key: password
           volumeMounts:
             - name: config-volume
-              mountPath: /app/resources
+              mountPath: /app/resources/application.yml
+              subPath: application.yaml
+            - name: postgres-config
+              mountPath: /app/resources/postgresql.yaml
+              subPath: postgresql.yaml
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst
