@@ -6,7 +6,7 @@ spring:
   r2dbc:
     url: r2dbc:postgresql://172.19.208.223:5432/rms
     username: postgres
-    password: snubi1004
+    password: K9IhSJDIaqrQ4zgU4w2RehD3Rt1qNOkHgSTJPHKQa57sZNzwzKWjxfNElA6W4zQX
     pool:
       initial-size: 2
       max-size: 10
@@ -16,6 +16,9 @@ logging:
   level:
     io.r2dbc.postgresql.QUERY: TRACE
     io.r2dbc.postgresql.PARAM: TRACE
+    root: info
+  file:
+    path: E:\Intellij log folder
 server:
   port: 9090
 

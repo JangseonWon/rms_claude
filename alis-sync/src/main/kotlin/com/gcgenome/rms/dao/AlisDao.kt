@@ -11,13 +11,13 @@ import java.time.LocalDateTime
 
 
 interface AlisDao {
-    fun DSLContext.selectAlisOrder(page: Int, count: Int, dateFrom: String, dateTo: String): Flux<AlisOrder> {
+    fun DSLContext.selectAlisOrder(page: Int, limit: Int, dateFrom: String, dateTo: String): Flux<AlisOrder> {
         return Flux.from(
             selectFrom(ALIS_ORDER_MV)
                 .where(ALIS_ORDER_MV.ORDER_DATE.between(LocalDateTime.parse(dateFrom)).and(LocalDateTime.parse(dateTo)))
-                .orderBy(ALIS_ORDER_MV.ORDER_DATE.asc(),ALIS_ORDER_MV.ORDER_NUMBER.asc())
-                .limit(count)
-                .offset(page*count)
+                .orderBy(ALIS_ORDER_MV.ORDER_DATE.asc(),ALIS_ORDER_MV.ORDER_NUMBER.asc(), ALIS_ORDER_MV.SERVICE_CODE.asc())
+                .limit(limit)
+                .offset(page*limit)
         ).map { it.into(AlisOrder::class.java) }
     }
 

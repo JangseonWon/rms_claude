@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
+import kotlin.time.Duration
 
 @Service
 class ScheduleService (
@@ -26,8 +27,8 @@ class ScheduleService (
     }
 
     fun dataSyncBatch(): Mono<Void> {
-        val fromDate = "2023-01-02T00:00:00"
-        val toDate = "2023-01-02T23:00:00"
+        val fromDate = "2023-01-01T00:00:00"
+        val toDate = "2023-01-07T23:00:00"
         val limit = 20
 
         return dslContext.selectAlisOrderCount(fromDate, toDate)
@@ -49,9 +50,7 @@ class ScheduleService (
                 selectAlisOrder(page - 1, limit, fromDate, toDate).flatMap { alisOrder ->
                     val rmsOrder = RmsOrder.toModel(alisOrder)
                     checkSampleByServiceId(rmsOrder.genomeBarcode, rmsOrder.serviceId)
-                        .flatMap {
-                            checkSampleByServiceId(rmsOrder.genomeBarcode, rmsOrder.serviceId)
-                            }.switchIfEmpty(insertUser(rmsOrder)
+                        .switchIfEmpty(insertUser(rmsOrder)
                             .then(insertOrganization(rmsOrder))
                             .then(insertPatient(rmsOrder))
                             .then(insertOrder(rmsOrder))
