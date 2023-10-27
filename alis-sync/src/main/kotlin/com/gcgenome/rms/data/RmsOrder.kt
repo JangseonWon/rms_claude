@@ -59,6 +59,8 @@ data class RmsOrder (
                 if (year in 0..30) { 2000 + year } else { 1900 + year } } else { null }
             val ofPattern = DateTimeFormatter.ofPattern("yyyyMMdd")
             val cost = alisOrder.cost?.minus(alisOrder.tax!!)
+            val branchCode = alisOrder.orderNumber.toString().substring(0,3)
+            val postfix = (alisOrder.orderNumber%10000).toString().padStart(4, '0')
 
             return RmsOrder(
                 orderNumber = alisOrder.orderNumber,
@@ -81,7 +83,7 @@ data class RmsOrder (
                 birthYear = fullYear?.toShort(),
                 birthMonth = month,
                 birthDay = day,
-                genomeBarcode = "${alisOrder.orderDate.format(ofPattern).toInt()}${alisOrder.branchCode}${alisOrder.orderNumber%10000}",
+                genomeBarcode = "${alisOrder.orderDate.format(ofPattern).toInt()}${branchCode}$postfix",
                 outsourcingCost = cost,
                 price = alisOrder.price,
                 type = alisOrder.type,
@@ -99,9 +101,9 @@ data class RmsOrder (
                 branchId = alisOrder.branchCode,
                 branchName = alisOrder.branchName,
                 genomeBarcodePrefix = alisOrder.orderDate.format(ofPattern).toInt(),
-                genomeBarcodeInfix = alisOrder.branchCode!!.toShort(),
-                genomeBarcodePostfix = alisOrder.orderNumber%10000,
-                userCode = alisOrder.branchCode.toShort()
+                genomeBarcodeInfix = branchCode.toShort(),
+                genomeBarcodePostfix = postfix.toInt(),
+                userCode = alisOrder.branchCode?.toShort()
             )
         }
     }

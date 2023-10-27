@@ -11,7 +11,8 @@ import reactor.core.publisher.Mono
 @Service
 class ScheduleService (
     val dslContext: DSLContext,
-    val alisDatabaseSync: AlisDatabaseSync
+    val alisDatabaseSync: AlisDatabaseSync,
+    val libraDataS3Transfer: LibraDataS3Transfer
 ): AlisDao {
     private val logger = LoggerFactory.getLogger("rms sync")
 
@@ -19,14 +20,15 @@ class ScheduleService (
     @Scheduled(fixedDelay = 1000L*60*60)
     fun executeScheduledTask() {
         logger.info("schedule start")
-        dataSyncBatch()
-        .doOnSuccess { sample -> logger.info("BATCH SUCCESS: ${sample}") }
-        .subscribe()
+//        dataSyncBatch()
+//        .doOnSuccess { sample -> logger.info("BATCH SUCCESS: ${sample}") }
+//        .subscribe()
+        libraDataS3Transfer.libraDataTransfer()
     }
 
     fun dataSyncBatch(): Mono<Void> {
         val fromDate = "2023-01-01T00:00:00"
-        val toDate = "2023-01-31T23:00:00"
+        val toDate = "2023-01-02T23:00:00"
         val limit = 20
 
         return dslContext.selectAlisOrderCount(fromDate, toDate)

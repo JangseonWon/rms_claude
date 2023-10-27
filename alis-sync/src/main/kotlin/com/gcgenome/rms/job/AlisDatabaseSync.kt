@@ -17,10 +17,9 @@ class AlisDatabaseSync (
     private val logger = LoggerFactory.getLogger("rms sync")
 
     fun alisDatabaseSync(page: Int, limit: Int, fromDate: String, toDate: String): Mono<Sample> {
-        logger.info("fun start")
+        logger.info("rms sync fun start")
         return Mono.from(dslContext.transactionPublisher{ trx ->
             trx.dsl().run {
-                logger.info("alis query start")
                 selectAlisOrder(page - 1, limit, fromDate, toDate).flatMap { alisOrder ->
                     val rmsOrder = RmsOrder.toModel(alisOrder)
                     checkSampleByServiceId(rmsOrder.genomeBarcode, rmsOrder.serviceId)

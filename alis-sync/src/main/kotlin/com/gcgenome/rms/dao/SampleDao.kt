@@ -6,6 +6,7 @@ import com.gcgenome.rms.tables.references.ITEM
 import com.gcgenome.rms.tables.references.SAMPLE
 import org.jooq.DSLContext
 import reactor.core.publisher.Mono
+import java.util.*
 
 interface SampleDao {
 
@@ -49,4 +50,12 @@ interface SampleDao {
         ).map { it.into(Sample::class.java) }
     }
 
+    fun DSLContext.updateSampleByGenomeBarcode(sampleId: UUID): Mono<Sample> {
+        return Mono.from(
+            update(SAMPLE)
+                .set(SAMPLE.STATE, "REPORTED")
+                .where(SAMPLE.ID.eq(sampleId))
+                .returning()
+        ).map { it.into(Sample::class.java) }
+    }
 }
