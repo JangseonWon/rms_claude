@@ -1,4 +1,4 @@
-package com.gcgenome.rms.job
+package com.gcgenome.rms.service
 
 import com.gcgenome.rms.dao.ReportDao
 import com.gcgenome.rms.dao.SampleDao
@@ -18,7 +18,7 @@ class ReportDatabaseSync(
 
     fun reportDatabaseSync(path: String, reportId: UUID, filePath: String): Mono<Report> {
         logger.info("reportDatabaseSync Start")
-        val file = LibraFile.libraToModel(path, reportId, filePath)
+        val file = LibraFile.libraToModel(path, reportId, filePath, 0)
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
                 checkSampleByServiceId(file.genomeBarcode, file.serviceId)

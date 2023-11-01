@@ -1,21 +1,53 @@
 package com.gcgenome.rms.job
 
 import com.gcgenome.rms.dao.*
-import com.gcgenome.rms.data.RmsOrder
-import com.gcgenome.rms.data.Sample
+import com.gcgenome.rms.data.*
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
+import java.util.*
 
 
 @Service
 class AlisDatabaseSync (
-    private val dslContext: DSLContext
-): AlisDao, OrderDao, ItemDao, SampleDao, PatientDao, OrganizationDao, ExtensionDao, UserDao {
+    private val dslContext: DSLContext,
+    val fileServerDataS3Transfer: FileServerDataS3Transfer
+): AlisDao, OrderDao, ItemDao, SampleDao, PatientDao, OrganizationDao, ExtensionDao, UserDao, ReportDao {
     private val logger = LoggerFactory.getLogger("rms sync")
 
+    fun dataSyncBatchSample(): Mono<Void> {
+        val fromDate = "2023-01-01T00:00:00"
+        val toDate = "2023-01-02T23:00:00"
+        val limit = 20
+
+        return dslContext.selectAlisOrderCount(fromDate, toDate)
+            .flatMap { count ->
+                logger.info("ALIS SAMPLE count : $count")
+                val batchCount = count / limit + if (count % limit == 0) 0 else 1
+                Flux.range(1, batchCount)
+                    .flatMap { i -> alisDatabaseSync(i, limit, fromDate, toDate)
+                        .doOnSuccess { logger.info("ALIS SAMPLE : TOTAL COUNT : $count / BATCH COUNT : $batchCount / CURRENT COUNT : $i") } }
+                    .then()
+            }
+    }
+    fun dataSyncBatchAlisFile(): Mono<Void> {
+        val fromDate = "2023-01-01T00:00:00"
+        val toDate = "2023-01-02T23:00:00"
+        val limit = 20
+
+        return dslContext.selectAlisOrderFileCount(fromDate, toDate)
+            .flatMap { count ->
+                logger.info("ALIS FILE count : $count")
+                val batchCount = count / limit + if (count % limit == 0) 0 else 1
+                Flux.range(1, 1)
+                    .flatMap { i -> fileServerDatabaseSync(i, limit, fromDate, toDate)
+                        .doOnSuccess { logger.info("ALIS FILE : TOTAL COUNT : $count / BATCH COUNT : $batchCount / CURRENT COUNT : $i") } }
+                    .then()
+            }
+    }
     fun alisDatabaseSync(page: Int, limit: Int, fromDate: String, toDate: String): Mono<Sample> {
         logger.info("rms sync fun start")
         return Mono.from(dslContext.transactionPublisher{ trx ->
@@ -35,6 +67,21 @@ class AlisDatabaseSync (
                                 }.toMono()
                             ).then(checkSampleByServiceId(rmsOrder.genomeBarcode, rmsOrder.serviceId))
                         )
+                }
+            }
+        })
+    }
+
+    fun fileServerDatabaseSync(page: Int, limit: Int, fromDate: String, toDate: String): Mono<Report> {
+        return Mono.from(dslContext.transactionPublisher { trx ->
+            trx.dsl().run {
+                selectAlisOrderFile(page - 1, limit, fromDate, toDate).flatMap { alisFile ->
+                    val s3File = FileServerFile.convertFileServerFile(alisFile)
+                    val report = LibraFile.alisFileToModel(alisFile, s3File.type, s3File.sequence)
+                    checkSampleByServiceId(s3File.genomeBarcode, s3File.serviceCode).flatMap { sample ->
+                        fileServerDataS3Transfer.fileServerDataS3Transfer(s3File.fileName, s3File.type, s3File.windowPath, s3File.s3Path, s3File.text)
+                        insertReport(sample.id!!, UUID.randomUUID(), report)
+                    }
                 }
             }
         })

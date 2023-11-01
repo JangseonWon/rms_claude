@@ -13,10 +13,11 @@ data class LibraFile (
     val sampleId: UUID,
     val reportedAt: LocalDateTime?,
     val genomeBarcode: String,
-    val serviceId: String
+    val serviceId: String,
+    val seqno: Number
 ) {
     companion object {
-        fun libraToModel(path: String, id: UUID, filePath: String): LibraFile {
+        fun libraToModel(path: String, id: UUID, filePath: String, sequence: Number): LibraFile {
             val part = path.split("/")
             val date = part[1] + part[2] + part[3]
             val genomeBarcode = date + part[4] + part[5]
@@ -24,7 +25,7 @@ data class LibraFile (
             val type = part.last().split(".").last()
             val formatter = DateTimeFormatter.ofPattern("yyyyMMdd")
             val localDate = LocalDate.parse(date, formatter).atStartOfDay()
-            val value = "api/reports/$id"
+            val value = "/api/reports/$id"
 
             return LibraFile(
                 createAt = localDate,
@@ -34,7 +35,31 @@ data class LibraFile (
                 sampleId = UUID.randomUUID(),
                 reportedAt = localDate,
                 genomeBarcode = genomeBarcode,
-                serviceId = serviceId
+                serviceId = serviceId,
+                seqno = sequence
+            )
+        }
+
+        fun alisFileToModel(alisOrderFile: AlisOrderFile, type: String, sequence: Number): LibraFile {
+            val part = alisOrderFile.filePath.split("\\")
+            val year = part[part.size - 3]
+            val date = part[part.size - 2]
+            val genomeBarcode = year + date + alisOrderFile.orderNumber
+            val serviceId = alisOrderFile.serviceCode
+            val formatter = DateTimeFormatter.ofPattern("yyyyMMdd")
+            val localDate = LocalDate.parse(year + date, formatter).atStartOfDay()
+            val value = "api/reports/${alisOrderFile.fileName}"
+
+            return LibraFile(
+                createAt = localDate,
+                path = alisOrderFile.filePath,
+                type = type.uppercase(),
+                value = value,
+                sampleId = UUID.randomUUID(),
+                reportedAt = localDate,
+                genomeBarcode = genomeBarcode,
+                serviceId = serviceId,
+                seqno = sequence
             )
         }
     }
