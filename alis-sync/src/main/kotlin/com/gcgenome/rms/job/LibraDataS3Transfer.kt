@@ -34,27 +34,6 @@ class LibraDataS3Transfer(
 
         val remoteFileList = mutableListOf<String>()
 
-        /*fun exploreDirectory(directory: String) {
-            val remoteEntries = channel.ls(directory) as Vector<LsEntry>
-            for (entry in remoteEntries) {
-                val remoteType = entry.toString().split(" ")[0]
-                val isDirectory = remoteType.startsWith("d")
-                val remotePath = entry.filename
-                if ("." == remotePath || ".." == remotePath) continue
-                else {
-                    if (isDirectory) {
-                        exploreDirectory("$directory/$remotePath")
-                    } else {
-                        if (remotePath.endsWith(".pdf") || remotePath.endsWith(".jpg")) {
-                            continue
-                        } else {
-                            remoteFileList.add("$directory/$remotePath")
-                        }
-                    }
-                }
-            }
-        }*/
-
         fun exploreDirectory(directory: String) {
             val remoteEntries = channel.ls(directory) as Vector<LsEntry>
             for (entry in remoteEntries) {
@@ -90,6 +69,4 @@ class LibraDataS3Transfer(
         sshSession.disconnect()
         logger.info("s3 transfer done")
     }
-
-
 }

@@ -10,5 +10,6 @@ data class Report (
     val type: String,
     val value: String?,
     val sampleId: UUID,
-    val reportedAt: LocalDateTime?
+    val reportedAt: LocalDateTime?,
+    val seqno: Int
 )

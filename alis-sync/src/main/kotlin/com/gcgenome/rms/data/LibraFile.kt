@@ -14,10 +14,10 @@ data class LibraFile (
     val reportedAt: LocalDateTime?,
     val genomeBarcode: String,
     val serviceId: String,
-    val seqno: Number
+    val seqno: Int
 ) {
     companion object {
-        fun libraToModel(path: String, id: UUID, filePath: String, sequence: Number): LibraFile {
+        fun libraToModel(path: String, id: UUID, filePath: String, sequence: Int): LibraFile {
             val part = path.split("/")
             val date = part[1] + part[2] + part[3]
             val genomeBarcode = date + part[4] + part[5]
@@ -40,7 +40,7 @@ data class LibraFile (
             )
         }
 
-        fun alisFileToModel(alisOrderFile: AlisOrderFile, type: String, sequence: Number): LibraFile {
+        fun alisFileToModel(alisOrderFile: AlisOrderFile, path: String, type: String, sequence: Int): LibraFile {
             val part = alisOrderFile.filePath.split("\\")
             val year = part[part.size - 3]
             val date = part[part.size - 2]
@@ -48,12 +48,12 @@ data class LibraFile (
             val serviceId = alisOrderFile.serviceCode
             val formatter = DateTimeFormatter.ofPattern("yyyyMMdd")
             val localDate = LocalDate.parse(year + date, formatter).atStartOfDay()
-            val value = "api/reports/${alisOrderFile.fileName}"
+            val value = if (type.contains("TEXT")) { alisOrderFile.textFile} else "/api/reports/${alisOrderFile.fileName}"
 
             return LibraFile(
                 createAt = localDate,
-                path = alisOrderFile.filePath,
-                type = type.uppercase(),
+                path = path,
+                type = type,
                 value = value,
                 sampleId = UUID.randomUUID(),
                 reportedAt = localDate,

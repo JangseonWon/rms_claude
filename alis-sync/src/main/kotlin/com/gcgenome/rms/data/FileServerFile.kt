@@ -8,9 +8,10 @@ data class FileServerFile (
     val text: String,
     val longText: Boolean,
     val shortText: Boolean,
-    val sequence: Number,
+    val sequence: Int,
     val genomeBarcode: String,
-    val serviceCode: String
+    val serviceCode: String,
+    val upperType: String
 ) {
     companion object {
         fun convertFileServerFile(alisOrderFile: AlisOrderFile): FileServerFile {
@@ -29,18 +30,20 @@ data class FileServerFile (
             val sequenceCheck = alisOrderFile.fileNameSeq.count { it == '_' } >= 2
             val sequence = if (sequenceCheck) { alisOrderFile.fileSeq + 1 } else { 0 }
             val type = if (longText || shortText) { "txt" } else { alisOrderFile.fileExt }
+            val upperType = if (longText) { "LONG TEXT" } else if (shortText) { "SHORT TEXT" } else { type.uppercase()}
             val s3Path = "reports/$year/$month/$day/$branchCode/$postfix/$serviceCode/$fileName.$type"
             return FileServerFile (
                 fileName = fileName,
                 type = type,
                 windowPath = alisOrderFile.filePath,
                 s3Path = s3Path,
-                text = alisOrderFile.textFile,
+                text = alisOrderFile.textFile ?: "",
                 longText,
                 shortText,
                 sequence = sequence,
                 genomeBarcode = year + month + day + branchCode + postfix,
-                serviceCode
+                serviceCode,
+                upperType
             )
         }
     }

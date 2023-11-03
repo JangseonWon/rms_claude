@@ -2,7 +2,7 @@ package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.AlisOrder
 import com.gcgenome.rms.data.AlisOrderFile
-import com.gcgenome.rms.tables.references.ALIS_ORDER_FILE
+import com.gcgenome.rms.tables.references.ALIS_ORDER_FILE_MV
 import com.gcgenome.rms.tables.references.ALIS_ORDER_MV
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.count
@@ -35,18 +35,22 @@ interface AlisDao {
 
     fun DSLContext.selectAlisOrderFile(page: Int, limit: Int, dateFrom: String, dateTo: String): Flux<AlisOrderFile>{
         return Flux.from(
-            selectFrom(ALIS_ORDER_FILE)
-                .where(ALIS_ORDER_FILE.CREATE_AT.between(LocalDateTime.parse(dateFrom)).and(LocalDateTime.parse(dateTo))).and(
-                    ALIS_ORDER_FILE.ORDER_NUMBER.eq(1715031))
-                .orderBy(ALIS_ORDER_FILE.CREATE_AT.asc(), ALIS_ORDER_FILE.ORDER_NUMBER.asc(), ALIS_ORDER_FILE.SERVICE_CODE.asc())
+            selectFrom(ALIS_ORDER_FILE_MV)
+                .where(ALIS_ORDER_FILE_MV.CREATE_AT.between(LocalDateTime.parse(dateFrom)).and(LocalDateTime.parse(dateTo)))
+                .orderBy(
+                    ALIS_ORDER_FILE_MV.CREATE_AT.asc(),
+                    ALIS_ORDER_FILE_MV.ORDER_NUMBER.asc(),
+                    ALIS_ORDER_FILE_MV.SERVICE_CODE.asc(),
+                    ALIS_ORDER_FILE_MV.FILE_NAME_SEQ.asc(),
+                    ALIS_ORDER_FILE_MV.FILE_SEQ.asc())
                 .limit(limit)
                 .offset(page*limit)
         ).map { it.into(AlisOrderFile::class.java) }
     }
 
     fun DSLContext.selectAlisOrderFileCount(fromDate: String, toDate: String): Mono<Int> {
-        return Mono.from(select(count(ALIS_ORDER_FILE.ORDER_NUMBER).`as`("count")).from(ALIS_ORDER_FILE)
-            .where(ALIS_ORDER_FILE.CREATE_AT.between(LocalDateTime.parse(fromDate)).and(LocalDateTime.parse(toDate)))
+        return Mono.from(select(count(ALIS_ORDER_FILE_MV.ORDER_NUMBER).`as`("count")).from(ALIS_ORDER_FILE_MV)
+            .where(ALIS_ORDER_FILE_MV.CREATE_AT.between(LocalDateTime.parse(fromDate)).and(LocalDateTime.parse(toDate)))
         ).map { r -> r.getValue("count", Int::class.java) }
     }
 }

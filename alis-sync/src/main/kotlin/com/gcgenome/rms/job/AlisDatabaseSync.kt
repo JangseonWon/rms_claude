@@ -18,11 +18,7 @@ class AlisDatabaseSync (
 ): AlisDao, OrderDao, ItemDao, SampleDao, PatientDao, OrganizationDao, ExtensionDao, UserDao, ReportDao {
     private val logger = LoggerFactory.getLogger("rms sync")
 
-    fun dataSyncBatchSample(): Mono<Void> {
-        val fromDate = "2023-01-01T00:00:00"
-        val toDate = "2023-01-02T23:00:00"
-        val limit = 20
-
+    fun dataSyncBatchSample(fromDate: String, toDate: String, limit: Int): Mono<Void> {
         return dslContext.selectAlisOrderCount(fromDate, toDate)
             .flatMap { count ->
                 logger.info("ALIS SAMPLE count : $count")
@@ -33,16 +29,12 @@ class AlisDatabaseSync (
                     .then()
             }
     }
-    fun dataSyncBatchAlisFile(): Mono<Void> {
-        val fromDate = "2023-01-01T00:00:00"
-        val toDate = "2023-01-02T23:00:00"
-        val limit = 20
-
+    fun dataSyncBatchAlisFile(fromDate: String, toDate: String, limit: Int): Mono<Void> {
         return dslContext.selectAlisOrderFileCount(fromDate, toDate)
             .flatMap { count ->
                 logger.info("ALIS FILE count : $count")
                 val batchCount = count / limit + if (count % limit == 0) 0 else 1
-                Flux.range(1, 1)
+                Flux.range(1, batchCount)
                     .flatMap { i -> fileServerDatabaseSync(i, limit, fromDate, toDate)
                         .doOnSuccess { logger.info("ALIS FILE : TOTAL COUNT : $count / BATCH COUNT : $batchCount / CURRENT COUNT : $i") } }
                     .then()
@@ -77,7 +69,7 @@ class AlisDatabaseSync (
             trx.dsl().run {
                 selectAlisOrderFile(page - 1, limit, fromDate, toDate).flatMap { alisFile ->
                     val s3File = FileServerFile.convertFileServerFile(alisFile)
-                    val report = LibraFile.alisFileToModel(alisFile, s3File.type, s3File.sequence)
+                    val report = LibraFile.alisFileToModel(alisFile, s3File.s3Path, s3File.upperType, s3File.sequence)
                     checkSampleByServiceId(s3File.genomeBarcode, s3File.serviceCode).flatMap { sample ->
                         fileServerDataS3Transfer.fileServerDataS3Transfer(s3File.fileName, s3File.type, s3File.windowPath, s3File.s3Path, s3File.text)
                         insertReport(sample.id!!, UUID.randomUUID(), report)

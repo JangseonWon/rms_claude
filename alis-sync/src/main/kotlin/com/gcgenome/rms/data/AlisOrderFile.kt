@@ -11,5 +11,5 @@ data class AlisOrderFile (
     val fileNameSeq: String,
     val fileSeq: Int,
     val fileExt: String,
-    val textFile: String
+    val textFile: String?
 )

@@ -16,11 +16,15 @@ class ScheduleService (
 
     @Scheduled(fixedDelay = 1000L*60*60*24)
     fun executeScheduledTask() {
+
+        val fromDate = "2023-01-01T00:00:00"
+        val toDate = "2023-01-31T23:00:00"
+        val limit = 20
+
         logger.info("schedule start")
-//        alisDatabaseSync.dataSyncBatchSample()
-//        .doOnSuccess { sample -> logger.info("BATCH SUCCESS: $sample") }
-//        .subscribe()
-        alisDatabaseSync.dataSyncBatchAlisFile().subscribe()
+
+//        alisDatabaseSync.dataSyncBatchSample(fromDate, toDate, limit).subscribe()
+        alisDatabaseSync.dataSyncBatchAlisFile(fromDate, toDate, limit).subscribe()
 //        libraDataS3Transfer.libraDataTransfer()
     }
 }

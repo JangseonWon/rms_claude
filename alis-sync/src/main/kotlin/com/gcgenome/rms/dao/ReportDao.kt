@@ -18,6 +18,7 @@ interface ReportDao {
                 .set(REPORT.VALUE, report.value)
                 .set(REPORT.SAMPLE_ID, sampleId)
                 .set(REPORT.REPORTED_AT, report.reportedAt)
+                .set(REPORT.SEQNO, report.seqno)
                 .onDuplicateKeyIgnore()
                 .returning()
         ).map { it.into(Report::class.java) }
