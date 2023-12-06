@@ -14,7 +14,6 @@ spec:
         accessKeyId:
           key: access-key
           name: s3-credentials
-        inheritFromIAMRole: false
         secretAccessKey:
           key: secret-key
           name: s3-credentials
