@@ -17,6 +17,9 @@ dependencies {
     implementation(libs.spring.gateway)
     implementation(libs.spring.actuator)
     implementation(libs.bundles.jooq)
+    implementation("com.jcraft:jsch:0.1.55")
+    implementation("software.amazon.awssdk:s3:2.20.118")
+    implementation("software.amazon.awssdk:netty-nio-client:2.20.117")
     jooqGenerator("org.postgresql:postgresql:42.6.0")
 
 }

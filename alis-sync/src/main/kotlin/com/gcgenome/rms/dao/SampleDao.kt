@@ -2,10 +2,13 @@ package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.RmsOrder
 import com.gcgenome.rms.data.Sample
+import com.gcgenome.rms.tables.references.ALIS_ORDER_MV
 import com.gcgenome.rms.tables.references.ITEM
 import com.gcgenome.rms.tables.references.SAMPLE
 import org.jooq.DSLContext
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import java.util.*
 
 interface SampleDao {
 
@@ -49,4 +52,20 @@ interface SampleDao {
         ).map { it.into(Sample::class.java) }
     }
 
+    fun DSLContext.updateSampleByGenomeBarcode(sampleId: UUID): Mono<Sample> {
+        return Mono.from(
+            update(SAMPLE)
+                .set(SAMPLE.STATE, "REPORTED")
+                .where(SAMPLE.ID.eq(sampleId))
+                .returning()
+        ).map { it.into(Sample::class.java) }
+    }
+
+    fun DSLContext.searchSampleReportByFileServer(): Flux<Sample> {
+        return Flux.from(
+            select(SAMPLE).from(SAMPLE)
+                .join(ITEM).on(SAMPLE.ITEM_ID.eq(ITEM.ID))
+                .orderBy(SAMPLE.CREATE_AT.asc(), SAMPLE.GENOME_BARCODE.asc(), ITEM.SERVICE_ID.asc())
+        ).map { it.into(Sample::class.java) }
+    }
 }
