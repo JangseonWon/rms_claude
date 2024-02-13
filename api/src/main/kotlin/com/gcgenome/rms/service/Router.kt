@@ -17,10 +17,10 @@ class Router (private val handler: Handler) {
     fun route() = router { GET("/api/services", contentType(MediaType("application", "vnd.api.v1", Charsets.UTF_8)), ::services) }
 
     private fun services(request: ServerRequest): Mono<ServerResponse> {
-        return request
-            .principal()
+        return request.principal()
             .cast(SecurityContextRepository.UserAuthentication::class.java)
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(handler.list(it.principal), Service::class.java) }
+            .flatMap { handler.list(it.principal).collectList() }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), Service::class.java) }
             .switchIfEmpty(ServerResponse.status(HttpStatus.NO_CONTENT).build())
             .onErrorResume { e ->
                 e.printStackTrace()

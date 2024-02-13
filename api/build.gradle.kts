@@ -28,8 +28,8 @@ jib {
         image = "image-registry.apps.gcgenome.com/rms-test/rms-api"
         tags = setOf("latest")
         auth {
-            username = System.getenv("REGISTRY_USERNAME")
-            password = System.getenv("REGISTRY_PASSWORD")
+            username = System.getenv("RMS_REGISTRY_USERNAME")
+            password = System.getenv("RMS_REGISTRY_PASSWORD")
         }
     }
     container { environment = mapOf(
@@ -52,9 +52,11 @@ jooq {
                 logging = Logging.WARN
                 jdbc.apply {
                     driver = "org.postgresql.Driver"
-                    url = "jdbc:postgresql://172.19.208.223:5432/rms"
-                    user = System.getenv("POSTGRES_USERNAME")
-                    password = System.getenv("POSTGRES_PASSWORD")
+                    //url = "jdbc:postgresql://libra:5432/report_service"
+                    url = if (System.getenv("DEPLOYMENT_ENV") == "local") "jdbc:postgresql://libra:5432/report_service"
+                    else "jdbc:postgresql://postgresql-pooler:5432/rms"
+                    user = System.getenv("RMS_POSTGRES_USERNAME")
+                    password = System.getenv("RMS_POSTGRES_PASSWORD")
                 }
                 generator.apply {
                     name = "org.jooq.codegen.KotlinGenerator"
