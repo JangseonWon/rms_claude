@@ -3,16 +3,26 @@ package com.gcgenome.rms.entity
 import jakarta.persistence.*
 
 @Entity
-@Table(schema = "public", name = "service")
+@Table(schema = "rms_dev", name = "service")
 data class Service(
     @Id
     @Column(name = "id", length = 8)
-    val id: String = "",
-    @Column(name = "name", length = 64)
-    val name: String = "",
+    val id: String,
+    @Column(name = "name", length = 64, nullable = false)
+    val name: String,
+
+    @ManyToOne
+    @JoinColumn(name = "category_id", insertable = false, updatable = false, nullable = true)
+    val categoryId: Category,
+
+    @OneToMany(mappedBy = "serviceId")
+    val user: List<UserService>,
+    @OneToMany(mappedBy = "serviceId")
+    val item: List<Item>,
     @OneToMany(mappedBy = "serviceId")
     val serviceSampleType: List<ServiceSampleType>,
     @OneToMany(mappedBy = "serviceId")
     val serviceExtension: List<ServiceExtension>
+
 
 )

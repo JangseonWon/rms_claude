@@ -4,26 +4,23 @@ import jakarta.persistence.*
 import java.io.Serializable
 
 @Entity
-@Table(schema = "public", name = "service_extension")
+@Table(schema = "rms_dev", name = "service_extension")
 data class ServiceExtension(
     @EmbeddedId
     val pk: ServiceExtensionPK,
-    @Column(name = "required")
-    val required: Boolean
+    @Column(name = "required", nullable = false)
+    val required: Boolean,
 
-){
     @ManyToOne
     @JoinColumn(name = "service_id", insertable = false, updatable = false)
-    lateinit var serviceId: Service
+    val serviceId: Service,
     @ManyToOne
     @JoinColumn(name = "extension_id", insertable = false, updatable = false)
-    lateinit var extensionId: Extension
-
-    companion object {
-        @Embeddable
-        data class ServiceExtensionPK(
-            @Column(name = "service_id") val serviceId: String,
-            @Column(name = "extension_id") val extensionId: String
-        ) : Serializable
-    }
+    val extensionId: Extension
+){
+    @Embeddable
+    data class ServiceExtensionPK(
+        @Column(name = "service_id") val serviceId: String,
+        @Column(name = "extension_id") val extensionId: String
+    ) : Serializable
 }

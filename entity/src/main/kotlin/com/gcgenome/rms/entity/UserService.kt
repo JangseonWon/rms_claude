@@ -2,27 +2,27 @@ package com.gcgenome.rms.entity
 
 import jakarta.persistence.*
 import java.io.Serializable
+import java.time.LocalDateTime
 
 @Entity
-@Table(schema = "public", name = "user_service")
+@Table(schema = "rms_dev", name = "user_service")
 data class UserService(
     @EmbeddedId
-    val pk: UserServicePK
+    val pk: UserServicePK,
+    @Column(name = "create_at", nullable = false)
+    val createAt: LocalDateTime,
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", insertable = false, updatable = false, nullable = false)
+    val userId: User,
+    @ManyToOne
+    @JoinColumn(name = "service_id", insertable = false, updatable = false, nullable = false)
+    val serviceId: Service
 ){
-    @ManyToOne
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
-    lateinit var userId: User
+    @Embeddable
+    data class UserServicePK(
+        @Column(name = "user_id") val userId: String,
+        @Column(name = "service_id") val serviceId: String
+    ) : Serializable
 
-    @ManyToOne
-    @JoinColumn(name = "service_id", insertable = false, updatable = false)
-    lateinit var serviceId: Service
-
-    companion object {
-        @Embeddable
-        data class UserServicePK(
-            @Column(name = "user_id") val userId: String,
-            @Column(name = "service_id") val serviceId: String
-        ) : Serializable
-    }
 }

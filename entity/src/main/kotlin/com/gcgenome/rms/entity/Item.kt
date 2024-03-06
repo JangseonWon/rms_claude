@@ -2,29 +2,31 @@ package com.gcgenome.rms.entity
 
 import jakarta.persistence.*
 import org.springframework.data.annotation.CreatedDate
+import java.io.Serializable
 import java.time.LocalDateTime
 import java.util.*
 
 @Entity
-@Table(schema = "public", name = "item")
+@Table(schema = "rms_dev", name = "item")
 data class Item(
-    @Id
-    @Column(name = "id")
-    val id: UUID,
-    @Column(name = "serial", length = 64)
+    @EmbeddedId
+    val pk: ItemPK,
+    @Column(name = "serial", length = 64, nullable = true)
     val serial: String,
+
+    @OneToMany(mappedBy = "itemId")
+    val sample: List<Sample>,
+
     @ManyToOne
-    @JoinColumn(name = "service_id")
-    val serviceId: Service,
+    @JoinColumn(name = "order_id", insertable = false, updatable = false)
+    val orderId: Order,
     @ManyToOne
-    @JoinColumn(name = "order_id")
-    val orderId: Order
+    @JoinColumn(name = "service_id", insertable = false, updatable = false)
+    val serviceId: Service
 ){
-    @ManyToOne
-    @JoinColumns(value = [
-        JoinColumn(name = "patient_serial", referencedColumnName = "serial", insertable=false, updatable=false),
-        JoinColumn(name = "organization_id", referencedColumnName = "organization_id", insertable=false, updatable=false),
-        JoinColumn(name = "user_id", referencedColumnName = "user_id", insertable=false, updatable=false)
-    ])
-    lateinit var patientId: Patient
+    @Embeddable
+    data class ItemPK(
+        @Column(name = "order_id") val orderId: UUID,
+        @Column(name = "service_id") val serviceId: String
+    ) : Serializable
 }

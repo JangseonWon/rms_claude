@@ -5,7 +5,7 @@ import java.io.Serializable
 import java.time.LocalDateTime
 
 @Entity
-@Table(schema = "public", name = "audit")
+@Table(schema = "rms_dev", name = "audit")
 data class Audit(
     @EmbeddedId
     val pk: AuditPK,
@@ -16,11 +16,10 @@ data class Audit(
     @Column(columnDefinition = "jsonb")
     val value: String,
 ){
-    companion object {
-        @Embeddable
-        data class AuditPK(
-            @Column(name = "create_at") val createAt: LocalDateTime,
-            @Column(name = "create_by", length=128) val createBy: String
-        ) : Serializable
-    }
+    @Embeddable
+    data class AuditPK(
+        @Column(name = "create_at") val createAt: LocalDateTime,
+        @Column(name = "create_by", length=128) val createBy: String
+    ) : Serializable
 }
+
