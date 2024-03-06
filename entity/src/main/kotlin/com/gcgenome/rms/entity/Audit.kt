@@ -22,4 +22,3 @@ data class Audit(
         @Column(name = "create_by", length=128) val createBy: String
     ) : Serializable
 }
-
