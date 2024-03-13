@@ -17,20 +17,20 @@ import org.springframework.web.server.ServerWebInputException
 import reactor.core.publisher.Mono
 
 @Configuration
-class OrderRouter (
-    private val handler: OrderHandler
+class CartRouter (
+    private val handler: CartHandler
 ){
-    @Bean("OrderServiceRouter")
+    @Bean("CartServiceRouter")
     fun route() = router {
-        PUT("/w-api/product-service/orders", ::orders)
+        PUT("/w-api/product-service/carts", ::cart)
     }
 
-    private fun orders(request: ServerRequest): Mono<ServerResponse> {
+    private fun cart(request: ServerRequest): Mono<ServerResponse> {
         return request
             .principal()
             .cast(SecurityContextRepository.UserAuthentication::class.java)
             .zipWith(request.bodyToMono(object : ParameterizedTypeReference<List<Item>>() {}))
-            .flatMap { handler.insertOrderRequest(it.t1.principal, it.t2) }
+            .flatMap { handler.insertCartRequest(it.t1.principal, it.t2) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), Order::class.java) }
             .onErrorResume (ServiceNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
             .onErrorResume (ServiceSampleTypeNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }

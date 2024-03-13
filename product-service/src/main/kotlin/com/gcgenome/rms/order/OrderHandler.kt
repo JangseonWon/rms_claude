@@ -3,9 +3,11 @@ package com.gcgenome.rms.order
 import com.gcgenome.rms.dao.*
 import com.gcgenome.rms.data.Item
 import com.gcgenome.rms.data.Sample
+import com.gcgenome.rms.data.Status
 import com.gcgenome.rms.exceptions.ServiceNotFoundException
 import com.gcgenome.rms.exceptions.ServiceSampleTypeNotFoundException
 import com.gcgenome.rms.exceptions.OrganizationNotFoundException
+import com.gcgenome.rms.tables.records.OrderRecord
 import com.gcgenome.rms.tables.records.OrganizationRecord
 import com.gcgenome.rms.tables.records.ServiceSampleTypeRecord
 import com.gcgenome.rms.tables.records.UserServiceRecord
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -32,18 +35,7 @@ class OrderHandler(
                     .then(checkOrganization(userId, items.patient.organization.id, trx))
                     .then(insertPatient(items.patient.organization.id, userId, items.patient))
                     .then(insertItem(orderRecord.id!!, items.serviceId, items.serial))
-                    .thenMany(Flux.fromIterable(items.patient.samples)
-                        .concatMap { sample ->
-                            checkServiceSampleTypeById(sample.sampleTypeId!!, items.serviceId, trx)
-                                .then(selectUserById(userId))
-                                .flatMap { userRecord ->
-                                    generateSampleBarcode(userRecord.branchSerial, trx).flatMap { barcode ->
-                                        insertSampleAndExtensions(userRecord.id, orderRecord.id!!, items.serviceId, sample, items.patient.serial,
-                                                items.patient.organization.id, barcode!!, "ordered", trx)
-                                    }
-                                }
-                        }
-                    )
+                    .thenMany(insertSampleProcess(userId, orderRecord, items, Status.ORDERED, trx))
                     .then(selectItemById(orderRecord.id!!, userId))
                 } }.collectList()
         } })
@@ -75,14 +67,29 @@ class OrderHandler(
             .switchIfEmpty(Mono.error(ServiceSampleTypeNotFoundException(sampleTypeId, serviceId)))
     }
 
-    fun insertSampleAndExtensions(userId: String, orderId: UUID, serviceId: String, sample: Sample,
-                                  patientSerial: String, organizationId: String, barcode: String, status: String, trx: Configuration
-    ): Mono<Void> {
-        return trx.dsl().insertSample(userId, orderId, serviceId, sample, patientSerial, organizationId, barcode, status)
+    fun insertSampleAndExtensions(userId: String, orderId: UUID, item: Item, sample: Sample, barcode: String, status: String, trx: Configuration): Mono<Void> {
+        return trx.dsl().insertSample(userId, orderId, item.serviceId, sample,
+            item.patient.serial, item.patient.organization.id, barcode, status)
             .flatMap { sampleRecord ->
                 Flux.fromIterable(sample.extensions ?: emptyList())
                     .flatMap { extension -> trx.dsl().insertSampleExtension(extension, sampleRecord.id!!) }
                     .then()
+            }
+    }
+
+    fun insertSampleProcess(userId: String, orderRecord: OrderRecord, items: Item, status: Status,trx: Configuration): Flux<Void> {
+        return Flux.fromIterable(items.patient.samples)
+            .concatMap { sample ->
+                checkServiceSampleTypeById(sample.sampleTypeId!!, items.serviceId, trx)
+                    .then(trx.dsl().selectUserById(userId))
+                    .flatMap { userRecord ->
+                        generateSampleBarcode(userRecord.branchSerial, trx)
+                            .flatMap { barcode ->
+                                if (status == Status.CART) sample.apply { cartAt = LocalDateTime.now() }
+                                insertSampleAndExtensions(userRecord.id, orderRecord.id!!, items,
+                                    sample, barcode, status.toString(), trx)
+                            }
+                    }
             }
     }
 }
