@@ -9,6 +9,7 @@ include("alis-api")
 include("alis-sync")
 include("api")
 include("login")
+include("organization-service")
 
 
 dependencyResolutionManagement {
