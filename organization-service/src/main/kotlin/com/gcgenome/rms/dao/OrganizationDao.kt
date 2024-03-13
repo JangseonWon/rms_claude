@@ -9,22 +9,15 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 interface OrganizationDao {
-    fun DSLContext.insertOrganization(userId: String, organization: Organization?): Mono<Organization> {
+    fun DSLContext.insertOrganization(userId: String, organization: Organization): Mono<Organization> {
         return Mono.from(
             insertInto(ORGANIZATION)
-                .set(ORGANIZATION.ID, organization?.id?: userId)
-                .set(ORGANIZATION.NAME, organization?.name)
-                .set(ORGANIZATION.TYPE, organization?.type)
+                .set(ORGANIZATION.ID, organization.id)
                 .set(ORGANIZATION.USER_ID, userId)
-                .set(ORGANIZATION.REGISTRATION_NUMBER, organization?.registrationNumber)
-                .set(ORGANIZATION.NURSING_NUMBER,organization?.nursingNumber)
-                .onDuplicateKeyUpdate()
-                .set(ORGANIZATION.NAME, organization?.name)
-                .set(ORGANIZATION.TYPE, organization?.type)
-                .set(ORGANIZATION.USER_ID, userId)
-                .set(ORGANIZATION.REGISTRATION_NUMBER, organization?.registrationNumber)
-                .set(ORGANIZATION.NURSING_NUMBER, organization?.nursingNumber)
-                .where(ORGANIZATION.ID.eq(organization?.id ?: userId))
+                .set(ORGANIZATION.NAME, organization.name)
+                .set(ORGANIZATION.TYPE, organization.type)
+                .set(ORGANIZATION.REGISTRATION_NUMBER, organization.registrationNumber)
+                .set(ORGANIZATION.NURSING_NUMBER,organization.nursingNumber)
                 .returning()
         ).map{it.into(Organization::class.java) }
     }
@@ -35,10 +28,12 @@ interface OrganizationDao {
             "name" -> ORGANIZATION.NAME
             else -> ORGANIZATION.ID
         }
+
         val asc : SortOrder = when (query.asc) {
             true -> SortOrder.ASC
             false -> SortOrder.DESC
         }
+
         return Flux.from(selectFrom(ORGANIZATION).where(where.and(ORGANIZATION.USER_ID.eq(userId)))
             .orderBy(order.sort(asc))
             .limit(query.size)

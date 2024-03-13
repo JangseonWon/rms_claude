@@ -15,7 +15,6 @@ import reactor.core.publisher.Mono
 class OrganizationHandler(
     val dslContext: DSLContext
 ): OrganizationDao {
-
     fun insertOrganization(userId: String, organization: Organization) : Mono<Organization> {
         return dslContext.insertOrganization(userId, organization)
     }

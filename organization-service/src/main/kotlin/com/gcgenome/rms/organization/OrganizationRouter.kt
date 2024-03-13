@@ -3,6 +3,9 @@ package com.gcgenome.rms.organization
 import com.gcgenome.rms.config.SecurityContextRepository
 import com.gcgenome.rms.data.Organization
 import com.gcgenome.rms.data.Query
+import com.gcgenome.rms.exception.WebInputException
+import org.jooq.exception.DataAccessException
+import org.jooq.exception.IntegrityConstraintViolationException
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
@@ -10,6 +13,7 @@ import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.router
+import org.springframework.web.server.ServerWebInputException
 import reactor.core.publisher.Mono
 
 @Configuration
@@ -26,12 +30,10 @@ class OrganizationRouter (
         return request.principal()
             .cast(SecurityContextRepository.UserAuthentication::class.java)
             .zipWith(request.bodyToMono(Organization::class.java))
-            .flatMap {
-                organizationHandler.insertOrganization(it.t1.principal, it.t2) }
-            .flatMap { organization ->
-                ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(organization)
-            }.onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
+            .flatMap { organizationHandler.insertOrganization(it.t1.principal, it.t2) }
+            .flatMap { organization -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(organization) }
+            .onErrorResume (ServerWebInputException::class.java) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue(WebInputException().message.toString()) }
+            .onErrorResume (IntegrityConstraintViolationException::class.java) {ServerResponse.status(HttpStatus.CONFLICT).bodyValue("Duplicate key error")}
     }
 
     fun selectOrganizations(request: ServerRequest): Mono<ServerResponse> {
