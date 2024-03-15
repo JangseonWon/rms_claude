@@ -1,12 +1,12 @@
-package com.gcgenome.rms.order
+package com.gcgenome.rms.service
 
 import com.gcgenome.rms.dao.*
 import com.gcgenome.rms.data.Item
 import com.gcgenome.rms.data.Sample
 import com.gcgenome.rms.data.Status
+import com.gcgenome.rms.exceptions.OrganizationNotFoundException
 import com.gcgenome.rms.exceptions.ServiceNotFoundException
 import com.gcgenome.rms.exceptions.ServiceSampleTypeNotFoundException
-import com.gcgenome.rms.exceptions.OrganizationNotFoundException
 import com.gcgenome.rms.tables.records.OrderRecord
 import com.gcgenome.rms.tables.records.OrganizationRecord
 import com.gcgenome.rms.tables.records.ServiceSampleTypeRecord

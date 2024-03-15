@@ -5,7 +5,6 @@ import com.gcgenome.rms.tables.records.PatientRecord
 import com.gcgenome.rms.tables.references.PATIENT
 import org.jooq.DSLContext
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
 
 interface PatientDao{
     fun DSLContext.insertPatient(organizationId: String, userId: String, patient: Patient): Mono<PatientRecord> {

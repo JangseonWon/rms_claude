@@ -1,4 +1,4 @@
-package com.gcgenome.rms.order
+package com.gcgenome.rms.service
 
 import com.gcgenome.rms.config.SecurityContextRepository
 import com.gcgenome.rms.data.Item
