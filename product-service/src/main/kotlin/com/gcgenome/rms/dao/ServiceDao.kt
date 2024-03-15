@@ -13,7 +13,6 @@ interface ServiceDao {
         return Flux.from(
             selectFrom(SERVICE).where(SERVICE.CATEGORY_ID.eq(categoryId))
         )
-
     }
 
     fun DSLContext.checkServiceId(serviceId: String): Mono<ServiceRecord> {

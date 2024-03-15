@@ -22,16 +22,12 @@ class ExtensionHandler(val dslContext: DSLContext): ExtensionDao, ServiceDao {
         }
     }
 
-    /*fun extensionByCategoryId(categoryId: UUID): Flux<ServiceExtension> {
+    fun extensionByCategoryId(categoryId: UUID): Flux<ServiceExtension> {
         return dslContext.run {
            checkCategoryId(categoryId)
                .switchIfEmpty(Mono.error(CategoryNotFoundException(categoryId.toString())))
-               .then(selectServiceByCategoryId(categoryId))
-               .flatMap { serviceIds ->
-                   val serviceIdList = serviceIds.split(",").map { it.trim() }
-                   selectExtensionByCategory(*serviceIdList.toTypedArray())
-               }
+               .flatMapMany { selectExtensionByCategory(categoryId) }
         }
-    }*/
+    }
 }
 

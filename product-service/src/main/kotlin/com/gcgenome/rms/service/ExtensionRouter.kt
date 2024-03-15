@@ -20,7 +20,7 @@ class ExtensionRouter (private val handler: ExtensionHandler){
     @Bean("ExtensionServiceRouter")
     fun route() = router {
         GET("/w-api/product-service/services/{serviceId}/extensions", ::serviceExtensions)
-//        GET("/w-api/product-service/categories/{categoryId}/extensions", ::categoryExtensions)
+        GET("/w-api/product-service/categories/{categoryId}/extensions", ::categoryExtensions)
     }
 
     private fun serviceExtensions(request: ServerRequest): Mono<ServerResponse> {
@@ -33,14 +33,14 @@ class ExtensionRouter (private val handler: ExtensionHandler){
             .onErrorResume (ServiceNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
     }
 
-    /*private fun categoryExtensions(request: ServerRequest): Mono<ServerResponse> {
-        val categoryId = UUID.fromString(request.pathVariable("categoryId"))
+    private fun categoryExtensions(request: ServerRequest): Mono<ServerResponse> {
+        val categoryId = request.pathVariable("categoryId")
         return request
             .principal()
             .cast(SecurityContextRepository.UserAuthentication::class.java)
-            .flatMap { handler.extensionByCategoryId(categoryId).collectList() }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                .body(Mono.just(it), ServiceExtension::class.java)}
+            .flatMap { handler.extensionByCategoryId(UUID.fromString(categoryId)).collectList() }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), ServiceExtension::class.java)}
             .onErrorResume (CategoryNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
-    }*/
+            .onErrorResume (IllegalArgumentException::class.java) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("Please check the reqeust url")}
+    }
 }

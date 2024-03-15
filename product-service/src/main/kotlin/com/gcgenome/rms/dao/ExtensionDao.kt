@@ -31,7 +31,8 @@ interface ExtensionDao{
         ).map { it.into(ServiceExtension::class.java) }
     }
 
-    fun DSLContext.selectExtensionByCategory(vararg serviceIds: String): Flux<ServiceExtension> {
+
+    fun DSLContext.selectExtensionByCategory(categoryId: UUID): Flux<ServiceExtension> {
         return Flux.from(
             select(
                 DSL.jsonObject(
@@ -45,10 +46,12 @@ interface ExtensionDao{
                         .from(EXTENSION)
                         .join(SERVICE_EXTENSION).on(EXTENSION.ID.eq(SERVICE_EXTENSION.EXTENSION_ID))
                         .join(SERVICE).on(SERVICE_EXTENSION.SERVICE_ID.eq(SERVICE.ID))
-                        .where(SERVICE.ID.`in`(*serviceIds)).asTable("ext")
+                        .where(SERVICE.CATEGORY_ID.eq(categoryId))
+                        .asTable("ext")
             )
         ).map { it.into(ServiceExtension::class.java) }
     }
+
 
     fun DSLContext.insertSampleExtension(sampleExtension: Extension, sampleId: UUID): Mono<SampleExtensionRecord> {
         return Mono.from(
