@@ -1,9 +1,12 @@
 package com.gcgenome.rms.organization
 
 import com.gcgenome.rms.dao.OrganizationDao
-import com.gcgenome.rms.data.Organization
+import com.gcgenome.rms.data.PatchOrganization
 import com.gcgenome.rms.data.Page
 import com.gcgenome.rms.data.Query
+import com.gcgenome.rms.exception.OrganizationNotFoundException
+import com.gcgenome.rms.tables.pojos.Organization
+import com.gcgenome.rms.tables.references.ORGANIZATION
 import org.jooq.Condition
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
@@ -17,6 +20,15 @@ class OrganizationHandler(
 ): OrganizationDao {
     fun insertOrganization(userId: String, organization: Organization) : Mono<Organization> {
         return dslContext.insertOrganization(userId, organization)
+    }
+
+    fun getOrganizationById(id: String) : Mono<Organization>{
+        return dslContext.getOrganizationById(id)
+            .switchIfEmpty(Mono.error(OrganizationNotFoundException()));
+    }
+
+    fun updateOrganization(patchOrganization: PatchOrganization) : Mono<Organization> {
+        return dslContext.updateOrganization(patchOrganization)
     }
 
     fun selectOrganizations(userId: String, query: Query): Mono<Page<Organization>> {
@@ -38,13 +50,10 @@ class OrganizationHandler(
         val conditions = filters.map { filter ->
             val key = filter.key
             val value = filter.value
-            when (key) {
-                "name", "registration_number" -> {
-                    value?.takeIf { it.isNotBlank() }?.let {
-                        field(key).like("%$it%") as Condition?
-                    }
+            key?.let {
+                value?.takeIf { it.isNotBlank() }?.let {
+                    field(key).like("%$it%") as Condition?
                 }
-                else -> throw IllegalArgumentException("제공하지 않는 컬럼 명: $key")
             }
         }
 

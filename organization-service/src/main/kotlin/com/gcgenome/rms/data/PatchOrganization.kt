@@ -2,13 +2,13 @@ package com.gcgenome.rms.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-data class Organization(
+data class PatchOrganization(
     @JsonProperty("id")
-    val id:String,
+    var id:String?,
     @JsonProperty("user_id")
-    val userId:String,
+    val userId:String?,
     @JsonProperty("name")
-    val name:String,
+    val name:String?,
     @JsonProperty("type")
     val type:String?,
     @JsonProperty("registration_number")

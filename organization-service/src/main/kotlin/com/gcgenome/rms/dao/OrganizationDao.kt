@@ -1,10 +1,11 @@
 package com.gcgenome.rms.dao
 
-import com.gcgenome.rms.data.Organization
+import com.gcgenome.rms.data.PatchOrganization
 import com.gcgenome.rms.data.Query
-import com.gcgenome.rms.tables.records.OrganizationRecord
+import com.gcgenome.rms.tables.pojos.Organization
 import com.gcgenome.rms.tables.references.ORGANIZATION
 import org.jooq.*
+import org.jooq.impl.DSL.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
@@ -22,20 +23,33 @@ interface OrganizationDao {
         ).map{it.into(Organization::class.java) }
     }
 
-    fun DSLContext.selectOrganizations(query: Query, where: Condition, userId: String): Flux<Organization> {
-        val order : TableField<OrganizationRecord, String?> = when (query.sortBy) {
-            "id" -> ORGANIZATION.ID
-            "name" -> ORGANIZATION.NAME
-            else -> ORGANIZATION.ID
-        }
+    fun DSLContext.updateOrganization(patchOrganization: PatchOrganization): Mono<Organization> {
+        return Mono.from(
+            update(ORGANIZATION)
+                .set(ORGANIZATION.NAME, coalesce(`val`(patchOrganization.name), ORGANIZATION.NAME))
+                .set(ORGANIZATION.TYPE, coalesce(`val`(patchOrganization.type), ORGANIZATION.TYPE))
+                .set(ORGANIZATION.REGISTRATION_NUMBER, coalesce(`val`(patchOrganization.registrationNumber), ORGANIZATION.REGISTRATION_NUMBER))
+                .set(ORGANIZATION.NURSING_NUMBER,coalesce(`val`(patchOrganization.nursingNumber), ORGANIZATION.NURSING_NUMBER))
+                .where(ORGANIZATION.ID.eq(patchOrganization.id))
+                .returning()
+        ).map{it.into(Organization::class.java) }
+    }
 
+    fun DSLContext.getOrganizationById(id: String) : Mono<Organization>{
+        return Mono.from(
+            selectFrom(ORGANIZATION)
+                .where(ORGANIZATION.ID.eq(id)))
+            .map { it.into(Organization::class.java) }
+    }
+
+    fun DSLContext.selectOrganizations(query: Query, where: Condition, userId: String): Flux<Organization> {
         val asc : SortOrder = when (query.asc) {
             true -> SortOrder.ASC
             false -> SortOrder.DESC
         }
 
         return Flux.from(selectFrom(ORGANIZATION).where(where.and(ORGANIZATION.USER_ID.eq(userId)))
-            .orderBy(order.sort(asc))
+            .orderBy(field(query.sortBy).sort(asc))
             .limit(query.size)
             .offset(query.page*query.size)
         ).map{it.into(Organization::class.java)}
