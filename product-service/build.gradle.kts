@@ -18,6 +18,8 @@ dependencies {
     implementation("org.jooq:jooq-codegen:3.18.2")
     implementation("org.jooq:jooq-meta:3.18.2")
     jooqGenerator("org.postgresql:postgresql:42.6.0")
+    implementation("org.apache.poi:poi:5.1.0")
+    implementation("org.apache.poi:poi-ooxml:5.1.0")
 }
 jib {
     from { image = "eclipse-temurin:17.0.7_7-jre-jammy" }
