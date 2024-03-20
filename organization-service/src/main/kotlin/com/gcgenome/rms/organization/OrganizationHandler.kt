@@ -19,7 +19,8 @@ class OrganizationHandler(
     val dslContext: DSLContext
 ): OrganizationDao {
     fun insertOrganization(userId: String, organization: Organization) : Mono<Organization> {
-        return dslContext.insertOrganization(userId, organization)
+        return Mono.from(dslContext.transactionPublisher { trx ->
+            trx.dsl().run { insertOrganization(userId, organization) }})
     }
 
     fun getOrganizationById(id: String) : Mono<Organization>{
@@ -28,7 +29,8 @@ class OrganizationHandler(
     }
 
     fun updateOrganization(patchOrganization: PatchOrganization) : Mono<Organization> {
-        return dslContext.updateOrganization(patchOrganization)
+        return Mono.from(dslContext.transactionPublisher { trx ->
+            trx.dsl().run { updateOrganization(patchOrganization) }})
     }
 
     fun selectOrganizations(userId: String, query: Query): Mono<Page<Organization>> {

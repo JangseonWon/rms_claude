@@ -31,7 +31,7 @@ class OrganizationRouter (
         PATCH("/w-api/organization-service/organizations/{organization_id}", ::updateOrganization)
     }
 
-    fun insertOrganization(request: ServerRequest) : Mono<ServerResponse> {
+    private fun insertOrganization(request: ServerRequest) : Mono<ServerResponse> {
         return request.principal()
             .cast(SecurityContextRepository.UserAuthentication::class.java)
             .zipWith(request.bodyToMono(Organization::class.java))
@@ -41,7 +41,7 @@ class OrganizationRouter (
             .onErrorResume (IntegrityConstraintViolationException::class.java) {ServerResponse.status(HttpStatus.CONFLICT).bodyValue("Duplicate key error")}
     }
 
-    fun getOrganizationById(request: ServerRequest) : Mono<ServerResponse> {
+    private fun getOrganizationById(request: ServerRequest) : Mono<ServerResponse> {
         val id = request.pathVariable("organization_id")
         return request.principal()
             .flatMap { organizationHandler.getOrganizationById(id) }
@@ -49,7 +49,7 @@ class OrganizationRouter (
             .onErrorResume (OrganizationNotFoundException::class.java) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${it.message}") }
     }
 
-    fun updateOrganization(request: ServerRequest) : Mono<ServerResponse> {
+    private fun updateOrganization(request: ServerRequest) : Mono<ServerResponse> {
         val organizationId = request.pathVariable("organization_id")
         return request.principal()
             .then(request.bodyToMono(PatchOrganization::class.java))
@@ -58,7 +58,7 @@ class OrganizationRouter (
             .onErrorResume (ServerWebInputException::class.java) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue(WebInputException().message.toString()) }
     }
 
-    fun selectOrganizations(request: ServerRequest): Mono<ServerResponse> {
+    private fun selectOrganizations(request: ServerRequest): Mono<ServerResponse> {
         return request.principal()
             .cast(SecurityContextRepository.UserAuthentication::class.java)
             .zipWith(request.bodyToMono(Query::class.java))
