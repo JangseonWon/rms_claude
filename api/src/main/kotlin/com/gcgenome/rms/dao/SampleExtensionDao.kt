@@ -10,16 +10,6 @@ import reactor.kotlin.core.publisher.toMono
 import java.util.*
 
 interface SampleExtensionDao{
-    fun DSLContext.insertSampleExtension(sampleExtension: Extension, sampleId: UUID): Mono<SampleExtension> {
-        return Mono.from(
-            insertInto(SAMPLE_EXTENSION)
-                .set(SAMPLE_EXTENSION.EXTENSION_ID, sampleExtension.id)
-                .set(SAMPLE_EXTENSION.SAMPLE_ID, sampleId)
-                .set(SAMPLE_EXTENSION.VALUE, sampleExtension.value)
-                .returning()
-        ).map{it.into(SampleExtension::class.java)}
-    }
-
     fun DSLContext.deleteSampleExtensionBySampleId(sampleId: UUID): Mono<SampleExtension> {
         return Mono.from(
             deleteFrom(SAMPLE_EXTENSION)

@@ -9,7 +9,7 @@ import reactor.core.publisher.Flux
 class Handler(
     val dslContext: DSLContext
 ):UserServiceDao {
-    fun list(userId: String): Flux<Service> {
+    fun getService(userId: String): Flux<Service> {
         return dslContext.selectUserService(userId)
     }
 }

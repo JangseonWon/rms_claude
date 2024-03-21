@@ -4,11 +4,11 @@ import org.jooq.meta.jaxb.SchemaMappingType
 
 plugins {
     kotlin("jvm")
-    id("org.springframework.boot") version "3.1.1"
-    id("io.spring.dependency-management") version "1.1.0"
-    id("org.jetbrains.kotlin.plugin.spring") version "1.8.22"
-    id("com.google.cloud.tools.jib") version "3.3.2"
-    id("nu.studer.jooq") version "8.1"
+    id("org.springframework.boot")
+    id("io.spring.dependency-management")
+    id("org.jetbrains.kotlin.plugin.spring")
+    id("com.google.cloud.tools.jib")
+    id("nu.studer.jooq") 
 }
 dependencies {
     implementation(libs.bundles.kotlin.webflux)
@@ -42,7 +42,6 @@ jib {
 }
 
 dependencyManagement { imports { mavenBom(libs.spring.cloud.bom.get().toString()) } }
-kotlin.jvmToolchain(17)
 tasks.processResources { if(project.gradle.startParameter.taskNames.contains("jib")) exclude("application.yml") }
 
 jooq {

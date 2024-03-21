@@ -1,141 +1,94 @@
 package com.gcgenome.rms.order
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.gcgenome.rms.dao.*
-import com.gcgenome.rms.data.Item
-import com.gcgenome.rms.data.Order
-import com.gcgenome.rms.data.Sample
+import com.gcgenome.rms.data.*
 import com.gcgenome.rms.exceptions.*
+import org.jooq.Condition
+import org.jooq.Configuration
 import org.jooq.DSLContext
+import org.jooq.impl.DSL.field
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
-import java.util.*
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.temporal.ChronoUnit
+import kotlin.reflect.full.declaredMemberProperties
 
 @Service("com.gcgenome.rms.order.Handler")
 class Handler(
     val dslContext: DSLContext
-): PatientDao, OrderDao, OrganizationDao, ItemDao, SampleExtensionDao, SampleDao, UserDao, UserServiceDao, ServiceSampleTypeDao {
-    fun insertOrder(userId: String, dto: Order): Mono<Order> {
-        return Mono.from(dslContext.transactionPublisher { trx ->
-            trx.dsl().run {
-                insertOrder(userId, dto).flatMap { orderRecord ->
-                    Flux.fromIterable(dto.items!!.toList()).flatMap { items ->
-                        selectUserServiceById(userId, items.serviceId!!)
-                        .switchIfEmpty(Mono.error(ServiceNotFoundException(items.serviceId)))
-                        .then(insertOrganization(userId, items.patient!!.organization))
-                        .then(insertPatient(items.patient.organization?.id ?: userId, userId, items.patient))
-                        .then(insertItem(userId, orderRecord.id!!, items.patient.organization?.id ?: userId, items))
-                        .flatMap { itemRecord ->
-                            Flux.fromIterable(items.patient.samples!!.toList()).flatMap { sample ->
-                                selectServiceSampleTypeById(sample.sampleTypeId, items.serviceId)
-                                .switchIfEmpty(Mono.error(ServiceSampleTypeNotFoundException(sample.sampleTypeId, items.serviceId)))
-                                .then(selectUserById(userId))
-                                .flatMap { user ->
-                                    selectSamplePostfix(user.code).flatMap { postfix ->
-                                        insertSample(items.patient.serial!!, userId, itemRecord.id!!, sample, items.patient.organization?.id ?: userId, user.code, postfix+1)
-                                            .flatMap { sampleRecord ->
-                                                Flux.fromIterable(sample.extensions?.toList() ?: listOf())
-                                                    .flatMap { extension -> insertSampleExtension(extension, sampleRecord.id!!) }
-                                                    .toMono()
-                                            }
-                                    }
-                                }
-                            }.toMono()
-                        }
-                    }.then(selectOrderById(orderRecord.id!!))
-                }
-            }
-        })
-    }
-    fun findOrder(sampleId: UUID, userId: String): Mono<Order> {
+): PatientDao, OrderDao, ItemDao, SampleExtensionDao, SampleDao, UserDao, UserServiceDao {
+
+    fun findOrder(barcode: String, userId: String): Mono<Sample> {
         return Mono.from(dslContext.transactionPublisher { trx->
             trx.dsl().run {
-                selectSampleById(sampleId)
-                    .switchIfEmpty(Mono.error(SampleNotFoundException(sampleId)))
-                    .flatMap { selectItemById(it.itemId!!) }
-                    .flatMap { selectOrderById(it.orderId!!) }
+                selectSampleByBarcode(barcode).switchIfEmpty(Mono.error(SampleNotFoundException(barcode)))
+                    .flatMap { selectSampleById(it.id!!) }
             }
         })
     }
-    fun addSample(userId: String, sampleId: UUID, dto: Array<Sample>): Mono<Order> {
-        return Mono.from(dslContext.transactionPublisher { trx ->
-            trx.dsl().run {
-                selectSampleById(sampleId)
-                    .switchIfEmpty(Mono.error(SampleNotFoundException(sampleId)))
-                    .zipWith(selectUserById(userId))
-                    .flatMap {
-                        Flux.fromIterable(dto.toList())
-                            .flatMap {sample ->
-                                selectSamplePostfix(it.t2.code).flatMap { postfix ->
-                                    insertSample(it.t1.patientSerial!!, userId, it.t1.itemId!!, sample, it.t1.organizationId!!, it.t2.code, postfix+1)
-                                        .flatMap { sampleRecord ->
-                                            Flux.fromIterable(sample.extensions?.toList() ?: listOf())
-                                                .flatMap { extension -> insertSampleExtension(extension, sampleRecord.id!!) }
-                                                .toMono()
-                                        }
-                                }
-                            }.then(selectItemById(it.t1.itemId!!))
-                    }.flatMap {
-                        selectOrderById(it.orderId!!)
-                    }
-            }
-        })
-    }
+    fun searchOrderList(condition:SampleSearchCondition): Flux<Sample>{
+        val createDateFrom = condition.filters.createAtFrom.atStartOfDay()
+        val createDateTo = condition.filters.createAtTo.atTime(LocalTime.MAX)
+        if (ChronoUnit.DAYS.between(createDateFrom,createDateTo) > 6)
+            throw MaxAllowedDaysException()
+        val whereClause = buildSelectSampleWhereClause(condition.filters, createDateFrom,createDateTo)
 
-    fun addItem(userId: String, itemId: UUID, dto: Array<Item>): Mono<Order> {
-        return Mono.from(dslContext.transactionPublisher { trx ->
+        return Flux.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
-                selectItemById(itemId)
-                    .switchIfEmpty(Mono.error(ItemNotFoundException(itemId)))
-                    .flatMap {
-                        Flux.fromIterable(dto.toList()).flatMap { items ->
-                            selectUserServiceById(userId, items.serviceId!!)
-                                .switchIfEmpty(Mono.error(ServiceNotFoundException(items.serviceId)))
-                                .then(insertOrganization(userId, items.patient!!.organization))
-                                .then(insertPatient(items.patient.organization?.id ?: userId, userId, items.patient))
-                                .then(insertItem(userId, it.orderId!!, items.patient.organization?.id ?: userId, items))
-                                .flatMap { itemRecord ->
-                                    Flux.fromIterable(items.patient.samples!!.toList()).flatMap { sample ->
-                                        selectServiceSampleTypeById(sample.sampleTypeId, items.serviceId)
-                                            .switchIfEmpty(Mono.error(ServiceSampleTypeNotFoundException(sample.sampleTypeId, items.serviceId)))
-                                            .then(selectUserById(userId))
-                                            .flatMap { user ->
-                                                selectSamplePostfix(user.code).flatMap { postfix ->
-                                                    insertSample(items.patient.serial!!, userId, itemRecord.id!!, sample, items.patient.organization?.id ?: userId, user.code, postfix+1)
-                                                        .flatMap { sampleRecord ->
-                                                            Flux.fromIterable(sample.extensions?.toList() ?: listOf())
-                                                                .flatMap { extension -> insertSampleExtension(extension, sampleRecord.id!!) }
-                                                                .toMono()
-                                                        }
-                                                }
-                                            }
-                                    }.toMono()
-                                }
-                        }.then(selectOrderById(it.orderId!!))
-                    }
+                selectSampleByCondition(condition,whereClause)
             }
         })
     }
-    fun cancelOrder(sampleId: UUID): Mono<Any> {
+    private fun buildSelectSampleWhereClause(filter:SampleSearchCondition.Companion.Filter, createDateFrom: LocalDateTime, createDateTo: LocalDateTime): Condition {
+        var whereClause: Condition = field("create_at").between(createDateFrom, createDateTo)
+
+        filter::class.declaredMemberProperties.forEach{ p ->
+            val key = p.name
+            val value = p.getter.call(filter)
+
+            if(value != null) {
+                when(key) {
+                    "barcode", "serial"  -> {
+                        whereClause = whereClause.and(field("SAMPLE.$key").like("%$value%"))
+                    }
+                    "sampleTypeId", "empId", "empName" -> {
+                        val jsonAnnotation = p.annotations.find { it is JsonProperty } as? JsonProperty
+                        val jsonName = jsonAnnotation?.value ?: key
+                        whereClause = whereClause.and(field("SAMPLE.$jsonName").like("%$value%"))
+                    }
+                    "status" -> {
+                        whereClause = whereClause.and(field(key).eq(value.toString()))
+                    }
+                    "test" -> {
+                        whereClause = whereClause.and(field("labs_test").eq(value))
+                    }
+                }
+            }
+        }
+
+        return whereClause
+    }
+    fun cancelOrder(barcode: String): Mono<Any> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
-                selectSampleById(sampleId)
-                    .switchIfEmpty(Mono.error(SampleNotFoundException(sampleId)))
-                    .flatMap { sample ->
-                        when(sample.state) {
-                            "NEW" -> {
-                                deleteSampleExtensionBySampleId(sampleId)
-                                    .then(deleteSampleById(sampleId))
-                                    .flatMap { deleteItemById(it.itemId!!) }
-                                    .flatMap { item ->
-                                        deletePatientById(item.patientSerial!!, item.organizationId!!, item.userId!!)
-                                            .then(deleteOrderById(item.orderId!!))
-                                    }
-                            }else -> Mono.error(SampleDeleteException())
-                        }
-                    }
+                selectSampleByBarcode(barcode).switchIfEmpty(Mono.error(SampleNotFoundException(barcode)))
+                    .filter{ it.status!! == Status.ORDERED.toString() }.switchIfEmpty(Mono.error(SampleDeleteException()))
+                    .flatMap { removeSample(it, trx) }
             }
+        })
+    }
+    private fun removeSample(sample: Sample, trx: Configuration): Mono<Any> {
+        return Mono.from(trx.dsl().run {
+            deleteSampleExtensionBySampleId(sample.id!!)
+                .then(deleteSampleById(sample.id!!))
+                .flatMap {
+                    deletePatientById(it.patientSerial!!, it.organizationId!!, it.userId!!)
+                        .then(deleteItemById(it.orderId!!,it.serviceId!!))
+                        .flatMap { deleteOrderById(it.orderId!!) }
+                }
         })
     }
 }

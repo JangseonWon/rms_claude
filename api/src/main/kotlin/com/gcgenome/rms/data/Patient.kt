@@ -19,7 +19,6 @@ data class Patient(
     val name: String?,
     @JsonProperty("sex")
     val sex: String?,
-
     @JsonProperty("organization")
     val organization: Organization?,
     @JsonProperty("samples")

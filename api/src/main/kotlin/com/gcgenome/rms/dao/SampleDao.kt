@@ -1,86 +1,83 @@
 package com.gcgenome.rms.dao
 
-import com.gcgenome.rms.tables.references.SAMPLE
 import com.gcgenome.rms.data.Sample
-import com.gcgenome.rms.data.SampleState
-import com.gcgenome.rms.tables.references.REPORT
-import com.gcgenome.rms.tables.references.SAMPLE_EXTENSION
+import com.gcgenome.rms.data.SampleSearchCondition
+import com.gcgenome.rms.tables.records.SampleRecord
+import com.gcgenome.rms.tables.references.*
+import org.jooq.Condition
 import org.jooq.DSLContext
+import org.jooq.SortOrder
+import org.jooq.TableField
 import org.jooq.impl.DSL.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 interface SampleDao {
-    fun DSLContext.selectSampleById(sampleId: UUID): Mono<Sample> =
-        Mono.from(selectFrom(SAMPLE).where(SAMPLE.ID.eq(sampleId))).map { it.into(Sample::class.java) }
+    fun DSLContext.selectSampleByBarcode(barcode: String): Mono<Sample> =
+        Mono.from(selectFrom(SAMPLE).where(SAMPLE.BARCODE.eq(barcode))).map { it.into(Sample::class.java) }
 
-    fun DSLContext.selectSamplePostfix(infix: Short): Mono<Int> {
-        val ofPattern = DateTimeFormatter.ofPattern("yyyyMMdd")
+    fun DSLContext.selectSampleById(sampleId: UUID) : Mono<Sample> {
         return Mono.from(
-            select(coalesce(max(SAMPLE.GENOME_BARCODE_POSTFIX), 5000))
-                .from(SAMPLE)
-                .where(SAMPLE.GENOME_BARCODE_PREFIX.eq(LocalDate.now().format(ofPattern).toInt()).and(SAMPLE.GENOME_BARCODE_INFIX.eq(infix))))
-            .mapNotNull { it.component1() }
-    }
-    fun DSLContext.insertSample(patientSerial: String, userId: String, itemId: UUID, sample: Sample, organizationId: String?, code: Short, postfix: Int): Mono<Sample> {
-        val ofPattern = DateTimeFormatter.ofPattern("yyyyMMdd")
-        return Mono.from(
-            insertInto(SAMPLE)
-                .set(SAMPLE.ID, UUID.randomUUID())
-                .set(SAMPLE.CREATE_AT, LocalDateTime.now())
-                .set(SAMPLE.LAST_MODIFY_AT, LocalDateTime.now())
-                .set(SAMPLE.GENOME_BARCODE_PREFIX, LocalDate.now().format(ofPattern).toInt())
-                .set(SAMPLE.GENOME_BARCODE_INFIX, code)
-                .set(SAMPLE.GENOME_BARCODE_POSTFIX, postfix)
-                .set(SAMPLE.GENOME_BARCODE, "${LocalDate.now().format(ofPattern).toInt()}${code}${postfix}")
-                .set(SAMPLE.SAMPLE_BARCODE, sample.sampleBarcode)
-                .set(SAMPLE.ORGANIZATION_ID, organizationId ?: userId)
-                .set(SAMPLE.PATIENT_SERIAL, patientSerial)
-                .set(SAMPLE.USER_ID, userId)
-                .set(SAMPLE.SAMPLE_TYPE_ID, sample.sampleTypeId)
-                .set(SAMPLE.AGE, sample.age)
-                .set(SAMPLE.DEPARTMENT, sample.department)
-                .set(SAMPLE.NOTE, sample.note)
-                .set(SAMPLE.REGISTRATION_AT, LocalDateTime.now())
-                .set(SAMPLE.SAMPLING, sample.sampling!!.atStartOfDay())
-                .set(SAMPLE.STATE, "NEW")
-                .set(SAMPLE.WARD, sample.ward)
-                .set(SAMPLE.PHYSICIAN, sample.physician)
-                .set(SAMPLE.ITEM_ID, itemId)
-                .set(SAMPLE.EMP_ID, sample.empId)
-                .set(SAMPLE.EMP_NAME, sample.empName)
-                .set(SAMPLE.EMP_MOBILE, sample.empMobile)
-                .returning()
-        ).map { it.into(Sample::class.java) }
-    }
-    fun DSLContext.selectSampleByCreateAt(userId: String, orderDateFrom: LocalDateTime, orderDateTo: LocalDateTime): Flux<Sample> {
-        return Flux.from(
             select(
-                SAMPLE.ID,
-                SAMPLE.CREATE_AT,
-                SAMPLE.LAST_MODIFY_AT,
+                SAMPLE.BARCODE,
+                SAMPLE.SERVICE_ID,
+                SAMPLE.STATUS,
+                SAMPLE.SERIAL,
+                SAMPLE.QUANTITY,
                 SAMPLE.AGE,
-                SAMPLE.SAMPLING,
-                SAMPLE.NOTE,
-                SAMPLE.GENOME_BARCODE,
-                SAMPLE.SAMPLE_BARCODE,
-                SAMPLE.SAMPLE_TYPE_ID,
+                SAMPLE.MEMO,
                 SAMPLE.DEPARTMENT,
                 SAMPLE.WARD,
                 SAMPLE.PHYSICIAN,
-                SAMPLE.STATE,
-                jsonArrayAgg(jsonObject(
-                    key("id").value(SAMPLE_EXTENSION.EXTENSION_ID),
-                    key("value").value(SAMPLE_EXTENSION.VALUE)
-                )).`as`("extensions"),
+                SAMPLE.SAMPLING,
+                SAMPLE.CREATE_AT,
+                SAMPLE.SPECIFIED_AT,
+                SAMPLE.COMPLETE_AT,
+                SAMPLE.RESAMPLE_AT,
+                SAMPLE.LAST_MODIFY_AT,
+                SAMPLE.EMP_ID,
+                SAMPLE.EMP_NAME,
+                SAMPLE.EMP_MOBILE,
+                SAMPLE.LABS_TEST,
+                SAMPLE.LABS_CREDIT,
+                SAMPLE.LABS_PRICE,
+                SAMPLE.LABS_OUTSOURCING_COST,
+                SAMPLE.SAMPLE_TYPE_ID,
+                jsonObject(
+                    key("serial").value(PATIENT.SERIAL),
+                    key("name").value(PATIENT.NAME),
+                    key("sex").value(PATIENT.SEX),
+                    key("name").value(PATIENT.NAME),
+                    key("birth_year").value(PATIENT.BIRTH_YEAR),
+                    key("birth_month").value(PATIENT.BIRTH_MONTH),
+                    key("birth_day").value(PATIENT.BIRTH_DAY),
+                    key("organization").value(
+                        select(
+                            jsonObject(
+                                key("id").value(ORGANIZATION.ID),
+                                key("name").value(ORGANIZATION.NAME),
+                                key("type").value(ORGANIZATION.TYPE),
+                                key("registration_number").value(ORGANIZATION.REGISTRATION_NUMBER),
+                                key("nursing_number").value(ORGANIZATION.NURSING_NUMBER)
+                            )
+                        ).from(ORGANIZATION)
+                            .where(PATIENT.ORGANIZATION_ID.eq(ORGANIZATION.ID)
+                                .and(PATIENT.USER_ID.eq(ORGANIZATION.USER_ID))
+                                .and(ORGANIZATION.USER_ID.ne(ORGANIZATION.ID)))
+                    )
+                ).`as`("patient"),
                 field(
                     select(
                         jsonArrayAgg(jsonObject(
-                            key("id").value(REPORT.ID),
+                            key("id").value(SAMPLE_EXTENSION.EXTENSION_ID),
+                            key("value").value(SAMPLE_EXTENSION.VALUE)
+                        ))
+                    ).from(SAMPLE_EXTENSION).where(SAMPLE.ID.eq(SAMPLE_EXTENSION.SAMPLE_ID))
+                ).`as`("extensions"),
+                field(
+                    select(
+                        jsonArrayAgg(jsonObject(
                             key("create_at").value(REPORT.CREATE_AT),
                             key("reported_at").value(REPORT.REPORTED_AT),
                             key("type").value(REPORT.TYPE),
@@ -89,18 +86,111 @@ interface SampleDao {
                     ).from(REPORT).where(SAMPLE.ID.eq(REPORT.SAMPLE_ID))
                 ).`as`("reports")
             ).from(SAMPLE)
-            .join(SAMPLE_EXTENSION).on(SAMPLE.ID.eq(SAMPLE_EXTENSION.SAMPLE_ID))
-            .where(SAMPLE.USER_ID.eq(userId)
-                .and(SAMPLE.CREATE_AT.between(orderDateFrom, orderDateTo))
-                .and(SAMPLE.STATE.eq(SampleState.FINISHED.name))
-            ).groupBy(SAMPLE.ID))
-            .map { it.into(Sample::class.java) }
+                .join(PATIENT).on(SAMPLE.PATIENT_SERIAL.eq(PATIENT.SERIAL)
+                    .and(SAMPLE.ORGANIZATION_ID.eq(PATIENT.ORGANIZATION_ID))
+                    .and(SAMPLE.USER_ID.eq(PATIENT.USER_ID)))
+                .where(SAMPLE.ID.eq(sampleId))
+        ).map { it.into(Sample::class.java) }
+
+    }
+
+    fun DSLContext.selectSampleByCondition(condition: SampleSearchCondition, whereClause:Condition): Flux<Sample> {
+        val order : TableField<SampleRecord,out Any?> = when (condition.sort?.field) {
+            "create_at" -> SAMPLE.CREATE_AT
+            "id" -> SAMPLE.BARCODE
+            "status" -> SAMPLE.STATUS
+            "serial" -> SAMPLE.SERIAL
+            "sample_type" -> SAMPLE.SAMPLE_TYPE_ID
+            "emp_id" -> SAMPLE.EMP_ID
+            "emp_name" -> SAMPLE.EMP_NAME
+            "test" -> SAMPLE.LABS_TEST
+            else -> SAMPLE.CREATE_AT
+        }
+
+        val asc: SortOrder = when (condition.sort?.asc) {
+            true -> SortOrder.ASC
+            false -> SortOrder.DESC
+            else -> SortOrder.DEFAULT
+        }
+
+        return Flux.from(
+            select(
+                SAMPLE.BARCODE,
+                SAMPLE.SERVICE_ID,
+                SAMPLE.STATUS,
+                SAMPLE.SERIAL,
+                SAMPLE.QUANTITY,
+                SAMPLE.AGE,
+                SAMPLE.MEMO,
+                SAMPLE.DEPARTMENT,
+                SAMPLE.WARD,
+                SAMPLE.PHYSICIAN,
+                SAMPLE.SAMPLING,
+                SAMPLE.CREATE_AT,
+                SAMPLE.SPECIFIED_AT,
+                SAMPLE.COMPLETE_AT,
+                SAMPLE.RESAMPLE_AT,
+                SAMPLE.LAST_MODIFY_AT,
+                SAMPLE.EMP_ID,
+                SAMPLE.EMP_NAME,
+                SAMPLE.EMP_MOBILE,
+                SAMPLE.LABS_TEST,
+                SAMPLE.LABS_CREDIT,
+                SAMPLE.LABS_PRICE,
+                SAMPLE.LABS_OUTSOURCING_COST,
+                SAMPLE.SAMPLE_TYPE_ID,
+                jsonObject(
+                    key("serial").value(PATIENT.SERIAL),
+                    key("name").value(PATIENT.NAME),
+                    key("sex").value(PATIENT.SEX),
+                    key("name").value(PATIENT.NAME),
+                    key("birth_year").value(PATIENT.BIRTH_YEAR),
+                    key("birth_month").value(PATIENT.BIRTH_MONTH),
+                    key("birth_day").value(PATIENT.BIRTH_DAY),
+                    key("organization").value(
+                        select(
+                            jsonObject(
+                                key("id").value(ORGANIZATION.ID),
+                                key("name").value(ORGANIZATION.NAME),
+                                key("type").value(ORGANIZATION.TYPE),
+                                key("registration_number").value(ORGANIZATION.REGISTRATION_NUMBER),
+                                key("nursing_number").value(ORGANIZATION.NURSING_NUMBER)
+                            )
+                        ).from(ORGANIZATION)
+                            .where(PATIENT.ORGANIZATION_ID.eq(ORGANIZATION.ID)
+                                .and(PATIENT.USER_ID.eq(ORGANIZATION.USER_ID))
+                                .and(ORGANIZATION.USER_ID.ne(ORGANIZATION.ID)))
+                    )
+                ).`as`("patient"),
+                field(
+                    select(
+                        jsonArrayAgg(jsonObject(
+                            key("id").value(SAMPLE_EXTENSION.EXTENSION_ID),
+                            key("value").value(SAMPLE_EXTENSION.VALUE)
+                        ))
+                    ).from(SAMPLE_EXTENSION).where(SAMPLE.ID.eq(SAMPLE_EXTENSION.SAMPLE_ID))
+                ).`as`("extensions"),
+                field(
+                    select(
+                        jsonArrayAgg(jsonObject(
+                            key("create_at").value(REPORT.CREATE_AT),
+                            key("reported_at").value(REPORT.REPORTED_AT),
+                            key("type").value(REPORT.TYPE),
+                            key("value").value(REPORT.VALUE)
+                        ))
+                    ).from(REPORT).where(SAMPLE.ID.eq(REPORT.SAMPLE_ID))
+                ).`as`("reports")
+            ).from(SAMPLE)
+                .join(PATIENT).on(SAMPLE.PATIENT_SERIAL.eq(PATIENT.SERIAL)
+                    .and(SAMPLE.ORGANIZATION_ID.eq(PATIENT.ORGANIZATION_ID))
+                    .and(SAMPLE.USER_ID.eq(PATIENT.USER_ID)))
+                .where(whereClause)
+                .orderBy(order.sort(asc))
+        ).map { it.into(Sample::class.java) }
     }
 
     fun DSLContext.deleteSampleById(sampleId: UUID): Mono<Sample> {
         return Mono.from(deleteFrom(SAMPLE).where(SAMPLE.ID.eq(sampleId)).returning()).map { it.into(Sample::class.java) }
     }
-    fun DSLContext.updateSampleState(sampleId: UUID, state: SampleState): Mono<Sample> {
-        return Mono.from(update(SAMPLE).set(SAMPLE.STATE, state.name).where(SAMPLE.ID.eq(sampleId)).returning()).map { it.into(Sample::class.java) }
-    }
+
 }

@@ -1,5 +1,5 @@
 package com.gcgenome.rms.data
 
 enum class ReportType {
-    PDF, JPG
+    PDF, IMG, SHORT_TEXT, LONG_TEXT
 }

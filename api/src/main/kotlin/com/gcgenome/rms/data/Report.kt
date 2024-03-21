@@ -21,12 +21,8 @@ data class Report(
     val value: String?,
     @JsonProperty("sample_id")
     val sampleId: UUID?,
-    @JsonProperty("genome_barcode")
-    val genomeBarcode: String?,
     @JsonProperty("reported_at")
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
-    val reportedAt: LocalDateTime?,
-    @JsonProperty("path")
-    val path: String?
+    val reportedAt: LocalDateTime?
 )
