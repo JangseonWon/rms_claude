@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Entity
-@Table(schema = "rms_dev", name = "report")
+@Table(schema = "rms_dev2", name = "report")
 data class Report(
     @Id
     @Column(name = "id")

@@ -5,7 +5,7 @@ import java.io.Serializable
 import java.time.LocalDateTime
 
 @Entity
-@Table(schema = "rms_dev", name = "user_service")
+@Table(schema = "rms_dev2", name = "user_service")
 data class UserService(
     @EmbeddedId
     val pk: UserServicePK,

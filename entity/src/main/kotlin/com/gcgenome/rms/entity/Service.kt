@@ -3,7 +3,7 @@ package com.gcgenome.rms.entity
 import jakarta.persistence.*
 
 @Entity
-@Table(schema = "rms_dev", name = "service")
+@Table(schema = "rms_dev2", name = "service")
 data class Service(
     @Id
     @Column(name = "id", length = 8)
@@ -18,7 +18,7 @@ data class Service(
     @OneToMany(mappedBy = "serviceId")
     val user: List<UserService>,
     @OneToMany(mappedBy = "serviceId")
-    val item: List<Item>,
+    val request: List<Request>,
     @OneToMany(mappedBy = "serviceId")
     val serviceSampleType: List<ServiceSampleType>,
     @OneToMany(mappedBy = "serviceId")

@@ -4,7 +4,7 @@ import jakarta.persistence.*
 import java.util.UUID
 
 @Entity
-@Table(schema = "rms_dev", name = "user")
+@Table(schema = "rms_dev2", name = "user")
 data class User(
     @Id
     @Column(name = "id", length = 64)

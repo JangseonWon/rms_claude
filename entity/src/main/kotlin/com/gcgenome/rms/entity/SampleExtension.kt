@@ -5,7 +5,7 @@ import java.io.Serializable
 import java.util.*
 
 @Entity
-@Table(schema = "rms_dev", name = "sample_extension")
+@Table(schema = "rms_dev2", name = "sample_extension")
 data class SampleExtension(
     @EmbeddedId
     val pk: SampleExtensionPK,

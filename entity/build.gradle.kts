@@ -1,34 +1,18 @@
 plugins {
     kotlin("jvm")
-    kotlin("kapt")
-    id("org.springframework.boot") version "3.0.3"
-    id("io.spring.dependency-management") version "1.1.0"
-    id("org.jetbrains.kotlin.plugin.spring") version "1.8.10"
+    kotlin("plugin.spring")
+    kotlin("plugin.jpa") version "1.9.22"
+    id("org.springframework.boot") version "3.2.0"
+    id("io.spring.dependency-management") version "1.1.4"
 }
-java.sourceCompatibility = JavaVersion.VERSION_17
-java.targetCompatibility = JavaVersion.VERSION_17
+kotlin.jvmToolchain(21)
+
 dependencies {
-    implementation(libs.bundles.kotlin)
-    implementation(libs.kotlin.reactor)
-    implementation(libs.kotlin.coroutines.reactor)
-    implementation(libs.kotlin.jackson)
+    implementation(libs.spring.webflux)
+    implementation(libs.spring.log4j2)
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     runtimeOnly("org.postgresql:postgresql")
-    implementation(libs.webflux)
-    implementation(libs.spring.log4j2)
 }
+dependencyManagement { imports { mavenBom(libs.spring.cloud.bom.get().toString()) } }
 configurations { all { exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging") } }
-/*dependencyManagement { imports { mavenBom(libs.spring.cloud.bom.get().toString()) } }
-kapt {
-    includeCompileClasspath = false
-}*/
-tasks {
-    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = "17"
-        }
-    }
-    getByName<Jar>("jar") {
-        enabled = false
-    }
-}
+kotlin.jvmToolchain(21)

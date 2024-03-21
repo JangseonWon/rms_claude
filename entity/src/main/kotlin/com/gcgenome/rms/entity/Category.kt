@@ -8,7 +8,7 @@ import jakarta.persistence.Table
 import java.util.UUID
 
 @Entity
-@Table(schema = "rms_dev", name = "category")
+@Table(schema = "rms_dev2", name = "category")
 data class Category(
     @Id
     @Column(name = "id", length = 64, nullable = false)
