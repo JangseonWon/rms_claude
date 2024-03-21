@@ -1,15 +1,18 @@
 package com.gcgenome.rms.entity
 
 import jakarta.persistence.*
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
 @Entity
-@Table(schema = "rms_dev2", name = "sample")
+@Table(schema = "rms_dev2", name = "sample", indexes=[
+    Index(unique = true, columnList = "barcode"),
+    Index(columnList = "user_id, user_sample_id")
+])
 data class Sample(
     @Id @Column(name = "id")
     val id: UUID,
-
     @Column(name = "barcode", length = 64, nullable = true, unique = true)
     val barcode: String,
     @Column(name = "user_sample_id", nullable = true)
@@ -18,8 +21,8 @@ data class Sample(
     val quantity: Int,
     @Column(name = "age", nullable = true)
     val age: Int,
-    @Column(name = "sampling", nullable = false)
-    val sampling: LocalDateTime,
+    @Column(name = "sampling_on", nullable = false)
+    val samplingOn: LocalDate,
     @Column(name = "resample_reason", nullable = true)
     val resampleReason: String,
     @Column(name = "create_at", nullable = true)

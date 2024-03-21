@@ -1,7 +1,6 @@
 package com.gcgenome.rms.entity
 
 import jakarta.persistence.*
-import org.springframework.data.annotation.CreatedDate
 import java.io.Serializable
 import java.time.LocalDateTime
 import java.util.*
@@ -11,7 +10,6 @@ import java.util.*
 data class Request(
     @EmbeddedId
     val pk: RequestPK,
-
     @Column(name = "user_service_id", length = 64, nullable = true)
     val userServiceId: String,
     @Column(name = "status", length = 64, nullable = false)
@@ -62,7 +60,7 @@ data class Request(
     val sampleId: Sample
 ){
     @Embeddable
-    data class RequestPK(
+    data class RequestPK (
         @Column(name = "order_id") val orderId: UUID,
         @Column(name = "service_id") val serviceId: String,
         @Column(name = "sample_id") val sampleId: UUID
