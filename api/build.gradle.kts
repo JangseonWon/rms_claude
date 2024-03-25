@@ -7,7 +7,6 @@ plugins {
     id("org.springframework.boot")
     id("io.spring.dependency-management")
     id("org.jetbrains.kotlin.plugin.spring")
-    id("com.google.cloud.tools.jib")
     id("nu.studer.jooq") 
 }
 dependencies {
@@ -22,23 +21,6 @@ dependencies {
     jooqGenerator("org.postgresql:postgresql:42.6.0")
 
 }
-jib {
-    from { image = "eclipse-temurin:17.0.7_7-jre-jammy" }
-    to {
-        image = "image-registry.apps.gcgenome.com/rms-test/rms-api"
-        tags = setOf("latest")
-        auth {
-            username = System.getenv("RMS_REGISTRY_USERNAME")
-            password = System.getenv("RMS_REGISTRY_PASSWORD")
-        }
-    }
-    container { environment = mapOf(
-            "LANG" to "C.UTF-8",
-            "TZ" to "Asia/Seoul",
-        )
-    }
-}
-
 configurations { all { exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging") } }
 dependencyManagement { imports { mavenBom(libs.spring.cloud.bom.get().toString()) } }
 tasks.processResources { if(project.gradle.startParameter.taskNames.contains("jib")) exclude("application.yml") }
@@ -51,11 +33,9 @@ jooq {
                 logging = Logging.WARN
                 jdbc.apply {
                     driver = "org.postgresql.Driver"
-                    //url = "jdbc:postgresql://libra:5432/report_service"
-                    url = if (System.getenv("DEPLOYMENT_ENV") == "local") "jdbc:postgresql://libra:5432/report_service"
-                    else "jdbc:postgresql://postgresql-pooler:5432/rms"
-                    user = System.getenv("RMS_POSTGRES_USERNAME")
-                    password = System.getenv("RMS_POSTGRES_PASSWORD")
+                    url = "jdbc:postgresql://${System.getenv("POSTGRES_URL")}/report_service"
+                    user = System.getenv("POSTGRES_USERNAME")
+                    password = System.getenv("POSTGRES_PASSWORD")
                 }
                 generator.apply {
                     name = "org.jooq.codegen.KotlinGenerator"

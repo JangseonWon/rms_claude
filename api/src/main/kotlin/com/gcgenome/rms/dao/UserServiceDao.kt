@@ -1,12 +1,10 @@
 package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.Service
-import com.gcgenome.rms.data.UserService
 import com.gcgenome.rms.tables.references.*
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
 
 interface UserServiceDao {
     fun DSLContext.selectUserService(userId: String): Flux<Service> {

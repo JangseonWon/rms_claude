@@ -14,14 +14,13 @@ import reactor.core.publisher.Mono
 @Configuration("com.gcgenome.rms.service.Route")
 class Router (private val handler: Handler) {
     @Bean("com.gcgenome.rms.service.Route.Bean")
-    fun route() = router { GET("/api/info-service/services", accept(MediaType("application","vnd.gcgenome.rms-v1")), ::services) }
+    fun route() = router { GET("/api/services", accept(MediaType("application","vnd.gcgenome.rms-v1")), ::services) }
 
     private fun services(request: ServerRequest): Mono<ServerResponse> {
         return request.principal()
             .cast(SecurityContextRepository.UserAuthentication::class.java)
             .flatMap { handler.getService(it.principal).collectList() }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), Service::class.java) }
-            .switchIfEmpty(ServerResponse.status(HttpStatus.NO_CONTENT).build())
             .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("${e.message}") }
     }
 }
