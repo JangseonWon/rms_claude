@@ -1,10 +1,6 @@
 package com.gcgenome.rms.download
 
-import com.gcgenome.rms.data.GenomeHealth
-import org.apache.pdfbox.pdmodel.PDDocument
-import org.apache.pdfbox.pdmodel.PDPageContentStream
-import org.apache.pdfbox.pdmodel.font.PDType0Font
-import org.springframework.core.io.ResourceLoader
+import com.gcgenome.rms.data.download.GenomeHealth
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import java.io.ByteArrayOutputStream

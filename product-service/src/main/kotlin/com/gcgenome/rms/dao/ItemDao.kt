@@ -49,7 +49,7 @@ interface ItemDao {
                     ),
                     DSL.key("samples").value(
                         select(
-                            DSL.jsonArray(
+                            DSL.jsonArrayAgg(
                                 DSL.jsonObject(
                                     DSL.key("retest_reason").value(SAMPLE.RETEST_REASON),
                                     DSL.key("status").value(SAMPLE.STATUS),

@@ -14,11 +14,8 @@ dependencies {
     implementation(libs.bundles.spring.client)
     implementation(libs.bundles.kotlin.webflux)
     implementation(libs.bundles.r2dbc.postgres)
-    implementation(libs.spring.gateway)
+    implementation(libs.bundles.jooq)
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.4")
-    implementation("org.jooq:jooq:3.18.2")
-    implementation("org.jooq:jooq-codegen:3.18.2")
-    implementation("org.jooq:jooq-meta:3.18.2")
     implementation("org.apache.pdfbox:pdfbox:2.0.29")
     jooqGenerator("org.postgresql:postgresql:42.6.0")
 }
@@ -43,9 +40,9 @@ jooq {
                 logging = Logging.WARN
                 jdbc.apply {
                     driver = "org.postgresql.Driver"
-                    url = "jdbc:postgresql://libra:5432/report_service"
-                    user = "postgres"
-                    password = "snubi1004"
+                    url = "jdbc:postgresql://${System.getenv("POSTGRES_URL")}/report_service"
+                    user = System.getenv("POSTGRES_USERNAME")
+                    password = System.getenv("POSTGRES_PASSWORD")
                 }
                 generator.apply {
                     name = "org.jooq.codegen.KotlinGenerator"

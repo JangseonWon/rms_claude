@@ -1,4 +1,4 @@
-package com.gcgenome.rms.data
+package com.gcgenome.rms.data.download
 
 import com.fasterxml.jackson.annotation.JsonProperty
 

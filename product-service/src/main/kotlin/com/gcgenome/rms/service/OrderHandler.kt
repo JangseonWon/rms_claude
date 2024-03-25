@@ -27,18 +27,20 @@ class OrderHandler(
 ): PatientDao, OrderDao, OrganizationDao, ItemDao, ExtensionDao, SampleDao, UserDao, UserServiceDao, ServiceSampleTypeDao {
 
     fun insertOrderRequest(userId: String, dto: List<Item>): Mono<List<Item>> {
-    return Mono.from(dslContext.transactionPublisher { trx ->
-        trx.dsl().run {
-            Flux.fromIterable(dto).concatMap { items ->
+        return Mono.from(dslContext.transactionPublisher { trx ->
+            trx.dsl().run {
                 insertOrder(userId).flatMap { orderRecord ->
-                    checkUserServiceById(userId, items.serviceId, trx)
-                    .then(checkOrganization(userId, items.patient.organization.id, trx))
-                    .then(insertPatient(items.patient.organization.id, userId, items.patient))
-                    .then(insertItem(orderRecord.id!!, items.serviceId, items.serial))
-                    .thenMany(insertSampleProcess(userId, orderRecord, items, Status.ORDERED, trx))
-                    .then(selectItemById(orderRecord.id!!, userId))
-                } }.collectList()
-        } })
+                    Flux.fromIterable(dto).flatMap { items ->
+                        checkUserServiceById(userId, items.serviceId, trx)
+                            .then(checkOrganization(userId, items.patient.organization.id, trx))
+                            .then(insertPatient(items.patient.organization.id, userId, items.patient))
+                            .then(insertItem(orderRecord.id!!, items.serviceId, items.serial))
+                            .thenMany(insertSampleProcess(userId, orderRecord, items, Status.ORDERED, trx))
+                            .then(selectItemById(orderRecord.id!!, userId))
+                    }.collectList()
+                }
+            }
+        })
     }
 
     fun generateSampleBarcode(infix: String, trx: Configuration): Mono<String> {

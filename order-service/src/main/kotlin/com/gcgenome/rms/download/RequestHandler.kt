@@ -1,7 +1,7 @@
 package com.gcgenome.rms.download
 
-import com.gcgenome.rms.data.GenomeHealth
-import com.gcgenome.rms.data.Nipt
+import com.gcgenome.rms.data.download.GenomeHealth
+import com.gcgenome.rms.data.download.Nipt
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import reactor.core.publisher.Mono

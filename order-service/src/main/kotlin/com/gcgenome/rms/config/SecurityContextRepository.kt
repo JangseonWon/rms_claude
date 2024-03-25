@@ -1,5 +1,6 @@
 package com.gcgenome.rms.config
 
+import com.gcgenome.rms.dao.UserDao
 import com.gcgenome.rms.data.User
 import org.jooq.DSLContext
 import org.springframework.security.core.Authentication
@@ -14,7 +15,7 @@ import reactor.core.publisher.Mono
 @Component
 class SecurityContextRepository(
     val dslContext: DSLContext
-) : ServerSecurityContextRepository, Dao {
+) : ServerSecurityContextRepository, UserDao {
     override fun save(exchange: ServerWebExchange, context: SecurityContext): Mono<Void> = Mono.empty()
     override fun load(exchange: ServerWebExchange): Mono<SecurityContext> {
         return Mono.justOrEmpty(exchange.request.headers.getFirst("X-USER-ID"))
