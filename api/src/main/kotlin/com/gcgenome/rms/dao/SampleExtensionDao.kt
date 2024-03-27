@@ -1,12 +1,9 @@
 package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.tables.references.SAMPLE_EXTENSION
-import com.gcgenome.rms.data.Extension
 import com.gcgenome.rms.data.SampleExtension
 import org.jooq.DSLContext
-import org.jooq.impl.DSL
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
 import java.util.*
 
 interface SampleExtensionDao{
