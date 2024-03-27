@@ -10,7 +10,7 @@ data class Query(
     @JsonProperty("sort_by")
     val sortBy: String?,
     @JsonProperty("asc")
-    val asc: Boolean?,
+    var asc: Boolean = true,
     @JsonProperty("filters")
     val filters: MutableList<Filter>?
 ){

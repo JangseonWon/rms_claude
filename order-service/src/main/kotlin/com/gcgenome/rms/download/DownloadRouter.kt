@@ -11,7 +11,7 @@ import org.springframework.web.reactive.function.server.router
 import reactor.core.publisher.Mono
 
 @Configuration("com.gcgenome.rms.service.Router")
-class Router (private val handler: RequestHandler) {
+class Router (private val handler: DownloadHandler) {
     @Bean("com.gcgenome.rms.service-download.Router.Bean")
     fun route() = router { POST("/w-api/order-service/medical-referral/service/{service}/download/{id}", ::download) }
 

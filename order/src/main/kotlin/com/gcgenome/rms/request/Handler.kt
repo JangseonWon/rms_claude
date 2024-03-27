@@ -1,4 +1,4 @@
-package com.gcgenome.rms.order
+package com.gcgenome.rms.request
 
 import com.gcgenome.rms.dao.*
 import com.gcgenome.rms.data.CancelOrder

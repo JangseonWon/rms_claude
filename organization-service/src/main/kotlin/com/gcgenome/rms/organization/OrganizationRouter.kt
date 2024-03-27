@@ -3,6 +3,7 @@ package com.gcgenome.rms.organization
 import com.gcgenome.rms.config.SecurityContextRepository
 import com.gcgenome.rms.data.PatchOrganization
 import com.gcgenome.rms.data.Query
+import com.gcgenome.rms.exception.ColumnNotFoundException
 import com.gcgenome.rms.exception.OrganizationNotFoundException
 import com.gcgenome.rms.exception.WebInputException
 import com.gcgenome.rms.tables.pojos.Organization
@@ -67,18 +68,7 @@ class OrganizationRouter (
             .flatMap { organizations ->
                 ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(organizations)
-            }.onErrorResume (DataAccessException::class.java) {
-                val errorMessage = it.message ?: ""
-                val pattern = Pattern.compile("\"([^\"]+)\" 이름의 칼럼은 없습니다")
-                val matcher = pattern.matcher(errorMessage)
-
-                var message = ""
-                if (matcher.find()) {
-                    val columnName = matcher.group(1)
-                  message = "해당 칼럼이 존재하지 않습니다: $columnName"
-                } else message = "해당 칼럼이 존재하지 않습니다."
-
-                ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue(message)
-            }.onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
+            }.onErrorResume(DataAccessException::class.java)  {e ->  ColumnNotFoundException(e).toServerResponse()}
+            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
     }
 }

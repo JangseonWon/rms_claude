@@ -1,4 +1,4 @@
-package com.gcgenome.rms.order
+package com.gcgenome.rms.request
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.gcgenome.rms.dao.*

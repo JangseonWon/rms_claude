@@ -1,4 +1,4 @@
-package com.gcgenome.rms.order
+package com.gcgenome.rms.request
 
 import com.gcgenome.rms.SecurityContextRepository
 import com.gcgenome.rms.data.CancelOrder

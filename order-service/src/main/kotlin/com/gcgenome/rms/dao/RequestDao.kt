@@ -1,15 +1,76 @@
 package com.gcgenome.rms.dao
 
+import com.gcgenome.rms.data.Query
+import com.gcgenome.rms.data.SelectRequest
+import com.gcgenome.rms.tables.references.*
+import org.jooq.Condition
+import org.jooq.DSLContext
+import org.jooq.impl.DSL.*
+import org.jooq.SortOrder
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 import com.gcgenome.rms.data.Request
 import com.gcgenome.rms.data.Dto
 import com.gcgenome.rms.data.Status
 import com.gcgenome.rms.tables.references.REQUEST
-import org.jooq.DSLContext
-import reactor.core.publisher.Mono
 import java.time.LocalDateTime
 import java.util.*
 
 interface RequestDao {
+    fun DSLContext.selectRequests(query: Query, where: Condition, userId: String) : Flux<SelectRequest> {
+        val asc : SortOrder = when (query.asc) {
+            true -> SortOrder.ASC
+            false -> SortOrder.DESC
+        }
+
+        return Flux.from(
+            select(
+                REQUEST.ORDER_ID,
+                SAMPLE,
+                SERVICE,
+                PATIENT,
+                REQUEST.CART_AT,
+                REQUEST.COMPLETE_AT,
+                REQUEST.CREATE_AT,
+                REQUEST.CREDIT,
+                REQUEST.DEPARTMENT,
+                REQUEST.EMP_ID,
+                REQUEST.EMP_MOBILE,
+                REQUEST.EMP_NAME,
+                REQUEST.LAST_MODIFY_AT,
+                REQUEST.MEMO,
+                REQUEST.OUTSOURCING_COST,
+                REQUEST.PHYSICIAN,
+                REQUEST.PRICE,
+                REQUEST.PRICE,
+                REQUEST.RESAMPLE_AT,
+                REQUEST.SPECIFIED_AT,
+                REQUEST.STATUS,
+                REQUEST.TEST,
+                REQUEST.USER_SERVICE_ID,
+                REQUEST.WARD
+            ).from(REQUEST)
+                .join(ORDER).on(ORDER.USER_ID.eq(userId))
+                .join(SAMPLE).on(REQUEST.SAMPLE_ID.eq(SAMPLE.ID))
+                .join(PATIENT).on(SAMPLE.PATIENT_SERIAL.eq(PATIENT.SERIAL))
+                .join(SERVICE).on(REQUEST.SERVICE_ID.eq(SERVICE.ID))
+                .where(where)
+                .orderBy(field(query.sortBy).sort(asc))
+                .limit(query.size)
+                .offset(query.page*query.size)
+        ).map { it.into(SelectRequest::class.java) }
+    }
+
+    fun DSLContext.selectRequestsCount(query: Query, where: Condition, userId: String): Mono<Int> {
+        return Mono.from(
+            select(count()).from(REQUEST)
+                .join(ORDER).on(ORDER.USER_ID.eq(userId))
+                .join(SAMPLE).on(REQUEST.SAMPLE_ID.eq(SAMPLE.ID))
+                .join(PATIENT).on(SAMPLE.PATIENT_SERIAL.eq(PATIENT.SERIAL))
+                .join(SERVICE).on(REQUEST.SERVICE_ID.eq(SERVICE.ID))
+                .where(where))
+            .map { it.component1() }
+    }
 
     fun DSLContext.selectRequestById(orderId: UUID, sampleId: UUID, serviceId: String): Mono<Request> {
         return Mono.from(selectFrom(REQUEST).where(REQUEST.ORDER_ID.eq(orderId).and(REQUEST.SAMPLE_ID.eq(sampleId))))

@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono
 
 
 @Component
-class RequestHandler(
+class DownloadHandler(
     private val niptHandler: NiptHandler,
     private val genomeHealthHandler: GenomeHealthHandler
 ) {
