@@ -77,10 +77,10 @@ interface OrderDao {
                                                 key("patient_serial").value(SAMPLE.PATIENT_SERIAL),
                                                 key("extensions").value(
                                                     select(
-                                                        jsonArray(
+                                                        jsonArrayAgg(
                                                             jsonObject(
                                                                 key("id").value(SAMPLE_EXTENSION.EXTENSION_ID),
-                                                                key("value").value(SAMPLE_EXTENSION.VALUE.name)
+                                                                key("value").value(SAMPLE_EXTENSION.VALUE)
                                                             )
                                                         )
                                                     ).from(SAMPLE_EXTENSION)

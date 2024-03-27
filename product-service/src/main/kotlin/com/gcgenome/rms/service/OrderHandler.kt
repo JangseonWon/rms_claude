@@ -1,15 +1,11 @@
 package com.gcgenome.rms.service
 
 import com.gcgenome.rms.dao.*
-import com.gcgenome.rms.data.Item
-import com.gcgenome.rms.data.Sample
-import com.gcgenome.rms.data.Status
+import com.gcgenome.rms.data.*
 import com.gcgenome.rms.exceptions.OrganizationNotFoundException
 import com.gcgenome.rms.exceptions.ServiceNotFoundException
 import com.gcgenome.rms.exceptions.ServiceSampleTypeNotFoundException
-import com.gcgenome.rms.tables.records.OrderRecord
 import com.gcgenome.rms.tables.records.OrganizationRecord
-import com.gcgenome.rms.tables.records.ServiceSampleTypeRecord
 import com.gcgenome.rms.tables.records.UserServiceRecord
 import org.jooq.Configuration
 import org.jooq.DSLContext
@@ -24,34 +20,28 @@ import java.util.*
 @Component
 class OrderHandler(
     val dslContext: DSLContext
-): PatientDao, OrderDao, OrganizationDao, ItemDao, ExtensionDao, SampleDao, UserDao, UserServiceDao, ServiceSampleTypeDao {
+): PatientDao, OrderDao, OrganizationDao, RequestDao, ExtensionDao, SampleDao, UserDao, UserServiceDao, ServiceSampleTypeDao {
 
-    fun insertOrderRequest(userId: String, dto: List<Item>): Mono<List<Item>> {
+    fun insertOrderProcess(userId: String, requests: List<Request>): Mono<Order> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
-                insertOrder(userId).flatMap { orderRecord ->
-                    Flux.fromIterable(dto).flatMap { items ->
-                        checkUserServiceById(userId, items.serviceId, trx)
-                            .then(checkOrganization(userId, items.patient.organization.id, trx))
-                            .then(insertPatient(items.patient.organization.id, userId, items.patient))
-                            .then(insertItem(orderRecord.id!!, items.serviceId, items.serial))
-                            .thenMany(insertSampleProcess(userId, orderRecord, items, Status.ORDERED, trx))
-                            .then(selectItemById(orderRecord.id!!, userId))
-                    }.collectList()
+                generateOrderSerial(userId, trx).flatMap { serial ->
+                    insertOrder(userId, serial, LocalDateTime.now()).flatMap { order ->
+                        Flux.fromIterable(requests).flatMap { request ->
+                            insertPatientProcess(userId, request.patient!!, trx)
+                                .then(insertSampleProcess(request.serviceId, request.patient.sample, trx))
+                                .flatMap { sample ->
+                                    request.apply {
+                                        orderId = order.id
+                                        sampleId = sample.id
+                                    }
+                                    insertRequestProcess(userId, Status.ORDERED, request, trx)
+                                }
+                        }.then(selectOrderById(order.id!!))
+                    }
                 }
             }
         })
-    }
-
-    fun generateSampleBarcode(infix: String, trx: Configuration): Mono<String> {
-        val todayBarcode = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
-        val barcodePrefix = "$todayBarcode$infix"
-        return trx.dsl().selectSampleBarcode(barcodePrefix)
-            .map { barcode ->
-                val incrementedBarcode = (barcode!!.toLong().plus(1)).toString()
-                incrementedBarcode
-            }
-            .switchIfEmpty(Mono.just("${barcodePrefix}5001"))
     }
 
     fun checkUserServiceById(userId: String, serviceId: String, trx: Configuration): Mono<UserServiceRecord> {
@@ -64,34 +54,73 @@ class OrderHandler(
             .switchIfEmpty(Mono.error(OrganizationNotFoundException(userId, organizationId)))
     }
 
-    fun checkServiceSampleTypeById(sampleTypeId: String, serviceId: String, trx: Configuration): Mono<ServiceSampleTypeRecord> {
+    fun checkServiceSampleTypeById(sampleTypeId: String, serviceId: String, trx: Configuration): Mono<Void> {
         return trx.dsl().selectServiceSampleTypeById(sampleTypeId, serviceId)
             .switchIfEmpty(Mono.error(ServiceSampleTypeNotFoundException(sampleTypeId, serviceId)))
+            .then()
     }
 
-    fun insertSampleAndExtensions(userId: String, orderId: UUID, item: Item, sample: Sample, barcode: String, status: String, trx: Configuration): Mono<Void> {
-        return trx.dsl().insertSample(userId, orderId, item.serviceId, sample,
-            item.patient.serial, item.patient.organization.id, barcode, status)
-            .flatMap { sampleRecord ->
-                Flux.fromIterable(sample.extensions ?: emptyList())
-                    .flatMap { extension -> trx.dsl().insertSampleExtension(extension, sampleRecord.id!!) }
-                    .then()
-            }
+    fun insertPatientProcess(userId: String, patient: Patient, trx: Configuration): Mono<Void> {
+        return trx.dsl().run {
+            checkOrganization(userId, patient.organization.id!!, trx)
+                .then(insertPatient(patient.organization.id, userId, patient)).
+                    then()
+        }
     }
 
-    fun insertSampleProcess(userId: String, orderRecord: OrderRecord, items: Item, status: Status,trx: Configuration): Flux<Void> {
-        return Flux.fromIterable(items.patient.samples)
-            .concatMap { sample ->
-                checkServiceSampleTypeById(sample.sampleTypeId!!, items.serviceId, trx)
-                    .then(trx.dsl().selectUserById(userId))
-                    .flatMap { userRecord ->
-                        generateSampleBarcode(userRecord.branchSerial, trx)
-                            .flatMap { barcode ->
-                                if (status == Status.CART) sample.apply { cartAt = LocalDateTime.now() }
-                                insertSampleAndExtensions(userRecord.id, orderRecord.id!!, items,
-                                    sample, barcode, status.toString(), trx)
-                            }
+    fun insertSampleProcess(serviceId: String, sampleDto: Sample, trx: Configuration): Mono<Sample> {
+        return trx.dsl().run {
+            checkServiceSampleTypeById(sampleDto.sampleTypeId!!, serviceId, trx)
+                .then(insertSample(sampleDto)
+                    .flatMap { sample ->
+                        insertSampleExtensionProcess(sample.id!!, sampleDto.extensions, trx)
+                            .then(selectSampleById(sample.id!!))
+                    })
+        }
+    }
+
+    fun insertRequestProcess(userId: String, status: Status, request: Request, trx: Configuration): Mono<Request> {
+        return trx.dsl().run {
+            if (status == Status.CART) request.apply { cartAt = LocalDateTime.now() }
+            checkUserServiceById(userId, request.serviceId, trx)
+                .then(insertRequest(status, request)
+            )
+        }
+    }
+
+    fun insertSampleExtensionProcess(sampleId: UUID, extensions: List<Extension>?, trx: Configuration): Mono<Void> {
+        return trx.dsl().run {
+            Flux.fromIterable(extensions ?: emptyList())
+                .flatMap { extension -> insertSampleExtension(extension, sampleId) }
+                .then()
+        }
+    }
+
+    fun generateSampleBarcode(userId: String, trx: Configuration): Mono<String> {
+        val todayBarcode = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
+        return trx.dsl().run {
+            selectUserById(userId).flatMap { user ->
+                val barcodePrefix = "$todayBarcode${user.branchSerial}"
+                selectSampleBarcode(barcodePrefix)
+                    .flatMap { barcode ->
+                        if (barcode != null) {
+                            Mono.just(barcode.toLong().plus(1).toString())
+                        } else {
+                            Mono.just("${barcodePrefix}5001")
+                        }
                     }
             }
+        }
+    }
+
+    fun generateOrderSerial(userId: String, trx: Configuration): Mono<String> {
+        val today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
+        val serialPrefix = "$userId$today"
+        return trx.dsl().selectOrderSerial(serialPrefix)
+            .map { serial ->
+                val incrementedSerial = (serial!!.toLong().plus(1)).toString()
+                incrementedSerial
+            }
+            .switchIfEmpty(Mono.just("${serialPrefix}0001"))
     }
 }

@@ -1,8 +1,8 @@
 package com.gcgenome.rms.service
 
 import com.gcgenome.rms.config.SecurityContextRepository
-import com.gcgenome.rms.data.Item
 import com.gcgenome.rms.data.Order
+import com.gcgenome.rms.data.Request
 import com.gcgenome.rms.exceptions.ServiceNotFoundException
 import com.gcgenome.rms.exceptions.ServiceSampleTypeNotFoundException
 import org.springframework.context.annotation.Bean
@@ -29,8 +29,8 @@ class OrderRouter (
         return request
             .principal()
             .cast(SecurityContextRepository.UserAuthentication::class.java)
-            .zipWith(request.bodyToMono(object : ParameterizedTypeReference<List<Item>>() {}))
-            .flatMap { handler.insertOrderRequest(it.t1.principal, it.t2) }
+            .zipWith(request.bodyToMono(object : ParameterizedTypeReference<List<Request>>() {}))
+            .flatMap { handler.insertOrderProcess(it.t1.principal, it.t2) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), Order::class.java) }
             .onErrorResume (ServiceNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
             .onErrorResume (ServiceSampleTypeNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
