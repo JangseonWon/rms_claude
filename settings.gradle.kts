@@ -13,6 +13,7 @@ include("login")
 include("organization-service")
 include("product-service")
 include("order-service")
+include("authentication")
 
 
 dependencyResolutionManagement {
