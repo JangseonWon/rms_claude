@@ -4,7 +4,7 @@ import jakarta.persistence.*
 import java.io.Serializable
 
 @Entity
-@Table(schema = "rms_dev2", name = "service_sample_type")
+@Table(schema = "rms_dev", name = "service_sample_type")
 data class ServiceSampleType(
     @EmbeddedId
     val pk: ServiceSampleTypePK,

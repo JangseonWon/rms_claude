@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.security.web.server.ServerAuthenticationEntryPoint
 import org.springframework.security.web.server.authorization.ServerAccessDeniedHandler
+import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository
 import org.springframework.security.web.server.header.XFrameOptionsServerHttpHeadersWriter
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers
 import reactor.core.publisher.Mono
@@ -23,16 +24,14 @@ import reactor.core.publisher.Mono
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
 @EnableR2dbcAuditing
-class SecurityConfig (
-    private val securityContextRepository: SecurityContextRepository
-) {
+class SecurityConfig {
     @Bean
     fun encoder(): BCryptPasswordEncoder {
         return BCryptPasswordEncoder()
     }
     @Bean
     fun resourceFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain {
-        http.securityContextRepository(securityContextRepository)
+        http.securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
         return http {
             cors { }
             httpBasic { disable() }
@@ -40,17 +39,13 @@ class SecurityConfig (
             formLogin { disable() }
             headers { frameOptions { mode = XFrameOptionsServerHttpHeadersWriter.Mode.SAMEORIGIN } }
             exceptionHandling {
-                authenticationEntryPoint = ServerAuthenticationEntryPoint { exchange, _ ->
-                    Mono.fromRunnable { exchange.response.statusCode = HttpStatus.UNAUTHORIZED }
-                }
-                accessDeniedHandler = ServerAccessDeniedHandler { exchange, _ ->
-                    Mono.fromRunnable { exchange.response.statusCode = HttpStatus.FORBIDDEN }
-                }
+                authenticationEntryPoint = ServerAuthenticationEntryPoint { exchange, _ -> Mono.fromRunnable { exchange.response.statusCode = HttpStatus.UNAUTHORIZED } }
+                accessDeniedHandler = ServerAccessDeniedHandler { exchange, _ -> Mono.fromRunnable { exchange.response.statusCode = HttpStatus.FORBIDDEN } }
             }
             authorizeExchange {
                 authorize(ServerWebExchangeMatchers.pathMatchers(HttpMethod.OPTIONS, "/**"), permitAll)
                 authorize (ServerWebExchangeMatchers.pathMatchers(HttpMethod.GET, "/actuator/health/**"), permitAll)
-                authorize(ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, "/w-api/login",), permitAll)
+                authorize(ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, "/w-api/login", "/w-api/signup"), permitAll)
                 authorize(anyExchange, authenticated)
             }
         }

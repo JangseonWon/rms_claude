@@ -6,7 +6,7 @@ import java.util.*
 
 
 @Entity
-@Table(schema = "rms_dev2", name = "order", indexes = [
+@Table(schema = "rms_dev", name = "order", indexes = [
     Index(unique = true, columnList = "serial")
 ])
 data class Order(

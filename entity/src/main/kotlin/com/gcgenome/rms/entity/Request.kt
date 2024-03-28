@@ -6,11 +6,11 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Entity
-@Table(schema = "rms_dev2", name = "request")
+@Table(schema = "rms_dev", name = "request")
 data class Request(
     @EmbeddedId
     val pk: RequestPK,
-    @Column(name = "user_service_id", length = 64, nullable = true)
+    @Column(name = "user_service_id", length = 64, nullable = false)
     val userServiceId: String,
     @Column(name = "status", length = 64, nullable = false)
     val status: String,

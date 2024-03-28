@@ -1,5 +1,7 @@
 package com.gcgenome.rms.data
 
+import com.gcgenome.rms.tables.pojos.User
+
 data class Token(
     val nbf : Long,				    // 토큰 유효 시각 milliseconds
     val exp : Long,				    // 토큰 만료 시각 milliseconds	nbf < current time < exp
@@ -7,8 +9,5 @@ data class Token(
     val aud : String,				// 토큰 사용 서비스, rms-test.gcgenome.com
     val iat : Long,				    // 토큰 발급 시각
     val jti : String,				// 토큰 식별자
-    val id : String,
-    val authorities : Array<String>,
-    val name : String?,
-    val department : String?,
+    val user : User
 )

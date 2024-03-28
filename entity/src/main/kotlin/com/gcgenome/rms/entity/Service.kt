@@ -3,7 +3,7 @@ package com.gcgenome.rms.entity
 import jakarta.persistence.*
 
 @Entity
-@Table(schema = "rms_dev2", name = "service")
+@Table(schema = "rms_dev", name = "service")
 data class Service(
     @Id
     @Column(name = "id", length = 8)

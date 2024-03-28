@@ -2,11 +2,12 @@ package com.gcgenome.rms.authenticate
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.gcgenome.rms.data.Token
-import com.gcgenome.rms.data.User
+import com.gcgenome.rms.tables.pojos.User
 import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
+import io.jsonwebtoken.security.SecureDigestAlgorithm
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+import java.security.PrivateKey
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
@@ -14,9 +15,9 @@ import java.util.*
 @Service
 class TokenFactory(
     private val objectMapper: ObjectMapper,
-    @Value("\${security.oauth2.authorization.jwt.signature-algorithm}")
+    @Value("\${spring.security.oauth2.authorization.jwt.signature-algorithm}")
     private val algorithm: String,
-    @Value("\${security.oauth2.authorization.jwt.duration}")
+    @Value("\${spring.security.oauth2.authorization.jwt.duration}")
     private val duration: Long,
     keyPair: KeyPair
 ) {
@@ -26,23 +27,31 @@ class TokenFactory(
         val payload = Token(
             nbf = iat,
             exp = iat + duration,
-            iss = "request-test.gcgenome.com",
-            aud = "request-test.gcgenome.com",
+            iss = "rms.gcgenome.com",
+            aud = "rms.gcgenome.com",
             iat = iat,
             jti = UUID.randomUUID().toString(),
-            id = user.id,
-            authorities = arrayOf(user.authority!!),
-            name = user.name,
-            department = user.department
+            user = user.apply { password = null }
+            /*userId = user.id!!,
+            name = user.name!!,
+            role = user.role!!,
+            type = user.type!!,
+            email = user.email,
+            phoneNumber = user.phoneNumber,
+            state = user.state!!,
+            branchSerial =  user.branchSerial!!,
+            branchName = user.branchName!!,*/
         )
         return sign(payload)
     }
     private fun sign(payload: Token): String {
-        val signatureAlgorithm = SignatureAlgorithm.forName(algorithm)
-        return Jwts.builder()
-            .setHeaderParam("typ", "JWT")
-            .setPayload(objectMapper.writeValueAsString(payload))
-            .signWith(privateKey, signatureAlgorithm)
-            .compact()
+        val signatureAlgorithm = Jwts.SIG.get()[algorithm]
+        if(signatureAlgorithm is SecureDigestAlgorithm) {
+            return Jwts.builder()
+                .header().add("typ", "JWT").and()
+                .content(objectMapper.writeValueAsString(payload))
+                .signWith(privateKey, signatureAlgorithm as SecureDigestAlgorithm<PrivateKey, *>)
+                .compact()
+        } else throw IllegalArgumentException("Unsupported algorithm: $algorithm")
     }
 }

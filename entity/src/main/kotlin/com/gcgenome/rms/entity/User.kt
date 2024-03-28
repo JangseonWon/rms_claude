@@ -1,10 +1,11 @@
 package com.gcgenome.rms.entity
 
 import jakarta.persistence.*
+import java.time.LocalDateTime
 import java.util.UUID
 
 @Entity
-@Table(schema = "rms_dev2", name = "user")
+@Table(schema = "rms_dev", name = "user")
 data class User(
     @Id
     @Column(name = "id", length = 64)
@@ -29,6 +30,8 @@ data class User(
     val branchSerial: String,
     @Column(name = "branch_name", length = 64, nullable = false)
     val branchName: String,
+    @Column(name = "create_at", nullable = false)
+    val createAt: LocalDateTime,
 
     @OneToMany(mappedBy = "userId")
     val organization: List<Organization>,

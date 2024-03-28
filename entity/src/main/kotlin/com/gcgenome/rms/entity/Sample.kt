@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Entity
-@Table(schema = "rms_dev2", name = "sample", indexes=[
+@Table(schema = "rms_dev", name = "sample", indexes=[
     Index(unique = true, columnList = "barcode"),
     Index(columnList = "user_id, user_sample_id")
 ])
