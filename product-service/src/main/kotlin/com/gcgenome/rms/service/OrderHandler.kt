@@ -26,16 +26,18 @@ class OrderHandler(
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
                 generateOrderSerial(userId, trx).flatMap { serial ->
-                    insertOrder(userId, serial, LocalDateTime.now()).flatMap { order ->
+                    val createTime = if (requests[0].status == "CART") null else LocalDateTime.now()
+                    insertOrder(userId, serial, createTime).flatMap { order ->
                         Flux.fromIterable(requests).flatMap { request ->
                             insertPatientProcess(userId, request.patient!!, trx)
-                                .then(insertSampleProcess(request.serviceId, request.patient.sample, trx))
+                                .then(insertSampleProcess(request.serviceId, request.patient.sample, createTime, trx))
                                 .flatMap { sample ->
                                     request.apply {
                                         orderId = order.id
                                         sampleId = sample.id
+                                        createAt = createTime
                                     }
-                                    insertRequestProcess(userId, Status.ORDERED, request, trx)
+                                    insertRequestProcess(userId, request, trx)
                                 }
                         }.then(selectOrderById(order.id!!))
                     }
@@ -68,10 +70,10 @@ class OrderHandler(
         }
     }
 
-    fun insertSampleProcess(serviceId: String, sampleDto: Sample, trx: Configuration): Mono<Sample> {
+    fun insertSampleProcess(serviceId: String, sampleDto: Sample, createTime: LocalDateTime?, trx: Configuration): Mono<Sample> {
         return trx.dsl().run {
             checkServiceSampleTypeById(sampleDto.sampleTypeId!!, serviceId, trx)
-                .then(insertSample(sampleDto)
+                .then(insertSample(sampleDto, createTime)
                     .flatMap { sample ->
                         insertSampleExtensionProcess(sample.id!!, sampleDto.extensions, trx)
                             .then(selectSampleById(sample.id!!))
@@ -79,11 +81,11 @@ class OrderHandler(
         }
     }
 
-    fun insertRequestProcess(userId: String, status: Status, request: Request, trx: Configuration): Mono<Request> {
+    fun insertRequestProcess(userId: String, request: Request, trx: Configuration): Mono<Request> {
         return trx.dsl().run {
-            if (status == Status.CART) request.apply { cartAt = LocalDateTime.now() }
+            if (request.status == Status.CART.toString()) request.apply { cartAt = LocalDateTime.now() }
             checkUserServiceById(userId, request.serviceId, trx)
-                .then(insertRequest(status, request)
+                .then(insertRequest(request)
             )
         }
     }

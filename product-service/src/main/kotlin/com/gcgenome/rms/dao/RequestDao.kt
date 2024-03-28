@@ -15,19 +15,19 @@ interface RequestDao {
             .map { it.into(Request::class.java) }
     }
 
-    fun DSLContext.insertRequest(status: Status, request: Request): Mono<Request> {
+    fun DSLContext.insertRequest(request: Request): Mono<Request> {
         return Mono.from(
             insertInto(REQUEST)
                 .set(REQUEST.ORDER_ID, request.orderId)
                 .set(REQUEST.SERVICE_ID, request.serviceId)
                 .set(REQUEST.SAMPLE_ID, request.sampleId)
                 .set(REQUEST.USER_SERVICE_ID, request.userServiceId ?: request.serviceId)
-                .set(REQUEST.STATUS, status.toString())
+                .set(REQUEST.STATUS, request.status)
                 .set(REQUEST.MEMO, request.memo)
                 .set(REQUEST.DEPARTMENT, request.department)
                 .set(REQUEST.WARD, request.ward)
                 .set(REQUEST.PHYSICIAN, request.physician)
-                .set(REQUEST.CREATE_AT, LocalDateTime.now())
+                .set(REQUEST.CREATE_AT, request.createAt)
                 .set(REQUEST.CART_AT, request.cartAt)
                 .set(REQUEST.SPECIFIED_AT, request.specifiedAt)
                 .set(REQUEST.COMPLETE_AT, request.completeAt)

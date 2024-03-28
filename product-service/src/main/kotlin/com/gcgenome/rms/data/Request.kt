@@ -34,7 +34,7 @@ data class Request(
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("create_at")
-    val createAt: LocalDateTime?,
+    var createAt: LocalDateTime?,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("cart_at")

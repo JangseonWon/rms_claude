@@ -24,7 +24,7 @@ interface SampleDao {
     }
 
 
-    fun DSLContext.insertSample(sample: Sample): Mono<Sample> {
+    fun DSLContext.insertSample(sample: Sample, createAt: LocalDateTime?): Mono<Sample> {
         return Mono.from(
             insertInto(SAMPLE)
                 .set(SAMPLE.ID, UUID.randomUUID())
@@ -34,7 +34,7 @@ interface SampleDao {
                 .set(SAMPLE.AGE, sample.age)
                 .set(SAMPLE.SAMPLING_ON, sample.samplingOn)
                 .set(SAMPLE.RESAMPLE_REASON, sample.resampleReason)
-                .set(SAMPLE.CREATE_AT, LocalDateTime.now())
+                .set(SAMPLE.CREATE_AT, createAt)
                 .set(SAMPLE.SAMPLE_TYPE_ID, sample.sampleTypeId)
                 .set(SAMPLE.PATIENT_SERIAL, sample.patientSerial)
                 .set(SAMPLE.ORGANIZATION_ID, sample.organizationId)
