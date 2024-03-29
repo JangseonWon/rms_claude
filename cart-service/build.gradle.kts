@@ -14,9 +14,9 @@ dependencies {
     implementation(libs.bundles.spring.client)
     implementation(libs.bundles.kotlin.webflux)
     implementation(libs.bundles.r2dbc.postgres)
-    implementation("org.jooq:jooq:3.18.2")
-    implementation("org.jooq:jooq-codegen:3.18.2")
-    implementation("org.jooq:jooq-meta:3.18.2")
+    implementation(libs.bundles.jooq)
+    implementation(libs.spring.security)
+    implementation(project(":authentication"))
     jooqGenerator("org.postgresql:postgresql:42.6.0")
 }
 configurations { all { exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging") } }

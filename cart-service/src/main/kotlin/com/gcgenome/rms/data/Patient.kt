@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder
 import com.fasterxml.jackson.annotation.JsonSubTypes
 
 
-@JsonSubTypes(JsonSubTypes.Type(Sample::class, name = "samples"))
-@JsonPropertyOrder(value = ["serial", "sex", "name", "birth_year", "birth_month", "birth_day", "organization", "samples"])
+@JsonSubTypes(JsonSubTypes.Type(Sample::class, name = "sample"))
+@JsonPropertyOrder(value = ["serial", "sex", "name", "birth_year", "birth_month", "birth_day", "organization", "sample"])
 data class Patient(
     @JsonProperty("serial")
     val serial: String,
@@ -20,8 +20,8 @@ data class Patient(
     val birthMonth: Byte?,
     @JsonProperty("birth_day")
     val birthDay: Byte?,
-    @JsonProperty("samples")
-    val samples: List<Sample>,
+    @JsonProperty("sample")
+    val sample: Sample,
     @JsonProperty("organization")
     val organization: Organization
 )
