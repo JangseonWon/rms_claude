@@ -1,8 +1,8 @@
 package com.gcgenome.rms.service
 
-import com.gcgenome.rms.config.SecurityContextRepository
 import com.gcgenome.rms.data.Order
 import com.gcgenome.rms.data.Request
+import com.gcgenome.rms.exceptions.AuthenticationNotFoundException
 import com.gcgenome.rms.exceptions.ServiceNotFoundException
 import com.gcgenome.rms.exceptions.ServiceSampleTypeNotFoundException
 import org.springframework.context.annotation.Bean
@@ -18,7 +18,8 @@ import reactor.core.publisher.Mono
 
 @Configuration
 class CartRouter (
-    private val handler: CartHandler
+    private val handler: CartHandler,
+    private val authentication: AuthenticationHandler
 ){
     @Bean("CartServiceRouter")
     fun route() = router {
@@ -26,15 +27,14 @@ class CartRouter (
     }
 
     private fun cart(request: ServerRequest): Mono<ServerResponse> {
-        return request
-            .principal()
-            .cast(SecurityContextRepository.UserAuthentication::class.java)
+        return authentication.principal(request)
             .zipWith(request.bodyToMono(object : ParameterizedTypeReference<List<Request>>() {}))
-            .flatMap { handler.insertCartProcess(it.t1.principal, it.t2) }
+            .flatMap { handler.insertCartProcess(it.t1.user.id!!, it.t2) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), Order::class.java) }
+            .onErrorResume (AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume (ServiceNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
             .onErrorResume (ServiceSampleTypeNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
-            .onErrorResume(ServerWebInputException::class.java) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("Request body type error.") }
+            .onErrorResume (ServerWebInputException::class.java) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("Request body type error.") }
             .onErrorResume { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("Request body error.") }
     }
 }

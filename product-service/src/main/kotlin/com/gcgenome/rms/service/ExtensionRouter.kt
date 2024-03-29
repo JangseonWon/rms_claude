@@ -1,7 +1,7 @@
 package com.gcgenome.rms.service
 
-import com.gcgenome.rms.config.SecurityContextRepository
 import com.gcgenome.rms.data.ServiceExtension
+import com.gcgenome.rms.exceptions.AuthenticationNotFoundException
 import com.gcgenome.rms.exceptions.CategoryNotFoundException
 import com.gcgenome.rms.exceptions.ServiceNotFoundException
 import org.springframework.context.annotation.Bean
@@ -15,7 +15,10 @@ import reactor.core.publisher.Mono
 import java.util.*
 
 @Configuration
-class ExtensionRouter (private val handler: ExtensionHandler){
+class ExtensionRouter (
+    private val handler: ExtensionHandler,
+    private val authentication: AuthenticationHandler
+){
     @Bean("ExtensionServiceRouter")
     fun route() = router {
         GET("/w-api/product-service/services/{serviceId}/extensions", ::serviceExtensions)
@@ -24,21 +27,19 @@ class ExtensionRouter (private val handler: ExtensionHandler){
 
     private fun serviceExtensions(request: ServerRequest): Mono<ServerResponse> {
         val serviceId = request.pathVariable("serviceId")
-        return request
-            .principal()
-            .cast(SecurityContextRepository.UserAuthentication::class.java)
+        return authentication.principal(request)
             .flatMap { handler.extensionByServiceId(serviceId).collectList() }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), ServiceExtension::class.java)}
+            .onErrorResume (AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume (ServiceNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
     }
 
     private fun categoryExtensions(request: ServerRequest): Mono<ServerResponse> {
         val categoryId = request.pathVariable("categoryId")
-        return request
-            .principal()
-            .cast(SecurityContextRepository.UserAuthentication::class.java)
+        return authentication.principal(request)
             .flatMap { handler.extensionByCategoryId(UUID.fromString(categoryId)).collectList() }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), ServiceExtension::class.java)}
+            .onErrorResume (AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume (CategoryNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
             .onErrorResume (IllegalArgumentException::class.java) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("Please check the reqeust url")}
     }

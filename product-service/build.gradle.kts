@@ -15,6 +15,8 @@ dependencies {
     implementation(libs.bundles.kotlin.webflux)
     implementation(libs.bundles.r2dbc.postgres)
     implementation(libs.bundles.jooq)
+    implementation(libs.spring.security)
+    implementation(project(":authentication"))
     jooqGenerator("org.postgresql:postgresql:42.6.0")
     implementation("org.apache.poi:poi:5.1.0")
     implementation("org.apache.poi:poi-ooxml:5.1.0")

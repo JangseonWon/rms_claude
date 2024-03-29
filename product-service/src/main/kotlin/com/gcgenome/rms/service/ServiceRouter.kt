@@ -1,6 +1,6 @@
 package com.gcgenome.rms.service
 
-import com.gcgenome.rms.config.SecurityContextRepository
+import com.gcgenome.rms.exceptions.AuthenticationNotFoundException
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
@@ -13,7 +13,8 @@ import java.util.*
 
 @Configuration
 class ServiceRouter(
-    private val serviceHandler: ServiceHandler
+    private val serviceHandler: ServiceHandler,
+    private val authentication: AuthenticationHandler
 ){
 
     @Bean("ServiceRouter")
@@ -23,10 +24,10 @@ class ServiceRouter(
 
     private fun selectService(request: ServerRequest): Mono<ServerResponse> {
         val categoryId= request.pathVariable("category_id")
-        return request.principal()
-            .cast(SecurityContextRepository.UserAuthentication::class.java)
-            .flatMap { serviceHandler.selectService(UUID.fromString(categoryId), it.user.id).collectList() }
+        return authentication.principal(request)
+            .flatMap { serviceHandler.selectService(UUID.fromString(categoryId), it.user.id!!).collectList() }
             .flatMap { service -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(service) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(IllegalArgumentException::class.java) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("category id error") }
     }
 }
