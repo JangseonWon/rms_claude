@@ -9,19 +9,22 @@ import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.router
 import reactor.core.publisher.Mono
+import java.util.*
 
 @Configuration("com.gcgenome.rms.service.Router")
 class Router (private val handler: DownloadHandler) {
     @Bean("com.gcgenome.rms.service-download.Router.Bean")
-    fun route() = router { POST("/w-api/order-service/medical-referral/service/{service}/download/{id}", ::download) }
+    fun route() = router { GET("/w-api/order-service/orders/{order_id}/services/{service_id}/samples/{sample_id}/form", ::download) }
 
     private fun download(request: ServerRequest): Mono<ServerResponse> {
-        val service = request.pathVariable("service")
-        val serviceName = handler.capitalizeServiceName(service)
+        val orderId = request.pathVariable("order_id")
+        val serviceId = request.pathVariable("service_id")
+        val sampleId = request.pathVariable("sample_id")
+        val type = request.queryParam("type")
         return request
             .principal()
             .cast(SecurityContextRepository.UserAuthentication::class.java)
-            .flatMap { handler.handleDownloadByService(it.name, serviceName, request) }
+            .flatMap { handler.handleDownloadByService(it.name, serviceId, UUID.fromString(sampleId)) }
             .flatMap { byteArray -> ServerResponse.ok().contentType(MediaType.APPLICATION_PDF)
                 .header("Content-Disposition", "attachment; filename=test.pdf")
                 .bodyValue (byteArray) }

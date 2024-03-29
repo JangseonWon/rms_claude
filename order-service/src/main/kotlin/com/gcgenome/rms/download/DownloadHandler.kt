@@ -1,36 +1,38 @@
 package com.gcgenome.rms.download
 
-import com.gcgenome.rms.data.download.GenomeHealth
-import com.gcgenome.rms.data.download.Nipt
-import org.springframework.stereotype.Component
-import org.springframework.web.reactive.function.server.ServerRequest
+import com.gcgenome.rms.dao.PatientDao
+import com.gcgenome.rms.dao.SampleExtensionDao
+import com.gcgenome.rms.tables.pojos.Patient
+import com.gcgenome.rms.tables.pojos.SampleExtension
+import org.jooq.DSLContext
+import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
+import java.util.UUID
 
 
-@Component
+@Service
 class DownloadHandler(
+    private val dslContext: DSLContext,
     private val niptHandler: NiptHandler,
     private val genomeHealthHandler: GenomeHealthHandler
-) {
-    fun handleDownloadByService(principal: String, serviceName: String, request: ServerRequest): Mono<ByteArray> {
-        return when (serviceName) {
-            "Nipt" -> request.bodyToMono(Nipt::class.java)
-                .flatMap { nipt ->
-                    niptHandler.niptDownload(principal, nipt)
-                }
-            "GenomeHealth" -> request.bodyToMono(GenomeHealth::class.java)
-                .flatMap { genomeHealth ->
-                    genomeHealthHandler.genomeHealthDownload(principal, genomeHealth)
-                }
-            else -> Mono.error(IllegalArgumentException("Unsupported service: $serviceName"))
-        }
+): SampleExtensionDao, PatientDao {
+
+    fun selectSampleExtensions(sampleId : UUID) : Mono<List<SampleExtension>>{
+        return dslContext.selectSampleExtensions(sampleId).collectList()
     }
 
-    fun capitalizeServiceName(service: String): String {
-        return when (service) {
-            "nipt" -> "Nipt"
-            "genomehealth" -> "GenomeHealth"
-            else -> service
-        }
+    fun selectPatient(sampleId : UUID) : Mono<Patient> {
+        return dslContext.selectPatient(sampleId)
+    }
+
+    fun handleDownloadByService(principal: String, serviceId : String, sampleId: UUID): Mono<ByteArray> {
+        return Mono.from( selectPatient(sampleId).flatMap { patient ->
+            selectSampleExtensions(sampleId).flatMap { extensions ->
+                when (serviceId) {
+                    "O001" -> niptHandler.niptDownload(principal, extensions, patient)
+                    else -> Mono.error(IllegalArgumentException("Unsupported service: $serviceId"))
+                }
+            }
+        })
     }
 }

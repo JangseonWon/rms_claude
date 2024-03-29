@@ -15,7 +15,7 @@ import java.util.*
 @Component
 class ResampleHandler(
     val dslContext: DSLContext
-) : OrderDao, RequestDao, ExtensionDao, SampleDao, UserDao {
+) : OrderDao, RequestDao, SampleExtensionDao, SampleDao, UserDao {
 
     fun insertSampleRequest(userId: String, urlServiceId: String, orderId: UUID, sampleId: UUID, requestDto: Request): Mono<Order> {
         val dto = Dto(orderId = orderId, sampleId = sampleId, userId = userId, serviceId = urlServiceId)

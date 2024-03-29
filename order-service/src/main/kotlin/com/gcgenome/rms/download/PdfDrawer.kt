@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 
 
 @Component
-class PdfDrawer(private val resourceLoader: ResourceLoader,) {
+class PdfDrawer(private val resourceLoader: ResourceLoader) {
     fun loadPdfDocument(service: String): PDDocument {
         val pdfResource = resourceLoader.getResource(service)
         val pdfFile = pdfResource.file
@@ -21,7 +21,7 @@ class PdfDrawer(private val resourceLoader: ResourceLoader,) {
     }
 
     fun loadFont(document: PDDocument): PDType0Font {
-        val fontGCStream = resourceLoader.getResource("classpath:font/GC120.ttf").inputStream
+        val fontGCStream = resourceLoader.getResource("classpath:font/NotoSansKR-Regular.ttf").inputStream
         return PDType0Font.load(document, fontGCStream)
     }
 
@@ -34,6 +34,4 @@ class PdfDrawer(private val resourceLoader: ResourceLoader,) {
             is Int -> contentStream.showText(text.toString()) }
         contentStream.endText()
     }
-
-
 }
