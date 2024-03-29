@@ -12,6 +12,12 @@ spring:
       max-size: 10
       max-idle-time: 30m
       validation-query: SELECT 1
+  security:
+    oauth2:
+      authentication:
+        header: Authorization
+        jwt:
+          secret: ${SECURITY_PUBLIC_KEY}
 server:
   port: 4444
 

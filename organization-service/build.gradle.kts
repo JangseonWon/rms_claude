@@ -15,12 +15,10 @@ dependencies {
     implementation(libs.bundles.kotlin.webflux)
     implementation(libs.bundles.r2dbc.postgres)
     implementation(libs.spring.gateway)
-    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.4")
-    implementation("org.jooq:jooq:3.18.2")
-    implementation("org.jooq:jooq-codegen:3.18.2")
-    implementation("org.jooq:jooq-meta:3.18.2")
-    implementation("org.apache.pdfbox:pdfbox:2.0.29")
-
+    implementation(libs.bundles.jooq)
+    implementation(libs.jjwt.api)
+    runtimeOnly(libs.bundles.jjwt.runtime)
+    implementation(project(":authentication"))
     jooqGenerator("org.postgresql:postgresql:42.6.0")
 
 }
