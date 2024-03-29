@@ -1,4 +1,10 @@
 spring:
+  security:
+    oauth2:
+      authentication:
+        header: Authorization
+        jwt:
+          secret: ${SECURITY_PUBLIC_KEY}
   application:
     name: rms-management-service
   main:

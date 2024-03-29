@@ -1,7 +1,7 @@
 package com.gcgenome.rms.service
 
 import com.gcgenome.lims.encrypt.SHA256
-import com.gcgenome.rms.config.SecurityContextRepository.UserAuthentication
+import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.dao.OrganizationDao
 import com.gcgenome.rms.dao.UserDao
 import com.gcgenome.rms.data.*
@@ -28,12 +28,11 @@ class UserHandler(
         })
     }
 
-    fun chkManager(authentication: UserAuthentication): Mono<UserAuthentication>{
-        return authentication.authorities
-            .any { it.authority == "MANAGER" || it.authority == "ADMIN" }
-            .takeIf { it }
-            ?.let { Mono.just(authentication) }
-            ?: Mono.error(ManagerAuthenticationException())
+    fun chkManager(authentication: UserAuthentication): Mono<UserAuthentication> {
+        return when(authentication.user.role) {
+            "MANAGER","ADMIN" -> Mono.just(authentication)
+            else -> Mono.error(ManagerAuthenticationException())
+        }
     }
 
 }

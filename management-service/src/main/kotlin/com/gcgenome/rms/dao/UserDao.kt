@@ -7,17 +7,18 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL.jsonObject
 import org.jooq.impl.DSL.key
 import reactor.core.publisher.Mono
+import java.time.LocalDateTime
 import java.util.*
 
 interface UserDao{
     fun DSLContext.selectUserById(userId: String): Mono<User> {
-        return Mono.from(select(USER.ID, USER.NAME, USER.ROLE,  USER.TYPE, USER.EMAIL, USER.PHONE_NUMBER, USER.KEY, USER.STATE, USER.BRANCH_SERIAL, USER.BRANCH_NAME)
+        return Mono.from(select(USER.ID, USER.NAME, USER.ROLE,  USER.TYPE, USER.EMAIL, USER.PHONE_NUMBER, USER.KEY, USER.STATE, USER.BRANCH_SERIAL, USER.BRANCH_NAME, USER.CREATE_AT)
             .from(USER).where(USER.ID.eq(userId)))
             .map { it.into(User::class.java) }
     }
 
     fun DSLContext.selectUserOrganizationById(userDto: User): Mono<User> {
-        return Mono.from(select(USER.ID, USER.NAME, USER.ROLE, USER.TYPE, USER.EMAIL, USER.PHONE_NUMBER, USER.KEY, USER.STATE, USER.BRANCH_SERIAL, USER.BRANCH_NAME,
+        return Mono.from(select(USER.ID, USER.NAME, USER.ROLE, USER.TYPE, USER.EMAIL, USER.PHONE_NUMBER, USER.KEY, USER.STATE, USER.BRANCH_SERIAL, USER.BRANCH_NAME, USER.CREATE_AT,
             jsonObject(
                 key("id").value(ORGANIZATION.ID),
                 key("name").value(ORGANIZATION.NAME),
@@ -44,6 +45,7 @@ interface UserDao{
                 .set(USER.STATE, userDto.state)
                 .set(USER.BRANCH_SERIAL, userDto.branchSerial)
                 .set(USER.BRANCH_NAME, userDto.branchName)
+                .set(USER.CREATE_AT,LocalDateTime.now())
                 .returning()
         ).map{it.into(User::class.java)}
     }

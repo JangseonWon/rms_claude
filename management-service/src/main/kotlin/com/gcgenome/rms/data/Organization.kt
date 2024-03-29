@@ -1,7 +1,6 @@
 package com.gcgenome.rms.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.gcgenome.rms.tables.records.OrganizationRecord
 
 data class Organization(
     @JsonProperty("id")

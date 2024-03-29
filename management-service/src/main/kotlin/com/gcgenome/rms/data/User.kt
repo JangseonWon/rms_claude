@@ -1,6 +1,11 @@
 package com.gcgenome.rms.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
+import java.time.LocalDateTime
 import java.util.*
 
 data class User(
@@ -26,6 +31,10 @@ data class User(
     val branchSerial:String?,
     @JsonProperty("branch_name")
     val branchName:String?,
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonProperty("create_at")
+    val createAt: LocalDateTime?,
     @JsonProperty("organization")
     var organization: Organization?
 )

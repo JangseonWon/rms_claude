@@ -16,11 +16,10 @@ dependencies {
     implementation(libs.bundles.r2dbc.postgres)
     implementation(libs.bundles.jooq)
     implementation(libs.spring.gateway)
+    implementation(libs.jjwt.api)
+    runtimeOnly(libs.bundles.jjwt.runtime)
+    implementation(project(":authentication"))
     jooqGenerator("org.postgresql:postgresql:42.6.0")
-
-    implementation("io.jsonwebtoken:jjwt-api:0.11.5")
-    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
 }
 jib {
     from { image = "eclipse-temurin:17.0.7_7-jre-jammy" }

@@ -1,9 +1,8 @@
 package com.gcgenome.rms.route
 
-import com.gcgenome.rms.config.SecurityContextRepository.UserAuthentication
+import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.data.*
-import com.gcgenome.rms.exception.DatabaseConstraintViolationException
-import com.gcgenome.rms.exception.WebInputException
+import com.gcgenome.rms.exception.*
 import com.gcgenome.rms.service.UserHandler
 import org.jooq.exception.IntegrityConstraintViolationException
 import org.springframework.context.annotation.Bean
@@ -28,16 +27,15 @@ class UserRouter (
     private fun saveUser(request: ServerRequest): Mono<ServerResponse> {
         return Mono.zip(principal(request), request.bodyToMono(User::class.java))
             .flatMap { p -> userHandler.insertUser(p.t1, p.t2) }
-            .flatMap {
-                ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), User::class.java)
-            }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), User::class.java) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume (IntegrityConstraintViolationException::class.java) { ServerResponse.status(HttpStatus.NOT_ACCEPTABLE).bodyValue(DatabaseConstraintViolationException().message.toString()) }
             .onErrorResume (ServerWebInputException::class.java) { ServerResponse.status(HttpStatus.NOT_ACCEPTABLE).bodyValue(WebInputException().message.toString()) }
             .onErrorResume { e ->  ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: ${e}") }
     }
-
     private fun principal(request: ServerRequest): Mono<UserAuthentication> {
-        return request.principal().cast(UserAuthentication::class.java)
+        return request.principal().switchIfEmpty(Mono.error(AuthenticationNotFoundException()))
+            .cast(UserAuthentication::class.java)
     }
 }
 
