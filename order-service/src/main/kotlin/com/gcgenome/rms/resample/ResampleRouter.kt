@@ -1,8 +1,9 @@
 package com.gcgenome.rms.resample
 
-import com.gcgenome.rms.config.SecurityContextRepository
+import com.gcgenome.rms.auth.AuthenticationHandler
 import com.gcgenome.rms.data.Order
 import com.gcgenome.rms.data.Request
+import com.gcgenome.rms.exception.AuthenticationNotFoundException
 import com.gcgenome.rms.exceptions.RequestNotFoundException
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -17,7 +18,8 @@ import java.util.*
 
 @Configuration
 class ResampleRouter (
-    private val handler: ResampleHandler
+    private val handler: ResampleHandler,
+    private val authenticationHandler: AuthenticationHandler
 ){
     @Bean("ResampleServiceRouter")
     fun route() = router {
@@ -28,12 +30,11 @@ class ResampleRouter (
         val orderId = UUID.fromString(request.pathVariable("orderId"))
         val serviceId = request.pathVariable("serviceId")
         val sampleId = UUID.fromString(request.pathVariable("sampleId"))
-        return request
-            .principal()
-            .cast(SecurityContextRepository.UserAuthentication::class.java)
+        return authenticationHandler.principal(request)
             .zipWith(request.bodyToMono(Request::class.java))
-            .flatMap { handler.insertSampleRequest(it.t1.principal, serviceId, orderId, sampleId, it.t2) }
+            .flatMap { handler.insertSampleRequest(it.t1.user.id!!, serviceId, orderId, sampleId, it.t2) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), Order::class.java) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume (RequestNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
             .onErrorResume(ServerWebInputException::class.java) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("Request body type error.") }
             .onErrorResume { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("Request body error.") }

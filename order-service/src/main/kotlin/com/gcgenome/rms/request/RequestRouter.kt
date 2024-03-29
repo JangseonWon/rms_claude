@@ -1,7 +1,8 @@
 package com.gcgenome.rms.request
 
-import com.gcgenome.rms.config.SecurityContextRepository
+import com.gcgenome.rms.auth.AuthenticationHandler
 import com.gcgenome.rms.data.Query
+import com.gcgenome.rms.exception.AuthenticationNotFoundException
 import com.gcgenome.rms.exception.ColumnNotFoundException
 import org.jooq.exception.DataAccessException
 import org.springframework.context.annotation.Bean
@@ -15,21 +16,22 @@ import reactor.core.publisher.Mono
 
 @Configuration
 class RequestRouter(
-    private val requstHandler: RequestHandler
+    private val requestHandler: RequestHandler,
+    private val authenticationHandler: AuthenticationHandler
 ) {
     @Bean
     fun route() = router {
-        POST("/w-api/order-service/orders", ::selectRequsts)
+        POST("/w-api/order-service/orders", ::selectRequests)
     }
 
-    private fun selectRequsts(request: ServerRequest) : Mono<ServerResponse> {
-        return request.principal()
-            .cast(SecurityContextRepository.UserAuthentication::class.java)
+    private fun selectRequests(request: ServerRequest) : Mono<ServerResponse> {
+        return authenticationHandler.principal(request)
             .zipWith(request.bodyToMono(Query::class.java))
-            .flatMap { requstHandler.selectRequests(it.t1.principal, it.t2.copy(page= it.t2.page - 1)) }
+            .flatMap { requestHandler.selectRequests(it.t1.user.id!!, it.t2.copy(page= it.t2.page - 1)) }
             .flatMap { request ->
                 ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(request)
             }.onErrorResume(DataAccessException::class.java)  {e ->  ColumnNotFoundException(e).toServerResponse()}
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
     }
 }
