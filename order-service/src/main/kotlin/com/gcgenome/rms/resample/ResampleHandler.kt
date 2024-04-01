@@ -24,7 +24,7 @@ class ResampleHandler(
                 checkRequest(orderId, sampleId, urlServiceId, trx)
                     .then(insertSampleProcess(dto, requestDto, trx))
                     .flatMap { sample -> insertRequest(sample.id!!, dto, requestDto)}
-                    .then(selectRequestBySampleId(orderId, sampleId))
+                    .then(selectRequestBySampleId(orderId, sampleId, urlServiceId))
             }
         })
     }
@@ -37,16 +37,16 @@ class ResampleHandler(
     fun insertSampleProcess(dto: Dto, request: Request, trx: Configuration): Mono<Sample> {
         return trx.dsl().run{
             selectUserById(dto.userId!!)
-            .flatMap { userRecord ->
-                generateSampleBarcode(userRecord.branchSerial, trx)
-                    .flatMap { newBarcode ->
-                        insertSample(newBarcode, request.sample!!)
-                            .flatMap { sample ->
-                                insertSampleExtensionProcess(sample.id!!, request.sample.extensions, trx)
-                                    .then(selectSampleById(sample.id!!))
-                            }
-                    }
-            }}
+                .flatMap { userRecord ->
+                    generateSampleBarcode(userRecord.branchSerial, trx)
+                        .flatMap { newBarcode ->
+                            insertSample(newBarcode, request.sample!!)
+                                .flatMap { sample ->
+                                    insertSampleExtensionProcess(sample.id!!, request.sample.extensions, trx)
+                                        .then(selectSampleById(sample.id!!))
+                                }
+                        }
+                }}
     }
 
     fun insertSampleExtensionProcess(sampleId: UUID, extensions: List<Extension>?, trx: Configuration): Mono<Void> {

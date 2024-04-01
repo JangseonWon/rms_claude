@@ -1,6 +1,8 @@
 package com.gcgenome.rms.request
 
+import com.gcgenome.rms.dao.OrderDao
 import com.gcgenome.rms.dao.RequestDao
+import com.gcgenome.rms.data.Order
 import com.gcgenome.rms.data.Page
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.SelectRequest
@@ -11,15 +13,20 @@ import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.UUID
 
 @Service
 class RequestHandler(
     val dslContext: DSLContext
-): RequestDao {
+): RequestDao, OrderDao {
     fun pageCount(query: Query, totalCount: Int) : Int{
         var totalPage = totalCount / query.size
         if (totalCount % query.size != 0) totalPage++
         return totalPage
+    }
+
+    fun selectRequest(orderId: UUID, sampleId: UUID, serviceId: String) : Mono<Order> {
+        return dslContext.selectRequestBySampleId(orderId, sampleId, serviceId)
     }
 
     fun selectRequests(userId: String, query: Query) : Mono<Page<SelectRequest>> {

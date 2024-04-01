@@ -10,7 +10,7 @@ import java.util.*
 
 interface OrderDao {
 
-    fun DSLContext.selectRequestBySampleId(orderId: UUID, sampleId: UUID): Mono<Order> =
+    fun DSLContext.selectRequestBySampleId(orderId: UUID, sampleId: UUID, serviceId: String): Mono<Order> =
         Mono.from(
             select(
                 ORDER.SERIAL,
@@ -18,7 +18,16 @@ interface OrderDao {
                 ORDER.USER_ID,
                 jsonArrayAgg(
                     jsonObject(
-                        key("service").value(REQUEST.SERVICE_ID),
+                        key("service").value(
+                            select(
+                                jsonObject(
+                                    key("id").value(SERVICE.ID),
+                                    key("name").value(SERVICE.NAME),
+                                    key("categoryId").value(SERVICE.CATEGORY_ID)
+                                )
+                            ).from(SERVICE)
+                                .where(SERVICE.ID.eq(REQUEST.SERVICE_ID))
+                        ),
                         key("user_service_id").value(REQUEST.USER_SERVICE_ID),
                         key("status").value(REQUEST.STATUS),
                         key("memo").value(REQUEST.MEMO),
@@ -93,7 +102,6 @@ interface OrderDao {
                             )
                         )
                     )
-
                 ).`as`("requests")
             ).from(ORDER)
                 .join(REQUEST).on(ORDER.ID.eq(REQUEST.ORDER_ID))
