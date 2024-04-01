@@ -1,9 +1,11 @@
 package com.gcgenome.rms.dao
 
+import com.gcgenome.rms.data.UpdateUser
 import com.gcgenome.rms.data.User
 import com.gcgenome.rms.tables.references.ORGANIZATION
 import com.gcgenome.rms.tables.references.USER
 import org.jooq.DSLContext
+import org.jooq.impl.DSL
 import org.jooq.impl.DSL.jsonObject
 import org.jooq.impl.DSL.key
 import reactor.core.publisher.Mono
@@ -47,6 +49,21 @@ interface UserDao{
                 .set(USER.BRANCH_NAME, userDto.branchName)
                 .set(USER.CREATE_AT,LocalDateTime.now())
                 .returning()
+        ).map{it.into(User::class.java)}
+    }
+
+    fun DSLContext.updateUserById(userId: String, password: String?, userDto: UpdateUser): Mono<User> {
+        return Mono.from(
+            update(USER)
+                .set(USER.NAME, DSL.coalesce(DSL.`val`(userDto.name), USER.NAME))
+                .set(USER.PASSWORD, DSL.coalesce(DSL.`val`(password), USER.PASSWORD))
+                .set(USER.ROLE, DSL.coalesce(DSL.`val`(userDto.role), USER.ROLE))
+                .set(USER.TYPE, DSL.coalesce(DSL.`val`(userDto.type), USER.TYPE))
+                .set(USER.EMAIL, DSL.coalesce(DSL.`val`(userDto.email), USER.EMAIL))
+                .set(USER.PHONE_NUMBER, DSL.coalesce(DSL.`val`(userDto.phoneNumber), USER.PHONE_NUMBER))
+                .set(USER.STATE, DSL.coalesce(DSL.`val`(userDto.state), USER.STATE))
+                .where(USER.ID.eq(userId))
+                .returningResult(USER.ID,USER.NAME,USER.ROLE,USER.TYPE,USER.EMAIL,USER.PHONE_NUMBER,USER.KEY,USER.STATE,USER.BRANCH_SERIAL,USER.BRANCH_NAME,USER.CREATE_AT)
         ).map{it.into(User::class.java)}
     }
 }

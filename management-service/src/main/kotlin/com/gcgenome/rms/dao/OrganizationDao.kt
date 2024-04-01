@@ -1,8 +1,11 @@
 package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.Organization
+import com.gcgenome.rms.data.User
 import com.gcgenome.rms.tables.references.ORGANIZATION
 import org.jooq.DSLContext
+import org.jooq.impl.DSL
+import org.jooq.impl.DSL.`val`
 import reactor.core.publisher.Mono
 
 interface OrganizationDao{
@@ -18,6 +21,15 @@ interface OrganizationDao{
                 .set(ORGANIZATION.TYPE, organizationDto.type)
                 .returning()
         ).map{it.into(Organization::class.java)}
+    }
+
+    fun DSLContext.updateOrganizationNameByUserId(userDto: User): Mono<Organization> {
+        return Mono.from(
+            update(ORGANIZATION)
+                .set(ORGANIZATION.NAME, DSL.coalesce(`val`(userDto.name), ORGANIZATION.NAME))
+                .where(ORGANIZATION.ID.eq(userDto.id).and(ORGANIZATION.USER_ID.eq(userDto.id)))
+                .returningResult(ORGANIZATION.ID, ORGANIZATION.NAME, ORGANIZATION.TYPE, ORGANIZATION.REGISTRATION_NUMBER, ORGANIZATION.NURSING_NUMBER)
+        ).map { it.into(Organization::class.java) }
     }
 
 }
