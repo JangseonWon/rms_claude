@@ -22,7 +22,7 @@ class RequestRouter(
 ) {
     @Bean
     fun route() = router {
-        POST("/w-api/order-service/orders", ::selectRequests)
+        POST("/w-api/order-service/requests", ::selectRequests)
         GET("/w-api/order-service/orders/{order_id}/services/{service_id}/samples/{sample_id}", :: selectRequest)
     }
 
@@ -39,12 +39,14 @@ class RequestRouter(
     }
 
     private fun selectRequests(request: ServerRequest) : Mono<ServerResponse> {
+        var progress : Boolean = false
+        if (request.queryParam("Inprogress").get().equals("true"))
+            progress = true
         return authenticationHandler.principal(request)
             .zipWith(request.bodyToMono(Query::class.java))
-            .flatMap { requestHandler.selectRequests(it.t1.user.id!!, it.t2.copy(page= it.t2.page - 1)) }
-            .flatMap { request ->
-                ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(request)
-            }.onErrorResume(DataAccessException::class.java)  {e ->  ColumnNotFoundException(e).toServerResponse()}
+            .flatMap { requestHandler.selectRequests(it.t1.user, progress, it.t2.copy(page= it.t2.page - 1)) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
+            .onErrorResume(DataAccessException::class.java)  {e ->  ColumnNotFoundException(e).toServerResponse()}
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
     }

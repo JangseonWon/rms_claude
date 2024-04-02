@@ -1,5 +1,6 @@
 package com.gcgenome.rms.dao
 
+import com.gcgenome.rms.authentication.User
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.SelectRequest
 import com.gcgenome.rms.tables.references.*
@@ -17,7 +18,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 interface RequestDao {
-    fun DSLContext.selectRequests(query: Query, where: Condition, userId: String) : Flux<SelectRequest> {
+    fun DSLContext.selectRequests(query: Query, where: Condition, userDto: User) : Flux<SelectRequest> {
         val asc : SortOrder = when (query.asc) {
             true -> SortOrder.ASC
             false -> SortOrder.DESC
@@ -42,7 +43,6 @@ interface RequestDao {
                 REQUEST.OUTSOURCING_COST,
                 REQUEST.PHYSICIAN,
                 REQUEST.PRICE,
-                REQUEST.PRICE,
                 REQUEST.RESAMPLE_AT,
                 REQUEST.SPECIFIED_AT,
                 REQUEST.STATUS,
@@ -50,25 +50,30 @@ interface RequestDao {
                 REQUEST.USER_SERVICE_ID,
                 REQUEST.WARD
             ).from(REQUEST)
-                .join(ORDER).on(ORDER.USER_ID.eq(userId))
+                .join(ORDER).on(REQUEST.ORDER_ID.eq(ORDER.ID))
                 .join(SAMPLE).on(REQUEST.SAMPLE_ID.eq(SAMPLE.ID))
                 .join(PATIENT).on(SAMPLE.PATIENT_SERIAL.eq(PATIENT.SERIAL))
                 .join(SERVICE).on(REQUEST.SERVICE_ID.eq(SERVICE.ID))
-                .where(where)
-                .orderBy(field(query.sortBy).sort(asc))
+                .where(where).apply {
+                    when { userDto.role.equals("USER") -> and(ORDER.USER_ID.eq(userDto.id)) }
+                }.orderBy(field(query.sortBy).sort(asc))
                 .limit(query.size)
                 .offset(query.page*query.size)
         ).map { it.into(SelectRequest::class.java) }
     }
 
-    fun DSLContext.selectRequestsCount(query: Query, where: Condition, userId: String): Mono<Int> {
+    fun DSLContext.selectRequestsCount(query: Query, where: Condition, userDto: User): Mono<Int> {
         return Mono.from(
-            select(count()).from(REQUEST)
-                .join(ORDER).on(ORDER.USER_ID.eq(userId))
+            select(count())
+                .from(REQUEST)
+                .join(ORDER).on(REQUEST.ORDER_ID.eq(ORDER.ID))
                 .join(SAMPLE).on(REQUEST.SAMPLE_ID.eq(SAMPLE.ID))
                 .join(PATIENT).on(SAMPLE.PATIENT_SERIAL.eq(PATIENT.SERIAL))
                 .join(SERVICE).on(REQUEST.SERVICE_ID.eq(SERVICE.ID))
-                .where(where))
+                .where(where).apply {
+                    when { userDto.role.equals("USER") -> and(ORDER.USER_ID.eq(userDto.id)) }
+                }
+        )
             .map { it.component1() }
     }
 

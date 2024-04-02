@@ -1,5 +1,6 @@
 package com.gcgenome.rms.request
 
+import com.gcgenome.rms.authentication.User
 import com.gcgenome.rms.dao.OrderDao
 import com.gcgenome.rms.dao.RequestDao
 import com.gcgenome.rms.data.Order
@@ -29,11 +30,11 @@ class RequestHandler(
         return dslContext.selectRequestBySampleId(orderId, sampleId, serviceId)
     }
 
-    fun selectRequests(userId: String, query: Query) : Mono<Page<SelectRequest>> {
+    fun selectRequests(userDto: User, status: Boolean, query: Query) : Mono<Page<SelectRequest>> {
         val filters = query.filters ?: emptyList()
-        val whereClause = buildSelectUserOrganizationWhereClause(filters)
-        val request =  dslContext.selectRequests(query,whereClause, userId)
-        return dslContext.selectRequestsCount(query, whereClause, userId)
+        val where = buildFilterWhereClause(filters, status)
+        val request =  dslContext.selectRequests(query, where, userDto)
+        return dslContext.selectRequestsCount(query, where, userDto)
             .flatMap { totalCount ->
                 request.collectList().flatMap { list ->
                     val page = Page(totalCount, pageCount(query, totalCount), query.size, query.page + 1, list)
@@ -42,7 +43,7 @@ class RequestHandler(
             }
     }
 
-    fun buildSelectUserOrganizationWhereClause(filters: List<Query.Companion.Filter>): Condition {
+    fun buildFilterWhereClause(filters: List<Query.Companion.Filter>, status: Boolean): Condition {
         var conditions : List<Condition?> = mutableListOf()
         conditions = filters.map { filter ->
             var key = filter.key
@@ -72,11 +73,20 @@ class RequestHandler(
             (conditions as MutableList).add(betweenCondition)
         }
 
-        return if (conditions.isNotEmpty()) {
-            conditions.reduceOrNull { acc, condition -> acc?.and(condition) ?: condition }
-                ?: trueCondition()
-        } else {
-            trueCondition()
+        val progressCondition: List<Condition?> = mutableListOf()
+        if (status) {
+            val progress = arrayOf("ORDERED", "SPECIFIED", "INPROGRESS", "TESTFALIED", "DELIVERED")
+            progress.forEach { i -> (progressCondition as MutableList).add(field("status").like("%$i%")) }
         }
+
+        val andCondition = conditions.reduceOrNull { acc, condition ->
+            acc?.and(condition) ?: condition
+        } ?: trueCondition()
+
+        val orCondition = progressCondition.filterNotNull().reduceOrNull { acc, condition ->
+            acc?.or(condition) ?: condition
+        } ?: trueCondition()
+
+        return andCondition.and(orCondition)
     }
 }
