@@ -1,13 +1,16 @@
 package com.gcgenome.rms.dao
 
+import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.UpdateUser
 import com.gcgenome.rms.data.User
 import com.gcgenome.rms.tables.references.ORGANIZATION
 import com.gcgenome.rms.tables.references.USER
+import org.jooq.Condition
 import org.jooq.DSLContext
+import org.jooq.SortOrder
 import org.jooq.impl.DSL
-import org.jooq.impl.DSL.jsonObject
-import org.jooq.impl.DSL.key
+import org.jooq.impl.DSL.*
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.time.LocalDateTime
 import java.util.*
@@ -17,6 +20,54 @@ interface UserDao{
         return Mono.from(select(USER.ID, USER.NAME, USER.ROLE,  USER.TYPE, USER.EMAIL, USER.PHONE_NUMBER, USER.KEY, USER.STATE, USER.BRANCH_SERIAL, USER.BRANCH_NAME, USER.CREATE_AT)
             .from(USER).where(USER.ID.eq(userId)))
             .map { it.into(User::class.java) }
+    }
+
+    fun DSLContext.selectUsers(query:Query, whereClause:Condition): Flux<User> {
+        val order: String = query.sortBy?.let { query.sortBy } ?: "CREATE_AT"
+
+        val asc: SortOrder = when(query.asc) {
+            true -> SortOrder.ASC
+            false -> SortOrder.DESC
+            else -> SortOrder.DEFAULT
+        }
+
+        return Flux.from(
+            select(
+                USER.ID,
+                USER.NAME,
+                USER.ROLE,
+                USER.TYPE,
+                USER.EMAIL,
+                USER.PHONE_NUMBER,
+                USER.KEY, USER.STATE,
+                USER.BRANCH_SERIAL,
+                USER.BRANCH_NAME,
+                USER.CREATE_AT,
+                field(
+                    select(
+                        jsonObject(
+                            key("id").value(ORGANIZATION.ID),
+                            key("name").value(ORGANIZATION.NAME),
+                            key("type").value(ORGANIZATION.TYPE),
+                            key("registration_number").value(ORGANIZATION.REGISTRATION_NUMBER),
+                            key("nursing_number").value(ORGANIZATION.NURSING_NUMBER)
+                        )
+                    ).from(ORGANIZATION)
+                        .where(USER.ID.eq(ORGANIZATION.USER_ID).and(USER.ID.eq(ORGANIZATION.ID)))
+                ).`as`("organization"))
+            .from(USER)
+                .where(whereClause)
+                .orderBy(field(order).sort(asc))
+                .limit(query.size)
+                .offset(query.page*query.size)
+        ).map { it.into(User::class.java) }
+    }
+
+    fun DSLContext.selectUsersCount(query: Query, whereClause:Condition): Mono<Int> {
+        return Mono.from(
+            selectCount().from(USER)
+                .where(whereClause)
+        ).map { it.component1() }
     }
 
     fun DSLContext.selectUserOrganizationById(userDto: User): Mono<User> {
