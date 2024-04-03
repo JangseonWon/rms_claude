@@ -49,6 +49,9 @@ data class Request(
     @Column(name = "outsourcing_cost", nullable = true)
     val outsourcingCost: Int,
 
+    @OneToMany(mappedBy = "requestId")
+    val report: List<Report>,
+
     @ManyToOne
     @JoinColumn(name = "order_id", insertable = false, updatable = false)
     val orderId: Order,

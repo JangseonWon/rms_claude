@@ -44,7 +44,5 @@ data class Sample(
     @OneToMany(mappedBy = "sampleId")
     val sampleExtension: List<SampleExtension>,
     @OneToMany(mappedBy = "sampleId")
-    val report: List<Report>,
-    @OneToMany(mappedBy = "sampleId")
     val request: List<Request>
 )

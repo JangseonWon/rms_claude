@@ -19,8 +19,14 @@ data class Report(
     val createAt: LocalDateTime,
     @Column(name = "reported_at", nullable = true)
     val reportedAt: LocalDateTime,
+    @Column(name = "is_latest", nullable = false)
+    val isLatest: Boolean,
 
     @ManyToOne
-    @JoinColumn(name = "sample_id", insertable = false, updatable = false, nullable = false)
-    val sampleId: Sample
+    @JoinColumns(value = [
+        JoinColumn(name = "order_id", referencedColumnName = "order_id", insertable=false, updatable=false),
+        JoinColumn(name = "service_id", referencedColumnName = "service_id", insertable=false, updatable=false),
+        JoinColumn(name = "sample_id", referencedColumnName = "sample_id", insertable=false, updatable=false)
+    ])
+    val requestId: Request,
 )
