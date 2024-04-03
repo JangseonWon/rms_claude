@@ -1,8 +1,10 @@
 package com.gcgenome.rms.resample
 
+import com.gcgenome.rms.authentication.User
 import com.gcgenome.rms.dao.*
 import com.gcgenome.rms.data.*
 import com.gcgenome.rms.exceptions.RequestNotFoundException
+import com.gcgenome.rms.tables.records.SampleExtensionRecord
 import org.jooq.Configuration
 import org.jooq.DSLContext
 import org.springframework.stereotype.Component
@@ -17,43 +19,43 @@ class ResampleHandler(
     val dslContext: DSLContext
 ) : OrderDao, RequestDao, SampleExtensionDao, SampleDao, UserDao {
 
-    fun insertSampleRequest(userId: String, urlServiceId: String, orderId: UUID, sampleId: UUID, requestDto: Request): Mono<Order> {
-        val dto = Dto(orderId = orderId, sampleId = sampleId, userId = userId, serviceId = urlServiceId)
+    fun traceSample(orderId: UUID): Mono<Order> {
+        return Mono.from(dslContext.selectOrderById(orderId))
+    }
+
+    fun insertSampleRequest(userDto: User, dto: Request): Mono<Request> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
-                checkRequest(orderId, sampleId, urlServiceId, trx)
-                    .then(insertSampleProcess(dto, requestDto, trx))
-                    .flatMap { sample -> insertRequest(sample.id!!, dto, requestDto)}
-                    .then(selectRequestBySampleId(orderId, sampleId, urlServiceId))
+                selectRequest(dto, trx)
+                    .then(insertSampleProcess(userDto, dto, trx))
+                    .flatMap { sample -> insertRequest(dto.apply { sampleId = sample.id!! })}
+                    .flatMap { request -> selectRequestByPK(request.orderId!!, request.sampleId!!, request.serviceId!!)}
             }
         })
     }
 
-    fun checkRequest(orderId: UUID, sampleId: UUID, serviceId: String, trx: Configuration): Mono<Request> {
-        return trx.dsl().selectRequestById(orderId, sampleId, serviceId)
+    fun selectRequest(dto:Request, trx: Configuration): Mono<Request> {
+        return trx.dsl().selectRequestById(dto)
             .switchIfEmpty(Mono.error(RequestNotFoundException()))
     }
 
-    fun insertSampleProcess(dto: Dto, request: Request, trx: Configuration): Mono<Sample> {
+    fun insertSampleProcess(userDto: User, requestDto: Request, trx: Configuration): Mono<Sample> {
         return trx.dsl().run{
-            selectUserById(dto.userId!!)
-                .flatMap { userRecord ->
-                    generateSampleBarcode(userRecord.branchSerial, trx)
-                        .flatMap { newBarcode ->
-                            insertSample(newBarcode, request.sample!!)
-                                .flatMap { sample ->
-                                    insertSampleExtensionProcess(sample.id!!, request.sample.extensions, trx)
-                                        .then(selectSampleById(sample.id!!))
-                                }
-                        }
+                generateSampleBarcode(userDto.branchSerial!!, trx)
+                    .flatMap { newBarcode ->
+                        insertSample(newBarcode, requestDto.sample!!)
+                            .flatMap { sample ->
+                                insertSampleExtensionProcess(sample.id!!, requestDto.sample.extensions, trx)
+                                    .then(selectSampleById(sample.id!!))
+                            }
+
                 }}
     }
 
-    fun insertSampleExtensionProcess(sampleId: UUID, extensions: List<Extension>?, trx: Configuration): Mono<Void> {
+    fun insertSampleExtensionProcess(sampleId: UUID, extensions: List<Extension>?, trx: Configuration): Flux<SampleExtensionRecord> {
         return trx.dsl().run {
             Flux.fromIterable(extensions ?: emptyList())
                 .flatMap { extension -> insertSampleExtension(extension, sampleId) }
-                .then()
         }
     }
 
@@ -67,5 +69,4 @@ class ResampleHandler(
             }
             .switchIfEmpty(Mono.just("${barcodePrefix}5001"))
     }
-
 }

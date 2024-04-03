@@ -11,8 +11,8 @@ import java.util.*
 
 interface SampleExtensionDao{
 
-    fun DSLContext.insertSampleExtension(sampleExtension: Extension, sampleId: UUID): Mono<SampleExtensionRecord> {
-        return Mono.from(
+    fun DSLContext.insertSampleExtension(sampleExtension: Extension, sampleId: UUID): Flux<SampleExtensionRecord> {
+        return Flux.from(
             insertInto(SAMPLE_EXTENSION)
                 .set(SAMPLE_EXTENSION.EXTENSION_ID, sampleExtension.id)
                 .set(SAMPLE_EXTENSION.SAMPLE_ID, sampleId)

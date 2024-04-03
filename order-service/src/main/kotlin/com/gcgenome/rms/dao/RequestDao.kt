@@ -11,7 +11,6 @@ import org.jooq.SortOrder
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import com.gcgenome.rms.data.Request
-import com.gcgenome.rms.data.Dto
 import com.gcgenome.rms.data.Status
 import com.gcgenome.rms.tables.references.REQUEST
 import java.time.LocalDateTime
@@ -77,37 +76,134 @@ interface RequestDao {
             .map { it.component1() }
     }
 
-    fun DSLContext.selectRequestById(orderId: UUID, sampleId: UUID, serviceId: String): Mono<Request> {
-        return Mono.from(selectFrom(REQUEST).where(REQUEST.ORDER_ID.eq(orderId).and(REQUEST.SAMPLE_ID.eq(sampleId))))
+    fun DSLContext.selectRequestById(dto: Request): Mono<Request> {
+        return Mono.from(selectFrom(REQUEST)
+            .where(REQUEST.ORDER_ID.eq(dto.orderId)
+                .and(REQUEST.SAMPLE_ID.eq(dto.sampleId))
+                .and(REQUEST.SERVICE_ID.eq(dto.serviceId))
+            ))
             .map { it.into(Request::class.java) }
     }
 
-    fun DSLContext.insertRequest(sampleId: UUID, resampleId: Dto, request: Request): Mono<Request> {
+    fun DSLContext.insertRequest(requestDto: Request): Mono<Request> {
         return Mono.from(
             insertInto(REQUEST)
-                .set(REQUEST.ORDER_ID, resampleId.orderId)
-                .set(REQUEST.SERVICE_ID, resampleId.serviceId)
-                .set(REQUEST.SAMPLE_ID, sampleId)
-                .set(REQUEST.USER_SERVICE_ID, request.userServiceId ?: resampleId.serviceId)
+                .set(REQUEST.ORDER_ID, requestDto.orderId)
+                .set(REQUEST.SERVICE_ID, requestDto.serviceId)
+                .set(REQUEST.SAMPLE_ID, requestDto.sampleId)
+                .set(REQUEST.USER_SERVICE_ID, requestDto.userServiceId ?: requestDto.serviceId)
                 .set(REQUEST.STATUS, Status.ORDERED.toString())
-                .set(REQUEST.MEMO, request.memo)
-                .set(REQUEST.DEPARTMENT, request.department)
-                .set(REQUEST.WARD, request.ward)
-                .set(REQUEST.PHYSICIAN, request.physician)
+                .set(REQUEST.MEMO, requestDto.memo)
+                .set(REQUEST.DEPARTMENT, requestDto.department)
+                .set(REQUEST.WARD, requestDto.ward)
+                .set(REQUEST.PHYSICIAN, requestDto.physician)
                 .set(REQUEST.CREATE_AT, LocalDateTime.now())
-                .set(REQUEST.CART_AT, request.cartAt)
-                .set(REQUEST.SPECIFIED_AT, request.specifiedAt)
-                .set(REQUEST.COMPLETE_AT, request.completeAt)
-                .set(REQUEST.RESAMPLE_AT, request.resampleAt)
+                .set(REQUEST.CART_AT, requestDto.cartAt)
+                .set(REQUEST.SPECIFIED_AT, requestDto.specifiedAt)
+                .set(REQUEST.COMPLETE_AT, requestDto.completeAt)
+                .set(REQUEST.RESAMPLE_AT, requestDto.resampleAt)
                 .set(REQUEST.LAST_MODIFY_AT, LocalDateTime.now())
-                .set(REQUEST.EMP_ID, request.empId)
-                .set(REQUEST.EMP_NAME, request.empName)
-                .set(REQUEST.EMP_MOBILE, request.empMobile)
-                .set(REQUEST.TEST, request.test)
-                .set(REQUEST.CREDIT, request.credit)
-                .set(REQUEST.PRICE, request.price)
-                .set(REQUEST.OUTSOURCING_COST, request.outsourcingCost)
+                .set(REQUEST.EMP_ID, requestDto.empId)
+                .set(REQUEST.EMP_NAME, requestDto.empName)
+                .set(REQUEST.EMP_MOBILE, requestDto.empMobile)
+                .set(REQUEST.TEST, requestDto.test)
+                .set(REQUEST.CREDIT, requestDto.credit)
+                .set(REQUEST.PRICE, requestDto.price)
+                .set(REQUEST.OUTSOURCING_COST, requestDto.outsourcingCost)
                 .returning()
         ).map { it.into(Request::class.java) }
     }
+
+    fun DSLContext.selectRequestByPK(orderId: UUID, sampleId: UUID, serviceId: String): Mono<Request> =
+        Mono.from(
+            select(
+                jsonObject(
+                    SERVICE.ID,
+                    SERVICE.NAME,
+                    SERVICE.CATEGORY_ID
+                ).`as`("service"),
+                REQUEST.USER_SERVICE_ID,
+                REQUEST.STATUS,
+                REQUEST.MEMO,
+                REQUEST.DEPARTMENT,
+                REQUEST.WARD,
+                REQUEST.PHYSICIAN,
+                REQUEST.CREATE_AT,
+                REQUEST.CART_AT,
+                REQUEST.SPECIFIED_AT,
+                REQUEST.COMPLETE_AT,
+                REQUEST.RESAMPLE_AT,
+                REQUEST.LAST_MODIFY_AT,
+                REQUEST.EMP_ID,
+                REQUEST.EMP_NAME,
+                REQUEST.EMP_MOBILE,
+                REQUEST.TEST,
+                REQUEST.CREDIT,
+                REQUEST.PRICE,
+                REQUEST.OUTSOURCING_COST,
+                jsonObject(
+                    key("serial").value(PATIENT.SERIAL),
+                    key("sex").value(PATIENT.SEX),
+                    key("name").value(PATIENT.NAME),
+                    key("birth_year").value(PATIENT.BIRTH_YEAR),
+                    key("birth_month").value(PATIENT.BIRTH_MONTH),
+                    key("birth_day").value(PATIENT.BIRTH_DAY),
+                    key("organization").value(
+                        select(
+                            jsonObject(
+                                key("id").value(ORGANIZATION.ID),
+                                key("name").value(ORGANIZATION.NAME),
+                                key("type").value(ORGANIZATION.TYPE),
+                                key("registration_number").value(ORGANIZATION.REGISTRATION_NUMBER),
+                                key("nursing_number").value(ORGANIZATION.NURSING_NUMBER)
+                            )
+                        ).from(ORGANIZATION)
+                            .where(
+                                PATIENT.ORGANIZATION_ID.eq(ORGANIZATION.ID)
+                                    .and(PATIENT.USER_ID.eq(ORGANIZATION.USER_ID))
+                                    .and(ORGANIZATION.USER_ID.ne(ORGANIZATION.ID))
+                            )
+                    ),
+                    key("sample").value(
+                        select(
+                            jsonObject(
+                                key("barcode").value(SAMPLE.BARCODE),
+                                key("user_sample_id").value(SAMPLE.USER_SAMPLE_ID),
+                                key("quantity").value(SAMPLE.QUANTITY),
+                                key("age").value(SAMPLE.AGE),
+                                key("sampling_on").value(SAMPLE.SAMPLING_ON),
+                                key("resample_reason").value(SAMPLE.RESAMPLE_REASON),
+                                key("create_at").value(SAMPLE.CREATE_AT),
+                                key("sample_type_id").value(SAMPLE.SAMPLE_TYPE_ID),
+                                key("patient_serial").value(SAMPLE.PATIENT_SERIAL),
+                                key("extensions").value(
+                                    select(
+                                        jsonArrayAgg(
+                                            jsonObject(
+                                                key("id").value(SAMPLE_EXTENSION.EXTENSION_ID),
+                                                key("value").value(SAMPLE_EXTENSION.VALUE)
+                                            )
+                                        )
+                                    ).from(SAMPLE_EXTENSION)
+                                        .where(SAMPLE.ID.eq(SAMPLE_EXTENSION.SAMPLE_ID))
+                                )
+                            )
+                        ).from(SAMPLE).where(REQUEST.SAMPLE_ID.eq(SAMPLE.ID))
+                    )
+                ).`as`("patient")
+            ).from(ORDER)
+                .join(REQUEST).on(ORDER.ID.eq(REQUEST.ORDER_ID))
+                .join(SAMPLE).on(REQUEST.SAMPLE_ID.eq(SAMPLE.ID))
+                .join(PATIENT).on(
+                    SAMPLE.PATIENT_SERIAL.eq(PATIENT.SERIAL)
+                        .and(
+                            SAMPLE.ORGANIZATION_ID.eq(PATIENT.ORGANIZATION_ID)
+                                .and(SAMPLE.USER_ID.eq(PATIENT.USER_ID))
+                        )
+                )
+                .join(SERVICE).on(REQUEST.SERVICE_ID.eq(SERVICE.ID))
+                .where(REQUEST.ORDER_ID.eq(orderId)
+                    .and(REQUEST.SAMPLE_ID.eq(sampleId))
+                    .and(REQUEST.SERVICE_ID.eq(serviceId)))
+        ).map(Request::toPatientModel)
 }

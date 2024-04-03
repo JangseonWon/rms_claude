@@ -23,20 +23,32 @@ class ResampleRouter (
 ){
     @Bean("ResampleServiceRouter")
     fun route() = router {
-        PUT("/w-api/order-service/orders/{orderId}/services/{serviceId}/samples/{sampleId}", ::addSample)
+        GET("/w-api/order-service/orders/{order_id}", ::traceSample)
+        PUT("/w-api/order-service/orders/{order_id}/services/{service_id}/samples/{sample_id}", ::addSample)
+    }
+
+    private fun traceSample(request: ServerRequest): Mono<ServerResponse> {
+        val orderId = UUID.fromString(request.pathVariable("order_id"))
+        return authenticationHandler.principal(request)
+            .flatMap { handler.traceSample(orderId) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), Order::class.java) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(ServerWebInputException::class.java) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("Request body type error.") }
+            .onErrorResume { e ->  ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("server error: ${e}") }
     }
 
     private fun addSample(request: ServerRequest): Mono<ServerResponse> {
-        val orderId = UUID.fromString(request.pathVariable("orderId"))
-        val serviceId = request.pathVariable("serviceId")
-        val sampleId = UUID.fromString(request.pathVariable("sampleId"))
+        val order = UUID.fromString(request.pathVariable("order_id"))
+        val service = request.pathVariable("service_id")
+        val sample = UUID.fromString(request.pathVariable("sample_id"))
         return authenticationHandler.principal(request)
             .zipWith(request.bodyToMono(Request::class.java))
-            .flatMap { handler.insertSampleRequest(it.t1.user.id!!, serviceId, orderId, sampleId, it.t2) }
+            .flatMap { handler.insertSampleRequest(it.t1.user, it.t2.apply { orderId = order; sampleId = sample; serviceId = service}) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), Order::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume (RequestNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
+            .onErrorResume (RequestNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
             .onErrorResume(ServerWebInputException::class.java) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("Request body type error.") }
             .onErrorResume { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("Request body error.") }
     }
+
 }

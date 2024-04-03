@@ -3,10 +3,7 @@ package com.gcgenome.rms.request
 import com.gcgenome.rms.authentication.User
 import com.gcgenome.rms.dao.OrderDao
 import com.gcgenome.rms.dao.RequestDao
-import com.gcgenome.rms.data.Order
-import com.gcgenome.rms.data.Page
-import com.gcgenome.rms.data.Query
-import com.gcgenome.rms.data.SelectRequest
+import com.gcgenome.rms.data.*
 import org.jooq.Condition
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.*
@@ -26,8 +23,8 @@ class RequestHandler(
         return totalPage
     }
 
-    fun selectRequest(orderId: UUID, sampleId: UUID, serviceId: String) : Mono<Order> {
-        return dslContext.selectRequestBySampleId(orderId, sampleId, serviceId)
+    fun selectRequest(orderId: UUID, sampleId: UUID, serviceId: String) : Mono<Request> {
+        return dslContext.selectRequestByPK(orderId, sampleId, serviceId)
     }
 
     fun selectRequests(userDto: User, status: Boolean, query: Query) : Mono<Page<SelectRequest>> {
