@@ -20,7 +20,7 @@ class CartRouter (
 ){
     @Bean("CartServiceRouter")
     fun route() = router {
-        GET("/w-api/cart-service/orders/{order_id}/samples/{sample_id}/services/{service_id}", ::cartInfo)
+        GET("/w-api/cart-service/orders/{order_id}/services/{service_id}/samples/{sample_id}", ::cartInfo)
     }
 
     private fun cartInfo(request: ServerRequest): Mono<ServerResponse> {
