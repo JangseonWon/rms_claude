@@ -1,5 +1,6 @@
-package com.gcgenome.rms.service
+package com.gcgenome.rms.user
 
+import com.gcgenome.rms.auth.ManagerAuthenticationHandler
 import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.dao.OrganizationDao
 import com.gcgenome.rms.dao.UserDao
@@ -17,12 +18,13 @@ import reactor.core.publisher.Mono
 @Component
 class UserHandler(
     val dslContext: DSLContext,
-    val encoder: BCryptPasswordEncoder
+    val encoder: BCryptPasswordEncoder,
+    private val managerAuthenticationHandler: ManagerAuthenticationHandler
 ): UserDao, OrganizationDao {
 
     fun selectUsers(authentication: UserAuthentication, query: Query): Mono<Page<User>> {
         val whereClause = buildWhereClause(query.filters)
-        return chkManager(authentication)
+        return managerAuthenticationHandler.chkManager(authentication)
             .flatMap {
                 val users = dslContext.dsl().selectUsers(query,whereClause)
                 dslContext.selectUsersCount(query,whereClause)
@@ -36,7 +38,7 @@ class UserHandler(
             }
     }
 
-    private fun buildWhereClause(filters:List<Query.Companion.Filter>?) : Condition {
+    fun buildWhereClause(filters:List<Query.Companion.Filter>?) : Condition {
         return filters?.let {
             it.filter { filter -> filter.key != null && filter.value?.isNotBlank() == true }
                 .map { filter ->
@@ -62,7 +64,7 @@ class UserHandler(
         userDto.organization = Organization(userDto.id,userDto.id, userDto.name,null,null,null)
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
-                chkManager(authentication)
+                managerAuthenticationHandler.chkManager(authentication)
                     .flatMap { insertUser(userDto, password) }
                     .flatMap { insertOrganization(userDto.organization!!) }
                     .flatMap { selectUserOrganizationById(userDto) }
@@ -73,7 +75,7 @@ class UserHandler(
     fun updateUserById(authentication: UserAuthentication, userId: String, userDto: UpdateUser): Mono<User> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
-                chkManager(authentication)
+                managerAuthenticationHandler.chkManager(authentication)
                     .filterWhen{checkPassword(userDto)}.switchIfEmpty(Mono.error(PasswordNotMatchException()))
                     .then(selectUserById(userId).switchIfEmpty(Mono.error(UserNotFoundException(userId))))
                     .flatMap { updateUser(userId,userDto,trx) }
@@ -97,13 +99,6 @@ class UserHandler(
         return Mono.from(trx.dsl().run {
             updateUserById(userId, password,userDto)
         })
-    }
-
-    fun chkManager(authentication: UserAuthentication): Mono<UserAuthentication> {
-        return when(authentication.user.role) {
-            "MANAGER","ADMIN" -> Mono.just(authentication)
-            else -> Mono.error(ManagerAuthenticationException())
-        }
     }
 
 }

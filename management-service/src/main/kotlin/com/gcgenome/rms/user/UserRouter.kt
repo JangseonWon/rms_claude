@@ -1,9 +1,8 @@
-package com.gcgenome.rms.route
+package com.gcgenome.rms.user
 
-import com.gcgenome.rms.authentication.UserAuthentication
+import com.gcgenome.rms.auth.AuthenticationHandler
 import com.gcgenome.rms.data.*
 import com.gcgenome.rms.exception.*
-import com.gcgenome.rms.service.UserHandler
 import org.jooq.exception.DataAccessException
 import org.jooq.exception.IntegrityConstraintViolationException
 import org.springframework.context.annotation.Bean
@@ -18,7 +17,8 @@ import reactor.core.publisher.Mono
 
 @Configuration
 class UserRouter (
-    private val userHandler: UserHandler
+    private val userHandler: UserHandler,
+    private val authenticationHandler: AuthenticationHandler
 ) {
     @Bean("UserRouter")
     fun route() = router {
@@ -28,7 +28,7 @@ class UserRouter (
     }
 
     private fun findUsers(request: ServerRequest): Mono<ServerResponse> {
-        return Mono.zip(principal(request),request.bodyToMono(Query::class.java))
+        return Mono.zip(authenticationHandler.principal(request),request.bodyToMono(Query::class.java))
             .flatMap { p -> userHandler.selectUsers(p.t1,p.t2.copy(page=p.t2.page - 1)) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
@@ -39,7 +39,7 @@ class UserRouter (
     }
 
     private fun saveUser(request: ServerRequest): Mono<ServerResponse> {
-        return Mono.zip(principal(request), request.bodyToMono(User::class.java))
+        return Mono.zip(authenticationHandler.principal(request), request.bodyToMono(User::class.java))
             .flatMap { p -> userHandler.insertUser(p.t1, p.t2) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), User::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
@@ -50,7 +50,7 @@ class UserRouter (
 
     private fun updateUser(request: ServerRequest): Mono<ServerResponse> {
         val userId = request.pathVariable("userId")
-        return Mono.zip(principal(request), request.bodyToMono(UpdateUser::class.java))
+        return Mono.zip(authenticationHandler.principal(request), request.bodyToMono(UpdateUser::class.java))
             .flatMap { p -> userHandler.updateUserById(p.t1, userId, p.t2) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), User::class.java) }
             .onErrorResume(MatchUserException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}") }
@@ -59,9 +59,5 @@ class UserRouter (
             .onErrorResume { e ->  ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: ${e}") }
     }
 
-    private fun principal(request: ServerRequest): Mono<UserAuthentication> {
-        return request.principal().switchIfEmpty(Mono.error(AuthenticationNotFoundException()))
-            .cast(UserAuthentication::class.java)
-    }
 }
 

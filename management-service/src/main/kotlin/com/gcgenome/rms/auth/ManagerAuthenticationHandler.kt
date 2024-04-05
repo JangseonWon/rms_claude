@@ -1,0 +1,17 @@
+package com.gcgenome.rms.auth
+
+import com.gcgenome.rms.authentication.UserAuthentication
+import com.gcgenome.rms.data.Role
+import com.gcgenome.rms.exception.ManagerAuthenticationException
+import org.springframework.stereotype.Component
+import reactor.core.publisher.Mono
+
+@Component
+class ManagerAuthenticationHandler {
+    fun chkManager(authentication: UserAuthentication): Mono<UserAuthentication> {
+        return when(authentication.user.role) {
+            Role.MANAGER.toString(),Role.ADMIN.toString() -> Mono.just(authentication)
+            else -> Mono.error(ManagerAuthenticationException())
+        }
+    }
+}
