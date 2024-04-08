@@ -1,4 +1,4 @@
-package com.gcgenome.rms.exceptions
+package com.gcgenome.rms.exception
 
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException
 

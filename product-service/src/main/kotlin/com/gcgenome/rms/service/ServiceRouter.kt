@@ -1,6 +1,6 @@
 package com.gcgenome.rms.service
 
-import com.gcgenome.rms.exceptions.AuthenticationNotFoundException
+import com.gcgenome.rms.exception.AuthenticationNotFoundException
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus

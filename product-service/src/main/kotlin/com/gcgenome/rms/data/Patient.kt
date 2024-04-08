@@ -21,7 +21,7 @@ data class Patient(
     @JsonProperty("birth_day")
     val birthDay: Byte?,
     @JsonProperty("sample")
-    val sample: Sample,
+    val sample: Sample?,
     @JsonProperty("organization")
-    val organization: Organization
+    val organization: Organization?
 )

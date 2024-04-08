@@ -3,8 +3,8 @@ package com.gcgenome.rms.service
 import com.gcgenome.rms.dao.ExtensionDao
 import com.gcgenome.rms.dao.ServiceDao
 import com.gcgenome.rms.data.ServiceExtension
-import com.gcgenome.rms.exceptions.CategoryNotFoundException
-import com.gcgenome.rms.exceptions.ServiceNotFoundException
+import com.gcgenome.rms.exception.CategoryNotFoundException
+import com.gcgenome.rms.exception.ServiceNotFoundException
 import org.jooq.DSLContext
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux

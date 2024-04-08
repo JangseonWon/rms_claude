@@ -2,7 +2,8 @@ package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.Extension
 import com.gcgenome.rms.data.ServiceExtension
-import com.gcgenome.rms.tables.records.SampleExtensionRecord
+import com.gcgenome.rms.tables.pojos.SampleExtension
+import com.gcgenome.rms.tables.records.ServiceExtensionRecord
 import com.gcgenome.rms.tables.references.EXTENSION
 import com.gcgenome.rms.tables.references.SAMPLE_EXTENSION
 import com.gcgenome.rms.tables.references.SERVICE
@@ -53,13 +54,20 @@ interface ExtensionDao{
     }
 
 
-    fun DSLContext.insertSampleExtension(sampleExtension: Extension, sampleId: UUID): Mono<SampleExtensionRecord> {
+    fun DSLContext.insertSampleExtension(sampleExtension: Extension, sampleId: UUID): Mono<SampleExtension> {
         return Mono.from(
             insertInto(SAMPLE_EXTENSION)
                 .set(SAMPLE_EXTENSION.EXTENSION_ID, sampleExtension.id)
                 .set(SAMPLE_EXTENSION.SAMPLE_ID, sampleId)
                 .set(SAMPLE_EXTENSION.VALUE, sampleExtension.value)
                 .returning()
+        ).map { it.into(SampleExtension::class.java) }
+    }
+
+    fun DSLContext.checkExtensionIdByService(serviceId: String, extensionId: String): Mono<ServiceExtensionRecord> {
+        return Mono.from(
+            selectFrom(SERVICE_EXTENSION)
+                .where(SERVICE_EXTENSION.SERVICE_ID.eq(serviceId).and(SERVICE_EXTENSION.EXTENSION_ID.eq(extensionId)))
         )
     }
 

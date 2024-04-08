@@ -22,15 +22,13 @@ interface OrderDao {
         ).map { it.into(Order::class.java) }
     }
 
-    fun DSLContext.selectOrderSerial(orderSerial: String): Mono<String?> {
+    fun DSLContext.selectOrderSerial(orderSerial: String): Mono<String> {
         return Mono.from(select(ORDER.SERIAL)
             .from(ORDER)
             .where(ORDER.SERIAL.like("$orderSerial%"))
             .orderBy(ORDER.SERIAL.desc())
             .limit(1))
-            .mapNotNull { result ->
-                result?.component1()
-            }
+            .map { it.into(String::class.java) }
     }
 
     fun DSLContext.selectOrderById(orderId: UUID): Mono<Order> =
