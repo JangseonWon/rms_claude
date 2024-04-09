@@ -1,6 +1,6 @@
 package com.gcgenome.rms.download
 
-import com.gcgenome.rms.tables.pojos.Patient
+import com.gcgenome.rms.data.Patient
 import com.gcgenome.rms.tables.pojos.SampleExtension
 import org.apache.pdfbox.pdmodel.PDPageContentStream
 import org.apache.pdfbox.pdmodel.font.PDType0Font

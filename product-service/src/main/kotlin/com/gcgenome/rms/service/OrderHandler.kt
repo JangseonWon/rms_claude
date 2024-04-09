@@ -33,7 +33,7 @@ class OrderHandler(
                         var createTime: LocalDateTime? = null
                         var cartTime: LocalDateTime? = null
                         var serial: String? = null
-                        if (checkCart(order)) {
+                        if (!checkCart(order)) {
                             createTime = LocalDateTime.now(); serial = orderSerial
                         } else { cartTime = LocalDateTime.now() }
                         insertOrder(userId, serial, createTime).flatMap { insertOrder ->

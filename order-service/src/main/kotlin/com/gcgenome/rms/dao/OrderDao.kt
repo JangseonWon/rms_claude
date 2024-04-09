@@ -1,8 +1,8 @@
 package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.Order
+import com.gcgenome.rms.tables.records.OrderRecord
 import com.gcgenome.rms.tables.references.*
-import org.jooq.Condition
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.*
 import reactor.core.publisher.Mono
@@ -102,4 +102,15 @@ interface OrderDao {
                 .where(ORDER.ID.eq(orderId))
                 .groupBy(ORDER.SERIAL, ORDER.CREATE_AT, ORDER.USER_ID)
         ).map(Order::toModel)
+
+    fun DSLContext.deleteOrderById(orderId: UUID): Mono<OrderRecord> {
+        return Mono.from(
+            deleteFrom(ORDER).where(ORDER.ID.eq(orderId))
+                .and(row(ORDER.ID)
+                    .notIn(select(REQUEST.ORDER_ID)
+                        .from(REQUEST)
+                        .where(REQUEST.ORDER_ID.eq(orderId))))
+                .returning()
+        )
+    }
 }

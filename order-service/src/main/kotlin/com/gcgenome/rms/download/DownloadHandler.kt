@@ -2,7 +2,7 @@ package com.gcgenome.rms.download
 
 import com.gcgenome.rms.dao.PatientDao
 import com.gcgenome.rms.dao.SampleExtensionDao
-import com.gcgenome.rms.tables.pojos.Patient
+import com.gcgenome.rms.data.Patient
 import com.gcgenome.rms.tables.pojos.SampleExtension
 import org.jooq.DSLContext
 import org.springframework.stereotype.Service

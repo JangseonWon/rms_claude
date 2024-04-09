@@ -12,6 +12,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import com.gcgenome.rms.data.Request
 import com.gcgenome.rms.data.Status
+import com.gcgenome.rms.tables.records.RequestRecord
 import com.gcgenome.rms.tables.references.REQUEST
 import java.time.LocalDateTime
 import java.util.*
@@ -76,11 +77,11 @@ interface RequestDao {
             .map { it.component1() }
     }
 
-    fun DSLContext.selectRequestById(dto: Request): Mono<Request> {
+    fun DSLContext.selectRequestById(orderId: UUID, serviceId: String, sampleId: UUID): Mono<Request> {
         return Mono.from(selectFrom(REQUEST)
-            .where(REQUEST.ORDER_ID.eq(dto.orderId)
-                .and(REQUEST.SAMPLE_ID.eq(dto.sampleId))
-                .and(REQUEST.SERVICE_ID.eq(dto.serviceId))
+            .where(REQUEST.ORDER_ID.eq(orderId)
+                .and(REQUEST.SAMPLE_ID.eq(sampleId))
+                .and(REQUEST.SERVICE_ID.eq(serviceId))
             ))
             .map { it.into(Request::class.java) }
     }
@@ -112,6 +113,16 @@ interface RequestDao {
                 .set(REQUEST.OUTSOURCING_COST, requestDto.outsourcingCost)
                 .returning()
         ).map { it.into(Request::class.java) }
+    }
+
+    fun DSLContext.deleteRequestById(orderId: UUID, sampleId: UUID, serviceId: String): Mono<RequestRecord> {
+        return Mono.from(
+            deleteFrom(REQUEST)
+                .where(REQUEST.ORDER_ID.eq(orderId)
+                    .and(REQUEST.SAMPLE_ID.eq(sampleId))
+                    .and(REQUEST.SERVICE_ID.eq(serviceId)))
+                .returning()
+        )
     }
 
     fun DSLContext.selectRequestByPK(orderId: UUID, sampleId: UUID, serviceId: String): Mono<Request> =

@@ -3,7 +3,8 @@ package com.gcgenome.rms.resample
 import com.gcgenome.rms.authentication.User
 import com.gcgenome.rms.dao.*
 import com.gcgenome.rms.data.*
-import com.gcgenome.rms.exceptions.RequestNotFoundException
+import com.gcgenome.rms.exception.OrderNotFoundException
+import com.gcgenome.rms.exception.RequestForbiddenException
 import com.gcgenome.rms.tables.records.SampleExtensionRecord
 import org.jooq.Configuration
 import org.jooq.DSLContext
@@ -17,7 +18,7 @@ import java.util.*
 @Component
 class ResampleHandler(
     val dslContext: DSLContext
-) : OrderDao, RequestDao, SampleExtensionDao, SampleDao, UserDao {
+) : OrderDao, RequestDao, SampleExtensionDao, SampleDao, UserDao, PatientDao {
 
     fun traceSample(orderId: UUID): Mono<Order> {
         return Mono.from(dslContext.selectOrderById(orderId))
@@ -26,7 +27,7 @@ class ResampleHandler(
     fun insertSampleRequest(userDto: User, dto: Request): Mono<Request> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
-                selectRequest(dto, trx)
+                checkRequest(dto.orderId!!, dto.serviceId!!, dto.sampleId!!, trx)
                     .then(insertSampleProcess(userDto, dto, trx))
                     .flatMap { sample -> insertRequest(dto.apply { sampleId = sample.id!! })}
                     .flatMap { request -> selectRequestByPK(request.orderId!!, request.sampleId!!, request.serviceId!!)}
@@ -34,9 +35,34 @@ class ResampleHandler(
         })
     }
 
-    fun selectRequest(dto:Request, trx: Configuration): Mono<Request> {
-        return trx.dsl().selectRequestById(dto)
-            .switchIfEmpty(Mono.error(RequestNotFoundException()))
+    fun cancelRequest(user: User, orderId: UUID, serviceId: String, sampleId: UUID): Mono<Any> {
+        return Mono.from(dslContext.transactionPublisher { trx ->
+            trx.dsl().run {
+                checkRequest(orderId, serviceId, sampleId, trx)
+                    .flatMap { request ->
+                        if(checkUserStatusAndRole(user, request.status!!)){
+                            deleteRequestById(orderId, sampleId, serviceId)
+                            .then(deleteSampleExtensionBySampleId(sampleId))
+                            .then(deleteSampleById(sampleId))
+                            .flatMap {deletePatientById(it.patientSerial!!) }
+                            .then(deleteOrderById(orderId))
+                        } else {
+                            Mono.error(RequestForbiddenException())
+                        }
+                    }
+            }
+        })
+    }
+
+    fun checkUserStatusAndRole(user: User, status: String?) : Boolean {
+        return (user.role.equals("USER") && status == Status.ORDERED.toString()) ||
+               (user.role.equals("USER") && status == Status.CART.toString()) ||
+               !user.role.equals("USER")
+    }
+
+    fun checkRequest(orderId: UUID, serviceId: String, sampleId: UUID, trx: Configuration): Mono<Request> {
+        return trx.dsl().selectRequestById(orderId, serviceId, sampleId)
+            .switchIfEmpty(Mono.error(OrderNotFoundException()))
     }
 
     fun insertSampleProcess(userDto: User, requestDto: Request, trx: Configuration): Mono<Sample> {

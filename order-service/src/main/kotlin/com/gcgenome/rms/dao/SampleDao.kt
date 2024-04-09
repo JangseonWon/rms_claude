@@ -1,6 +1,7 @@
 package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.Sample
+import com.gcgenome.rms.tables.records.SampleRecord
 import com.gcgenome.rms.tables.references.SAMPLE
 import org.jooq.DSLContext
 import reactor.core.publisher.Mono
@@ -23,6 +24,12 @@ interface SampleDao {
             }
     }
 
+    fun DSLContext.deleteSampleById(sampleId: UUID): Mono<Sample> {
+        return Mono.from(
+            deleteFrom(SAMPLE).where(SAMPLE.ID.eq(sampleId))
+                .returning()
+        ).map { it.into(Sample::class.java) }
+    }
 
     fun DSLContext.insertSample(barcode: String, sample: Sample): Mono<Sample> {
         return Mono.from(
@@ -42,4 +49,5 @@ interface SampleDao {
                 .returning()
         ).map { it.into(Sample::class.java) }
     }
+
 }

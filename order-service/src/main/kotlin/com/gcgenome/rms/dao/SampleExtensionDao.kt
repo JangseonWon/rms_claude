@@ -27,4 +27,12 @@ interface SampleExtensionDao{
                 .where(SAMPLE_EXTENSION.SAMPLE_ID.eq(sampleId))
         ).map { it.into(SampleExtension::class.java) }
     }
+
+    fun DSLContext.deleteSampleExtensionBySampleId(sampleId: UUID): Mono<SampleExtension> {
+        return Mono.from(
+            deleteFrom(SAMPLE_EXTENSION)
+                .where(SAMPLE_EXTENSION.SAMPLE_ID.eq(sampleId))
+                .returning()
+        ).map { it.into(SampleExtension::class.java) }
+    }
 }
