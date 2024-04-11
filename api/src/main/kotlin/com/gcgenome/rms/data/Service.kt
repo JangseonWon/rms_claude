@@ -8,7 +8,7 @@ data class Service(
     @JsonProperty("name")
     val name: String,
     @JsonProperty("sample_types")
-    val sampleTypes: Array<SampleType>,
+    val sampleTypes: Array<SampleType>?,
     @JsonProperty("extensions")
     val extensions: Array<Extension>?
 )

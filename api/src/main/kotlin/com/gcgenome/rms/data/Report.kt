@@ -19,10 +19,16 @@ data class Report(
     val type: ReportType,
     @JsonProperty("value")
     val value: String?,
-    @JsonProperty("sample_id")
-    val sampleId: UUID?,
     @JsonProperty("reported_at")
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
-    val reportedAt: LocalDateTime?
+    val reportedAt: LocalDateTime?,
+    @JsonProperty("is_latest")
+    val isLatest: Boolean,
+    @JsonProperty("order_id")
+    val orderId: UUID?,
+    @JsonProperty("service_id")
+    val serviceId: String?,
+    @JsonProperty("sample_id")
+    val sampleId: UUID?,
 )

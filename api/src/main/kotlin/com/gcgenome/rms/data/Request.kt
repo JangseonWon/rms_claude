@@ -61,7 +61,11 @@ data class Request(
     val serviceId: String?,
     @JsonProperty("sample_id")
     val sampleId: UUID?,
-    @JsonProperty("samples")
-    val samples: Array<Sample>?
+    @JsonProperty("service")
+    val service: Service?,
+    @JsonProperty("sample")
+    val sample: Sample?,
+    @JsonProperty("reports")
+    val reports: Array<Report>?
 
 )
