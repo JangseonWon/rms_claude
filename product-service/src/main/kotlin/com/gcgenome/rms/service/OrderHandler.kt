@@ -39,7 +39,7 @@ class OrderHandler(
                         insertOrder(userId, serial, createTime).flatMap { insertOrder ->
                             Flux.fromIterable(order.requests!!).flatMap { request ->
                                 insertPatientProcess(userId, request.patient!!, trx)
-                                    .then(insertSampleProcess(request.serviceId, request.patient.sample!!, createTime, trx))
+                                    .then(insertSampleProcess(request.serviceId, request.patient, createTime, userId, trx))
                                     .flatMap { sample ->
                                         request.apply {
                                             orderId = insertOrder.id
@@ -47,7 +47,7 @@ class OrderHandler(
                                             createAt = createTime
                                             cartAt = cartTime
                                         }
-                                        insertSampleExtensionProcess(request.serviceId, sample.id!!, request.patient.sample.extensions, trx)
+                                        insertSampleExtensionProcess(request.serviceId, sample.id!!, request.patient.sample!!.extensions, trx)
                                             .then(insertRequestProcess(userId, request, trx))
                                     }
                             }.then(selectOrderById(insertOrder.id!!))
@@ -85,10 +85,10 @@ class OrderHandler(
         }
     }
 
-    fun insertSampleProcess(serviceId: String, sampleDto: Sample, createTime: LocalDateTime?, trx: Configuration): Mono<Sample> {
+    fun insertSampleProcess(serviceId: String, patient: Patient, createTime: LocalDateTime?, userId: String, trx: Configuration): Mono<Sample> {
         return trx.dsl().run {
-            checkServiceSampleTypeById(sampleDto.sampleTypeId!!, serviceId, trx)
-                .then(insertSample(sampleDto, createTime))
+            checkServiceSampleTypeById(patient.sample!!.sampleTypeId!!, serviceId, trx)
+                .then(insertSample(patient, patient.sample, userId, createTime))
                 .flatMap { sample -> selectSampleById(sample.id!!) }
         }
     }

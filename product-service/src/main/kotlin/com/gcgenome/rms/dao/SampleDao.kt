@@ -1,5 +1,6 @@
 package com.gcgenome.rms.dao
 
+import com.gcgenome.rms.data.Patient
 import com.gcgenome.rms.data.Sample
 import com.gcgenome.rms.tables.references.SAMPLE
 import org.jooq.DSLContext
@@ -24,7 +25,7 @@ interface SampleDao {
     }
 
 
-    fun DSLContext.insertSample(sample: Sample, createAt: LocalDateTime?): Mono<Sample> {
+    fun DSLContext.insertSample(patient: Patient, sample: Sample, userId: String, createAt: LocalDateTime?): Mono<Sample> {
         return Mono.from(
             insertInto(SAMPLE)
                 .set(SAMPLE.ID, UUID.randomUUID())
@@ -36,9 +37,9 @@ interface SampleDao {
                 .set(SAMPLE.RESAMPLE_REASON, sample.resampleReason)
                 .set(SAMPLE.CREATE_AT, createAt)
                 .set(SAMPLE.SAMPLE_TYPE_ID, sample.sampleTypeId)
-                .set(SAMPLE.PATIENT_SERIAL, sample.patientSerial)
-                .set(SAMPLE.ORGANIZATION_ID, sample.organizationId)
-                .set(SAMPLE.USER_ID, sample.userId)
+                .set(SAMPLE.PATIENT_SERIAL, patient.serial)
+                .set(SAMPLE.ORGANIZATION_ID, patient.organization!!.id)
+                .set(SAMPLE.USER_ID, userId)
                 .returning()
         ).map { it.into(Sample::class.java) }
     }
