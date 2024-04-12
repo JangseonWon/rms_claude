@@ -1,0 +1,49 @@
+spring:
+  security:
+    oauth2:
+      authentication:
+        header: Authorization
+        jwt:
+          secret: -----BEGIN RSA PRIVATE KEY-----
+                  MIIEogIBAAKCAQEA1NOp/82UK6qUn1B8IXUqal/RsxYSE/w4WDttEKzVb/Vqf8k3
+                  4ufawjrMagFFCB3qPM3/oBCS4qyskRB0A5O9ovvrZs95g6luHhS+mL55hfSMcg/f
+                  TgANmhSpqIBIvD4ieJ0ebB3/i4wLt6Lox+ykEMSlwKrbLdP7fP3n/FhmM7zXjOrb
+                  Zva+6dIQx5+D/yO64q/nRLAdLGrcIYPErnYwLiCV/R8zpRAXfLahfw1eEIw5AW+Z
+                  oDvAYX8UYCZ71E5odx3QZpVsVuxRim62ZVWuf08QIHvdkNefhwmN88xoHSKlmbiI
+                  2c9HaX5B779W+GR/MXOJ9D/n6NEwb6BFLtAykwIDAQABAoIBAD2s2Sb4PGgrFsbU
+                  XCSV/6Sz/+EWFEcWYH2xOvoKHBBF3ocJmNh4uDxxLavKkma3xJm6WMnaA7cMszWW
+                  vwgKWHpS5vT0SxKMlwzAljtNd4oKRGkJkHzaJxbvxfq+slVa7EJnxdkvGE8oVnzx
+                  CORm/2ScmCwtVzcAp3ChZAkM1RFIsQ+6WVG+FVa/qszqbMnlY3Oi/Po/PyKjugUN
+                  Wy4iL8AYDljTBGRu7OxxYJxxemOJR4ssagxp50EPomtaZcR3ykWVok9IqHvwUiub
+                  NPxGS4dLgFrrWnl/um0zH1QsdXZTCHWMmFTBuCI8O5ggyZEEXJtNa1CvZBx+sNVx
+                  DhlkWQECgYEA4VlvKbxm+ctkIa7cOWj1Sw4WeKB1lqJ0mT848tzzGgwGkY2DJIbg
+                  pqaIUajCbMIh0rJGRTZ81Z07/PwgASYEqCUVXiucKrOboBJl/fkYZspWJGKB6CWb
+                  cea+rGRUiK2/0UK8swX01TtsPZIIW7jpFfbfF0kI+lytbXT0vO44rjkCgYEA8cYz
+                  UpvL2K3/fXwdvelmi/YoMoHFuMO5DludawE157vE2UpHxQryLBm1XGAT2s8e+0bp
+                  owN3DLHWWM5ktjiQuT0dQoBFf7BaNUxJ2D235BmYadKF2wqxcxz7j7kmOEDnDSkx
+                  kMuFus6vfDg8rIES1983Z7H4wBi39nfy3wbCZysCgYANoxnlDq+0oihXGXveRYnC
+                  lwGpHxy+luozc+4AVHqpstya5lNvXHIv45gQSQQrDLx7Qaqa+acoTjGZJ7DQIPrb
+                  KhNW9ZCnzOK4FyTw76gYYFpCLWvrHot/oxUa3Z93/fvDsCQ3OT8NwGDWgQXcdx4z
+                  5BKwGA1hCUa9fvxoiooHkQKBgEvwzmQPLYsktBBNMOZa7mvd6KhcnKc5SuIYoqxe
+                  l/juwJjjvQFGO+TgOlgGkZXz4q5YisA6MWWaYlJImdemksasTIl70tiVovAEw1kZ
+                  oa4S4A21I3g2tqAKpXVyWW/n6ur2Wmw5kQqpKvOgkmY4sJt/sF5wx0pHOVlAOdgV
+                  vnA7AoGAZM35xztldL9vfDZMF3SuO9ReFd/S2Ap8EwkiSNVYe1Eqbke2ZnYjFez0
+                  1j4ZWsbdCg0oSFwHbZ+BUkU65iNc6rchk44Knt14Sy5aVVoQ5qg/vrMeAIej6PlH
+                  +9vEMxl9eufZl7Svwa7I/9dMaCVdYIKoIiKohSLgQToVTFyj/l8=
+                  -----END RSA PRIVATE KEY-----
+  application:
+    name: rms-management-service
+  main:
+    web-application-type: reactive
+  r2dbc:
+    pool:
+      initial-size: 2
+      max-size: 10
+      max-idle-time: 30m
+      validation-query: SELECT 1
+logging:
+  level:
+    io.r2dbc.postgresql.QUERY: TRACE
+
+server:
+  port: 9090

@@ -20,6 +20,14 @@ dependencies {
     runtimeOnly(libs.bundles.jjwt.runtime)
     implementation(project(":authentication"))
     jooqGenerator("org.postgresql:postgresql:42.6.0")
+
+    testImplementation(libs.bundles.test.api)
+    testImplementation(libs.spring.security.test)
+    testImplementation(libs.bundles.test.containers)
+    testImplementation(libs.bundles.test.kubernetes)
+}
+tasks.test {
+    useJUnitPlatform()
 }
 jib {
     from { image = "eclipse-temurin:17.0.7_7-jre-jammy" }

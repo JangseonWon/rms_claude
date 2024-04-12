@@ -49,11 +49,21 @@ dependencyResolutionManagement {
             library("cassandra", "org.springframework.boot", "spring-boot-starter-data-cassandra").withoutVersion()
 
 
-            library("spring-boot-test", "org.springframework.boot", "spring-boot-starter-test").withoutVersion()
-            library("mockk", "io.mockk", "mockk").version { require("1.13.4") }
-            library("reactor-test", "io.projectreactor", "reactor-test").withoutVersion()
             library("kotlin-test", "org.jetbrains.kotlin", "kotlin-test").withoutVersion()
+            library("reactor-test", "io.projectreactor", "reactor-test").withoutVersion()
+            library("kotest-runner", "io.kotest", "kotest-runner-junit5").version { require("5.8.1") }
+            library("mockk", "io.mockk", "mockk").version { require("1.13.10") }
+            library("kotest-extensions-spring", "io.kotest.extensions", "kotest-extensions-spring").version { require("1.1.3") }
+            library("kotest-extensions-testcontainers", "io.kotest.extensions", "kotest-extensions-testcontainers").version { require("2.0.2") }
+            library("spring-boot-test", "org.springframework.boot", "spring-boot-starter-test").withoutVersion()
+            library("spring-security-test", "org.springframework.security", "spring-security-test").withoutVersion()
+            library("kubernetes-mock", "io.fabric8", "kubernetes-server-mock").version { require("6.10.0") }
+            library("testcontainers-junit", "org.testcontainers", "junit-jupiter").withoutVersion()
+            library("testcontainers-postgresql", "org.testcontainers", "postgresql").withoutVersion()
             bundle("test", listOf("spring-boot-test", "mockk", "reactor-test", "kotlin-test"))
+            bundle("test-api", listOf("reactor-test", "kotest-runner", "mockk", "kotest-extensions-spring", "spring-boot-test"))
+            bundle("test-containers", listOf("testcontainers-junit", "testcontainers-postgresql", "kotest-extensions-testcontainers"))
+            bundle("test-kubernetes", listOf("kubernetes-mock"))
 
 
             library("spring-cloud-bom", "org.springframework.cloud", "spring-cloud-dependencies").version { require("2023.0.0") }
