@@ -2,11 +2,12 @@ package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.Service_
 import com.gcgenome.rms.tables.pojos.Service
-import com.gcgenome.rms.tables.references.*
+import com.gcgenome.rms.tables.references.SERVICE
+import com.gcgenome.rms.tables.references.USER_SERVICE
+import org.jooq.Condition
 import org.jooq.DSLContext
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import java.util.*
 
 
 interface ServiceDao{
@@ -24,6 +25,12 @@ interface ServiceDao{
         return Mono.from(
             selectFrom(SERVICE).where(SERVICE.ID.eq(serviceId))
         ).map { it.into(Service_::class.java) }
+    }
+
+    fun DSLContext.selectServiceByNameOrId(whereClause: Condition): Flux<Service> {
+        return Flux.from(
+            selectFrom(SERVICE).where(whereClause)
+        ).map { it.into(Service::class.java) }
     }
 
     fun DSLContext.updateServiceById(service: Service): Mono<Service> {
