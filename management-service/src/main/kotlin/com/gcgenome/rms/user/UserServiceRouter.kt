@@ -3,7 +3,6 @@ package com.gcgenome.rms.user
 import com.gcgenome.rms.auth.AuthenticationHandler
 import com.gcgenome.rms.data.*
 import com.gcgenome.rms.exception.*
-import org.jooq.exception.DataAccessException
 import org.jooq.exception.IntegrityConstraintViolationException
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -27,9 +26,9 @@ class UserServiceRouter (
 
     private fun saveUserServices(request: ServerRequest): Mono<ServerResponse> {
         val userId = request.pathVariable("userId")
-        return Mono.zip(authenticationHandler.principal(request),request.bodyToMono(Array<Service>::class.java))
+        return Mono.zip(authenticationHandler.principal(request),request.bodyToMono(Array<Service_>::class.java))
             .flatMap { userServiceHandler.insertUserService(it.t1,userId, it.t2).collectList() }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it),Service::class.java ) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it),Service_::class.java ) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume (IntegrityConstraintViolationException::class.java) { ServerResponse.status(HttpStatus.NOT_ACCEPTABLE).bodyValue(DatabaseConstraintViolationException().message.toString()) }
             .onErrorResume(UserNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }

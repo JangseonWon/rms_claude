@@ -18,7 +18,7 @@ class UserServiceHandler(
     val dslContext: DSLContext,
     private val managerAuthenticationHandler: ManagerAuthenticationHandler
 ): UserServiceDao, ServiceDao, UserDao {
-    fun insertUserService(authentication: UserAuthentication, userId: String, services: Array<Service>): Flux<Service> {
+    fun insertUserService(authentication: UserAuthentication, userId: String, services: Array<Service_>): Flux<Service_> {
 
         return Flux.from(dslContext.transactionPublisher{ trx ->
                 trx.dsl().run {

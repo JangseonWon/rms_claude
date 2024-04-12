@@ -1,7 +1,7 @@
 package com.gcgenome.rms.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
-data class Service(
+data class Service_(
     @JsonProperty("id")
     val id: String,
     @JsonProperty("name")

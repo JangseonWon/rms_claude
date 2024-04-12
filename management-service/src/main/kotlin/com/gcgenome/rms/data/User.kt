@@ -28,5 +28,5 @@ data class User(
     @JsonProperty("create_at")
     val createAt: LocalDateTime?,
     var organization: Organization?,
-    val service:Service?
+    val service:Service_?
 )

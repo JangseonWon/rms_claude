@@ -1,14 +1,16 @@
 package com.gcgenome.rms.dao
 
-import com.gcgenome.rms.data.Service
+import com.gcgenome.rms.data.Service_
+import com.gcgenome.rms.tables.pojos.Service
 import com.gcgenome.rms.tables.references.*
 import org.jooq.DSLContext
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import java.util.*
 
 
 interface ServiceDao{
-    fun DSLContext.selectServiceByUserId(userId: String): Flux<Service>{
+    fun DSLContext.selectServiceByUserId(userId: String): Flux<Service_>{
         return Flux.from(
             select(
                 SERVICE.ID,
@@ -16,11 +18,28 @@ interface ServiceDao{
             ).from(SERVICE)
                 .join(USER_SERVICE).on(SERVICE.ID.eq(USER_SERVICE.SERVICE_ID))
                 .where(USER_SERVICE.USER_ID.eq(userId))
-        ).map { it.into(Service::class.java) }
+        ).map { it.into(Service_::class.java) }
     }
-    fun DSLContext.selectServiceById(serviceId: String): Mono<Service> {
+    fun DSLContext.selectServiceById(serviceId: String): Mono<Service_> {
         return Mono.from(
             selectFrom(SERVICE).where(SERVICE.ID.eq(serviceId))
+        ).map { it.into(Service_::class.java) }
+    }
+
+    fun DSLContext.updateServiceById(service: Service): Mono<Service> {
+        return Mono.from(
+            update(SERVICE)
+                .set(SERVICE.NAME, service.name)
+                .set(SERVICE.CATEGORY_ID, service.categoryId)
+                .where(SERVICE.ID.eq(service.id))
+                .returning()
+        ).map { it.into(Service::class.java) }
+    }
+
+    fun DSLContext.selectServiceByCategoryId(categoryId: UUID): Flux<Service> {
+        return Flux.from(
+            select(SERVICE.ID, SERVICE.NAME).from(SERVICE)
+                .where(SERVICE.CATEGORY_ID.eq(categoryId))
         ).map { it.into(Service::class.java) }
     }
 }
