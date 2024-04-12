@@ -1,9 +1,9 @@
 package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.Sample
-import com.gcgenome.rms.tables.records.SampleRecord
 import com.gcgenome.rms.tables.references.SAMPLE
 import org.jooq.DSLContext
+import org.jooq.impl.DSL.*
 import reactor.core.publisher.Mono
 import java.time.LocalDateTime
 import java.util.*
@@ -50,4 +50,21 @@ interface SampleDao {
         ).map { it.into(Sample::class.java) }
     }
 
+    fun DSLContext.updateSample(sample: Sample, organizationId : String): Mono<Sample> {
+        return Mono.from(
+            update(SAMPLE)
+                .set(SAMPLE.PATIENT_SERIAL, coalesce(`val`(sample.patientSerial), SAMPLE.PATIENT_SERIAL))
+                .set(SAMPLE.BARCODE, coalesce(`val`(sample.barcode), SAMPLE.BARCODE))
+                .set(SAMPLE.USER_SAMPLE_ID, coalesce(`val`(sample.userSampleId ?: sample.barcode), SAMPLE.USER_SAMPLE_ID))
+                .set(SAMPLE.QUANTITY, coalesce(`val`(sample.quantity), SAMPLE.QUANTITY))
+                .set(SAMPLE.AGE, coalesce(`val`(sample.age), SAMPLE.AGE))
+                .set(SAMPLE.SAMPLING_ON, coalesce(`val`(sample.samplingOn), SAMPLE.SAMPLING_ON))
+                .set(SAMPLE.RESAMPLE_REASON, coalesce(`val`(sample.resampleReason), SAMPLE.RESAMPLE_REASON))
+                .set(SAMPLE.SAMPLE_TYPE_ID, coalesce(`val`(sample.sampleTypeId), SAMPLE.SAMPLE_TYPE_ID))
+                .set(SAMPLE.ORGANIZATION_ID, coalesce(`val`(organizationId), SAMPLE.ORGANIZATION_ID))
+                .set(SAMPLE.USER_ID, coalesce(`val`(sample.userId), SAMPLE.USER_ID))
+                .where(SAMPLE.ID.eq(sample.id))
+                .returning()
+        ).map { it.into(Sample::class.java) }
+    }
 }

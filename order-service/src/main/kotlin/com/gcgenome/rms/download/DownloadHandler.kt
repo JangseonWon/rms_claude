@@ -22,7 +22,7 @@ class DownloadHandler(
     }
 
     fun selectPatient(sampleId : UUID) : Mono<Patient> {
-        return dslContext.selectPatient(sampleId)
+        return dslContext.selectPatientBySampleId(sampleId)
     }
 
     fun handleDownloadByService(principal: String, serviceId : String, sampleId: UUID): Mono<ByteArray> {

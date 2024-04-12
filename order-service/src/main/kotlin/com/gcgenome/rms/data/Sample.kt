@@ -27,7 +27,7 @@ data class Sample(
     @JsonProperty("sampling_on")
     @JsonDeserialize(using = LocalDateDeserializer::class)
     @JsonSerialize(using = LocalDateSerializer::class)
-    val samplingOn: LocalDate,
+    val samplingOn: LocalDate?,
     @JsonProperty("resample_reason")
     val resampleReason: String?,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
@@ -37,7 +37,7 @@ data class Sample(
     @JsonProperty("sample_type_id")
     val sampleTypeId: String?,
     @JsonProperty("patient_serial")
-    val patientSerial: String?,
+    var patientSerial: String?,
     @JsonProperty("organization_id")
     val organizationId: String?,
     @JsonProperty("user_id")

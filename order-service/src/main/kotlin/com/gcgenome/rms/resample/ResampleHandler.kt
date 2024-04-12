@@ -40,25 +40,26 @@ class ResampleHandler(
             trx.dsl().run {
                 checkRequest(orderId, serviceId, sampleId, trx)
                     .flatMap { request ->
-                        if(checkUserStatusAndRole(user, request.status!!)){
-                            deleteRequestById(orderId, sampleId, serviceId)
+                        checkUserStatusAndRole(user, request.status!!)
+                            .then(deleteRequestById(orderId, sampleId, serviceId))
                             .then(deleteSampleExtensionBySampleId(sampleId))
                             .then(deleteSampleById(sampleId))
-                            .flatMap {deletePatientById(it.patientSerial!!) }
+                            .flatMap {deletePatientById(request.patient!!, user.id) }
                             .then(deleteOrderById(orderId))
-                        } else {
-                            Mono.error(RequestForbiddenException())
-                        }
                     }
             }
         })
     }
 
-    fun checkUserStatusAndRole(user: User, status: String?) : Boolean {
-        return (user.role.equals("USER") && status == Status.ORDERED.toString()) ||
-               (user.role.equals("USER") && status == Status.CART.toString()) ||
-               !user.role.equals("USER")
+    fun checkUserStatusAndRole(user: User, status: String?) : Mono<Boolean> {
+        return if ((user.role.equals("USER") && status == Status.ORDERED.toString()) ||
+            (user.role.equals("USER") && status == Status.CART.toString()) ||
+            !user.role.equals("USER")) { Mono.just(true) }
+        else {
+            Mono.error(RequestForbiddenException())
+        }
     }
+
 
     fun checkRequest(orderId: UUID, serviceId: String, sampleId: UUID, trx: Configuration): Mono<Request> {
         return trx.dsl().selectRequestById(orderId, serviceId, sampleId)
@@ -67,13 +68,13 @@ class ResampleHandler(
 
     fun insertSampleProcess(userDto: User, requestDto: Request, trx: Configuration): Mono<Sample> {
         return trx.dsl().run{
-                generateSampleBarcode(userDto.branchSerial!!, trx)
-                    .flatMap { newBarcode ->
-                        insertSample(newBarcode, requestDto.sample!!)
-                            .flatMap { sample ->
-                                insertSampleExtensionProcess(sample.id!!, requestDto.sample.extensions, trx)
-                                    .then(selectSampleById(sample.id!!))
-                            }
+            generateSampleBarcode(userDto.branchSerial!!, trx)
+                .flatMap { newBarcode ->
+                    insertSample(newBarcode, requestDto.sample!!)
+                        .flatMap { sample ->
+                            insertSampleExtensionProcess(sample.id!!, requestDto.sample.extensions, trx)
+                                .then(selectSampleById(sample.id!!))
+                        }
 
                 }}
     }

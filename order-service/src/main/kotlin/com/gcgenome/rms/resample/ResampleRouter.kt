@@ -6,7 +6,6 @@ import com.gcgenome.rms.data.Request
 import com.gcgenome.rms.exception.AuthenticationNotFoundException
 import com.gcgenome.rms.exception.OrderNotFoundException
 import com.gcgenome.rms.exception.RequestForbiddenException
-import com.gcgenome.rms.exception.SampleDeleteException
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus

@@ -115,6 +115,28 @@ interface RequestDao {
         ).map { it.into(Request::class.java) }
     }
 
+    fun DSLContext.updateRequest(request: Request): Mono<Request> {
+        return Mono.from(
+            update(REQUEST)
+                .set(REQUEST.USER_SERVICE_ID, coalesce(`val`(request.userServiceId), REQUEST.USER_SERVICE_ID))
+                .set(REQUEST.STATUS, coalesce(`val`(request.status), REQUEST.STATUS))
+                .set(REQUEST.MEMO, coalesce(`val`(request.memo), REQUEST.MEMO))
+                .set(REQUEST.DEPARTMENT, coalesce(`val`(request.department), REQUEST.DEPARTMENT))
+                .set(REQUEST.WARD, coalesce(`val`(request.ward), REQUEST.WARD))
+                .set(REQUEST.PHYSICIAN, coalesce(`val`(request.physician), REQUEST.PHYSICIAN))
+                .set(REQUEST.LAST_MODIFY_AT,LocalDateTime.now())
+                .set(REQUEST.EMP_ID, coalesce(`val`(request.empId),REQUEST.EMP_ID))
+                .set(REQUEST.EMP_NAME, coalesce(`val`(request.empName),REQUEST.EMP_NAME))
+                .set(REQUEST.EMP_MOBILE, coalesce(`val`(request.empMobile), REQUEST.EMP_MOBILE))
+                .set(REQUEST.TEST, coalesce(`val`(request.test),REQUEST.TEST))
+                .set(REQUEST.CREDIT, coalesce(`val`(request.credit), REQUEST.CREDIT))
+                .set(REQUEST.PRICE, coalesce(`val`(request.price), REQUEST.PRICE))
+                .set(REQUEST.OUTSOURCING_COST, coalesce(`val`(request.outsourcingCost), REQUEST.OUTSOURCING_COST))
+                .where(REQUEST.ORDER_ID.eq(request.orderId).and(REQUEST.SAMPLE_ID.eq(request.sampleId).and(REQUEST.SERVICE_ID.eq(request.serviceId))))
+                .returning()
+        ).map { it.into(Request::class.java) }
+    }
+
     fun DSLContext.deleteRequestById(orderId: UUID, sampleId: UUID, serviceId: String): Mono<RequestRecord> {
         return Mono.from(
             deleteFrom(REQUEST)
