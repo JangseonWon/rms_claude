@@ -35,11 +35,4 @@ interface ServiceDao{
                 .returning()
         ).map { it.into(Service::class.java) }
     }
-
-    fun DSLContext.selectServiceByCategoryId(categoryId: UUID): Flux<Service> {
-        return Flux.from(
-            select(SERVICE.ID, SERVICE.NAME).from(SERVICE)
-                .where(SERVICE.CATEGORY_ID.eq(categoryId))
-        ).map { it.into(Service::class.java) }
-    }
 }
