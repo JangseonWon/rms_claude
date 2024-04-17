@@ -22,7 +22,7 @@ data class Patient(
     @JsonProperty("organization")
     val organization: Organization?,
     @JsonProperty("samples")
-    val samples: Array<Sample>?
+    val samples: List<Sample>?
 ) {
     constructor(organizationId: String, serial: String, userId: String) : this(organizationId, serial, userId, null, null, null, null, null, null, null)
 }

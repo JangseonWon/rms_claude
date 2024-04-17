@@ -24,7 +24,7 @@ data class Report(
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     val reportedAt: LocalDateTime?,
     @JsonProperty("is_latest")
-    val isLatest: Boolean,
+    val isLatest: Boolean?,
     @JsonProperty("order_id")
     val orderId: UUID?,
     @JsonProperty("service_id")

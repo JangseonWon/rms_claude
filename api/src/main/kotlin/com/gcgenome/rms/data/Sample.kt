@@ -12,9 +12,9 @@ import java.time.LocalDateTime
 import java.util.*
 
 data class Sample(
-    @JsonProperty("sample_id")
-    var id: UUID?,
     @JsonProperty("id")
+    var id: UUID?,
+    @JsonProperty("barcode")
     val barcode: String?,
     @JsonProperty("user_sample_id")
     val userSampleId: String?,
@@ -41,10 +41,12 @@ data class Sample(
     @JsonProperty("user_id")
     val userId: String?,
     @JsonProperty("requests")
-    val requests: Array<Request>?,
+    val requests: List<Request>?,
+    @JsonProperty("sample_type")
+    val sampleType: SampleType?,
     @JsonProperty("patient")
     val patient: Patient?,
     @JsonProperty("extensions")
-    val extensions: Array<Extension>?
+    val extensions: List<Extension>?
 
 )

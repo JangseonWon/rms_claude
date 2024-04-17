@@ -8,6 +8,27 @@ import org.jooq.impl.DSL.row
 import reactor.core.publisher.Mono
 
 interface PatientDao{
+    fun DSLContext.insertPatient(userId: String, patient: Patient) : Mono<Patient> {
+        return Mono.from(
+            insertInto(PATIENT)
+                .set(PATIENT.SERIAL,patient.serial)
+                .set(PATIENT.ORGANIZATION_ID,patient.organization!!.id)
+                .set(PATIENT.USER_ID,userId)
+                .set(PATIENT.NAME,patient.name)
+                .set(PATIENT.SEX,patient.sex)
+                .set(PATIENT.BIRTH_YEAR,patient.birthYear)
+                .set(PATIENT.BIRTH_MONTH,patient.birthMonth)
+                .set(PATIENT.BIRTH_DAY,patient.birthDay)
+                .onConflict()
+                .doUpdate()
+                .set(PATIENT.NAME,patient.name)
+                .set(PATIENT.SEX,patient.sex)
+                .set(PATIENT.BIRTH_YEAR,patient.birthYear)
+                .set(PATIENT.BIRTH_MONTH,patient.birthMonth)
+                .set(PATIENT.BIRTH_DAY,patient.birthDay)
+                .returning()
+        ).map { it.into(Patient::class.java) }
+    }
     fun DSLContext.deletePatientById(patient: Patient): Mono<Patient> {
         return Mono.from(
             deleteFrom(PATIENT)

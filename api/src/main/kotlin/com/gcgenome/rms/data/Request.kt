@@ -66,6 +66,6 @@ data class Request(
     @JsonProperty("sample")
     val sample: Sample?,
     @JsonProperty("reports")
-    val reports: Array<Report>?
+    val reports: List<Report>?
 
 )

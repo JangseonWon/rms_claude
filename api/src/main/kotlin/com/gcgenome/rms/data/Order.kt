@@ -9,11 +9,11 @@ import java.time.LocalDateTime
 import java.util.*
 
 data class Order(
-    @JsonProperty("order_id")
+    @JsonProperty("id")
     val id: UUID?,
     @JsonProperty("user_id")
     val userId: String?,
-    @JsonProperty("id")
+    @JsonProperty("serial")
     val serial: String?,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)

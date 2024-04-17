@@ -25,12 +25,12 @@ data class Filter(
 ){
     companion object{
         data class OrderFilter(
-            @JsonProperty("id")
+            @JsonProperty("serial")
             val serial: String?
         )
         data class RequestFilter(
-            @JsonProperty("service_id")
-            val serviceId: String?,
+            @JsonProperty("service")
+            val service: Service?,
             @JsonProperty("user_service_id")
             val userServiceId: String?,
             @JsonProperty("date_from")
@@ -51,12 +51,12 @@ data class Filter(
             val test: Boolean?
         )
         data class SampleFilter(
-            @JsonProperty("id")
+            @JsonProperty("barcode")
             val barcode: String?,
             @JsonProperty("user_sample_id")
             val userSampleId: String?,
-            @JsonProperty("sample_type_id")
-            val sampleTypeId: String?
+            @JsonProperty("sample_type")
+            val sampleType: SampleType?
         )
         data class PatientFilter(
             @JsonProperty("serial")
