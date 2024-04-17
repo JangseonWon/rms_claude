@@ -5,10 +5,14 @@ import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.dao.ServiceDao
 import com.gcgenome.rms.dao.UserDao
 import com.gcgenome.rms.dao.UserServiceDao
-import com.gcgenome.rms.data.*
+import com.gcgenome.rms.data.Query
+import com.gcgenome.rms.data.Service_
 import com.gcgenome.rms.exception.ServiceNotFoundException
 import com.gcgenome.rms.exception.UserNotFoundException
+import com.gcgenome.rms.tables.pojos.Service
+import org.jooq.Condition
 import org.jooq.DSLContext
+import org.jooq.impl.DSL.field
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -31,5 +35,17 @@ class UserServiceHandler(
                         .thenMany(selectServiceByUserId(userId))
                 }
         })
+    }
+
+    fun selectUserService(userId: String, filter: Query.Companion.Filter): Flux<Service> {
+        val whereClause = buildUserServiceIdOrNameWhereClause(filter)
+        return Flux.from(dslContext.run {
+            selectUserById(userId).switchIfEmpty(Mono.error(UserNotFoundException(userId)))
+                .thenMany(selectUserByServiceIdOrName(userId, whereClause))
+        })
+    }
+
+    fun buildUserServiceIdOrNameWhereClause(filter: Query.Companion.Filter) : Condition {
+        return field("user_service.service_id").like("%${filter.value}%").or(field("service.name").like("%${filter.value}%"))
     }
 }

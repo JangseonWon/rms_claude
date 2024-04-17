@@ -2,7 +2,10 @@ package com.gcgenome.rms.dao
 
 
 import com.gcgenome.rms.data.UserService
-import com.gcgenome.rms.tables.references.*
+import com.gcgenome.rms.tables.pojos.Service
+import com.gcgenome.rms.tables.references.SERVICE
+import com.gcgenome.rms.tables.references.USER_SERVICE
+import org.jooq.Condition
 import org.jooq.DSLContext
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -17,5 +20,13 @@ interface UserServiceDao {
             .onDuplicateKeyIgnore()
             .returning()
         ).map { it.into(UserService::class.java) }
+    }
+
+    fun DSLContext.selectUserByServiceIdOrName(userId: String, where: Condition): Flux<Service> {
+        return Flux.from(
+            select(SERVICE.ID, SERVICE.NAME).from(USER_SERVICE)
+                .join(SERVICE).on(USER_SERVICE.SERVICE_ID.eq(SERVICE.ID))
+                .where(USER_SERVICE.USER_ID.eq(userId).and(where))
+        ).map { it.into(Service::class.java) }
     }
 }

@@ -22,6 +22,7 @@ class UserServiceRouter (
     @Bean("UserServiceRouter")
     fun route() = router {
         PUT("/w-api/management-service/users/{userId}/services", ::saveUserServices)
+        POST("/w-api/management-service/users/{userId}/services", ::selectUserServices)
     }
 
     private fun saveUserServices(request: ServerRequest): Mono<ServerResponse> {
@@ -34,6 +35,17 @@ class UserServiceRouter (
             .onErrorResume(UserNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
             .onErrorResume(ServiceNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
             .onErrorResume (ServerWebInputException::class.java) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue(WebInputException().message.toString()) }
+            .onErrorResume { e ->  ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: ${e}") }
+    }
+
+    private fun selectUserServices(request: ServerRequest): Mono<ServerResponse> {
+        val userId = request.pathVariable("userId")
+        return authenticationHandler.principal(request)
+            .flatMap { request.bodyToMono(Query.Companion.Filter::class.java) }
+            .flatMap { userServiceHandler.selectUserService(userId, it).collectList() }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it),Service_::class.java ) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(UserNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
             .onErrorResume { e ->  ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: ${e}") }
     }
 }
