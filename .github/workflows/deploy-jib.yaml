@@ -1,0 +1,107 @@
+name: 백엔드 배포
+on:
+  push:
+    branches:
+      - master
+      - deploy
+    paths:
+      - management-service/**
+permissions: write-all
+jobs:
+  extract:
+    runs-on: ubi9
+    outputs:
+      matrix: ${{ steps.extract-modules.outputs.matrix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 10
+      - name: Extract module names from changed files
+        id: extract-modules
+        run: |
+          changed_files="$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }})"
+          module_names=()
+          for file in $changed_files; do
+            module_name="${file%%/*}"
+            [[ "$module_name" == "management-service" ]] && module_names+=("$module_name")
+          done
+          module_names=($(printf '%s\n' "${module_names[@]}" | sort -u))
+          echo "matrix=[$(printf '"%s",' "${module_names[@]}" | sed 's/,$//')]"
+          echo "matrix=[$(printf '"%s",' "${module_names[@]}" | sed 's/,$//')]" >> $GITHUB_OUTPUT
+  deploy:
+    needs: extract
+    runs-on: ubi9
+    strategy:
+      fail-fast: true
+      matrix:
+        SUBMODULE: ${{ fromJSON(needs.extract.outputs.matrix) }}
+    env:
+      DATABASE_URL_TEST: ${{ secrets.DATABASE_URL_TEST }}
+      DATABASE_USERNAME_TEST: ${{ secrets.DATABASE_USERNAME_TEST }}
+      DATABASE_PASSWORD_TEST: ${{ secrets.DATABASE_PASSWORD_TEST }}
+      IMAGE_REGISTRY_TEST: ${{ secrets.IMAGE_REGISTRY_TEST }}
+      REGISTRY_USERNAME_TEST: ${{ secrets.REGISTRY_USERNAME_TEST }}
+      REGISTRY_PASSWORD_TEST: ${{ secrets.REGISTRY_PASSWORD_TEST }}
+      DATABASE_URL_DEPLOY: ${{ secrets.DATABASE_URL_DEPLOY }}
+      DATABASE_USERNAME_DEPLOY: ${{ secrets.DATABASE_USERNAME_DEPLOY }}
+      DATABASE_PASSWORD_DEPLOY: ${{ secrets.DATABASE_PASSWORD_DEPLOY }}
+      IMAGE_REGISTRY_DEPLOY: ${{ secrets.IMAGE_REGISTRY_DEPLOY }}
+      REGISTRY_USERNAME_DEPLOY: ${{ secrets.REGISTRY_USERNAME_DEPLOY }}
+      REGISTRY_PASSWORD_DEPLOY: ${{ secrets.REGISTRY_PASSWORD_DEPLOY }}
+      BASE_IMAGE: eclipse-temurin:21-jre-ubi9-minimal
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      SUBMODULE: ${{ matrix.SUBMODULE }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: 8.7
+      - name: Build&Test
+        run: |
+          if [ "$GITHUB_REF_NAME" = "master" ]; then 
+            export POSTGRES_URL=$DATABASE_URL_TEST
+            export POSTGRES_USERNAME=$DATABASE_USERNAME_TEST
+            export POSTGRES_PASSWORD=$DATABASE_PASSWORD_TEST
+          else 
+            export POSTGRES_URL=$DATABASE_URL_DEPLOY
+            export POSTGRES_USERNAME=$DATABASE_USERNAME_DEPLOY
+            export POSTGRES_PASSWORD=$DATABASE_PASSWORD_DEPLOY
+          fi
+          gradle $SUBMODULE:test
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: ${{ always() }}
+        with:
+          files: ${{ env.SUBMODULE }}/build/test-results/**/*.xml
+      - name: Deploy
+        run: |
+          if [ "$GITHUB_REF_NAME" = "master" ]; then 
+            export IMAGE="rms-test/$SUBMODULE"
+            export IMAGE_REGISTRY=$IMAGE_REGISTRY_TEST
+            export REGISTRY_USERNAME=$REGISTRY_USERNAME_TEST
+            export REGISTRY_PASSWORD=$REGISTRY_PASSWORD_TEST
+          else 
+            export IMAGE="rms/$SUBMODULE"
+            export IMAGE_REGISTRY=$IMAGE_REGISTRY_DEPLOY
+            export REGISTRY_USERNAME=$REGISTRY_USERNAME_DEPLOY
+            export REGISTRY_PASSWORD=$REGISTRY_PASSWORD_DEPLOY
+          fi
+          TAG="latest" 
+          gradle $SUBMODULE:jib -x generateJooq \
+            -Djib.from.image=$BASE_IMAGE \
+            -Djib.from.auth.username=$DOCKER_USERNAME \
+            -Djib.from.auth.password=$DOCKER_PASSWORD \
+            -Djib.to.image=$IMAGE_REGISTRY/$IMAGE:$TAG \
+            -Djib.to.auth.username=$REGISTRY_USERNAME \
+            -Djib.to.auth.password=$REGISTRY_PASSWORD \
+            -Djib.allowInsecureRegistries=true \
+            -Djib.sendCredentialsOverHttp=true
