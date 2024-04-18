@@ -1,21 +1,24 @@
 package com.gcgenome.rms.service
 
+import com.gcgenome.rms.dao.SampleTypeDao
 import com.gcgenome.rms.dao.ServiceDao
 import com.gcgenome.rms.dao.ServiceExtensionDao
 import com.gcgenome.rms.data.Extension
 import com.gcgenome.rms.data.Query
+import com.gcgenome.rms.exception.ServiceNotFoundException
+import com.gcgenome.rms.tables.pojos.SampleType
 import com.gcgenome.rms.tables.pojos.Service
-import com.gcgenome.rms.tables.pojos.ServiceExtension
 import org.jooq.Condition
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.field
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 
 @Component
 class ServiceHandler(
     val dslContext: DSLContext
-): ServiceDao, ServiceExtensionDao {
+): ServiceDao, ServiceExtensionDao, SampleTypeDao {
 
     fun selectServiceByNameOrId(filter: Query.Companion.Filter): Flux<Service> {
         val whereClause = buildServiceIdOrNameWhereClause(filter)
@@ -24,7 +27,17 @@ class ServiceHandler(
 
     fun selectServiceExtensions(filter: Query.Companion.Filter, serviceId: String): Flux<Extension> {
         val whereClause = buildExtensionIdOrNameWhereClause(filter)
-        return Flux.from(dslContext.selectServiceExtensionByNameOrId(whereClause, serviceId))
+        return Flux.from(dslContext.run {
+            selectServiceById(serviceId).switchIfEmpty(Mono.error(ServiceNotFoundException(serviceId)))
+                .thenMany(selectServiceExtensionByNameOrId(whereClause, serviceId))
+        })
+    }
+
+    fun selectSampleTypes(filter: Query.Companion.Filter, serviceId: String): Flux<SampleType> {
+        return Flux.from(dslContext.run {
+            selectServiceById(serviceId).switchIfEmpty(Mono.error(ServiceNotFoundException(serviceId)))
+                .thenMany(selectSampleTypeByNameOrId(serviceId, filter.value))
+        })
     }
 
     fun buildServiceIdOrNameWhereClause(filter: Query.Companion.Filter) : Condition {
