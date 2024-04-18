@@ -7,9 +7,7 @@ import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.Service_
 import com.gcgenome.rms.exception.CategoryNotFoundException
 import com.gcgenome.rms.exception.CategoryOrderTypeNotFoundException
-import com.gcgenome.rms.exception.ServiceNotFoundException
 import com.gcgenome.rms.tables.pojos.Category
-import com.gcgenome.rms.tables.pojos.Service
 import org.jooq.Condition
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.field
@@ -33,12 +31,6 @@ class CategoriesHandler(
             .then(dslContext.insertCategory(category))
     }
 
-    fun updateServiceById(service: Service): Mono<Service> {
-        return checkServiceById(service.id!!).flatMap {
-            dslContext.updateServiceById(service.apply { name = it.name })
-        }
-    }
-
     fun selectServiceInfoByCategoryId(categoryId: UUID, filter: Query.Companion.Filter): Flux<Service_> {
         val whereClause = buildServiceIdOrNameWhereClause(filter)
         return Flux.from(checkCategoryById(categoryId)
@@ -58,11 +50,6 @@ class CategoriesHandler(
         } else {
             Mono.error(CategoryOrderTypeNotFoundException())
         }
-    }
-
-    fun checkServiceById(serviceId: String): Mono<Service_> {
-        return dslContext.selectServiceById(serviceId)
-            .switchIfEmpty(Mono.error(ServiceNotFoundException(serviceId)))
     }
 
     fun buildServiceIdOrNameWhereClause(filter: Query.Companion.Filter) : Condition {

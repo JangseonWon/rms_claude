@@ -5,6 +5,7 @@ import com.gcgenome.rms.dao.ServiceDao
 import com.gcgenome.rms.dao.ServiceExtensionDao
 import com.gcgenome.rms.data.Extension
 import com.gcgenome.rms.data.Query
+import com.gcgenome.rms.data.Service_
 import com.gcgenome.rms.exception.ServiceNotFoundException
 import com.gcgenome.rms.tables.pojos.SampleType
 import com.gcgenome.rms.tables.pojos.Service
@@ -19,6 +20,17 @@ import reactor.core.publisher.Mono
 class ServiceHandler(
     val dslContext: DSLContext
 ): ServiceDao, ServiceExtensionDao, SampleTypeDao {
+
+    fun checkServiceById(serviceId: String): Mono<Service_> {
+        return dslContext.selectServiceById(serviceId)
+            .switchIfEmpty(Mono.error(ServiceNotFoundException(serviceId)))
+    }
+
+    fun updateServiceById(service: Service): Mono<Service> {
+        return checkServiceById(service.id!!).flatMap {
+            dslContext.updateServiceById(service)
+        }
+    }
 
     fun selectServiceByNameOrId(filter: Query.Companion.Filter): Flux<Service> {
         val whereClause = buildServiceIdOrNameWhereClause(filter)

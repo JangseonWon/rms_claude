@@ -1,4 +1,4 @@
-package com.gcgenome.rms.statistics
+package com.gcgenome.rms.dashboard
 
 import com.gcgenome.rms.authentication.User
 import com.gcgenome.rms.dao.RequestDao

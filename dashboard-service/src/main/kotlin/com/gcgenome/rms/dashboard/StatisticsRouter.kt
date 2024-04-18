@@ -1,4 +1,4 @@
-package com.gcgenome.rms.statistics
+package com.gcgenome.rms.dashboard
 
 import com.gcgenome.rms.auth.AuthenticationHandler
 import com.gcgenome.rms.exception.AuthenticationNotFoundException

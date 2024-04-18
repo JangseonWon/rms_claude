@@ -36,7 +36,6 @@ interface ServiceDao{
     fun DSLContext.updateServiceById(service: Service): Mono<Service> {
         return Mono.from(
             update(SERVICE)
-                .set(SERVICE.NAME, service.name)
                 .set(SERVICE.CATEGORY_ID, service.categoryId)
                 .where(SERVICE.ID.eq(service.id))
                 .returning()
