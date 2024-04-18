@@ -2,7 +2,7 @@ package com.gcgenome.rms.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-data class Organization(
+data class Organization_(
     val id:String,
     @JsonProperty("user_id")
     val userId:String?,

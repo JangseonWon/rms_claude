@@ -6,6 +6,7 @@ import com.gcgenome.rms.dao.OrganizationDao
 import com.gcgenome.rms.dao.UserDao
 import com.gcgenome.rms.data.*
 import com.gcgenome.rms.exception.*
+import com.gcgenome.rms.tables.pojos.Organization
 import org.jooq.Condition
 import org.jooq.Configuration
 import org.jooq.DSLContext
@@ -13,6 +14,7 @@ import org.jooq.impl.DSL
 import org.jooq.impl.DSL.field
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Component
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 @Component
@@ -38,6 +40,13 @@ class UserHandler(
             }
     }
 
+    fun selectUserOrganizations(userId: String): Flux<Organization> {
+        return Flux.from(dslContext.run {
+            selectUserById(userId).switchIfEmpty(Mono.error(UserNotFoundException(userId)))
+                .thenMany(selectOrganizationByUserId(userId))
+        })
+    }
+
     fun buildWhereClause(filters:List<Query.Companion.Filter>?) : Condition {
         return filters?.let {
             it.filter { filter -> filter.key != null && filter.value?.isNotBlank() == true }
@@ -61,7 +70,7 @@ class UserHandler(
 
     fun insertUser(authentication: UserAuthentication, userDto: User): Mono<User> {
         val password = encoder.encode(userDto.password!!)
-        userDto.organization = Organization(userDto.id,userDto.id, userDto.name,null,null,null)
+        userDto.organization = Organization_(userDto.id,userDto.id, userDto.name,null,null,null)
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
                 managerAuthenticationHandler.chkManager(authentication)

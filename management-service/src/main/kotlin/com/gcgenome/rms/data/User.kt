@@ -27,6 +27,6 @@ data class User(
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("create_at")
     val createAt: LocalDateTime?,
-    var organization: Organization?,
+    var organization: Organization_?,
     val service:Service_?
 )

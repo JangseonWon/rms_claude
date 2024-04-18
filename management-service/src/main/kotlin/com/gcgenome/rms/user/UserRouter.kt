@@ -14,6 +14,7 @@ import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.router
 import org.springframework.web.server.ServerWebInputException
 import reactor.core.publisher.Mono
+import java.util.*
 
 @Configuration
 class UserRouter (
@@ -23,6 +24,7 @@ class UserRouter (
     @Bean("UserRouter")
     fun route() = router {
         POST("/w-api/management-service/users", :: findUsers)
+        GET("/w-api/management-service/users/{user_id}/organizations", :: findUserOrganizations)
         PUT("/w-api/management-service/users", ::saveUser)
         PATCH("/w-api/management-service/users/{userId}", ::updateUser)
     }
@@ -36,6 +38,19 @@ class UserRouter (
             .onErrorResume(DataAccessException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue(ColumnNotFoundException(e).message) }
             .onErrorResume(IllegalArgumentException::class.java) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue(FilterOperatorNotFoundException().message.toString())}
             .onErrorResume { e ->  ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: ${e}") }
+    }
+
+    private fun findUserOrganizations(request: ServerRequest): Mono<ServerResponse> {
+        val userId = request.pathVariable("user_id")
+        return authenticationHandler.principal(request)
+            .then(userHandler.selectUserOrganizations(userId).collectList())
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(ServerWebInputException::class.java) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue(WebInputException().message.toString()) }
+            .onErrorResume(UserNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+            .onErrorResume(DataAccessException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue(ColumnNotFoundException(e).message) }
+            .onErrorResume(IllegalArgumentException::class.java) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue(FilterOperatorNotFoundException().message.toString())}
+            .onErrorResume { e ->  ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e") }
     }
 
     private fun saveUser(request: ServerRequest): Mono<ServerResponse> {
