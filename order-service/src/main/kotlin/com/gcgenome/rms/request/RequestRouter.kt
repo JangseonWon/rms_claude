@@ -15,7 +15,7 @@ import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.router
 import org.springframework.web.server.ServerWebInputException
 import reactor.core.publisher.Mono
-import java.util.UUID
+import java.util.*
 
 @Configuration
 class RequestRouter(
@@ -68,12 +68,12 @@ class RequestRouter(
     }
 
     private fun selectRequests(request: ServerRequest) : Mono<ServerResponse> {
-        var progress : Boolean = false
-        if (request.queryParam("Inprogress").get().equals("true"))
-            progress = true
+        var status = request.queryParam("status")
+        if (!status.isPresent)
+            status = Optional.of("all")
         return authenticationHandler.principal(request)
             .zipWith(request.bodyToMono(Query::class.java))
-            .flatMap { requestHandler.selectRequests(it.t1.user, progress, it.t2.copy(page= it.t2.page - 1)) }
+            .flatMap { requestHandler.selectRequests(it.t1.user, status.get(), it.t2.copy(page= it.t2.page - 1)) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
             .onErrorResume(DataAccessException::class.java)  {e ->  ColumnNotFoundException(e).toServerResponse()}
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}

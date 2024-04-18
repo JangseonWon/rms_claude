@@ -12,7 +12,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-@JsonSubTypes(JsonSubTypes.Type(Extension::class, name = "extensions"))
+@JsonSubTypes(JsonSubTypes.Type(Extension::class, name = "extensions"), JsonSubTypes.Type(SampleType::class, name = "sample_type"))
 data class Sample(
     @JsonProperty("id")
     var id: UUID?,
@@ -36,6 +36,8 @@ data class Sample(
     val createAt: LocalDateTime?,
     @JsonProperty("sample_type_id")
     val sampleTypeId: String?,
+    @JsonProperty("sample_type")
+    val sampleType: List<SampleType>?,
     @JsonProperty("patient_serial")
     var patientSerial: String?,
     @JsonProperty("organization_id")

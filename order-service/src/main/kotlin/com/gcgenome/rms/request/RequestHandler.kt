@@ -33,7 +33,7 @@ class RequestHandler(
             .switchIfEmpty(Mono.error(RequestNotFoundException()))
     }
 
-    fun selectRequests(userDto: User, status: Boolean, query: Query) : Mono<Page<SelectRequest>> {
+    fun selectRequests(userDto: User, status: String, query: Query) : Mono<Page<Request>> {
         val filters = query.filters ?: emptyList()
         val where = buildFilterWhereClause(filters, status)
         val request =  dslContext.selectRequests(query, where, userDto)
@@ -132,7 +132,7 @@ class RequestHandler(
         })
     }
 
-    fun buildFilterWhereClause(filters: List<Query.Companion.Filter>, status: Boolean): Condition {
+    fun buildFilterWhereClause(filters: List<Query.Companion.Filter>, status: String): Condition {
         var conditions : List<Condition?> = mutableListOf()
         conditions = filters.map { filter ->
             var key = filter.key
@@ -142,7 +142,7 @@ class RequestHandler(
                     if (!key.equals("createFrom") && !key.equals("createTo")) {
                         if (key.equals("serial") || key.equals("name"))
                             key = "PATIENT." + key
-                        field(key).like("%$it%") as Condition?
+                        field(key).likeIgnoreCase("%$it%") as Condition?
                     }
                     else {
                         null
@@ -163,9 +163,32 @@ class RequestHandler(
         }
 
         val progressCondition: List<Condition?> = mutableListOf()
-        if (status) {
-            val progress = arrayOf("ORDERED", "SPECIFIED", "INPROGRESS", "TESTFALIED", "DELIVERED")
-            progress.forEach { i -> (progressCondition as MutableList).add(field("status").like("%$i%")) }
+        when {
+            status.equals("resample") -> {
+                (progressCondition as MutableList).add(field("resample_at").isNotNull)
+            }
+            status.equals("inprogress") -> {
+                val progress = Status.entries.filter { it != Status.CART && it != Status.FINISHED }
+                progress.forEach { status ->
+                    (progressCondition as MutableList).add(field("status").like("%$status%"))
+                }
+            }
+            status.equals("result") -> {
+                val progress = Status.entries.filter { it == Status.DELIVERED }
+                progress.forEach { status ->
+                    (progressCondition as MutableList).add(field("status").like("%$status%"))
+                }
+            }
+            status.equals("confirm") -> {
+                val progress = Status.entries.filter { it == Status.ORDERED }
+                progress.forEach { status ->
+                    (progressCondition as MutableList).add(field("status").like("%$status%"))
+                }
+            }
+            else -> {
+                if (!status.equals("all"))
+                    throw WebInputException()
+            }
         }
 
         val andCondition = conditions.reduceOrNull { acc, condition ->
