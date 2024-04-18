@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: rms-service
+  main:
+    web-application-type: reactive
+  r2dbc:
+    url: r2dbc:postgresql://${POSTGRES_URL}/report_service?schema=rms_dev
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+    pool:
+      initial-size: 2
+      max-size: 10
+      max-idle-time: 30m
+      validation-query: SELECT 1
+  security:
+    oauth2:
+      authentication:
+        header: Authorization
+        jwt:
+          secret: ${SECURITY_PUBLIC_KEY}
+server:
+  port: 4444
+
+logging:
+  level:
+    io.r2dbc.postgresql.QUERY: TRACE # for queries
