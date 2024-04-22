@@ -29,4 +29,18 @@ interface UserServiceDao {
                 .where(USER_SERVICE.USER_ID.eq(userId).and(where))
         ).map { it.into(Service::class.java) }
     }
+
+    fun DSLContext.selectUserByServiceId(userId: String, serviceId: String): Mono<Service> {
+        return Mono.from(
+            selectFrom(USER_SERVICE).where(USER_SERVICE.USER_ID.eq(userId).and(USER_SERVICE.SERVICE_ID.eq(serviceId)))
+        ).map { it.into(Service::class.java) }
+    }
+
+    fun DSLContext.deleteUserService(userId: String, serviceId: String): Mono<UserService> {
+        return Mono.from(
+            deleteFrom(USER_SERVICE)
+                .where(USER_SERVICE.USER_ID.eq(userId).and(USER_SERVICE.SERVICE_ID.eq(serviceId)))
+                .returning()
+        ).map { it.into(UserService::class.java) }
+    }
 }

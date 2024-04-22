@@ -7,6 +7,7 @@ import com.gcgenome.rms.dao.UserDao
 import com.gcgenome.rms.dao.UserServiceDao
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.Service_
+import com.gcgenome.rms.data.UserService
 import com.gcgenome.rms.exception.ServiceNotFoundException
 import com.gcgenome.rms.exception.UserNotFoundException
 import com.gcgenome.rms.tables.pojos.Service
@@ -42,6 +43,19 @@ class UserServiceHandler(
         return Flux.from(dslContext.run {
             selectUserById(userId).switchIfEmpty(Mono.error(UserNotFoundException(userId)))
                 .thenMany(selectUserByServiceIdOrName(userId, whereClause))
+        })
+    }
+
+    fun deleteUserServices(authentication: UserAuthentication, userId: String, services: Array<Service_>): Mono<UserService> {
+        return Mono.from(dslContext.transactionPublisher { trx ->
+            trx.dsl().run {
+                managerAuthenticationHandler.chkManager(authentication)
+                    .thenMany(Flux.fromArray(services)
+                        .flatMap { service -> selectUserByServiceId(userId, service.id)
+                            .switchIfEmpty(Mono.error(ServiceNotFoundException(service.id)))
+                            .then(deleteUserService(userId, service.id))
+                        })
+            }
         })
     }
 

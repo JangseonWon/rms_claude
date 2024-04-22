@@ -23,6 +23,7 @@ class UserServiceRouter (
     fun route() = router {
         PUT("/w-api/management-service/users/{userId}/services", ::saveUserServices)
         POST("/w-api/management-service/users/{userId}/services", ::selectUserServices)
+        DELETE("/w-api/management-service/users/{user_id}/services", ::deleteUserServices)
     }
 
     private fun saveUserServices(request: ServerRequest): Mono<ServerResponse> {
@@ -47,6 +48,18 @@ class UserServiceRouter (
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(UserNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
             .onErrorResume { e ->  ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: ${e}") }
+    }
+
+    private fun deleteUserServices(request: ServerRequest): Mono<ServerResponse> {
+        val userId = request.pathVariable("user_id")
+        return authenticationHandler.principal(request).zipWith(request.bodyToMono(Array<Service_>::class.java))
+            .flatMap { userServiceHandler.deleteUserServices(it.t1, userId, it.t2) }
+            .flatMap { ServerResponse.status(HttpStatus.OK).bodyValue("${userId}의 서비스 삭제 완료") }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(ManagerAuthenticationException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(ServiceNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
     }
 }
 
