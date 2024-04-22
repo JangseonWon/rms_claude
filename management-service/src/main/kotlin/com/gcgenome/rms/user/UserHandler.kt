@@ -81,6 +81,24 @@ class UserHandler(
         })
     }
 
+    fun insertUserOrganization(userId: String, authentication: UserAuthentication, organization: Organization): Mono<Organization_> {
+        val organizationDto = Organization_(
+            id = organization.id!!,
+            userId = userId,
+            name = organization.name,
+            type = organization.type,
+            registrationNumber = organization.registrationNumber,
+            nursingNumber = organization.nursingNumber
+        )
+        return Mono.from(dslContext.transactionPublisher { trx ->
+            trx.dsl().run {
+                managerAuthenticationHandler.chkManager(authentication)
+                    .flatMap { selectUserById(userId).switchIfEmpty(Mono.error(UserNotFoundException(userId))) }
+                    .flatMap { insertOrganization(organizationDto) }
+            }
+        })
+    }
+
     fun updateUserById(authentication: UserAuthentication, userId: String, userDto: UpdateUser): Mono<User> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {

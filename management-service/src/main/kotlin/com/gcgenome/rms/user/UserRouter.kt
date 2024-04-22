@@ -1,8 +1,10 @@
 package com.gcgenome.rms.user
 
 import com.gcgenome.rms.auth.AuthenticationHandler
+import com.gcgenome.rms.auth.ManagerAuthenticationHandler
 import com.gcgenome.rms.data.*
 import com.gcgenome.rms.exception.*
+import com.gcgenome.rms.tables.pojos.Organization
 import org.jooq.exception.DataAccessException
 import org.jooq.exception.IntegrityConstraintViolationException
 import org.springframework.context.annotation.Bean
@@ -17,15 +19,16 @@ import reactor.core.publisher.Mono
 import java.util.*
 
 @Configuration
-class UserRouter (
+class UserRouter(
     private val userHandler: UserHandler,
     private val authenticationHandler: AuthenticationHandler
 ) {
     @Bean("UserRouter")
     fun route() = router {
-        POST("/w-api/management-service/users", :: findUsers)
         GET("/w-api/management-service/users/{user_id}/organizations", :: findUserOrganizations)
+        POST("/w-api/management-service/users", :: findUsers)
         PUT("/w-api/management-service/users", ::saveUser)
+        PUT("/w-api/management-service/users/{user_id}/organizations", ::saveUserOrganization)
         PATCH("/w-api/management-service/users/{userId}", ::updateUser)
     }
 
@@ -58,6 +61,18 @@ class UserRouter (
             .flatMap { p -> userHandler.insertUser(p.t1, p.t2) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), User::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume (IntegrityConstraintViolationException::class.java) { ServerResponse.status(HttpStatus.NOT_ACCEPTABLE).bodyValue(DatabaseConstraintViolationException().message.toString()) }
+            .onErrorResume (ServerWebInputException::class.java) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue(WebInputException().message.toString()) }
+            .onErrorResume { e ->  ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: ${e}") }
+    }
+
+    private fun saveUserOrganization(request: ServerRequest): Mono<ServerResponse> {
+        val userId = request.pathVariable("user_id")
+        return Mono.zip(authenticationHandler.principal(request), request.bodyToMono(Organization::class.java))
+            .flatMap { userHandler.insertUserOrganization(userId, it.t1, it.t2) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), Organization_::class.java) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(UserNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
             .onErrorResume (IntegrityConstraintViolationException::class.java) { ServerResponse.status(HttpStatus.NOT_ACCEPTABLE).bodyValue(DatabaseConstraintViolationException().message.toString()) }
             .onErrorResume (ServerWebInputException::class.java) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue(WebInputException().message.toString()) }
             .onErrorResume { e ->  ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: ${e}") }
