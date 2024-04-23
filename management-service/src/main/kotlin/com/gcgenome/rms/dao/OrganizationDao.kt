@@ -4,8 +4,10 @@ import com.gcgenome.rms.data.Organization_
 import com.gcgenome.rms.data.User
 import com.gcgenome.rms.tables.pojos.Organization
 import com.gcgenome.rms.tables.references.ORGANIZATION
+import com.gcgenome.rms.tables.references.SAMPLE
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
+import org.jooq.impl.DSL.row
 import org.jooq.impl.DSL.`val`
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -40,4 +42,23 @@ interface OrganizationDao{
         ).map { it.into(Organization::class.java) }
     }
 
+    fun DSLContext.selectUserByOrganizationId(userId: String, organizationId: String): Mono<Organization> {
+        return Mono.from(
+            selectFrom(ORGANIZATION).where(ORGANIZATION.USER_ID.eq(userId).and(ORGANIZATION.ID.eq(organizationId)))
+        ).map { it.into(Organization::class.java) }
+    }
+
+    fun DSLContext.deleteUserByOrganizationId(userId: String, organizationId: String): Mono<Organization> {
+        return Mono.from(
+            deleteFrom(ORGANIZATION)
+                .where(ORGANIZATION.USER_ID.eq(userId)
+                    .and(ORGANIZATION.ID.eq(organizationId))
+                    .and(row(ORGANIZATION.ID).notIn(
+                        select(SAMPLE.ORGANIZATION_ID).from(SAMPLE)
+                            .where(SAMPLE.ORGANIZATION_ID.eq(organizationId).and(SAMPLE.USER_ID.eq(userId)))
+                    ))
+                )
+                .returning()
+        ).map { it.into(Organization::class.java) }
+    }
 }

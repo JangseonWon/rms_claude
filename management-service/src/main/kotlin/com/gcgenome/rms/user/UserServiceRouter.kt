@@ -24,6 +24,7 @@ class UserServiceRouter (
         PUT("/w-api/management-service/users/{userId}/services", ::saveUserServices)
         POST("/w-api/management-service/users/{userId}/services", ::selectUserServices)
         DELETE("/w-api/management-service/users/{user_id}/services", ::deleteUserServices)
+        DELETE("/w-api/management-service/users/{user_id}/organizations/{organization_id}", ::deleteUserOrganization)
     }
 
     private fun saveUserServices(request: ServerRequest): Mono<ServerResponse> {
@@ -58,6 +59,20 @@ class UserServiceRouter (
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(ManagerAuthenticationException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(ServiceNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
+    }
+
+    private fun deleteUserOrganization(request: ServerRequest): Mono<ServerResponse> {
+        val userId = request.pathVariable("user_id")
+        val organizationId = request.pathVariable("organization_id")
+        return authenticationHandler.principal(request)
+            .flatMap { userServiceHandler.deleteUserOrganization(it, userId, organizationId) }
+            .flatMap { ServerResponse.status(HttpStatus.OK).bodyValue("${userId}의 $organizationId 삭제 완료") }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(ManagerAuthenticationException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(OrganizationNotDeleteException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+            .onErrorResume(OrganizationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
             .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
             .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
     }
