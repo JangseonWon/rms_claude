@@ -6,11 +6,8 @@ import com.gcgenome.rms.dao.*
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.Service_
 import com.gcgenome.rms.data.UserService
-import com.gcgenome.rms.exception.OrganizationNotDeleteException
-import com.gcgenome.rms.exception.OrganizationNotFoundException
 import com.gcgenome.rms.exception.ServiceNotFoundException
 import com.gcgenome.rms.exception.UserNotFoundException
-import com.gcgenome.rms.tables.pojos.Organization
 import com.gcgenome.rms.tables.pojos.Service
 import org.jooq.Condition
 import org.jooq.DSLContext
@@ -56,18 +53,6 @@ class UserServiceHandler(
                             .switchIfEmpty(Mono.error(ServiceNotFoundException(service.id)))
                             .then(deleteUserService(userId, service.id))
                         })
-            }
-        })
-    }
-
-    fun deleteUserOrganization(authentication: UserAuthentication, userId: String, organizationId: String): Mono<Organization> {
-        return Mono.from(dslContext.transactionPublisher { trx ->
-            trx.dsl().run {
-                managerAuthenticationHandler.chkManager(authentication)
-                    .then(selectUserByOrganizationId(userId, organizationId)
-                    .switchIfEmpty(Mono.error(OrganizationNotFoundException())))
-                    .then(deleteUserByOrganizationId(userId, organizationId))
-                    .switchIfEmpty(Mono.error(OrganizationNotDeleteException()))
             }
         })
     }

@@ -61,4 +61,16 @@ interface OrganizationDao{
                 .returning()
         ).map { it.into(Organization::class.java) }
     }
+
+    fun DSLContext.updateOrganizationByUserId(userId: String, organizationId: String, organization: Organization): Mono<Organization> {
+        return Mono.from(
+            update(ORGANIZATION)
+                .set(ORGANIZATION.NAME, organization.name)
+                .set(ORGANIZATION.TYPE, organization.type)
+                .set(ORGANIZATION.NURSING_NUMBER, organization.nursingNumber)
+                .set(ORGANIZATION.REGISTRATION_NUMBER, organization.registrationNumber)
+                .where(ORGANIZATION.ID.eq(organizationId).and(ORGANIZATION.USER_ID.eq(userId)))
+                .returning()
+        ).map { it.into(Organization::class.java) }
+    }
 }

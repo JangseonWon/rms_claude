@@ -81,24 +81,6 @@ class UserHandler(
         })
     }
 
-    fun insertUserOrganization(userId: String, authentication: UserAuthentication, organization: Organization): Mono<Organization_> {
-        val organizationDto = Organization_(
-            id = organization.id!!,
-            userId = userId,
-            name = organization.name,
-            type = organization.type,
-            registrationNumber = organization.registrationNumber,
-            nursingNumber = organization.nursingNumber
-        )
-        return Mono.from(dslContext.transactionPublisher { trx ->
-            trx.dsl().run {
-                managerAuthenticationHandler.chkManager(authentication)
-                    .flatMap { selectUserById(userId).switchIfEmpty(Mono.error(UserNotFoundException(userId))) }
-                    .flatMap { insertOrganization(organizationDto) }
-            }
-        })
-    }
-
     fun updateUserById(authentication: UserAuthentication, userId: String, userDto: UpdateUser): Mono<User> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
@@ -128,4 +110,44 @@ class UserHandler(
         })
     }
 
+    fun insertUserOrganization(userId: String, authentication: UserAuthentication, organization: Organization): Mono<Organization_> {
+        val organizationDto = Organization_(
+            id = organization.id!!,
+            userId = userId,
+            name = organization.name,
+            type = organization.type,
+            registrationNumber = organization.registrationNumber,
+            nursingNumber = organization.nursingNumber
+        )
+        return Mono.from(dslContext.transactionPublisher { trx ->
+            trx.dsl().run {
+                managerAuthenticationHandler.chkUserAndManager(authentication, userId)
+                    .flatMap { selectUserById(userId).switchIfEmpty(Mono.error(UserNotFoundException(userId))) }
+                    .flatMap { insertOrganization(organizationDto) }
+            }
+        })
+    }
+
+    fun deleteUserOrganization(authentication: UserAuthentication, userId: String, organizationId: String): Mono<Organization> {
+        return Mono.from(dslContext.transactionPublisher { trx ->
+            trx.dsl().run {
+                managerAuthenticationHandler.chkUserAndManager(authentication, userId)
+                    .then(selectUserByOrganizationId(userId, organizationId)
+                        .switchIfEmpty(Mono.error(OrganizationNotFoundException())))
+                    .then(deleteUserByOrganizationId(userId, organizationId))
+                    .switchIfEmpty(Mono.error(OrganizationNotDeleteException()))
+            }
+        })
+    }
+
+    fun updateUserOrganization(authentication: UserAuthentication, userId: String, organizationId: String, organization: Organization): Mono<Organization> {
+        return Mono.from(dslContext.transactionPublisher { trx ->
+            trx.dsl().run {
+                managerAuthenticationHandler.chkUserAndManager(authentication, userId)
+                    .then(selectUserByOrganizationId(userId, organizationId)
+                        .switchIfEmpty(Mono.error(OrganizationNotFoundException())))
+                    .then(updateOrganizationByUserId(userId, organizationId, organization))
+            }
+        })
+    }
 }

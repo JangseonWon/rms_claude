@@ -22,4 +22,12 @@ class ManagerAuthenticationHandler {
             else -> Mono.error(AdminAuthenticationException())
         }
     }
+
+    fun chkUserAndManager(authentication: UserAuthentication, userId: String): Mono<UserAuthentication> {
+        return when {
+            authentication.user.role in listOf(Role.MANAGER.toString(), Role.ADMIN.toString()) -> Mono.just(authentication)
+            authentication.user.id == userId -> Mono.just(authentication)
+            else -> Mono.error(ManagerAuthenticationException())
+        }
+    }
 }
