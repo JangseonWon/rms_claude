@@ -1,0 +1,26 @@
+"use client"
+
+import style from "@/app/(afterLogin)/_component/header.module.css"
+import {Session} from "@auth/core/types";
+import ProfileButton from "@/app/(afterLogin)/_component/ProfileButton";
+import Link from "next/link";
+import {useSelectedLayoutSegment} from "next/navigation";
+
+type Props = {
+    session: Session | null
+}
+
+export default function Header({session}: Props) {
+    const segment = useSelectedLayoutSegment();
+    console.log(segment)
+
+    return (
+        <header className={style.header}>
+            <div>
+                <Link href={"/home"} className={style.gPortalLogo}>G-Portal</Link>
+                <Link href={"/request"} className={style.headerMenu} style={{ borderBottom: segment?.includes('request') ? 'solid #90BA2D' : 'none' }}>Request order</Link>
+            </div>
+            <ProfileButton session={session}/>
+        </header>
+    )
+}

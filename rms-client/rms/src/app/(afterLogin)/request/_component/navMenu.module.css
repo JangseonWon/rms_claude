@@ -1,0 +1,31 @@
+.navPill {
+    display: inline-flex;
+    padding: 5px;
+    background-color: white;
+    margin: 25px;
+    border-radius: 15px;
+}
+.navPill ul {
+    padding: 10px;
+}
+.navPill li{
+    list-style-type: none;
+    margin: 20px;
+}
+.navPill li:hover {
+    font-weight: bold;
+}
+.navPill li a {
+    text-decoration: none;
+}
+.navPill li a span {
+    margin: 0 15px;
+    color: #666666;
+    font-size: 18px;
+    font-family: "Manrope", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+}
+.navPill li a svg {
+    color: #666666;
+}

@@ -1,0 +1,28 @@
+.container {
+    display: flex;
+    align-items: stretch;
+    width: 93%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 0 0 20px 20px;
+}
+.card {
+    position: relative;
+    margin: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    justify-content: space-between;
+    padding: 20px;
+}
+.cardLabel{
+    text-align: left;
+    color: #333;
+}
+.cardValue{
+    text-align: right;
+    font-size: 36px;
+}

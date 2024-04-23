@@ -1,0 +1,55 @@
+.profile span {
+    color: #999999;
+    font-size: 15px;
+    font-family: "Manrope", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-style: normal;
+    cursor: pointer;
+    margin: 15px;
+}
+.profile {
+    color: #ffffff;
+    font-size: 15px;
+    font-family: "Manrope", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-style: normal;
+    cursor: pointer;
+}
+.profileDropdown {
+    position: absolute;
+    top: 1%;
+    right: 0;
+    transform: translate(-20%, 40%);
+    /*display: none; !* Initially hidden *!*/
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 2px 2px rgba(0, 0, 0, 0.05);
+    color: #4d4d4d;
+    font-size: 16px;
+    font-family: "Manrope", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-style: normal;
+    cursor: pointer;
+}
+
+.profileDropdown.active {
+    display: block; /* Show dropdown when active */
+}
+
+.profileDropdown ul {
+    list-style: none;
+    padding: 0;
+}
+
+.profileDropdown li {
+    padding: 5px;
+    cursor: pointer;
+}
+
+.profileDropdown li:hover {
+    background-color: #f0f0f0;
+}

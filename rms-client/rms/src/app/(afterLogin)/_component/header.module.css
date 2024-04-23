@@ -1,0 +1,29 @@
+.header {
+    background-color: #182847;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.headerMenu {
+    font-size: 16px;
+    font-weight: normal;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 15px 5px 10px;
+    margin-left: 30px;
+    transition: background-color 0.3s ease;
+}
+.headerMenu:hover {
+    border-bottom: solid #90BA2D ;
+    cursor: pointer;
+}
+.gPortalLogo{
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 35px;
+    font-family: "Manrope", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 800;
+    font-style: normal;
+}
