@@ -1,0 +1,14 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: authentication
+  namespace: {{ .Release.Namespace }}
+data:
+  authentication.yaml: |
+    spring:
+      security:
+        oauth2:
+          authentication:
+            header: Authorization
+            jwt:
+              secret: ${jwt.public}
