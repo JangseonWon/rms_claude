@@ -14,13 +14,9 @@ spring:
     username: ${POSTGRES_USERNAME}
     password: ${POSTGRES_PASSWORD}
     pool:
-      initial-size: 100
-      max-size: 500
+      initial-size: 2
+      max-size: 10
       max-idle-time: 30m
       validation-query: SELECT 1
-logging:
-  level:
-    io.r2dbc.postgresql.QUERY: TRACE
-#    io.r2dbc.postgresql.PARAM: TRACE
 server:
   port: 9395
