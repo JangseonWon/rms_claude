@@ -1,4 +1,14 @@
+header{
+    font-family: "Manrope", sans-serif;
+}
 body{
     margin: 0;
     background-color: #EBECEE;
+    font-family: "Manrope", sans-serif;
+}
+footer{
+    font-family: "Manrope", sans-serif;
+}
+button{
+    font-family: "Manrope", sans-serif;
 }

@@ -1,0 +1,44 @@
+.footer {
+    border-top: solid #999999;
+    border-width: thin;
+}
+.menu {
+    flex-direction: column;
+}
+.flex {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+.footerMenu {
+    font-size: 16px;
+    font-weight: 300;
+    color: #999999;
+    text-decoration: none;
+    padding: 10px 15px 5px 10px;
+    transition: background-color 0.3s ease;
+}
+.footerMenu:hover {
+    color: #666666;
+    font-weight: bold;
+    cursor: pointer;
+}
+.followUsOn{
+    text-decoration: none;
+    color: #666666;
+    font-size: 24px;
+    font-weight: 800;
+    font-style: normal;
+}
+.div1Menu {
+    padding: 20px 0 0 180px;
+}
+.div2Menu {
+    padding: 25px 100px 0 0;
+}
+.div3Menu {
+    padding: 10px 0 0 145px;
+}
+.div4Menu {
+    padding: 5px 100px 0 0;
+}
