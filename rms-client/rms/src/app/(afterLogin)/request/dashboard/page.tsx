@@ -5,7 +5,6 @@ export default async function Page() {
     return(
         <>
             <Statistics/>
-            dashboard
         </>
     )
 }

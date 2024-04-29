@@ -6,6 +6,8 @@ import {JWT} from "@auth/core/jwt";
 import {Session} from "@auth/core/types";
 import Credentials from "next-auth/providers/credentials";
 import {string} from "prop-types";
+import {cookies} from "next/headers";
+import cookie from 'cookie'
 
 declare module 'next-auth' {
     interface Session {
@@ -76,10 +78,15 @@ export const{
                     }),
                 })
                 if (!authResponse.ok) throw new Error('Authorization header not found or invalid format');
-                const cookie = authResponse.headers.get('set-cookie')!
+                const setCookie = authResponse.headers.get('set-cookie')!
 
-                const [authorizationHeader, ...remainingHeaders] = cookie?.split(';')
+                const [authorizationHeader, ...remainingHeaders] = setCookie?.split(';')
                 const authorization = authorizationHeader.split('=')[1];
+                if (setCookie) {
+                    const parsed = cookie.parse(setCookie);
+                    cookies().set('Authorization', parsed['Authorization'], parsed); // 브라우저에 쿠키를 심어주는 것
+                }
+
                 return JWTParser.decode(authorization, {complete:true})?.payload
             }
         })

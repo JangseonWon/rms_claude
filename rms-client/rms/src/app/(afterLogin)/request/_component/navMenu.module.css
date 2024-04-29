@@ -12,9 +12,7 @@
     list-style-type: none;
     margin: 20px;
 }
-.navPill li:hover {
-    font-weight: bold;
-}
+
 .navPill li a {
     text-decoration: none;
 }
@@ -29,3 +27,7 @@
 .navPill li a svg {
     color: #666666;
 }
+.navPill li:hover .icon {
+    color: #90BA2D;
+}
+
