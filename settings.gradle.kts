@@ -13,7 +13,6 @@ include("login-service")
 include("organization-service")
 include("product-service")
 include("order-service")
-include("cart-service")
 include("authentication")
 include("dashboard-service")
 

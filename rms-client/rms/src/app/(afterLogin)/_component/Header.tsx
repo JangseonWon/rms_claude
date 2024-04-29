@@ -12,8 +12,6 @@ type Props = {
 
 export default function Header({session}: Props) {
     const segment = useSelectedLayoutSegment();
-    console.log(segment)
-
     return (
         <header className={style.header}>
             <div>
