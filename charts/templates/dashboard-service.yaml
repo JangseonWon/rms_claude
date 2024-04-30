@@ -1,0 +1,136 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: dashboard-service
+  namespace: {{ .Release.Namespace }}
+data:
+  application.yaml: |
+    spring:
+      application:
+        name: rms-dashboard-service
+      config:
+        import:
+          - classpath:authentication.yaml
+          - classpath:database.yaml
+      main:
+        web-application-type: reactive
+    server:
+      port: 8080
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  annotations:
+    alpha.image.policy.openshift.io/resolve-names: '*'
+    app.openshift.io/route-disabled: 'false'
+    app.openshift.io/vcs-uri: 'https://github.com/GC-Genome/rms.git'
+    reloader.stakater.com/auto: 'true'
+  name: dashboard-service
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: dashboard-service
+    app.openshift.io/runtime: spring-boot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dashboard-service
+  template:
+    metadata:
+      labels:
+        app: dashboard-service
+      annotations:
+        sidecar.istio.io/inject: 'true'
+    spec:
+      volumes:
+        - name: config
+          configMap:
+            name: dashboard-service
+            defaultMode: 420
+        - name: authentication-config
+          configMap:
+            name: authentication
+            defaultMode: 420
+        - name: database-config
+          configMap:
+            name: database
+            defaultMode: 420
+      containers:
+        - resources: {}
+          terminationMessagePath: /dev/termination-log
+          name: dashboard-service
+          env:
+            - name: database.url
+              valueFrom:
+                secretKeyRef:
+                  name: database
+                  key: url
+            - name: database.username
+              valueFrom:
+                secretKeyRef:
+                  name: database
+                  key: username
+            - name: database.password
+              valueFrom:
+                secretKeyRef:
+                  name: database
+                  key: password
+            - name: jwt.public
+              valueFrom:
+                secretKeyRef:
+                  name: jwt
+                  key: public
+            - name: TZ
+              value: Asia/Seoul
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: config
+              mountPath: /app/resources/application.yaml
+              subPath: application.yaml
+            - name: database-config
+              mountPath: /app/resources/database.yaml
+              subPath: database.yaml
+            - name: authentication-config
+              mountPath: /app/resources/authentication.yaml
+              subPath: authentication.yaml
+          terminationMessagePolicy: File
+          image: 'image-registry.openshift-image-registry.svc:5000/rms-test/dashboard-service:latest'
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 2
+  progressDeadlineSeconds: 600
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: rms-dashboard-service
+  namespace: rms-test
+spec:
+  type: ClusterIP
+  ports:
+    - name: 80-tcp
+      protocol: TCP
+      port: 80
+      targetPort: 8080
+  selector:
+    app: dashboard-service
+---
+kind: ImageStream
+apiVersion: image.openshift.io/v1
+metadata:
+  name: dashboard-service
+  namespace: {{ .Release.Namespace }}
+spec:
+  lookupPolicy:
+    local: false

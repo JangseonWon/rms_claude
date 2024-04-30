@@ -66,8 +66,8 @@ export const{
     },
     providers: [
         CredentialsProvider({
-            async authorize(credentials) {
-                const authResponse = await fetch(`${process.env.BASE_URL}/w-api/login`, {
+            async authorize(credentials): Promise<any> {
+                const authResponse = await fetch(`${process.env.BASE_URL}/w-api/login-service/login`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -77,7 +77,9 @@ export const{
                         password: credentials.password,
                     }),
                 })
-                if (!authResponse.ok) throw new Error('Authorization header not found or invalid format');
+                if (!authResponse.ok) {
+                    return null
+                }
                 const setCookie = authResponse.headers.get('set-cookie')!
 
                 const [authorizationHeader, ...remainingHeaders] = setCookie?.split(';')

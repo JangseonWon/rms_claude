@@ -15,14 +15,12 @@
 .mainTitle{
     color: #002b49;
     font-size: 50px;
-    font-family: "Manrope", sans-serif;
     font-weight: 800;
 }
 .subTitle {
     align-self: flex-end;
     color: #808080;
     font-size: 15px;
-    font-family: "Manrope", sans-serif;
     font-weight: 600;
 }
 .subTitle span {
@@ -45,14 +43,12 @@
 }
 .cardLabel{
     font-size: 18px;
-    font-family: "Manrope", sans-serif;
     color:#002b49;
     font-weight: 500;
     text-align: left;
 }
 .cardValue{
     font-size: 30px;
-    font-family: "Manrope", sans-serif;
     color:#002b49;
     font-weight: 600;
     text-align: right;

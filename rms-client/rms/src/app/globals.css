@@ -1,0 +1,8 @@
+body{
+    margin: 0;
+    background-color: #EBECEE;
+}
+body * {
+    font-family: "Manrope", sans-serif;
+    font-optical-sizing: auto;
+}

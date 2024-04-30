@@ -1,10 +1,7 @@
 rootProject.name = "rms"
 
-include("gateway")
 include("entity")
-include("service")
 include("management-service")
-include("order")
 include("user")
 include("alis-api")
 include("alis-sync")
@@ -15,6 +12,7 @@ include("product-service")
 include("order-service")
 include("authentication")
 include("dashboard-service")
+include("cart-service")
 
 
 dependencyResolutionManagement {
