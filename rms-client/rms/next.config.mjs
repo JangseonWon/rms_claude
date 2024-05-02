@@ -4,7 +4,7 @@ const nextConfig = {
         return [
             {
                 source: '/w-api/:path*',
-                destination: `http://localhost:4444/w-api/:path*`, // Matched parameters can be used in the destination
+                destination: `https://rms-test.gcgenome.com/w-api/:path*`, // Matched parameters can be used in the destination
             },
         ]
     },

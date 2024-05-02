@@ -1,13 +1,13 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: management-service
+  name: product-service
   namespace: {{ .Release.Namespace }}
 data:
   application.yaml: |
     spring:
       application:
-        name: rms-management-service
+        name: rms-product-service
       config:
         import:
           - classpath:authentication.yaml
@@ -25,27 +25,27 @@ metadata:
     app.openshift.io/route-disabled: 'false'
     app.openshift.io/vcs-uri: 'https://github.com/GC-Genome/rms.git'
     reloader.stakater.com/auto: 'true'
-  name: management-service
+  name: product-service
   namespace: {{ .Release.Namespace }}
   labels:
-    app: management-service
+    app: product-service
     app.openshift.io/runtime: spring-boot
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: management-service
+      app: product-service
   template:
     metadata:
       labels:
-        app: management-service
+        app: product-service
       annotations:
         sidecar.istio.io/inject: 'true'
     spec:
       volumes:
         - name: config
           configMap:
-            name: management-service
+            name: product-service
             defaultMode: 420
         - name: authentication-config
           configMap:
@@ -58,7 +58,7 @@ spec:
       containers:
         - resources: {}
           terminationMessagePath: /dev/termination-log
-          name: management-service
+          name: product-service
           env:
             - name: database.url
               valueFrom:
@@ -97,7 +97,7 @@ spec:
               mountPath: /app/resources/authentication.yaml
               subPath: authentication.yaml
           terminationMessagePolicy: File
-          image: 'image-registry.openshift-image-registry.svc:5000/rms-test/management-service:latest'
+          image: 'image-registry.openshift-image-registry.svc:5000/rms-test/product-service:latest'
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst
@@ -114,7 +114,7 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: rms-management-service
+  name: rms-product-service
   namespace: rms-test
 spec:
   type: ClusterIP
@@ -124,12 +124,12 @@ spec:
       port: 80
       targetPort: 8080
   selector:
-    app: management-service
+    app: product-service
 ---
 kind: ImageStream
 apiVersion: image.openshift.io/v1
 metadata:
-  name: management-service
+  name: product-service
   namespace: {{ .Release.Namespace }}
 spec:
   lookupPolicy:

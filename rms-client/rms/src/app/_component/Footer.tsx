@@ -1,4 +1,4 @@
-import style from "@/app/(beforeLogin)/_component/footer.module.css";
+import style from "@/app/_component/footer.module.css";
 import Avatar from '@mui/material/Avatar';
 import Stack from '@mui/material/Stack';
 import Link from "next/link";

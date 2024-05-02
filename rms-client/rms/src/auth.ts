@@ -1,7 +1,7 @@
 import NextAuth, {DefaultSession} from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import forge from "node-forge"
-import JWTParser, {Secret} from "jsonwebtoken"
+import JWTParser, {Jwt, JwtPayload, Secret} from "jsonwebtoken"
 import {JWT} from "@auth/core/jwt";
 import {Session} from "@auth/core/types";
 import Credentials from "next-auth/providers/credentials";

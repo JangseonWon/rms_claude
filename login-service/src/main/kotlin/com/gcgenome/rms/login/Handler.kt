@@ -23,9 +23,8 @@ class Handler(
     }
 
     fun signup(user: User): Mono<User>{
-        val dto = user.apply { password = encoder.encode(user.password) }
         return Mono.from(dslContext.transactionPublisher { trx ->
-            trx.dsl().run { insertUser(dto) }
+            trx.dsl().run { insertUser(user.apply { password = encoder.encode(user.password) }) }
         })
     }
 }

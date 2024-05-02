@@ -8,6 +8,7 @@ on:
       - management-service/**
       - login-service/**
       - dashboard-service/**
+      - product-service/**
 permissions: write-all
 jobs:
   extract:
@@ -28,7 +29,8 @@ jobs:
             module_name="${file%%/*}"
             [[ "$module_name" == "management-service" || 
           "$module_name" == "login-service" || 
-          "$module_name" == "dashboard-service" ]] && module_names+=("$module_name")
+          "$module_name" == "dashboard-service" ||
+          "$module_name" == "product-service" ]] && module_names+=("$module_name")
           done
           module_names=($(printf '%s\n' "${module_names[@]}" | sort -u))
           echo "matrix=[$(printf '"%s",' "${module_names[@]}" | sed 's/,$//')]"

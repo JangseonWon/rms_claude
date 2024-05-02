@@ -8,14 +8,13 @@ import type {Statistics} from "@/model/Statistics";
 import Loading from "@/app/(afterLogin)/_component/Loading";
 
 export default function Statistics() {
-    const request = useRequestStore();
-    const [statisticsData, setStatisticsData] = useState<Statistics>()
+    const [statisticsData, setRequestData] = useState<Statistics>()
     const [isLoading, setLoading] = useState(true)
 
     useEffect(() => {
         getStatisticsRequest()
             .then((data) => {
-                setStatisticsData(data)
+                setRequestData(data)
                 setLoading(false)
             })
 
