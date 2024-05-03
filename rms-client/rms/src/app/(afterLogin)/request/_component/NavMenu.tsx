@@ -2,74 +2,124 @@
 
 import style from "@/app/(afterLogin)/request/_component/navMenu.module.css"
 import Link from "next/link";
-import {faHouse, faAngleDown, faGripLines, faBorderAll, faPlus, faCircleCheck, faCircleQuestion} from "@fortawesome/free-solid-svg-icons";
+import {
+    faAngleDown,
+    faBorderAll,
+    faCircleCheck,
+    faCircleQuestion,
+    faGripLines,
+    faHouse,
+    faPlus
+} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import React from "react";
+import React, {useState} from "react";
 import {useSelectedLayoutSegment} from "next/navigation";
 
 
 export default function NavMenu() {
     const segment = useSelectedLayoutSegment();
+    const [showServicesDropdown, setShowServicesDropdown] = useState(false);
+    const [showDashboardDropdown, setShowDashboardDropdown] = useState(false);
+
+    const toggleServicesDropdown = () => {
+        setShowServicesDropdown(!showServicesDropdown);
+    }
+    const toggleDashboardDropdown = () => {
+        setShowDashboardDropdown(!showDashboardDropdown);
+    }
+    console.log(segment);
 
     return (
-        <div className={style.navPill}>
+        <li className={style.navPill}>
             <ul>
-                <li>
-                    <Link href={"/request/dashboard"}>
-                        <FontAwesomeIcon
-                            className={style.icon}
-                            style={{color: segment?.includes('dashboard') ? '#90BA2D' : '#666666'}}
-                            icon={faHouse}/>
-                        <span>Dashboard</span>
-                        <FontAwesomeIcon icon={faAngleDown}/>
-                    </Link>
+                <li onClick={toggleDashboardDropdown}>
+                    <FontAwesomeIcon
+                        className={segment === 'dashboard' ? style.clickIcon : style.icon}
+                        icon={faHouse}/>
+                    <span className={segment === 'dashboard' ? style.clickSpan : ''}>Dashboard</span>
                 </li>
-                <li>
-                    <Link href={"/request/services"}>
-                        <FontAwesomeIcon
-                            className={style.icon}
-                            style={{color: segment?.includes('services') ? '#90BA2D' : '#666666'}}
-                            icon={faBorderAll}/>
-                        <span>Services</span>
-                    </Link>
+                {showDashboardDropdown && (
+                    <>
+                        <ol>
+                            <Link href={"/request/dashboard/service-catalog"}>
+                                Service Catalog
+                            </Link>
+                        </ol>
+                        <ol>
+                            <Link href={"/request/dashboard"}>
+                                Dashboard
+                            </Link>
+                        </ol>
+                    </>
+                )}
+                <li onClick={toggleServicesDropdown}>
+                    <FontAwesomeIcon
+                        className={segment === 'services' ? style.clickIcon : style.icon}
+                        icon={faBorderAll}/>
+                    <span className={segment === 'services' ? style.clickSpan : ''}>Services</span>
                 </li>
+                {showServicesDropdown && (
+                    <>
+                        <ol>
+                            <Link href={"/request/services/precision-oncology"}>
+                                Precision Oncology
+                            </Link>
+                        </ol>
+                        <ol>
+                            <Link href={"/request/services/pre-and-neonatal"}>
+                                Pre & neonatal
+                            </Link>
+                        </ol>
+                        <ol>
+                            <Link href={"/request/services/rare-disease"}>
+                                Rare disease
+                            </Link>
+                        </ol>
+                        <ol>
+                            <Link href={"/request/services/health-checkup"}>
+                                Health Checkup
+                            </Link>
+                        </ol>
+                        <ol>
+                            <Link href={"/request/services/others"}>
+                                Others
+                            </Link>
+                        </ol>
+                    </>
+                )}
                 <li>
                     <Link href={"/request/cart"}>
                         <FontAwesomeIcon
-                            className={style.icon}
-                            style={{color: segment?.includes('cart') ? '#90BA2D' : '#666666'}}
+                            className={segment === 'cart' ? style.clickIcon : style.icon}
                             icon={faPlus}/>
-                        <span>Cart</span>
+                        <span className={segment === 'cart' ? style.clickSpan : ''}>Cart</span>
                     </Link>
                 </li>
                 <li>
                     <Link href={"/request/order"}>
                         <FontAwesomeIcon
-                            className={style.icon}
-                            style={{color: segment?.includes('order') ? '#90BA2D' : '#666666'}}
+                            className={segment === 'order' ? style.clickIcon : style.icon}
                             icon={faGripLines}/>
-                        <span>Request Order</span>
+                        <span className={segment === 'order' ? style.clickSpan : ''}>Request Order</span>
                     </Link>
                 </li>
                 <li>
                     <Link href={"/request/result"}>
                         <FontAwesomeIcon
-                            className={style.icon}
-                            style={{color: segment?.includes('result') ? '#90BA2D' : '#666666'}}
+                            className={segment === 'result' ? style.clickIcon : style.icon}
                             icon={faCircleCheck}/>
-                        <span>Result</span>
+                        <span className={segment === 'result' ? style.clickSpan : ''}>Result</span>
                     </Link>
                 </li>
                 <li>
                     <Link href={"/request/qna"}>
                         <FontAwesomeIcon
-                            className={style.icon}
-                            style={{color: segment?.includes('qna') ? '#90BA2D' : '#666666'}}
+                            className={segment === 'qna' ? style.clickIcon : style.icon}
                             icon={faCircleQuestion}/>
-                        <span>QnA</span>
+                        <span className={segment === 'qna' ? style.clickSpan : ''}>QnA</span>
                     </Link>
                 </li>
             </ul>
-        </div>
+        </li>
     )
 }

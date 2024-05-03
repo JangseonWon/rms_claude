@@ -1,27 +1,52 @@
 .navPill {
     display: inline-flex;
-    padding: 5px;
     background-color: white;
-    margin: 25px;
+    margin: 23px;
     border-radius: 15px;
+    width: 270px;
 }
 .navPill ul {
     padding: 10px;
 }
+.navPill ul ol {
+    margin: 15px 0 0 40px;
+    font-size: 15px;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    padding: 3px 50px 3px 20px;
+    border-radius: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.navPill ul ol:hover {
+    background-color: #C8C9CB;
+}
+.navPill ul ol:active {
+    background-color: #e8e8eb;
+}
+.navPill ul ol a{
+    text-decoration: none;
+    color: #666666;
+}
 .navPill li{
     list-style-type: none;
     margin: 20px;
+    cursor: pointer;
 }
-
 .navPill li a {
     text-decoration: none;
 }
-.navPill li a span {
+.navPill li span {
     margin: 0 15px;
     color: #666666;
     font-size: 18px;
     font-optical-sizing: auto;
     font-weight: 400;
+}
+.navPill li:hover span {
+    color: #002b49;
+    font-weight: 800;
 }
 .navPill li a svg {
     color: #666666;
@@ -29,4 +54,10 @@
 .navPill li:hover .icon {
     color: #90BA2D;
 }
-
+.navPill li .clickIcon {
+    color: #90BA2D !important;
+}
+.navPill li .clickSpan {
+    color: #002b49 !important;
+    font-weight: 800 !important;
+}

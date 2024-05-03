@@ -1,7 +1,8 @@
+
 export default async function Page() {
     return(
         <>
-            Request Order
+           Others
         </>
     )
 }

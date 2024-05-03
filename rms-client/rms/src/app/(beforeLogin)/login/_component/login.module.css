@@ -73,19 +73,26 @@
     color: #ffffff;
     margin-bottom: 30px;
     border: none;
-}
-.healthcareButton {
-    color: #999999;
-    border: thin solid #999999;
-    font-weight: 300;
+    box-shadow: 1px 4px 10px rgb(0,0,0,0.5);
 }
 .loginButton:hover {
     background: linear-gradient(135deg, #1b3351, #3d587e);
     cursor: pointer;
 }
-
+.loginButton:active {
+    box-shadow: 1px 1px 0 rgb(0,0,0,0.5);
+}
+.healthcareButton {
+    color: #999999;
+    border: thin solid #999999;
+    font-weight: 300;
+    box-shadow: 1px 5px 10px rgb(0,0,0,0.2);
+}
 .healthcareButton:hover {
     color: #666666;
     border-color: #666666;
     cursor: pointer;
+}
+.healthcareButton:active {
+    box-shadow: 1px 1px 0 rgb(0,0,0,0.5);
 }
