@@ -34,9 +34,9 @@ data class Sample(
     val sampleTypeId: SampleType,
     @ManyToOne
     @JoinColumns(value = [
-        JoinColumn(name = "patient_serial", referencedColumnName = "serial", insertable=false, updatable=false),
-        JoinColumn(name = "organization_id", referencedColumnName = "organization_id", insertable=false, updatable=false),
-        JoinColumn(name = "user_id", referencedColumnName = "user_id", insertable=false, updatable=false)
+        JoinColumn(name = "patient_serial", referencedColumnName = "serial", insertable=false, updatable=false, nullable = false),
+        JoinColumn(name = "organization_id", referencedColumnName = "organization_id", insertable=false, updatable=false, nullable = false),
+        JoinColumn(name = "user_id", referencedColumnName = "user_id", insertable=false, updatable=false, nullable = false)
     ])
     val patientId: Patient,
 

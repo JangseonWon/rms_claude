@@ -1,6 +1,6 @@
 package com.gcgenome.rms.data
 
-import org.jooq.Record8
+import org.jooq.Record7
 
 data class StatusCount (
     val total: Int?,
@@ -9,11 +9,10 @@ data class StatusCount (
     val inProgress: Int?,
     val testFailed: Int?,
     val delivered: Int?,
-    val finished: Int?,
-    val cart: Int?
+    val finished: Int?
 ) {
     companion object{
-        fun toModel(record: Record8<Int?, Int?, Int?, Int?, Int?, Int?, Int?, Int?>) =
+        fun toModel(record: Record7<Int?, Int?, Int?, Int?, Int?, Int?, Int?>) =
             StatusCount(
                 total = record.getValue(0, Int::class.java),
                 ordered = record.getValue(1, Int::class.java),
@@ -21,8 +20,7 @@ data class StatusCount (
                 inProgress = record.getValue(3, Int::class.java),
                 testFailed = record.getValue(4, Int::class.java),
                 delivered = record.getValue(5, Int::class.java),
-                finished = record.getValue(6, Int::class.java),
-                cart = record.getValue(7, Int::class.java)
+                finished = record.getValue(6, Int::class.java)
             )
     }
 }

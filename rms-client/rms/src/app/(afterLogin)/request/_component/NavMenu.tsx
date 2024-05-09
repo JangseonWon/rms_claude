@@ -27,8 +27,6 @@ export default function NavMenu() {
     const toggleDashboardDropdown = () => {
         setShowDashboardDropdown(!showDashboardDropdown);
     }
-    console.log(segment);
-
     return (
         <li className={style.navPill}>
             <ul>
@@ -46,7 +44,7 @@ export default function NavMenu() {
                             </Link>
                         </ol>
                         <ol>
-                            <Link href={"/request/dashboard"}>
+                            <Link href={"/request/dashboard/dashboard"}>
                                 Dashboard
                             </Link>
                         </ol>

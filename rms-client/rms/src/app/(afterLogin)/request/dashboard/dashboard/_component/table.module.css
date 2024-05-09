@@ -1,0 +1,96 @@
+.container {
+    width: 100%;
+    margin: 20px auto;
+}
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.table thead {
+    background-color: #838689;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+}
+.table thead tr th:first-child {
+    border-radius: 20px 0 0 0;
+}
+.table thead tr th:last-child {
+    border-radius: 0 20px 0 0;
+}
+.table tbody {
+    font-weight: 300;
+}
+.table tbody tr {
+    border-bottom: 1px solid #838689;
+}
+.table tbody tr td {
+    color: #666666;
+    font-size: 16px;
+    padding: 10px;
+}
+.table tbody tr:nth-child(even) {
+    background-color: #ffffff;
+}
+.table th,
+.table td {
+    padding: 8px;
+    text-align: center;
+}
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+.pagination span {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #1a1a1a;
+    align-items: center;
+}
+.pagination span:first-child {
+    padding: 10px 5px 10px 0;
+}
+.pagination button {
+    border: none;
+    border-radius: 18px;
+    font-size: 18px;
+    padding: 15px;
+}
+.pagination button:hover:not([disabled]) {
+    background-color: #d3d3d3;
+    cursor: pointer;
+}
+.select {
+    position: relative;
+    width: 50px;
+}
+
+.select select {
+    appearance: none; /* 기본 스타일 제거 */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 15px;
+    background-color: #f8f8f8;
+    cursor: pointer;
+}
+
+.select::after {
+    content: '\25BC'; /* 화살표 아이콘 */
+    font-size: 12px;
+    color: #555;
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    pointer-events: none; /* 화살표를 클릭 가능하도록 함 */
+}
+.select select:focus {
+    outline: none;
+}
+.select select:hover {
+    border-color: #1a1a1a;
+}
