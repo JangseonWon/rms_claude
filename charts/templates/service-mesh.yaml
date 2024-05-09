@@ -10,7 +10,7 @@ spec:
   project: {{ .Release.Namespace }}
   source:
     path: charts/service-mesh
-    repoURL: 'https://gitea.apps.gcgenome.com/LIMS/rms.git'
+    repoURL: 'https://github.com/GC-Genome/rms.git'
     targetRevision: {{ .Values.revision }}
     helm:
       parameters:

@@ -1,8 +1,0 @@
-apiVersion: v2
-name: postgresql
-annotations:
-  charts.openshift.io/name: postgresql
-type: application
-version: 1.0.0
-appVersion: "latest"
-kubeVersion: '>= 1.20.0-0'

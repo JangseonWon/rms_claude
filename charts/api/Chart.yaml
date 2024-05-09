@@ -1,5 +1,0 @@
-apiVersion: v2
-name: rms-api
-type: application
-version: 1.0.0
-appVersion: "latest"

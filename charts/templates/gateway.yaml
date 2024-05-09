@@ -8,49 +8,8 @@ spec:
     istio: ingressgateway
   servers:
   - port:
-      number: 443
-      name: https
-      protocol: HTTPS
-    tls:
-      mode: SIMPLE
-      credentialName: {{ .Values.host }}-ca
+      number: 80
+      name: http
+      protocol: HTTP
     hosts:
     - {{ .Values.host }}
-
----
-
-apiVersion: networking.istio.io/v1alpha3
-kind: Gateway
-metadata:
-  name: gateway-tcp
-  namespace: {{ .Release.Namespace }}
-  annotations:
-    maistra.io/manageRoute: 'false'
-spec:
-  selector:
-    istio: ingressgateway
-  servers:
-    - hosts:
-        - postgres.{{ .Values.host }}
-      port:
-        number: 5432
-        name: postgres
-        protocol: TCP
-
----
-
-apiVersion: networking.istio.io/v1alpha3
-kind: Gateway
-metadata:
-  name: cert-manager-gateway
-  namespace: {{ .Release.Namespace }}
-spec:
-  selector:
-    istio: ingressgateway
-  servers:
-    - port:
-        number: 80
-        name: http
-        protocol: HTTP
-      hosts:
-        - {{ .Values.host }}
