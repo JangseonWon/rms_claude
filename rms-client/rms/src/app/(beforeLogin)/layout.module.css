@@ -15,7 +15,6 @@
     position: fixed;
     top: 73px;
     height: calc(100vh - 73px - 150px);
-    overflow: auto;
     width: 100%;
 }
 .bottomSection {

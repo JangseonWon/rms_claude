@@ -1,0 +1,43 @@
+.firstSection {
+    display: flex;
+    margin: 10px 40px;
+}
+.middleSection {
+    margin: 10px 40px;
+}
+.bottomSection {
+    margin: 10px 40px;
+}
+.subSection {
+    display: flex;
+}
+.subItem {
+    margin-right: 50px;
+}
+.mainName {
+    color: #002b49;
+    font-weight: 800;
+    font-size: 16px;
+}
+.subName {
+    color: #565454;
+    font-size: 15px;
+    font-weight: 500;
+    margin: 10px 0 5px 0;
+    width: 150px;
+}
+.order {
+    margin-right: 50px;
+    margin-left: auto;
+    border-radius: 15px;
+    border: none;
+    background: linear-gradient(135deg, #182847, #354e6d);
+    color: #ffffff;
+    font-weight: 700;
+    width: 110px;
+    padding: 5px 0 5px 0;
+    cursor: pointer;
+}
+.order:hover {
+    background: linear-gradient(135deg, #138d28, #98e69d);
+}
