@@ -38,6 +38,10 @@
     padding: 20px;
     height: 100px;
 }
+.card img {
+    width: 25%;
+    height: auto;
+}
 .cardLabel{
     font-size: 18px;
     color:#002b49;

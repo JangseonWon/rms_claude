@@ -9,24 +9,14 @@ import Loading from "@/app/(afterLogin)/_component/Loading";
 
 export default function Statistics() {
     const [statisticsData, setStatisticsData] = useState<Statistics>()
-    const [isLoading, setLoading] = useState(true)
 
     useEffect(() => {
         getStatisticsRequest()
             .then((data) => {
                 setStatisticsData(data)
-                setLoading(false)
             })
 
     }, []);
-
-    if(isLoading) {
-        return(
-            <div className={style.container} style={{height:"240px"}}>
-                <Loading/>
-            </div>
-        )
-    }
 
     return (
         <div className={style.container}>
@@ -39,30 +29,51 @@ export default function Statistics() {
                 </div>
             </div>
             <div className={style.cardContainer}>
-
                 <div className={style.card}>
                     <div className={style.cardLabel}>Total</div>
-                    <div className={style.cardValue}>{statisticsData?.total}</div>
+                    <div className={style.cardValue}>{statisticsData ? (
+                        statisticsData.total
+                    ) : <Loading/>}</div>
                 </div>
                 <div className={style.card}>
                     <div className={style.cardLabel}>Ordered</div>
-                    <div className={style.cardValue}>{statisticsData?.ordered}</div>
+                    <div className={style.cardValue}>
+                        {statisticsData ? (
+                            statisticsData.ordered
+                        ) : <Loading/>}
+                    </div>
                 </div>
                 <div className={style.card}>
                     <div className={style.cardLabel}>In progress</div>
-                    <div className={style.cardValue}>{statisticsData?.inProgress}</div>
+                    <div className={style.cardValue}>
+                        {statisticsData ? (
+                            statisticsData.inProgress
+                        ) : <Loading/>}
+                    </div>
                 </div>
                 <div className={style.card}>
                     <div className={style.cardLabel}>Test failed</div>
-                    <div className={style.cardValue}>{statisticsData?.testFailed}</div>
+                    <div className={style.cardValue}>
+                        {statisticsData ? (
+                            statisticsData.testFailed
+                        ) : <Loading/>}
+                    </div>
                 </div>
                 <div className={style.card}>
                     <div className={style.cardLabel}>Delivered</div>
-                    <div className={style.cardValue}>{statisticsData?.delivered}</div>
+                    <div className={style.cardValue}>
+                        {statisticsData ? (
+                            statisticsData.delivered
+                        ) : <Loading/>}
+                    </div>
                 </div>
                 <div className={style.card}>
                     <div className={style.cardLabel}>Complete</div>
-                    <div className={style.cardValue}>{statisticsData?.finished}</div>
+                    <div className={style.cardValue}>
+                        {statisticsData ? (
+                            statisticsData.finished
+                        ) : <Loading/>}
+                    </div>
                 </div>
             </div>
         </div>

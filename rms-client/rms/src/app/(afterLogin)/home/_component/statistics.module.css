@@ -1,0 +1,69 @@
+.container {
+    padding: 20px 10%;
+}
+.container h1 {
+    color: #002b49;
+    font-size: 26px;
+}
+.container h1 span button {
+    cursor: pointer;
+    margin-left: 10px;
+    padding: 3px 10px;
+    border-radius: 15px;
+    font-size: 18px;
+    color: #002b49;
+    font-weight: 600;
+    background-color: #fff;
+    border: 1px solid #002b49;
+}
+.container h1 span button:hover {
+    color: #fff;
+    background-color: #002b49;
+}
+.cardContainer {
+    display: flex;
+}
+.card{
+    text-decoration: none;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    border-radius: 10px;
+    justify-content: space-between;
+    padding: 20px;
+    height: 100px;
+    background-color: #fff;
+    color:#002b49;
+    margin: 20px
+}
+.card:first-child{
+    margin-left: 0;
+}
+.card:last-child{
+    margin-right: 0;
+}
+.card:hover{
+    color:white;
+    background: linear-gradient(to right, #002b49, #3d587e);
+}
+.cardLabel{
+    font-size: 18px;
+    font-weight: 500;
+    text-align: left;
+}
+.line {
+    width: 4%;
+    height: 5px;
+    background-color: #002b49;
+}
+.cardValue{
+    font-size: 30px;
+    font-weight: 600;
+    text-align: right;
+}
+.cardValue img {
+    width: 20%;
+    height: auto;
+}
