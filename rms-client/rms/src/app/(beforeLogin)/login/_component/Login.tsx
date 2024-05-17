@@ -4,12 +4,14 @@ import React, {ChangeEventHandler, FormEventHandler, useState} from "react";
 import {signIn} from "next-auth/react";
 import {useRouter} from "next/navigation";
 import style from "@/app/(beforeLogin)/login/_component/login.module.css"
+import {useSetLoginUser} from "@/store/LoginUser";
 
 export default function Login() {
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const router = useRouter();
+    const setUserId = useSetLoginUser();
 
     const onSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
         e.preventDefault();
@@ -22,6 +24,7 @@ export default function Login() {
             if (!response?.ok) {
                 setMessage('아이디와 비밀번호가 일치하지 않습니다.');
             } else {
+                setUserId(id);
                 router.replace('/home');
             }
         } catch (err) {

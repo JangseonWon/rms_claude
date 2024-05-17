@@ -6,10 +6,7 @@ import type {Request} from "@/model/Request";
 import {getRequests} from "@/app/(afterLogin)/request/dashboard/dashboard/_api/getRequests";
 import {format} from "date-fns";
 import type {Page} from "@/model/Page"
-import {
-    faAngleRight,
-    faAngleLeft
-} from "@fortawesome/free-solid-svg-icons";
+import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 export default function Table() {

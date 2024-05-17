@@ -3,7 +3,6 @@ import Avatar from '@mui/material/Avatar';
 import Stack from '@mui/material/Stack';
 import Link from "next/link";
 import React from "react";
-import {Icon, IconButton} from "@mui/material";
 
 export default function Footer() {
     return (

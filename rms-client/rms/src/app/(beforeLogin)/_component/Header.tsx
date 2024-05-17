@@ -3,7 +3,6 @@
 import style from "@/app/(beforeLogin)/_component/header.module.css"
 import Link from "next/link";
 import {useRouter, useSelectedLayoutSegment} from "next/navigation";
-import {useState} from "react";
 
 
 export default function Header() {

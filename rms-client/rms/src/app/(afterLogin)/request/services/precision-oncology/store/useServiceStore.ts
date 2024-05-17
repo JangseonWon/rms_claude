@@ -1,22 +1,22 @@
 import {create, SetState} from 'zustand';
 
-interface Item {
+interface Service {
     id: string;
     name: string;
 }
 
 interface ServiceState {
-    service: Item[] | null;
-    selectService: Item | null;
-    setServices: (newOrganization: Item[] | null) => void;
-    setSelectService: (newSelectOrganization: Item | null) => void;
+    service: Service[];
+    selectService: Service | null;
+    setServices: (newService: Service[]) => void;
+    setSelectService: (newSelectService: Service | null) => void;
 }
 
 const useServiceStore = create<ServiceState>((set: SetState<ServiceState>) => ({
-    service: null,
+    service: [],
     selectService: null,
-    setServices: (newOrganization) => set({ service: newOrganization }),
-    setSelectService: (newSelectOrganization) => set({ selectService: newSelectOrganization }),
+    setServices: (newService) => set({ service: newService }),
+    setSelectService: (newSelectService) => set({ selectService: newSelectService }),
 }));
 
 export const useService = () => useServiceStore((state) => state.service);

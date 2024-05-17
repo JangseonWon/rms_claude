@@ -2,9 +2,17 @@
 
 import InputTextField from "@/app/(afterLogin)/request/services/_component/InputTextField";
 import style from "@/app/(afterLogin)/request/services/precision-oncology/_component/inputExtension.module.css";
-import {useEffect, useState} from "react";
-import {fetchServiceExtensions} from "@/app/(afterLogin)/request/services/precision-oncology/_api/fetchServiceExtensions";
+import {useEffect} from "react";
+import {
+    fetchServiceExtensions
+} from "@/app/(afterLogin)/request/services/precision-oncology/_api/fetchServiceExtensions";
 import {useSelectService} from "@/app/(afterLogin)/request/services/precision-oncology/store/useServiceStore";
+import {
+    useExtensions,
+    useSetExtensions
+} from "@/app/(afterLogin)/request/services/precision-oncology/store/useInputExtensionStore";
+import CheckBox from "@/app/(afterLogin)/request/services/_component/CheckBox";
+import TA0007Check from "@/app/(afterLogin)/request/services/precision-oncology/_component/TA0007Check";
 
 interface Extension {
     id: string;
@@ -14,7 +22,8 @@ interface Extension {
 }
 
 export default function InputExtension() {
-    const [extensions, setExtensions] = useState<Extension[]>([]);
+    const extensions = useExtensions();
+    const setExtensions = useSetExtensions();
     const service = useSelectService();
 
     useEffect(() => {
@@ -27,32 +36,29 @@ export default function InputExtension() {
     }, [service]);
 
     const renderInput = (extension: Extension) => {
-        if (extension.regex.startsWith('-?\\d+')) {
-            return <InputTextField />;
-        } else if (extension.regex.startsWith('\\b(?:true|false)\\b')) {
-            return (
-                <label form="agree" className={style.checkbox}>
-                    <input type="checkbox" id="agree" />
-                    <span className={style.on}></span>
-                </label>
-            );
+        if (extension.regex.startsWith('\\b(?:true|false)\\b')) {
+            return <CheckBox key={extension.id} value={extension.id}/>
+        } else if (extension.regex.startsWith('\\b(?:double|triple|quad)\\b')) {
+            return <TA0007Check key={extension.id}/>
         } else {
-            return <InputTextField />;
+            return <InputTextField key={extension.id} value={extension.id}/>;
         }
     };
 
-    const renderExtensionSection = (sectionExtensions: Extension[]) => (
-        <div className={style.section}>
-            {sectionExtensions.map((extension) => (
-                <div key={extension.id} className={style.item}>
-                    <div className={style.name}>
-                        {extension.name}
+    const renderExtensionSection = (sectionExtensions: Extension[]) => {
+        return (
+            <div key={sectionExtensions.map(extension => extension.id).join('-')} className={style.section}>
+                {sectionExtensions.map((extension) => (
+                    <div key={extension.id} className={style.item}>
+                        <div className={style.name}>
+                            {extension.name}
+                        </div>
+                        {renderInput(extension)}
                     </div>
-                    {renderInput(extension)}
-                </div>
-            ))}
-        </div>
-    );
+                ))}
+            </div>
+        );
+    };
 
     const renderSections = () => {
         const sections = [];
@@ -66,12 +72,12 @@ export default function InputExtension() {
     return (
         <>
             {extensions.length > 0 && (
-                <>
+                <div key="clinicalInfo">
                     <div className={style.mainName}>
                         Clinical Info.
                     </div>
                     {renderSections()}
-                </>
+                </div>
             )}
         </>
     );

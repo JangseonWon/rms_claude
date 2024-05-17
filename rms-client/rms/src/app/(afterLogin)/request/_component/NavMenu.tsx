@@ -3,7 +3,6 @@
 import style from "@/app/(afterLogin)/request/_component/navMenu.module.css"
 import Link from "next/link";
 import {
-    faAngleDown,
     faBorderAll,
     faCircleCheck,
     faCircleQuestion,

@@ -5,12 +5,44 @@ import clsx from 'clsx';
 import {css, styled} from '@mui/system';
 import {Modal as BaseModal} from '@mui/base/Modal';
 import style from "@/app/(afterLogin)/request/services/precision-oncology/_component/orderModal.module.css";
-import InputExtension from "@/app/(afterLogin)/request/services/precision-oncology/_component/InputExtension";
+import {useSelectOrganization} from "@/app/(afterLogin)/request/services/precision-oncology/store/useOrganizationStore";
+import {useSelectService} from "@/app/(afterLogin)/request/services/precision-oncology/store/useServiceStore";
+import {
+    useAge,
+    useMedicalDepartment,
+    useMemo,
+    useMrn,
+    useName,
+    usePhysician,
+    useQuantity,
+    useType,
+    useWard
+} from "@/app/(afterLogin)/request/services/precision-oncology/store/useInputOrderStore";
+import ModalExtension from "@/app/(afterLogin)/request/services/precision-oncology/_component/ModalExtension";
+import {useBirth, useCollection} from "@/app/(afterLogin)/request/services/precision-oncology/store/useDatePickerStore";
+import {useState} from "react";
 
 export default function OrderModal() {
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+
+    const organization = useSelectOrganization();
+    const service = useSelectService();
+    const name = useName();
+    const mrn = useMrn();
+    const birthday = useBirth();
+    const age = useAge();
+    const type = useType();
+    const collectionDate = useCollection();
+    const quantity = useQuantity();
+    const memo = useMemo();
+    const medicalDepartment = useMedicalDepartment();
+    const ward = useWard();
+    const physician = usePhysician();
+
+    const isAddOrderDisabled = !(organization && service && name && mrn && type && quantity && collectionDate);
+    const handleOnClickAddToOrder = () => console.log("click");
 
     return (
         <div>
@@ -23,12 +55,17 @@ export default function OrderModal() {
                 slots={{ backdrop: StyledBackdrop }}
             >
                 <ModalContent>
+                    <div className={style.header}>
+                        ORDER
+                    </div>
                     <section className={style.firstSection}>
                         <div>
                             <div className={style.mainName}>
                                 Institution name *
                             </div>
-                            기관 명
+                            <div className={organization ? "" : style.emptySelect}>
+                                {organization?.name ? organization.name : "Select Institution Name"}
+                            </div>
                         </div>
                     </section>
                     <section className={style.middleSection}>
@@ -36,10 +73,10 @@ export default function OrderModal() {
                             <div className={style.mainName}>
                                 Service Info.
                             </div>
-                            <div className={style.subName}>
+                            <div className={service ? style.subName : style.emptySelect}>
                                 Service *
                             </div>
-                            서비스 명
+                            {service?.name ? service.name : "Select Service"}
                         </div>
                     </section>
                     <section className={style.middleSection}>
@@ -48,28 +85,28 @@ export default function OrderModal() {
                         </div>
                         <section className={style.subSection}>
                             <div className={style.subItem}>
-                                <div className={style.subName}>
+                                <div className={name ? style.subName : style.emptySubName}>
                                     Name *
                                 </div>
-                                이름
+                                {name}
                             </div>
                             <div className={style.subItem}>
-                                <div className={style.subName}>
+                                <div className={mrn ? style.subName : style.emptySubName}>
                                     MRN *
                                 </div>
-                                MRN 명
+                                {mrn}
                             </div>
                             <div className={style.subItem}>
                                 <div className={style.subName}>
                                     Date of Birth
                                 </div>
-                                날짜
+                                {birthday?.fullDate}
                             </div>
                             <div className={style.subItem}>
                                 <div className={style.subName}>
                                     Age
                                 </div>
-                                나이
+                                {age}
                             </div>
                         </section>
                     </section>
@@ -79,28 +116,28 @@ export default function OrderModal() {
                         </div>
                         <section className={style.subSection}>
                             <div className={style.subItem}>
-                                <div className={style.subName}>
+                                <div className={type ? style.subName : style.emptySubName}>
                                     Type *
                                 </div>
-                                타입
+                                {type}
                             </div>
                             <div className={style.subItem}>
                                 <div className={style.subName}>
                                     Date of collection *
                                 </div>
-                                날짜
+                                {collectionDate?.fullDate}
                             </div>
                             <div className={style.subItem}>
-                                <div className={style.subName}>
+                                <div className={quantity ? style.subName : style.emptySubName}>
                                     Quantity *
                                 </div>
-                                수량
+                                {quantity}
                             </div>
                             <div className={style.subItem}>
                                 <div className={style.subName}>
                                     Memo
                                 </div>
-                                메모
+                                {memo}
                             </div>
                         </section>
                     </section>
@@ -113,28 +150,35 @@ export default function OrderModal() {
                                 <div className={style.subName}>
                                     Medical Department
                                 </div>
-                                의료기관
+                                {medicalDepartment}
                             </div>
                             <div className={style.subItem}>
                                 <div className={style.subName}>
                                     Ward
                                 </div>
-                                동
+                                {ward}
                             </div>
                             <div className={style.subItem}>
                                 <div className={style.subName}>
                                     Physician Name
                                 </div>
-                                이름
+                                {physician}
                             </div>
                         </section>
                     </section>
                     <section className={style.bottomSection}>
-                        <InputExtension/>
+                        <ModalExtension/>
                     </section>
-                    <button className={style.order}>
-                        Order
-                    </button>
+                    <div className={style.orderButton}>
+                        <button className={isAddOrderDisabled ? style.disabled : style.addOrder}
+                                disabled={isAddOrderDisabled}
+                                onClick={handleOnClickAddToOrder}>
+                            Order
+                        </button>
+                        <button className={style.cancel} onClick={handleClose}>
+                            Cancel
+                        </button>
+                    </div>
                 </ModalContent>
             </Modal>
         </div>
@@ -145,10 +189,10 @@ const Backdrop = React.forwardRef<
     HTMLDivElement,
     { open?: boolean; className: string }
 >((props, ref) => {
-    const { open, className, ...other } = props;
+    const {open, className, ...other} = props;
     return (
         <div
-            className={clsx({ 'base-Backdrop-open': open }, className)}
+            className={clsx({'base-Backdrop-open': open}, className)}
             ref={ref}
             {...other}
         />
@@ -156,29 +200,29 @@ const Backdrop = React.forwardRef<
 });
 
 const Modal = styled(BaseModal)`
-  position: fixed;
-  z-index: 1300;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    position: fixed;
+    z-index: 1300;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border-radius: 200px;
 `;
 
 const StyledBackdrop = styled(Backdrop)`
-  z-index: -1;
-  position: fixed;
-  inset: 0;
-  background-color: rgb(0 0 0 / 0.5);
-  -webkit-tap-highlight-color: transparent;
+    z-index: -1;
+    position: fixed;
+    inset: 0;
+    background-color: rgb(0 0 0 / 0.5);
+    -webkit-tap-highlight-color: transparent;
 `;
 
 const ModalContent = styled('div')(
-    ({ theme }) => css`
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-weight: 500;
-    text-align: start;
-    position: relative;
+    ({theme}) => css`
+        font-family: 'IBM Plex Sans', sans-serif;
+        font-weight: 500;
+        text-align: start;
+        position: relative;
     display: flex;
     flex-direction: column;
     gap: 8px;

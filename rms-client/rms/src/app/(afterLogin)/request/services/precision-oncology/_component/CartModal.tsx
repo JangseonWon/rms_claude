@@ -2,15 +2,101 @@
 
 import * as React from 'react';
 import clsx from 'clsx';
-import { styled, css } from '@mui/system';
-import { Modal as BaseModal } from '@mui/base/Modal';
+import {css, styled} from '@mui/system';
+import {Modal as BaseModal} from '@mui/base/Modal';
 import style from "@/app/(afterLogin)/request/services/precision-oncology/_component/cartModal.module.css";
-import InputExtension from "@/app/(afterLogin)/request/services/precision-oncology/_component/InputExtension";
+import {
+    useAge,
+    useMedicalDepartment,
+    useMemo,
+    useMrn,
+    useName,
+    usePhysician,
+    useQuantity,
+    useType,
+    useWard
+} from "@/app/(afterLogin)/request/services/precision-oncology/store/useInputOrderStore";
+import {useSelectService} from "@/app/(afterLogin)/request/services/precision-oncology/store/useServiceStore";
+import {useSelectOrganization} from "@/app/(afterLogin)/request/services/precision-oncology/store/useOrganizationStore";
+import ModalExtension from "@/app/(afterLogin)/request/services/precision-oncology/_component/ModalExtension";
+import {useBirth, useCollection} from "@/app/(afterLogin)/request/services/precision-oncology/store/useDatePickerStore";
+import {fetchAddCart} from "@/app/(afterLogin)/request/services/precision-oncology/_api/fetchAddCart";
+import {Order} from "@/model/Order";
 
 export default function CartModal() {
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+
+    const organization = useSelectOrganization();
+    const service = useSelectService() || { id: 'default_service_id', name: 'Default Service' };
+    const name = useName();
+    const mrn = useMrn();
+    const birthday = useBirth();
+    const age = useAge();
+    const type = useType();
+    const collectionDate = useCollection();
+    const quantity = useQuantity();
+    const memo = useMemo();
+    const medicalDepartment = useMedicalDepartment();
+    const ward = useWard();
+    const physician = usePhysician();
+
+    const isAddCartDisabled = !(organization && service && name && mrn && type && quantity && collectionDate);
+
+    const selectedMonthFormatted = collectionDate.month < 10 ? `0${collectionDate.month}` : `${collectionDate.month}`;
+
+    const order: Order[] = [{
+        requests: [{
+            service: {
+                id: service!.id,
+            },
+            memo: memo,
+            department: medicalDepartment,
+            ward: ward,
+            physician: physician,
+            status: "CART",
+            sample: {
+                quantity: Number(quantity),
+                age: Number(age),
+                sampling_on: `${collectionDate?.year}-${selectedMonthFormatted}-${collectionDate.day}`,
+                sample_type: {
+                    id: type
+                },
+                patient: {
+                    serial: mrn,
+                    sex: "M", // 아직 입력하는 곳이 없네여
+                    name: name,
+                    birth_year: birthday?.year,
+                    birth_month: birthday?.month,
+                    birth_day: birthday?.day,
+                    organization: {
+                        id: organization?.id,
+                        name: organization?.name
+                    }
+                },
+                extensions: [
+                    {
+                        id: "TA0003",
+                        value: "13"
+                    },
+                    {
+                        id: "TA0008",
+                        value: "777"
+                    }
+                ] // extensions 추가 해야되는데 일단 그냥 테스트용으로 넘김
+            }
+        }]
+    }];
+
+    const handleOnClickAddToCart = async () => {
+        try {
+            await fetchAddCart(order);
+            alert("test 성공")
+        } catch (error) {
+            alert("error 실패")
+        }
+    };
 
     return (
         <div>
@@ -18,30 +104,30 @@ export default function CartModal() {
                 Add to Cart
             </TriggerButton>
             <Modal
-                aria-labelledby="unstyled-modal-title"
-                aria-describedby="unstyled-modal-description"
                 open={open}
                 onClose={handleClose}
                 slots={{ backdrop: StyledBackdrop }}
             >
                 <ModalContent>
+                    <div className={style.header}>
+                        CART
+                    </div>
                     <section className={style.firstSection}>
-                        <div>
+                        <div className={style.first}>
                             <div className={style.mainName}>
                                 Institution name *
                             </div>
-                            기관 명
+                            <div className={organization ? "" : style.emptySelect}>
+                                {organization?.name ? organization.name : "Select Institution Name"}
+                            </div>
                         </div>
-                    </section>
-                    <section className={style.middleSection}>
-                        <div>
+                        <div className={style.first}>
                             <div className={style.mainName}>
                                 Service Info.
                             </div>
-                            <div className={style.subName}>
-                                Service *
+                            <div className={service ? "" : style.emptySelect}>
+                                {service?.name ? service.name : "Select Service"}
                             </div>
-                            서비스 명
                         </div>
                     </section>
                     <section className={style.middleSection}>
@@ -50,28 +136,28 @@ export default function CartModal() {
                         </div>
                         <section className={style.subSection}>
                             <div className={style.subItem}>
-                                <div className={style.subName}>
+                                <div className={name ? style.subName : style.emptySubName}>
                                     Name *
                                 </div>
-                                이름
+                                {name}
                             </div>
                             <div className={style.subItem}>
-                                <div className={style.subName}>
+                                <div className={mrn ? style.subName : style.emptySubName}>
                                     MRN *
                                 </div>
-                                MRN 명
+                                {mrn}
                             </div>
                             <div className={style.subItem}>
                                 <div className={style.subName}>
-                                    Date of Birth
+                                    Date of Birth (DD/MM/YYYY)
                                 </div>
-                                날짜
+                                {birthday?.fullDate}
                             </div>
                             <div className={style.subItem}>
                                 <div className={style.subName}>
                                     Age
                                 </div>
-                                나이
+                                {age}
                             </div>
                         </section>
                     </section>
@@ -81,28 +167,28 @@ export default function CartModal() {
                         </div>
                         <section className={style.subSection}>
                             <div className={style.subItem}>
-                                <div className={style.subName}>
+                                <div className={type ? style.subName : style.emptySubName}>
                                     Type *
                                 </div>
-                                타입
+                                {type}
                             </div>
                             <div className={style.subItem}>
                                 <div className={style.subName}>
-                                    Date of collection *
+                                    Date of collection *(DD/MM/YYYY)
                                 </div>
-                                날짜
+                                {collectionDate?.fullDate}
                             </div>
                             <div className={style.subItem}>
-                                <div className={style.subName}>
+                                <div className={quantity ? style.subName : style.emptySubName}>
                                     Quantity *
                                 </div>
-                                수량
+                                {quantity}
                             </div>
                             <div className={style.subItem}>
                                 <div className={style.subName}>
                                     Memo
                                 </div>
-                                메모
+                                {memo}
                             </div>
                         </section>
                     </section>
@@ -115,28 +201,35 @@ export default function CartModal() {
                                 <div className={style.subName}>
                                     Medical Department
                                 </div>
-                                의료기관
+                                {medicalDepartment}
                             </div>
                             <div className={style.subItem}>
                                 <div className={style.subName}>
                                     Ward
                                 </div>
-                                동
+                                {ward}
                             </div>
                             <div className={style.subItem}>
                                 <div className={style.subName}>
                                     Physician Name
                                 </div>
-                                이름
+                                {physician}
                             </div>
                         </section>
                     </section>
                     <section className={style.bottomSection}>
-                        <InputExtension/>
+                        <ModalExtension/>
                     </section>
-                    <button className={style.cart}>
-                        Cart
-                    </button>
+                    <div className={style.cartButton}>
+                        <button className={isAddCartDisabled ?  style.disabled : style.addCart}
+                                disabled={isAddCartDisabled}
+                                onClick={handleOnClickAddToCart}>
+                            Cart
+                        </button>
+                        <button className={style.cancel} onClick={handleClose}>
+                            Cancel
+                        </button>
+                    </div>
                 </ModalContent>
             </Modal>
         </div>

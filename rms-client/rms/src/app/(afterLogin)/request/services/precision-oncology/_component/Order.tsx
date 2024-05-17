@@ -8,7 +8,6 @@ import SelectService from "@/app/(afterLogin)/request/services/precision-oncolog
 import InputExtension from "@/app/(afterLogin)/request/services/precision-oncology/_component/InputExtension";
 
 export default function Order() {
-
     return (
         <>
             <section className={style.firstSection}>
@@ -39,25 +38,25 @@ export default function Order() {
                         <div className={style.subName}>
                             Name *
                         </div>
-                        <InputTextField/>
+                        <InputTextField value={"name"}/>
                     </div>
                     <div className={style.subItem}>
                         <div className={style.subName}>
                             MRN *
                         </div>
-                        <InputTextField/>
+                        <InputTextField value={"mrn"}/>
                     </div>
                     <div className={style.subItem}>
                         <div className={style.subName}>
                             Date of Birth
                         </div>
-                        <DatePickerButton/>
+                        <DatePickerButton value={"birth"}/>
                     </div>
                     <div className={style.subItem}>
                         <div className={style.subName}>
                             Age
                         </div>
-                        <InputTextField/>
+                        <InputTextField value={"age"}/>
                     </div>
                 </section>
             </section>
@@ -70,25 +69,25 @@ export default function Order() {
                         <div className={style.subName}>
                             Type *
                         </div>
-                        <InputTextField/>
+                        <InputTextField value={"type"}/>
                     </div>
                     <div className={style.subItem}>
                         <div className={style.subName}>
-                            Date of collection *
+                            Date of Collection *
                         </div>
-                        <DatePickerButton/>
+                        <DatePickerButton value={"collection"}/>
                     </div>
                     <div className={style.subItem}>
                         <div className={style.subName}>
                             Quantity *
                         </div>
-                        <InputTextField/>
+                        <InputTextField value={"quantity"}/>
                     </div>
                     <div className={style.subItem}>
                         <div className={style.subName}>
                             Memo
                         </div>
-                        <InputTextField/>
+                        <InputTextField value={"memo"}/>
                     </div>
                 </section>
             </section>
@@ -101,19 +100,19 @@ export default function Order() {
                         <div className={style.subName}>
                             Medical Department
                         </div>
-                        <InputTextField/>
+                        <InputTextField value={"medicalDepartment"}/>
                     </div>
                     <div className={style.subItem}>
                         <div className={style.subName}>
                             Ward
                         </div>
-                        <InputTextField/>
+                        <InputTextField value={"ward"}/>
                     </div>
                     <div className={style.subItem}>
                         <div className={style.subName}>
                             Physician Name
                         </div>
-                        <InputTextField/>
+                        <InputTextField value={"physician"}/>
                     </div>
                 </section>
             </section>

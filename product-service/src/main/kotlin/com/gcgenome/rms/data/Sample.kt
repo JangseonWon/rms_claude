@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
+import com.gcgenome.rms.tables.pojos.SampleType
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -34,14 +35,10 @@ data class Sample(
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("create_at")
     val createAt: LocalDateTime?,
-    @JsonProperty("sample_type_id")
-    val sampleTypeId: String?,
-    @JsonProperty("patient_serial")
-    val patientSerial: String?,
-    @JsonProperty("organization_id")
-    val organizationId: String?,
-    @JsonProperty("user_id")
-    val userId: String?,
+    @JsonProperty("sample_type")
+    val sampleType: SampleType?,
+    @JsonProperty("patient")
+    val patient: Patient?,
     @JsonProperty("extensions")
     val extensions: List<Extension>?,
 )
