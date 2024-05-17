@@ -11,16 +11,14 @@ type Props = { children: ReactNode};
 export default async function Layout({ children }: Props) {
     const session = await auth();
     return (
-        <div className={style.container}>
-            <section className={style.topSection}>
+        <div className={style.layout}>
+            <div className={style.header}>
                 <Header session={session}/>
-            </section>
-            <section className={style.bodySection}>
+            </div>
+            <div className={style.content}>
                 {children}
-            </section>
-            <section className={style.bottomSection}>
                 <Footer/>
-            </section>
+            </div>
         </div>
-)
+    )
 }

@@ -12,12 +12,22 @@ export default function Statistics() {
     const [statisticsData, setStatisticsData] = useState<Statistics>()
 
     useEffect(() => {
-        getStatisticsRequest()
-            .then((data) => {
-                setStatisticsData(data)
-            })
-
+        const fetchData = async () => {
+            const response = await getStatisticsRequest();
+            const data = await response.json();
+            setStatisticsData(data as Statistics);
+        };
+        fetchData()
     }, []);
+
+    const statisticsCards = [
+        { label: "Total", value: statisticsData?.total },
+        { label: "Ordered", value: statisticsData?.ordered },
+        { label: "In progress", value: statisticsData?.in_progress },
+        { label: "Test failed", value: statisticsData?.test_failed },
+        { label: "Delivered", value: statisticsData?.delivered },
+        { label: "Complete", value: statisticsData?.finished },
+    ];
 
     return (
         <div className={style.container}>
@@ -30,53 +40,14 @@ export default function Statistics() {
                 </span>
             </h1>
             <div className={style.cardContainer}>
-                <Link href={"/request/order"} className={style.card}>
-                    <div className={style.cardLabel}>Total</div>
-                    <div className={style.cardValue}>{statisticsData ? (
-                        statisticsData.total
-                    ): <Loading/>}</div>
-                </Link>
-                <Link href={"/request/order"} className={style.card}>
-                    <div className={style.cardLabel}>Ordered</div>
-                    <div className={style.cardValue}>
-                        {statisticsData ? (
-                            statisticsData.ordered
-                        ): <Loading/>}
-                    </div>
-                </Link>
-                <Link href={"/request/order"} className={style.card}>
-                        <div className={style.cardLabel}>In progress</div>
+                {statisticsCards.map((card) => (
+                    <Link href={"/request/order"} className={style.card}>
+                        <div className={style.cardLabel}>{card.label}</div>
                         <div className={style.cardValue}>
-                            {statisticsData ? (
-                                statisticsData.inProgress
-                            ): <Loading/>}
+                            {card.value !== undefined ? card.value : <Loading/>}
                         </div>
-                </Link>
-                <Link href={"/request/order"} className={style.card}>
-                        <div className={style.cardLabel}>Test failed</div>
-                        <div className={style.cardValue}>
-                            {statisticsData ? (
-                                statisticsData.testFailed
-                            ): <Loading/>}
-                        </div>
-                </Link>
-                <Link href={"/request/order"} className={style.card}>
-
-                        <div className={style.cardLabel}>Delivered</div>
-                        <div className={style.cardValue}>
-                            {statisticsData ? (
-                                statisticsData.delivered
-                            ): <Loading/>}
-                        </div>
-                </Link>
-                <Link href={"/request/order"} className={style.card}>
-                    <div className={style.cardLabel}>Complete</div>
-                    <div className={style.cardValue}>
-                        {statisticsData ? (
-                            statisticsData.finished
-                        ): <Loading/>}
-                    </div>
-                </Link>
+                    </Link>
+                ))}
             </div>
         </div>
     )

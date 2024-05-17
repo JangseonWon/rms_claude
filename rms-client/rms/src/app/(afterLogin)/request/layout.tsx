@@ -1,19 +1,19 @@
-import React, {ReactNode} from "react";
+import {ReactNode} from "react";
 import NavMenu from "@/app/(afterLogin)/request/_component/NavMenu";
 import style from "@/app/(afterLogin)/request/layout.module.css"
 
-type Props = { children: ReactNode};
-export default async function Layout({ children }: Props) {
+type Props = { children: ReactNode, modal: ReactNode }
+export default function Layout({ children, modal }: Props) {
     return (
-        <>
-            <div className={style.container}>
-                <section className={style.leftSection}>
-                    <NavMenu/>
-                </section>
-                <section className={style.rightSection}>
-                    {children}
-                </section>
+        <div className={style.container}>
+            <div className={style.leftSection}>
+                <NavMenu/>
             </div>
-        </>
+            <div className={style.rightSection}>
+                {modal}
+                {children}
+            </div>
+        </div>
+
     )
 }

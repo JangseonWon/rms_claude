@@ -1,7 +1,6 @@
 "use client"
 
 import style from "@/app/(afterLogin)/request/dashboard/dashboard/_component/statistics.module.css"
-import {useRequestStore} from "@/store/organization";
 import {useEffect, useState} from "react";
 import {getStatisticsRequest} from "@/app/(afterLogin)/request/dashboard/dashboard/_api/getStatisticsRequest";
 import type {Statistics} from "@/model/Statistics";
@@ -11,12 +10,22 @@ export default function Statistics() {
     const [statisticsData, setStatisticsData] = useState<Statistics>()
 
     useEffect(() => {
-        getStatisticsRequest()
-            .then((data) => {
-                setStatisticsData(data)
-            })
-
+        const fetchData = async () => {
+            const response = await getStatisticsRequest();
+            const data = await response.json();
+            setStatisticsData(data as Statistics);
+        };
+        fetchData()
     }, []);
+
+    const statisticsCards = [
+        { label: "Total", value: statisticsData?.total },
+        { label: "Ordered", value: statisticsData?.ordered },
+        { label: "In progress", value: statisticsData?.in_progress },
+        { label: "Test failed", value: statisticsData?.test_failed },
+        { label: "Delivered", value: statisticsData?.delivered },
+        { label: "Complete", value: statisticsData?.finished },
+    ];
 
     return (
         <div className={style.container}>
@@ -29,52 +38,14 @@ export default function Statistics() {
                 </div>
             </div>
             <div className={style.cardContainer}>
-                <div className={style.card}>
-                    <div className={style.cardLabel}>Total</div>
-                    <div className={style.cardValue}>{statisticsData ? (
-                        statisticsData.total
-                    ) : <Loading/>}</div>
-                </div>
-                <div className={style.card}>
-                    <div className={style.cardLabel}>Ordered</div>
-                    <div className={style.cardValue}>
-                        {statisticsData ? (
-                            statisticsData.ordered
-                        ) : <Loading/>}
+                {statisticsCards.map((card) => (
+                    <div className={style.card} key={card.label}>
+                        <div className={style.cardLabel}>{card.label}</div>
+                        <div className={style.cardValue}>
+                            {card.value !== undefined ? card.value : <Loading/>}
+                        </div>
                     </div>
-                </div>
-                <div className={style.card}>
-                    <div className={style.cardLabel}>In progress</div>
-                    <div className={style.cardValue}>
-                        {statisticsData ? (
-                            statisticsData.inProgress
-                        ) : <Loading/>}
-                    </div>
-                </div>
-                <div className={style.card}>
-                    <div className={style.cardLabel}>Test failed</div>
-                    <div className={style.cardValue}>
-                        {statisticsData ? (
-                            statisticsData.testFailed
-                        ) : <Loading/>}
-                    </div>
-                </div>
-                <div className={style.card}>
-                    <div className={style.cardLabel}>Delivered</div>
-                    <div className={style.cardValue}>
-                        {statisticsData ? (
-                            statisticsData.delivered
-                        ) : <Loading/>}
-                    </div>
-                </div>
-                <div className={style.card}>
-                    <div className={style.cardLabel}>Complete</div>
-                    <div className={style.cardValue}>
-                        {statisticsData ? (
-                            statisticsData.finished
-                        ) : <Loading/>}
-                    </div>
-                </div>
+                ))}
             </div>
         </div>
     )

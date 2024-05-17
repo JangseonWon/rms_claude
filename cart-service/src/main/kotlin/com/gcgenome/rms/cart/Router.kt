@@ -2,6 +2,8 @@ package com.gcgenome.rms.cart
 
 import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.data.Order
+import com.gcgenome.rms.data.Query
+import com.gcgenome.rms.data.Request
 import com.gcgenome.rms.exceptions.AuthenticationNotFoundException
 import com.gcgenome.rms.exceptions.OrderNotFoundException
 import org.springframework.context.annotation.Bean
@@ -15,12 +17,13 @@ import reactor.core.publisher.Mono
 import java.util.*
 
 @Configuration
-class CartRouter (
-    private val handler: CartHandler
+class Router (
+    private val handler: Handler
 ){
     @Bean("CartServiceRouter")
     fun route() = router {
         GET("/w-api/cart-service/orders/{order_id}/services/{service_id}/samples/{sample_id}", ::cartInfo)
+        POST("/w-api/cart-service/requests", :: requests)
     }
 
     private fun cartInfo(request: ServerRequest): Mono<ServerResponse> {
@@ -33,7 +36,17 @@ class CartRouter (
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(OrderNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
     }
-
+    private fun requests(request: ServerRequest): Mono<ServerResponse> {
+        return principal(request)
+            .zipWith(request.bodyToMono(Query::class.java))
+            .flatMap { handler.requests(it.t1.user, it.t2) }
+            .flatMap { ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Total-Page", it.second.totalPage.toString())
+                .body(Mono.just(it.first), Request::class.java) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
+    }
     private fun principal(request: ServerRequest): Mono<UserAuthentication> {
         return request.principal().switchIfEmpty(Mono.error(AuthenticationNotFoundException()))
             .cast(UserAuthentication::class.java)

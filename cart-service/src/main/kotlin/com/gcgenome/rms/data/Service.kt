@@ -1,8 +1,9 @@
 package com.gcgenome.rms.data
 
-data class Extension(
+import java.util.*
+
+data class Service(
     var id: String?,
     var name: String?,
-    var regex: String?,
-    var value: String?
+    var categoryId: UUID?
 )
