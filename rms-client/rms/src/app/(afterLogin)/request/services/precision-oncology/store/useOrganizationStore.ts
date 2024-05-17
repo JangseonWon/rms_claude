@@ -1,15 +1,15 @@
 import {create, SetState} from 'zustand';
 
-interface Item {
+interface Organization {
     id: string;
-    name: string;
+    name?: string;
 }
 
 interface OrganizationState {
-    organization: Item[] | null;
-    selectOrganization: Item | null;
-    setOrganizations: (newOrganization: Item[] | null) => void;
-    setSelectOrganization: (newSelectOrganization: Item | null) => void;
+    organization: Organization[] | null;
+    selectOrganization: Organization | null;
+    setOrganizations: (newOrganization: Organization[] | null) => void;
+    setSelectOrganization: (newSelectOrganization: Organization | null) => void;
 }
 
 const useOrganizationStore = create<OrganizationState>((set: SetState<OrganizationState>) => ({

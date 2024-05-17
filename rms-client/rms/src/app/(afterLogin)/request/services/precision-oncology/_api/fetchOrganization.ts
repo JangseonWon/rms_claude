@@ -1,5 +1,6 @@
-export async function fetchOrganization() {
-    const res = await fetch(`/w-api/management-service/users/220008/organizations`, {
+export async function fetchOrganization(userId: string) {
+
+    const res = await fetch(`/w-api/management-service/users/${userId}/organizations`, {
         method: 'GET',
         credentials: 'include',
         cache: 'no-store'

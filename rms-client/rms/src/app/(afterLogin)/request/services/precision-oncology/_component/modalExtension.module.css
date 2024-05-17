@@ -7,7 +7,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    padding: 10px 25px 10px 0;
+    padding: 10px 10px 10px 0;
 }
 .mainName {
     color: #002b49;
@@ -19,5 +19,8 @@
     font-size: 15px;
     font-weight: 500;
     margin: 10px 0 5px 0;
-    width: 206px;
+    width: 200px;
+}
+.value {
+    margin-left: 10px;
 }

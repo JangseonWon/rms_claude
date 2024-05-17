@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react';
+import {useEffect} from 'react';
 import {Select as BaseSelect, SelectProps, SelectRootSlotProps,} from '@mui/base/Select';
 import {Option as BaseOption, optionClasses} from '@mui/base/Option';
 import {styled} from '@mui/system';
@@ -10,11 +11,12 @@ import {
     StyledListBox,
     StyledPopup
 } from "@/app/(afterLogin)/request/services/precision-oncology/_component/SelectStyle";
-import {useEffect} from "react";
 import {fetchOrganization} from "@/app/(afterLogin)/request/services/precision-oncology/_api/fetchOrganization";
 import {
-    useOrganization, useSelectOrganization,
-    useOrganizationsAction, useSelectOrganizationAction
+    useOrganization,
+    useOrganizationsAction,
+    useSelectOrganization,
+    useSelectOrganizationAction
 } from "@/app/(afterLogin)/request/services/precision-oncology/store/useOrganizationStore";
 import {useLoginUser} from "@/store/LoginUser";
 
@@ -23,16 +25,17 @@ export default function SelectOrganization() {
     const selectOrganization = useSelectOrganization();
     const setOrganizations = useOrganizationsAction();
     const setSelectOrganization = useSelectOrganizationAction();
+    const userId = useLoginUser();
 
     useEffect(() => {
-        fetchOrganization()
+        fetchOrganization(userId)
             .then((data) => {
                 setOrganizations(data)
             })
             .catch((error) => {
                 console.error('Error fetching organization:', error);
             });
-    }, []);
+    }, [userId]);
 
     return (
         <div>
