@@ -38,8 +38,8 @@ class OrderHandler(
                         } else { cartTime = LocalDateTime.now() }
                         insertOrder(userId, serial, createTime).flatMap { insertOrder ->
                             Flux.fromIterable(order.requests!!).flatMap { request ->
-                                insertPatientProcess(userId, request.patient!!, trx)
-                                    .then(insertSampleProcess(request.serviceId, request.patient, createTime, userId, trx))
+                                insertPatientProcess(userId, request.sample!!.patient!!, trx)
+                                    .then(insertSampleProcess(request.service!!.id!!, request.sample, createTime, userId, trx))
                                     .flatMap { sample ->
                                         request.apply {
                                             orderId = insertOrder.id
@@ -47,7 +47,7 @@ class OrderHandler(
                                             createAt = createTime
                                             cartAt = cartTime
                                         }
-                                        insertSampleExtensionProcess(request.serviceId, sample.id!!, request.patient.sample!!.extensions, trx)
+                                        insertSampleExtensionProcess(request.service.id!!, sample.id!!, request.sample.extensions, trx)
                                             .then(insertRequestProcess(userId, request, trx))
                                     }
                             }.then(selectOrderById(insertOrder.id!!))
@@ -85,17 +85,17 @@ class OrderHandler(
         }
     }
 
-    fun insertSampleProcess(serviceId: String, patient: Patient, createTime: LocalDateTime?, userId: String, trx: Configuration): Mono<Sample> {
+    fun insertSampleProcess(serviceId: String, sample: Sample, createTime: LocalDateTime?, userId: String, trx: Configuration): Mono<Sample> {
         return trx.dsl().run {
-            checkServiceSampleTypeById(patient.sample!!.sampleTypeId!!, serviceId, trx)
-                .then(insertSample(patient, patient.sample, userId, createTime))
+            checkServiceSampleTypeById(sample.sampleType!!.id!!, serviceId, trx)
+                .then(insertSample(sample.patient!!, sample, userId, createTime))
                 .flatMap { sample -> selectSampleById(sample.id!!) }
         }
     }
 
     fun insertRequestProcess(userId: String, request: Request, trx: Configuration): Mono<Request> {
         return trx.dsl().run {
-            checkUserServiceById(userId, request.serviceId, trx).then(insertRequest(request))
+            checkUserServiceById(userId, request.service!!.id!!, trx).then(insertRequest(request))
         }
     }
 

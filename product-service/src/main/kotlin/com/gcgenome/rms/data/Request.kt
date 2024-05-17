@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
+import com.gcgenome.rms.tables.pojos.Service
 import java.time.LocalDateTime
 import java.util.*
 
@@ -14,7 +15,7 @@ data class Request(
     @JsonProperty("order_id")
     var orderId: UUID?,
     @JsonProperty("service")
-    val serviceId: String,
+    val service: Service?,
     @JsonProperty("sample_id")
     var sampleId: UUID?,
     @JsonProperty("serial")
@@ -69,8 +70,6 @@ data class Request(
     val price: Int?,
     @JsonProperty("outsourcing_cost")
     val outsourcingCost: Int?,
-    @JsonProperty("patient")
-    val patient: Patient?,
     @JsonProperty("sample")
     val sample: Sample?
 )

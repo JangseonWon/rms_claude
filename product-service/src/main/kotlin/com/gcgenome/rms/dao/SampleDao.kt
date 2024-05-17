@@ -36,7 +36,7 @@ interface SampleDao {
                 .set(SAMPLE.SAMPLING_ON, sample.samplingOn)
                 .set(SAMPLE.RESAMPLE_REASON, sample.resampleReason)
                 .set(SAMPLE.CREATE_AT, createAt)
-                .set(SAMPLE.SAMPLE_TYPE_ID, sample.sampleTypeId)
+                .set(SAMPLE.SAMPLE_TYPE_ID, sample.sampleType!!.id)
                 .set(SAMPLE.PATIENT_SERIAL, patient.serial)
                 .set(SAMPLE.ORGANIZATION_ID, patient.organization!!.id)
                 .set(SAMPLE.USER_ID, userId)
