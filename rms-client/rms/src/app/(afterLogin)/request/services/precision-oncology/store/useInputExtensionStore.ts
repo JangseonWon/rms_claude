@@ -1,6 +1,7 @@
 import {create, SetState} from 'zustand';
+import {Extension} from "@/model/Extension";
 
-interface Extension {
+interface Extensions {
     id: string;
     name: string;
     regex: string;
@@ -8,39 +9,41 @@ interface Extension {
 }
 
 interface ExtensionInfoState {
-    extensions: Extension[];
-    setExtensions: (newSetExtension: Extension[]) => void;
-    SA0001: number;
-    TA0001: number;
-    TA0002: number;
-    TA0003: number;
-    TA0004: number;
-    TA0005: string;
-    TA0006: boolean;
-    TA0007: string;
-    TA0008: number;
-    TA0009: string;
-    TA0013: boolean;
-    TA0014: boolean;
-    TA0015: boolean;
-    TA0016: boolean;
-    TA0017: boolean;
-    TA0018: number;
-    TA0019: number;
-    TA0020: number;
-    TA0021: number;
-    TA0022: number;
-    TA0023: string;
-    TA0024: number;
-    TA0025: number;
-    TA0026: number;
-    TA0027: string;
-    TA0090: string;
-    TA0091: string;
-    TA0092: string;
-    TA0093: string;
-    TA0094: boolean;
-    TA0095: string;
+    extensions: Extensions[];
+    setExtensions: (newSetExtension: Extensions[]) => void;
+    pushExtensions: Extension[];
+    setPushExtensions : (newSetPushExtensions: Extension[]) => void;
+    SA0001: number | null;
+    TA0001: number | null;
+    TA0002: number | null;
+    TA0003: number | null;
+    TA0004: number | null;
+    TA0005: string | null;
+    TA0006: boolean | null;
+    TA0007: string | null;
+    TA0008: number | null;
+    TA0009: string | null;
+    TA0013: boolean | null;
+    TA0014: boolean | null;
+    TA0015: boolean | null;
+    TA0016: boolean | null;
+    TA0017: boolean | null;
+    TA0018: number | null;
+    TA0019: number | null;
+    TA0020: number | null;
+    TA0021: number | null;
+    TA0022: number | null;
+    TA0023: string | null;
+    TA0024: number | null;
+    TA0025: number | null;
+    TA0026: number | null;
+    TA0027: string | null;
+    TA0090: string | null;
+    TA0091: string | null;
+    TA0092: string | null;
+    TA0093: string | null;
+    TA0094: boolean | null;
+    TA0095: string | null;
     setSA0001: (newSetText: number) => void;
     setTA0001: (newSetText: number) => void;
     setTA0002: (newSetText: number) => void;
@@ -76,38 +79,40 @@ interface ExtensionInfoState {
 
 const useExtensionInfoStore = create<ExtensionInfoState>((set: SetState<ExtensionInfoState>) => ({
     extensions: [],
-    SA0001: 0,
-    TA0001: 0,
-    TA0002: 0,
-    TA0003: 0,
-    TA0004: 0,
-    TA0005: "",
-    TA0006: false,
-    TA0007: "",
-    TA0008: 0,
-    TA0009: "",
-    TA0013: false,
-    TA0014: false,
-    TA0015: false,
-    TA0016: false,
-    TA0017: false,
-    TA0018: 0,
-    TA0019: 0,
-    TA0020: 0,
-    TA0021: 0,
-    TA0022: 0,
-    TA0023: "",
-    TA0024: 0,
-    TA0025: 0,
-    TA0026: 0,
-    TA0027: "",
-    TA0090: "",
-    TA0091: "",
-    TA0092: "",
-    TA0093: "",
-    TA0094: false,
-    TA0095: "",
+    pushExtensions: [],
+    SA0001: null,
+    TA0001: null,
+    TA0002: null,
+    TA0003: null,
+    TA0004: null,
+    TA0005: null,
+    TA0006: null,
+    TA0007: null,
+    TA0008: null,
+    TA0009: null,
+    TA0013: null,
+    TA0014: null,
+    TA0015: null,
+    TA0016: null,
+    TA0017: null,
+    TA0018: null,
+    TA0019: null,
+    TA0020: null,
+    TA0021: null,
+    TA0022: null,
+    TA0023: null,
+    TA0024: null,
+    TA0025: null,
+    TA0026: null,
+    TA0027: null,
+    TA0090: null,
+    TA0091: null,
+    TA0092: null,
+    TA0093: null,
+    TA0094: null,
+    TA0095: null,
     setExtensions: (newSetExtension) => set({ extensions: newSetExtension}),
+    setPushExtensions: (newSetPushExtensions) => set( { pushExtensions: newSetPushExtensions }),
     setSA0001: (newSetText) => set({ SA0001: newSetText }),
     setTA0001: (newSetText) => set({ TA0001: newSetText }),
     setTA0002: (newSetText) => set({ TA0002: newSetText }),
@@ -143,6 +148,9 @@ const useExtensionInfoStore = create<ExtensionInfoState>((set: SetState<Extensio
 
 export const useExtensions = () => useExtensionInfoStore((state) => state.extensions);
 export const useSetExtensions = () => useExtensionInfoStore((state) => state.setExtensions);
+
+export const usePushExtensions = () => useExtensionInfoStore((state) => state.pushExtensions);
+export const useSetPushExtensions = () => useExtensionInfoStore((state) => state.setPushExtensions);
 
 export const useSA0001 = () => useExtensionInfoStore((state) => state.SA0001);
 export const useSetSA0001 = () => useExtensionInfoStore((state) => state.setSA0001);

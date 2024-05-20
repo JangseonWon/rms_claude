@@ -22,6 +22,7 @@ import ModalExtension from "@/app/(afterLogin)/request/services/precision-oncolo
 import {useBirth, useCollection} from "@/app/(afterLogin)/request/services/precision-oncology/store/useDatePickerStore";
 import {fetchAddCart} from "@/app/(afterLogin)/request/services/precision-oncology/_api/fetchAddCart";
 import {Order} from "@/model/Order";
+import {usePushExtensions} from "@/app/(afterLogin)/request/services/precision-oncology/store/useInputExtensionStore";
 
 export default function CartModal() {
     const [open, setOpen] = React.useState(false);
@@ -41,6 +42,7 @@ export default function CartModal() {
     const medicalDepartment = useMedicalDepartment();
     const ward = useWard();
     const physician = usePhysician();
+    const useExtensionArray = usePushExtensions();
 
     const isAddCartDisabled = !(organization && service && name && mrn && type && quantity && collectionDate);
 
@@ -75,16 +77,7 @@ export default function CartModal() {
                         name: organization?.name
                     }
                 },
-                extensions: [
-                    {
-                        id: "TA0003",
-                        value: "13"
-                    },
-                    {
-                        id: "TA0008",
-                        value: "777"
-                    }
-                ] // extensions 추가 해야되는데 일단 그냥 테스트용으로 넘김
+                extensions: useExtensionArray
             }
         }]
     }];
