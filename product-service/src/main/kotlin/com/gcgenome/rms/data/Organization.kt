@@ -6,7 +6,7 @@ data class Organization(
     @JsonProperty("id")
     val id:String?,
     @JsonProperty("name")
-    val name:String,
+    val name:String?,
     @JsonProperty("type")
     val type:String?,
     @JsonProperty("registration_number")

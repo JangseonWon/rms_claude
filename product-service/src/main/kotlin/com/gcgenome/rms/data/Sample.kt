@@ -22,13 +22,13 @@ data class Sample(
     @JsonProperty("user_sample_id")
     val userSampleId: String?,
     @JsonProperty("quantity")
-    val quantity: Int,
+    val quantity: Int?,
     @JsonProperty("age")
     val age: Int?,
     @JsonProperty("sampling_on")
     @JsonDeserialize(using = LocalDateDeserializer::class)
     @JsonSerialize(using = LocalDateSerializer::class)
-    val samplingOn: LocalDate,
+    val samplingOn: LocalDate?,
     @JsonProperty("resample_reason")
     val resampleReason: String?,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)

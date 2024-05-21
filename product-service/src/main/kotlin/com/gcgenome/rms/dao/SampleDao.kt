@@ -22,14 +22,15 @@ interface SampleDao {
             .mapNotNull { result ->
                 result?.component1()
             }
+            .defaultIfEmpty("empty")
     }
 
 
-    fun DSLContext.insertSample(patient: Patient, sample: Sample, userId: String, createAt: LocalDateTime?): Mono<Sample> {
+    fun DSLContext.insertSample(patient: Patient, barcode: String, sample: Sample, userId: String, createAt: LocalDateTime?): Mono<Sample> {
         return Mono.from(
             insertInto(SAMPLE)
                 .set(SAMPLE.ID, UUID.randomUUID())
-                .set(SAMPLE.BARCODE, sample.barcode)
+                .set(SAMPLE.BARCODE, barcode)
                 .set(SAMPLE.USER_SAMPLE_ID, sample.userSampleId)
                 .set(SAMPLE.QUANTITY, sample.quantity)
                 .set(SAMPLE.AGE, sample.age)

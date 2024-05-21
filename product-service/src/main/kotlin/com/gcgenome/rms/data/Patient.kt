@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 @JsonPropertyOrder(value = ["serial", "sex", "name", "birth_year", "birth_month", "birth_day", "organization"])
 data class Patient(
     @JsonProperty("serial")
-    val serial: String,
+    val serial: String?,
     @JsonProperty("sex")
     val sex: String?,
     @JsonProperty("name")

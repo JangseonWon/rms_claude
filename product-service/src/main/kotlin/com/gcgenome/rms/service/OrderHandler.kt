@@ -37,18 +37,20 @@ class OrderHandler(
                             createTime = LocalDateTime.now(); serial = orderSerial
                         } else { cartTime = LocalDateTime.now() }
                         insertOrder(userId, serial, createTime).flatMap { insertOrder ->
-                            Flux.fromIterable(order.requests!!).flatMap { request ->
-                                insertPatientProcess(userId, request.sample!!.patient!!, trx)
-                                    .then(insertSampleProcess(request.service!!.id!!, request.sample, createTime, userId, trx))
-                                    .flatMap { sample ->
-                                        request.apply {
-                                            orderId = insertOrder.id
-                                            sampleId = sample.id
-                                            createAt = createTime
-                                            cartAt = cartTime
+                            Flux.fromIterable(order.requests!!).concatMap { request ->
+                                generateSampleBarcode(userId, trx).flatMap { barcode ->
+                                    insertPatientProcess(userId, request.sample!!.patient!!, trx)
+                                        .then(insertSampleProcess(request.service!!.id!!, barcode, request.sample, createTime, userId, trx))
+                                        .flatMap { sample ->
+                                            request.apply {
+                                                orderId = insertOrder.id
+                                                sampleId = sample.id
+                                                createAt = createTime
+                                                cartAt = cartTime
+                                            }
+                                            insertSampleExtensionProcess(request.service.id!!, sample.id!!, request.sample.extensions, trx)
+                                                .then(insertRequestProcess(userId, request, trx))
                                         }
-                                        insertSampleExtensionProcess(request.service.id!!, sample.id!!, request.sample.extensions, trx)
-                                            .then(insertRequestProcess(userId, request, trx))
                                     }
                             }.then(selectOrderById(insertOrder.id!!))
                         }
@@ -85,10 +87,10 @@ class OrderHandler(
         }
     }
 
-    fun insertSampleProcess(serviceId: String, sample: Sample, createTime: LocalDateTime?, userId: String, trx: Configuration): Mono<Sample> {
+    fun insertSampleProcess(serviceId: String, barcode: String, sample: Sample, createTime: LocalDateTime?, userId: String, trx: Configuration): Mono<Sample> {
         return trx.dsl().run {
             checkServiceSampleTypeById(sample.sampleType!!.id!!, serviceId, trx)
-                .then(insertSample(sample.patient!!, sample, userId, createTime))
+                .then(insertSample(sample.patient!!, barcode, sample, userId, createTime))
                 .flatMap { sample -> selectSampleById(sample.id!!) }
         }
     }
@@ -116,8 +118,8 @@ class OrderHandler(
                 val barcodePrefix = "$todayBarcode${user.branchSerial}"
                 selectSampleBarcode(barcodePrefix)
                     .flatMap { barcode ->
-                        if (barcode != null) {
-                            Mono.just(barcode.toLong().plus(1).toString())
+                        if (barcode != "empty") {
+                            Mono.just(barcode!!.toLong().plus(1).toString())
                         } else {
                             Mono.just("${barcodePrefix}5001")
                         }
