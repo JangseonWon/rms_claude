@@ -15,9 +15,9 @@
 
 .btnSelect {
     display: flex;
+    width: 100%;
     justify-content: space-between;
     align-items: center;
-    width: 200px;
     border: 1px solid #C4C4C4;
     border-radius: 10px;
     padding: 5px 15px;
@@ -33,7 +33,6 @@
 .btnSelect.open {
     outline: 2px solid #CCE492;
     border: 1px solid #90BA2D;
-    font-weight: 500;
 }
 
 .listMember {
@@ -58,7 +57,6 @@
     text-align: left;
     padding: 7px 20px 7px;
     border: none;
-    border-radius: 10px;
     cursor: pointer;
 }
 

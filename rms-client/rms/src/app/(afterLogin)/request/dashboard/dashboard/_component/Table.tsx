@@ -52,13 +52,13 @@ export default function Table() {
                 <tbody>
                 {requestData.map((row) => (
                     <tr>
-                        <td>{row.sample.barcode}</td>
-                        <td>{row.sample.patient.organization.user.id}</td>
-                        <td>{row.sample.patient.organization.id}</td>
-                        <td>{row.service.name}</td>
-                        <td>{row.sample.patient.name}</td>
-                        <td>{row.sample.patient.serial}</td>
-                        <td>{row.sample.patient.birth_year}-{row.sample.patient.birth_month}-{row.sample.patient.birth_day}</td>
+                        <td>{row.sample!.barcode}</td>
+                        <td>{row.sample!.patient!.organization!.user!.id}</td>
+                        <td>{row.sample!.patient!.organization!.id}</td>
+                        <td>{row.service!.name}</td>
+                        <td>{row.sample!.patient!.name}</td>
+                        <td>{row.sample!.patient!.serial}</td>
+                        <td>{row.sample!.patient!.birth_year}-{row.sample!.patient!.birth_month}-{row.sample!.patient!.birth_day}</td>
                         <td>{row.status}</td>
                         <td>{row.create_at ? format(new Date(row.create_at), "yyyy-MM-dd") : '-'}</td>
                     </tr>

@@ -5,11 +5,11 @@ import {Extension} from "@/model/Extension";
 export interface Sample {
     id?: string
     user_sample_id?: string
-    age: number
-    sampling_on: string
-    sample_type: SampleType
-    quantity: number
+    age?: number
+    sampling_on?: string
+    sample_type?: SampleType
+    quantity?: number
     barcode?: string
-    patient: Patient
+    patient?: Patient
     extensions?: Extension[]
 }

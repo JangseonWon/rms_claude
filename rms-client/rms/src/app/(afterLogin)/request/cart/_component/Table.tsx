@@ -52,7 +52,7 @@ export default function Table() {
         );
     };
     const handleRowClick = (row: RequestWithSelected) => {
-        router.push(`/request/cart/info?order=${row.order_id}&service=${row.service.id}&sample=${row.sample.id}`);
+        router.push(`/request/cart/info?order=${row.order_id}&service=${row.service!.id}&sample=${row.sample!.id}&user_id=${row.sample!.patient!.organization!.user!.id}`);
     };
 
     return (
@@ -82,7 +82,7 @@ export default function Table() {
                     <tbody>
                     {requestData.map((row, rowIndex) => (
                         <tr
-                            key={row.order_id + row.service.id + row.sample.id}
+                            key={row.order_id! + row.service!.id + row.sample!.id}
                             onClick={()=>handleRowClick(row)}
                         >
                             <td onClick={(e) => e.stopPropagation()}>
@@ -93,14 +93,14 @@ export default function Table() {
                                     className={style.checkbox}
                                 />
                             </td>
-                            <td>{row.service.name}</td>
-                            <td>{row.sample.patient.name}</td>
-                            <td>{row.sample.patient.birth_day}-{row.sample.patient.birth_month}-{row.sample.patient.birth_year}</td>
-                            <td>{row.sample.patient.sex}</td>
+                            <td>{row.service?.name}</td>
+                            <td>{row.sample?.patient?.name}</td>
+                            <td>{row.sample?.patient?.birth_day}-{row.sample?.patient?.birth_month}-{row.sample?.patient?.birth_year}</td>
+                            <td>{row.sample?.patient?.sex}</td>
                             <td>{row.physician}</td>
-                            <td>{row.sample.sampling_on ? format(new Date(row.sample.sampling_on), "dd-MM-yyyy") : '-'}</td>
-                            <td>{row.sample.patient.serial}</td>
-                            <td>{row.service.id}</td>
+                            <td>{row.sample?.sampling_on ? format(new Date(row.sample.sampling_on), "dd-MM-yyyy") : '-'}</td>
+                            <td>{row.sample?.patient?.serial}</td>
+                            <td>{row.service?.id}</td>
                         </tr>
                     ))}
                     </tbody>

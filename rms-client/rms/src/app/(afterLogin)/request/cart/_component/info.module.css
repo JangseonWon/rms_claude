@@ -13,11 +13,11 @@
     position: relative;
     top: 5%;
     max-width: 80vw;
-    min-width: 600px;
+    max-height: 80vh;
     border-radius: 16px;
     display: flex;
     flex-direction: column;
-    height: 450px;
+    overflow: auto;
 }
 .modalTitle {
     display: flex;
@@ -40,4 +40,23 @@
 }
 .modalContent {
     padding: 20px;
+}
+.modalContent .content {
+    display: flex;
+    flex-wrap: wrap;
+}
+.modalContent .content .title {
+    flex-basis: 100%;
+    margin: 20px 0 5px 0;
+    color: #002b49;
+    font-size: 18px;
+    font-weight: 700;
+}
+.modalContent .content div {
+    padding-right: 20px;
+}
+.modalBottom {
+    padding: 0 20px;
+    display: flex;
+    justify-content: flex-end;
 }

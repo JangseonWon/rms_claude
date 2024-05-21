@@ -2,6 +2,7 @@ package com.gcgenome.rms.cart
 
 import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.data.Order
+import com.gcgenome.rms.data.Organization
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.Request
 import com.gcgenome.rms.exceptions.AuthenticationNotFoundException
@@ -23,7 +24,10 @@ class Router (
     @Bean("CartServiceRouter")
     fun route() = router {
         GET("/w-api/cart-service/orders/{order_id}/services/{service_id}/samples/{sample_id}", ::cartInfo)
+        GET("/w-api/cart-service/organizations", :: organizations)
         POST("/w-api/cart-service/requests", :: requests)
+        PATCH("/w-api/cart-service/orders/{order_id}/services/{service_id}/samples/{sample_id}", :: updateRequest)
+
     }
 
     private fun cartInfo(request: ServerRequest): Mono<ServerResponse> {
@@ -44,6 +48,31 @@ class Router (
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-Total-Page", it.second.totalPage.toString())
                 .body(Mono.just(it.first), Request::class.java) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
+    }
+    private fun organizations(request: ServerRequest): Mono<ServerResponse> {
+        val userId = request.queryParam("user_id").get()
+        return principal(request)
+            .flatMap { handler.organizations(userId).collectList() }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), Organization::class.java) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
+    }
+    private fun updateRequest(request: ServerRequest): Mono<ServerResponse> {
+        val orderIdPathVar = UUID.fromString(request.pathVariable("order_id"))
+        val sampleIdPathVar = UUID.fromString(request.pathVariable("sample_id"))
+        val serviceIdPathVar = request.pathVariable("service_id")
+        return principal(request)
+            .flatMap { request.bodyToMono(Request::class.java) }
+            .flatMap { handler.updateRequest(
+                it.apply {
+                    orderId = orderIdPathVar
+                    sampleId = sampleIdPathVar
+                    serviceId = serviceIdPathVar
+                }
+            ) }
+            .flatMap { ServerResponse.ok().bodyValue(it)}
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
     }

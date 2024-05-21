@@ -1,16 +1,18 @@
 package com.gcgenome.rms.cart
 
 import com.gcgenome.rms.authentication.User
+import com.gcgenome.rms.dao.OrganizationDao
 import com.gcgenome.rms.dao.RequestDao
 import com.gcgenome.rms.data.*
 import com.gcgenome.rms.exceptions.OrderNotFoundException
 import org.jooq.DSLContext
 import org.springframework.stereotype.Component
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.util.*
 
 @Component
-class Handler(val dslContext: DSLContext ): RequestDao {
+class Handler(val dslContext: DSLContext ): RequestDao, OrganizationDao {
 
     fun getCartInfo(orderId: UUID, sampleId: UUID, serviceId: String): Mono<Request> {
         return Mono.from(dslContext.transactionPublisher { trx ->
@@ -30,5 +32,15 @@ class Handler(val dslContext: DSLContext ): RequestDao {
                     Pair(request, Page(query.page.size, query.page.number + 1, pageCount, count))
                 }
             }
+    }
+    fun organizations(userId: String): Flux<Organization> {
+        return dslContext.selectOrganizationByUserId(userId)
+    }
+    fun updateRequest(request: Request): Mono<Request> {
+        return Mono.from(dslContext.transactionPublisher { trx ->
+            trx.dsl().run {
+                updateRequest(request)
+            }
+        })
     }
 }

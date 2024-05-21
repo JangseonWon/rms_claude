@@ -1,0 +1,14 @@
+.greenButton {
+    background-color: white;
+    font-weight: 700;
+    font-size: 0.875rem;
+    padding: 8px 15px;
+    border-radius: 15px;
+    border: 1px solid #90BA2D;
+    cursor: pointer;
+}
+.greenButton:hover {
+    background: linear-gradient(135deg, #a1b86a, #dae8ba);
+    color: #ffffff;
+    border: solid #dae8ba thin;
+}

@@ -1,7 +1,6 @@
 package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.authentication.User
-import com.gcgenome.rms.data.Order
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.Request
 import com.gcgenome.rms.data.Status
@@ -10,6 +9,7 @@ import org.jooq.*
 import org.jooq.impl.DSL.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import java.time.LocalDateTime
 import java.util.*
 
 interface RequestDao {
@@ -22,6 +22,20 @@ interface RequestDao {
                     .and(`when`(`val`(user.role).eq("USER"), ORDER.USER_ID.eq(user.id)).else_(true)))
 
         ).map { it.into(Int::class.java) }
+    }
+    fun DSLContext.updateRequest(request: Request): Mono<Request> {
+        return Mono.from(
+            update(REQUEST)
+                .set(REQUEST.USER_SERVICE_ID, coalesce(`val`(request.userServiceId), REQUEST.USER_SERVICE_ID))
+                .set(REQUEST.STATUS, coalesce(`val`(request.status), REQUEST.STATUS))
+                .set(REQUEST.MEMO, coalesce(`val`(request.memo), REQUEST.MEMO))
+                .set(REQUEST.DEPARTMENT, coalesce(`val`(request.department), REQUEST.DEPARTMENT))
+                .set(REQUEST.WARD, coalesce(`val`(request.ward), REQUEST.WARD))
+                .set(REQUEST.PHYSICIAN, coalesce(`val`(request.physician), REQUEST.PHYSICIAN))
+                .set(REQUEST.LAST_MODIFY_AT, LocalDateTime.now())
+                .where(REQUEST.ORDER_ID.eq(request.orderId).and(REQUEST.SAMPLE_ID.eq(request.sampleId).and(REQUEST.SERVICE_ID.eq(request.serviceId))))
+                .returning()
+        ).map { it.into(Request::class.java) }
     }
     fun DSLContext.selectRequestByUserId(user: User, query: Query): Flux<Request> {
         return Flux.from(
@@ -98,12 +112,17 @@ interface RequestDao {
     fun DSLContext.selectRequestById(orderId: UUID, sampleId: UUID, serviceId: String): Mono<Request> =
         Mono.from(
             select(
+                REQUEST.ORDER_ID,
                 REQUEST.USER_SERVICE_ID,
                 REQUEST.MEMO,
                 REQUEST.DEPARTMENT,
                 REQUEST.WARD,
                 REQUEST.PHYSICIAN,
                 REQUEST.CART_AT,
+                jsonObject(
+                    key("id").value(SERVICE.ID),
+                    key("name").value(SERVICE.NAME)
+                ).`as`("service"),
                 jsonObject(
                     key("id").value(SAMPLE.ID),
                     key("userSampleId").value(SAMPLE.USER_SAMPLE_ID),
@@ -145,6 +164,7 @@ interface RequestDao {
                     )
                 ).`as`("sample")
             ).from(REQUEST)
+                .join(SERVICE).on(REQUEST.SERVICE_ID.eq(SERVICE.ID))
                 .join(SAMPLE).on(REQUEST.SAMPLE_ID.eq(SAMPLE.ID))
                 .join(SAMPLE_TYPE).on(SAMPLE.SAMPLE_TYPE_ID.eq(SAMPLE_TYPE.ID))
                 .join(PATIENT).on(

@@ -1,0 +1,26 @@
+.inputBox p {
+    font-size: 12px;
+    color: #666666;
+    margin: 0 0 5px 0;
+}
+.inputBox input {
+    width: 100%;
+    border: 1px solid #C4C4C4;
+    border-radius: 10px;
+    padding: 5px 15px;
+    box-sizing: border-box;
+}
+.inputBox.error input{
+    border: 1px solid red;
+}
+.inputBox.error p{
+    color: red;
+}
+.inputBox input:not(:disabled):hover {
+    outline: 2px solid #CCE492;
+    border: 1px solid #90BA2D;
+}
+.inputBox input:focus {
+    outline: 2px solid #CCE492;
+    border: 1px solid #90BA2D;
+}

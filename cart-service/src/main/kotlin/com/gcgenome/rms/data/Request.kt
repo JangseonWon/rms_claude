@@ -10,7 +10,7 @@ import java.util.*
 data class Request(
     var orderId: UUID?,
     var serviceId: String?,
-    var sampleId: String?,
+    var sampleId: UUID?,
     var userServiceId: String?,
     var status: String?,
     var memo: String?,

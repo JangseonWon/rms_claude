@@ -4,7 +4,6 @@ import {Service} from "@/model/Service";
 export interface Request {
     service?: Service
     order_id?: string
-    service_id?: string
     user_service_id?: string
     status?: string
     memo?: string
