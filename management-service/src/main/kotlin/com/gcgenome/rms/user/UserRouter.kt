@@ -27,12 +27,22 @@ class UserRouter(
     @Bean("UserRouter")
     fun route() = router {
         GET("/w-api/management-service/users/{user_id}/organizations", :: findUserOrganizations)
+        GET("/w-api/management-service/users/{user_id}", :: findUser)
         POST("/w-api/management-service/users", :: findUsers)
         PUT("/w-api/management-service/users", ::saveUser)
         PUT("/w-api/management-service/users/{user_id}/organizations", ::saveUserOrganization)
         DELETE("/w-api/management-service/users/{user_id}/organizations/{organization_id}", ::deleteUserOrganization)
         PATCH("/w-api/management-service/users/{user_id}/organizations/{organization_id}", ::updateUserOrganization)
         PATCH("/w-api/management-service/users/{userId}", ::updateUser)
+    }
+
+    private fun findUser(request: ServerRequest): Mono<ServerResponse> {
+        val userId = request.pathVariable("user_id")
+        return authenticationHandler.principal(request)
+            .then(userHandler.selectUserById(userId))
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), User::class.java) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request error.") }
     }
 
     private fun findUsers(request: ServerRequest): Mono<ServerResponse> {

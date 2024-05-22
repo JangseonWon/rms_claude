@@ -24,6 +24,10 @@ class UserHandler(
     private val managerAuthenticationHandler: ManagerAuthenticationHandler
 ): UserDao, OrganizationDao {
 
+    fun selectUserById(userId: String): Mono<User> {
+        return Mono.from(dslContext.selectUserById(userId))
+    }
+
     fun selectUsers(authentication: UserAuthentication, query: Query): Mono<Page<User>> {
         val whereClause = buildWhereClause(query.filters)
         return managerAuthenticationHandler.chkManager(authentication)
