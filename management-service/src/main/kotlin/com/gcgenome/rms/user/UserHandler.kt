@@ -88,7 +88,8 @@ class UserHandler(
     fun updateUserById(authentication: UserAuthentication, userId: String, userDto: UpdateUser): Mono<User> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
-                managerAuthenticationHandler.chkManager(authentication)
+                managerAuthenticationHandler.chkMySelf(authentication, userId)
+                    .switchIfEmpty(managerAuthenticationHandler.chkManager(authentication))
                     .filterWhen{checkPassword(userDto)}.switchIfEmpty(Mono.error(PasswordNotMatchException()))
                     .then(selectUserById(userId).switchIfEmpty(Mono.error(UserNotFoundException(userId))))
                     .flatMap { updateUser(userId,userDto,trx) }
