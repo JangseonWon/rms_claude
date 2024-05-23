@@ -1,6 +1,6 @@
 import {Order} from "@/model/Order";
 
-export async function fetchAddCart(order: Order[]) {
+export async function fetchAddCartAndOrder(order: Order[]) {
     const res = await fetch(`/w-api/product-service/orders`, {
         method: 'PUT',
         headers: {

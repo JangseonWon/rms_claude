@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import {useState} from 'react';
 import clsx from 'clsx';
 import {css, styled} from '@mui/system';
 import {Modal as BaseModal} from '@mui/base/Modal';
@@ -20,7 +21,9 @@ import {
 } from "@/app/(afterLogin)/request/services/precision-oncology/store/useInputOrderStore";
 import ModalExtension from "@/app/(afterLogin)/request/services/precision-oncology/_component/ModalExtension";
 import {useBirth, useCollection} from "@/app/(afterLogin)/request/services/precision-oncology/store/useDatePickerStore";
-import {useState} from "react";
+import {usePushExtensions} from "@/app/(afterLogin)/request/services/precision-oncology/store/useInputExtensionStore";
+import {Order} from "@/model/Order";
+import {fetchAddCartAndOrder} from "@/app/(afterLogin)/request/services/precision-oncology/_api/fetchAddCartAndOrder";
 
 export default function OrderModal() {
     const [open, setOpen] = useState(false);
@@ -28,7 +31,7 @@ export default function OrderModal() {
     const handleClose = () => setOpen(false);
 
     const organization = useSelectOrganization();
-    const service = useSelectService();
+    const service = useSelectService() || { id: 'default_service_id', name: 'Default Service' };
     const name = useName();
     const mrn = useMrn();
     const birthday = useBirth();
@@ -40,9 +43,55 @@ export default function OrderModal() {
     const medicalDepartment = useMedicalDepartment();
     const ward = useWard();
     const physician = usePhysician();
+    const useExtensionArray = usePushExtensions();
 
     const isAddOrderDisabled = !(organization && service && name && mrn && type && quantity && collectionDate);
-    const handleOnClickAddToOrder = () => console.log("click");
+
+    const selectedMonthFormatted = collectionDate.month < 10 ? `0${collectionDate.month}` : `${collectionDate.month}`;
+    const selectedDayFormatted = collectionDate.day < 10 ? `0${collectionDate.day}` : `${collectionDate.day}`;
+
+    const order: Order[] = [{
+        requests: [{
+            service: {
+                id: service!.id,
+            },
+            memo: memo,
+            department: medicalDepartment,
+            ward: ward,
+            physician: physician,
+            status: "ORDERED",
+            sample: {
+                quantity: Number(quantity),
+                age: Number(age),
+                sampling_on: `${collectionDate?.year}-${selectedMonthFormatted}-${selectedDayFormatted}`,
+                sample_type: {
+                    id: type
+                },
+                patient: {
+                    serial: mrn,
+                    sex: "M", // 아직 입력하는 곳이 없네여
+                    name: name,
+                    birth_year: birthday?.year,
+                    birth_month: birthday?.month,
+                    birth_day: birthday?.day,
+                    organization: {
+                        id: organization?.id,
+                        name: organization?.name
+                    }
+                },
+                extensions: useExtensionArray
+            }
+        }]
+    }];
+
+    const handleOnClickAddToOrder = async () => {
+        try {
+            await fetchAddCartAndOrder(order);
+            alert("test 성공")
+        } catch (error) {
+            alert("error 실패")
+        }
+    };
 
     return (
         <div>

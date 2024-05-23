@@ -1,0 +1,46 @@
+.container {
+    display: grid;
+}
+.header {
+    font-weight: 800;
+    font-size: 35px;
+    color: #002b49;
+}
+.subTitle {
+    color: #002b49;
+    font-weight: 700;
+    font-size: 18px;
+}
+.section {
+    margin: 20px 0 10px 0;
+    padding: 20px 0;
+}
+.middleSection {
+    padding: 50px 0;
+    border-top: solid 1px black;
+    border-bottom: solid 1px black;
+}
+.detailSentence {
+    display: flex;
+}
+.detailFName {
+    color: #002b49;
+    font-size: 15px;
+    font-weight: 500;
+}
+.detailSupport {
+    color: red;
+    font-size: 15px;
+    font-weight: 500;
+}
+.input {
+    display: flex;
+    margin-top: 10px;
+}
+.inputBox {
+    margin: 0 40px 0 20px;
+    width: 200px;
+}
+.saveButton {
+    margin: 20px 0 0 20px;
+}

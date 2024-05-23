@@ -1,0 +1,12 @@
+.container {
+    display: grid;
+}
+.header {
+    font-weight: 800;
+    font-size: 35px;
+    color: #002b49;
+}
+.table {
+    margin: 20px 0 10px 0;
+    padding: 20px 0;
+}

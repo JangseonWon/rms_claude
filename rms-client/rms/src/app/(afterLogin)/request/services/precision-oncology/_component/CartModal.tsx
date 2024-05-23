@@ -20,7 +20,7 @@ import {useSelectService} from "@/app/(afterLogin)/request/services/precision-on
 import {useSelectOrganization} from "@/app/(afterLogin)/request/services/precision-oncology/store/useOrganizationStore";
 import ModalExtension from "@/app/(afterLogin)/request/services/precision-oncology/_component/ModalExtension";
 import {useBirth, useCollection} from "@/app/(afterLogin)/request/services/precision-oncology/store/useDatePickerStore";
-import {fetchAddCart} from "@/app/(afterLogin)/request/services/precision-oncology/_api/fetchAddCart";
+import {fetchAddCartAndOrder} from "@/app/(afterLogin)/request/services/precision-oncology/_api/fetchAddCartAndOrder";
 import {Order} from "@/model/Order";
 import {usePushExtensions} from "@/app/(afterLogin)/request/services/precision-oncology/store/useInputExtensionStore";
 
@@ -47,8 +47,9 @@ export default function CartModal() {
     const isAddCartDisabled = !(organization && service && name && mrn && type && quantity && collectionDate);
 
     const selectedMonthFormatted = collectionDate.month < 10 ? `0${collectionDate.month}` : `${collectionDate.month}`;
+    const selectedDayFormatted = collectionDate.day < 10 ? `0${collectionDate.day}` : `${collectionDate.day}`;
 
-    const order: Order[] = [{
+    const cart: Order[] = [{
         requests: [{
             service: {
                 id: service!.id,
@@ -61,7 +62,7 @@ export default function CartModal() {
             sample: {
                 quantity: Number(quantity),
                 age: Number(age),
-                sampling_on: `${collectionDate?.year}-${selectedMonthFormatted}-${collectionDate.day}`,
+                sampling_on: `${collectionDate?.year}-${selectedMonthFormatted}-${selectedDayFormatted}`,
                 sample_type: {
                     id: type
                 },
@@ -84,7 +85,7 @@ export default function CartModal() {
 
     const handleOnClickAddToCart = async () => {
         try {
-            await fetchAddCart(order);
+            await fetchAddCartAndOrder(cart);
             alert("test 성공")
         } catch (error) {
             alert("error 실패")

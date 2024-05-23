@@ -8,7 +8,6 @@ import type {Request} from "@/model/Request";
 import type {Page} from "@/model/Page";
 import {getRequests} from "@/app/(afterLogin)/request/cart/_api/getRequests";
 import {format} from "date-fns";
-import Link from "next/link";
 import {useRouter} from "next/navigation";
 
 interface RequestWithSelected extends Request {

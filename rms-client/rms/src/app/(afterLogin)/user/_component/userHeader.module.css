@@ -1,0 +1,30 @@
+.headerTag {
+    display: flex;
+    height: 50px;
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+}
+.firstTag, .shortTag, .middleTag, .longTag, .setting {
+    margin: 15px 10px;
+    color: #ffffff;
+    font-weight: 100;
+    width: 120px;
+    cursor: pointer;
+}
+.firstTag {
+    margin: 15px 0 15px 50px;
+}
+.middleTag {
+    margin: 15px 20px 15px 0;
+    width: 170px;
+}
+.longTag {
+    margin: 15px 20px 15px 0;
+    width: 210px;
+}
+.setting {
+    margin-left: auto;
+}
+.firstTag:hover, .shortTag:hover ,.middleTag:hover, .longTag:hover, .setting:hover {
+    font-weight: bold;
+}
