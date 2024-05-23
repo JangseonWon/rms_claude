@@ -69,6 +69,7 @@ class OrganizationRouter (
                 organizationHandler.selectOrganizations(it.t1.user.id!!, it.t2.copy(page= it.t2.page - 1)) }
             .flatMap { organizations ->
                 ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                    .header("X-Total-Page", organizations.totalPage.toString())
                     .bodyValue(organizations)
             }.onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(DataAccessException::class.java)  {e ->  ColumnNotFoundException(e).toServerResponse()}
