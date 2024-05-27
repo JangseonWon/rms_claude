@@ -51,7 +51,7 @@ export default function Table() {
                 </thead>
                 <tbody>
                 {requestData.map((row) => (
-                    <tr>
+                    <tr key={`${row.order_id}${row.sample?.id}${row.service!.id}`}>
                         <td>{row.sample!.barcode}</td>
                         <td>{row.sample!.patient!.organization!.user!.id}</td>
                         <td>{row.sample!.patient!.organization!.id}</td>

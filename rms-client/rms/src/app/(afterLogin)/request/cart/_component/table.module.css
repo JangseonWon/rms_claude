@@ -1,6 +1,9 @@
 .container {
     padding: 20px;
 }
+.buttonSection {
+    text-align: right;
+}
 .table {
     width: 100%;
     border-collapse: collapse;

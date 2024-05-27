@@ -1,8 +1,7 @@
 package com.gcgenome.rms.cart
 
 import com.gcgenome.rms.authentication.User
-import com.gcgenome.rms.dao.OrganizationDao
-import com.gcgenome.rms.dao.RequestDao
+import com.gcgenome.rms.dao.*
 import com.gcgenome.rms.data.*
 import com.gcgenome.rms.exceptions.OrderNotFoundException
 import org.jooq.DSLContext
@@ -12,7 +11,9 @@ import reactor.core.publisher.Mono
 import java.util.*
 
 @Component
-class Handler(val dslContext: DSLContext ): RequestDao, OrganizationDao {
+class Handler(val dslContext: DSLContext ) :
+    RequestDao, OrganizationDao, SampleTypeDao, PatientDao, SampleDao
+{
 
     fun getCartInfo(orderId: UUID, sampleId: UUID, serviceId: String): Mono<Request> {
         return Mono.from(dslContext.transactionPublisher { trx ->
@@ -39,8 +40,18 @@ class Handler(val dslContext: DSLContext ): RequestDao, OrganizationDao {
     fun updateRequest(request: Request): Mono<Request> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
-                updateRequest(request)
+                selectRequestById(request.orderId!!, request.sampleId!!, request.serviceId!!)
+                    .flatMap { r->
+                        insertPatient(request.sample!!.patient!!)
+                            .then(updateSample(request.sample!!))
+                            .then(deletePatientById(r.sample!!.patient!!))
+                            .then(updateRequest(request))
+                            .then(selectRequestById(request.orderId!!, request.sampleId!!, request.serviceId!!))
+                    }
             }
         })
+    }
+    fun sampleTypes(serviceId: String): Flux<SampleType> {
+        return dslContext.selectSampleTypeByServiceId(serviceId)
     }
 }

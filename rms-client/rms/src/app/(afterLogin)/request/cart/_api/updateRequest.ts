@@ -10,6 +10,5 @@ export async function updateRequest(request: Request) {
         credentials: 'include',
         cache: 'no-store'
     });
-    if (!res.ok) throw new Error('Failed to fetch data')
     return  res
 }

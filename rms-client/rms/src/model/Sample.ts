@@ -6,7 +6,7 @@ export interface Sample {
     id?: string
     user_sample_id?: string
     age?: number
-    sampling_on?: string
+    sampling_on?: Date
     sample_type?: SampleType
     quantity?: number
     barcode?: string

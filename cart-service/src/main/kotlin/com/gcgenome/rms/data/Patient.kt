@@ -5,7 +5,7 @@ data class Patient(
     var organization: Organization?,
     var name: String?,
     var sex: String?,
-    var birthYear: Int?,
-    var birthMonth: Int?,
-    var birthDay: Int?
+    var birthYear: Short?,
+    var birthMonth: Byte?,
+    var birthDay: Byte?
 )
