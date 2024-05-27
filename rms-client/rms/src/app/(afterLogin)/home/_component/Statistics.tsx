@@ -41,7 +41,7 @@ export default function Statistics() {
             </h1>
             <div className={style.cardContainer}>
                 {statisticsCards.map((card) => (
-                    <Link href={"/request/order"} className={style.card}>
+                    <Link href={"/request/order"} className={style.card} key={card.label}>
                         <div className={style.cardLabel}>{card.label}</div>
                         <div className={style.cardValue}>
                             {card.value !== undefined ? card.value : <Loading/>}

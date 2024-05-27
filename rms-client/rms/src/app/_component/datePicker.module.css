@@ -1,0 +1,25 @@
+.datepickerInput {
+    width: 100%;
+    border: 1px solid #C4C4C4;
+    border-radius: 10px;
+    padding: 5px 15px;
+}
+.datepickerInput:focus {
+    outline: 2px solid #CCE492;
+    border: 1px solid #90BA2D;
+}
+.dateBox p {
+    font-size: 12px;
+    color: #666666;
+    margin: 0 0 5px 0;
+}
+.dateBox {
+    position: relative;
+}
+.icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}

@@ -8,7 +8,7 @@ type Props = {
     options: SelectBoxOption[]
     label: string
     value?: string
-    onChange?: (selectedValue: string) => void;
+    onChange?: (selectedValue: any) => void;
 }
 
 export default function SelectBox({ label, value, options, onChange }: Props) {
@@ -18,7 +18,7 @@ export default function SelectBox({ label, value, options, onChange }: Props) {
     const handleOptionClick = (option: SelectBoxOption) => {
         setSelectedLanguage(option.name!);
         setIsOpen(!isOpen);
-        onChange?.(option.value!);
+        onChange?.(option);
     };
     const toggleList = () => {
         setIsOpen(!isOpen)

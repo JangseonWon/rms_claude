@@ -1,10 +1,7 @@
 package com.gcgenome.rms.cart
 
 import com.gcgenome.rms.authentication.UserAuthentication
-import com.gcgenome.rms.data.Order
-import com.gcgenome.rms.data.Organization
-import com.gcgenome.rms.data.Query
-import com.gcgenome.rms.data.Request
+import com.gcgenome.rms.data.*
 import com.gcgenome.rms.exceptions.AuthenticationNotFoundException
 import com.gcgenome.rms.exceptions.OrderNotFoundException
 import org.springframework.context.annotation.Bean
@@ -27,6 +24,7 @@ class Router (
         GET("/w-api/cart-service/organizations", :: organizations)
         POST("/w-api/cart-service/requests", :: requests)
         PATCH("/w-api/cart-service/orders/{order_id}/services/{service_id}/samples/{sample_id}", :: updateRequest)
+        GET("/w-api/cart-service/sample_types", :: sampleTypes)
 
     }
 
@@ -75,6 +73,14 @@ class Router (
             .flatMap { ServerResponse.ok().bodyValue(it)}
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
+    }
+    private fun sampleTypes(request: ServerRequest): Mono<ServerResponse> {
+        val serviceId = request.queryParam("service_id").get()
+        return principal(request)
+            .flatMap { handler.sampleTypes(serviceId).collectList() }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), SampleType::class.java) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(OrderNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
     }
     private fun principal(request: ServerRequest): Mono<UserAuthentication> {
         return request.principal().switchIfEmpty(Mono.error(AuthenticationNotFoundException()))

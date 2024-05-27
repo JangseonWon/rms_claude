@@ -146,7 +146,10 @@ interface RequestDao {
                             key("name").value(ORGANIZATION.NAME),
                             key("registrationNumber").value(ORGANIZATION.REGISTRATION_NUMBER),
                             key("type").value(ORGANIZATION.TYPE),
-                            key("nursingNumber").value(ORGANIZATION.NURSING_NUMBER)
+                            key("nursingNumber").value(ORGANIZATION.NURSING_NUMBER),
+                            key("user").value(jsonObject(
+                                key("id").value(USER.ID)
+                            ))
                         ))
                     )),
                     key("extensions").value(
@@ -175,6 +178,7 @@ interface RequestDao {
                 .join(ORGANIZATION).on(
                     PATIENT.ORGANIZATION_ID.eq(ORGANIZATION.ID)
                     .and(PATIENT.USER_ID.eq(ORGANIZATION.USER_ID)))
+                .join(USER).on(ORGANIZATION.USER_ID.eq(USER.ID))
                 .where(
                     REQUEST.ORDER_ID.eq(orderId)
                     .and(REQUEST.SERVICE_ID.eq(serviceId))

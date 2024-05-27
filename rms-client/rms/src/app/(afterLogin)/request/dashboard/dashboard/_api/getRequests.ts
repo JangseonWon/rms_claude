@@ -1,7 +1,7 @@
 import {Page} from "@/model/Page";
 
 export async function getRequests(page: Page) {
-    const res = await fetch(`/w-api/cart-service/requests`, {
+    const res = await fetch(`/w-api/dashboard-service/requests`, {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
