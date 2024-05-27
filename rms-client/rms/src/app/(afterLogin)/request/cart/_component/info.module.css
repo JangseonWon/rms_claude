@@ -14,14 +14,15 @@
     top: 5%;
     max-width: 80vw;
     max-height: 80vh;
+    min-width: 50vw;
     border-radius: 16px;
     display: flex;
     flex-direction: column;
     overflow: auto;
+    padding: 30px;
 }
 .modalTitle {
     display: flex;
-    padding: 20px;
     justify-content: space-between;
     align-items: flex-start;
 }
@@ -38,9 +39,6 @@
 .modalTitle button:hover {
     background-color: #C8C9CB;
 }
-.modalContent {
-    padding: 20px;
-}
 .modalContent .content {
     display: flex;
     flex-wrap: wrap;
@@ -52,7 +50,7 @@
     font-size: 18px;
     font-weight: 700;
 }
-.modalContent .content div {
+.modalContent .content > * {
     padding-right: 20px;
 }
 .modalBottom {

@@ -9,6 +9,9 @@ import type {Page} from "@/model/Page";
 import {getRequests} from "@/app/(afterLogin)/request/cart/_api/getRequests";
 import {format} from "date-fns";
 import {useRouter} from "next/navigation";
+import GreenButton from "@/app/_component/GreenButton";
+import BlueButton from "@/app/_component/BlueButton";
+import {deleteRequest} from "@/app/(afterLogin)/request/cart/_api/deleteRequest";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean; // Add an optional property for selection state
@@ -53,9 +56,19 @@ export default function Table() {
     const handleRowClick = (row: RequestWithSelected) => {
         router.push(`/request/cart/info?order=${row.order_id}&service=${row.service!.id}&sample=${row.sample!.id}&user_id=${row.sample!.patient!.organization!.user!.id}`);
     };
+    const handleDeleteCart = () => {
+        requestData.map((request) => {
+            const res = deleteRequest(request)
+
+        })
+    }
 
     return (
         <div className={style.container}>
+            <div className={style.buttonSection}>
+                <GreenButton name={"Back"} onClick={handleDeleteCart}/>
+                <BlueButton name={"Save & Order"}/>
+            </div>
             <div>
                 <table className={style.table}>
                     <thead>
