@@ -6,10 +6,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
-//import com.gcgenome.rms.tables.pojos.Service
+import com.gcgenome.rms.tables.references.ORDER
 import com.gcgenome.rms.tables.references.REQUEST
 import org.jooq.JSON
-import org.jooq.Record21
+import org.jooq.Record22
 import java.time.LocalDateTime
 import java.util.*
 
@@ -83,7 +83,7 @@ data class Request(
     constructor(orderId: UUID, serviceId: String, sampleId: UUID) :
             this(orderId, serviceId, null, sampleId, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
     companion object {
-        fun toPatientModel(record: Record21<JSON?, String?, String?, String?, String?, String?, String?,
+        fun toPatientModel(record: Record22<JSON?, String?, String?, String?, String?, String?, String?, String?,
                 LocalDateTime?, LocalDateTime?, LocalDateTime?, LocalDateTime?, LocalDateTime?, LocalDateTime?,
                 String?, String?, String?, Boolean?, Boolean?, Int?, Int?, JSON?>) =
             Request(
@@ -91,7 +91,7 @@ data class Request(
                 serviceId = null,
                 service = record.get("service", Service::class.java),
                 sampleId = null,
-                serial = null,
+                serial = record.get(ORDER.SERIAL),
                 userServiceId = record.get(REQUEST.USER_SERVICE_ID),
                 status = record.get(REQUEST.STATUS),
                 memo = record.get(REQUEST.MEMO),

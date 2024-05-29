@@ -2,17 +2,16 @@ package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.authentication.User
 import com.gcgenome.rms.data.Query
-import com.gcgenome.rms.tables.references.*
-import org.jooq.Condition
-import org.jooq.DSLContext
-import org.jooq.impl.DSL.*
-import org.jooq.SortOrder
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
 import com.gcgenome.rms.data.Request
 import com.gcgenome.rms.data.Status
 import com.gcgenome.rms.tables.records.RequestRecord
-import com.gcgenome.rms.tables.references.REQUEST
+import com.gcgenome.rms.tables.references.*
+import org.jooq.Condition
+import org.jooq.DSLContext
+import org.jooq.SortOrder
+import org.jooq.impl.DSL.*
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 import java.time.LocalDateTime
 import java.util.*
 
@@ -31,6 +30,7 @@ interface RequestDao {
                     SERVICE.NAME,
                     SERVICE.CATEGORY_ID
                 ).`as`("service"),
+                ORDER.SERIAL,
                 REQUEST.USER_SERVICE_ID,
                 REQUEST.STATUS,
                 REQUEST.MEMO,
@@ -215,6 +215,7 @@ interface RequestDao {
                     SERVICE.NAME,
                     SERVICE.CATEGORY_ID
                 ).`as`("service"),
+                ORDER.SERIAL,
                 REQUEST.USER_SERVICE_ID,
                 REQUEST.STATUS,
                 REQUEST.MEMO,
@@ -235,54 +236,49 @@ interface RequestDao {
                 REQUEST.PRICE,
                 REQUEST.OUTSOURCING_COST,
                 jsonObject(
-                    key("serial").value(PATIENT.SERIAL),
-                    key("sex").value(PATIENT.SEX),
-                    key("name").value(PATIENT.NAME),
-                    key("birth_year").value(PATIENT.BIRTH_YEAR),
-                    key("birth_month").value(PATIENT.BIRTH_MONTH),
-                    key("birth_day").value(PATIENT.BIRTH_DAY),
-                    key("organization").value(
-                        select(
-                            jsonObject(
-                                key("id").value(ORGANIZATION.ID),
-                                key("name").value(ORGANIZATION.NAME),
-                                key("type").value(ORGANIZATION.TYPE),
-                                key("registration_number").value(ORGANIZATION.REGISTRATION_NUMBER),
-                                key("nursing_number").value(ORGANIZATION.NURSING_NUMBER)
-                            )
-                        ).from(ORGANIZATION)
-                            .where(
-                                PATIENT.ORGANIZATION_ID.eq(ORGANIZATION.ID)
-                                    .and(PATIENT.USER_ID.eq(ORGANIZATION.USER_ID))
-                            )
+                    key("barcode").value(SAMPLE.BARCODE),
+                    key("user_sample_id").value(SAMPLE.USER_SAMPLE_ID),
+                    key("quantity").value(SAMPLE.QUANTITY),
+                    key("age").value(SAMPLE.AGE),
+                    key("resample_reason").value(SAMPLE.RESAMPLE_REASON),
+                    key("sampling_on").value(SAMPLE.SAMPLING_ON),
+                    key("create_at").value(SAMPLE.CREATE_AT),
+                    key("sample_type").value(
+                        jsonObject(
+                            key("id").value(SAMPLE_TYPE.ID),
+                            key("name").value(SAMPLE_TYPE.NAME)
+                        )
                     ),
-                    key("sample").value(
-                        select(
-                            jsonObject(
-                                key("barcode").value(SAMPLE.BARCODE),
-                                key("user_sample_id").value(SAMPLE.USER_SAMPLE_ID),
-                                key("quantity").value(SAMPLE.QUANTITY),
-                                key("age").value(SAMPLE.AGE),
-                                key("sampling_on").value(SAMPLE.SAMPLING_ON),
-                                key("resample_reason").value(SAMPLE.RESAMPLE_REASON),
-                                key("create_at").value(SAMPLE.CREATE_AT),
-                                key("sample_type_id").value(SAMPLE.SAMPLE_TYPE_ID),
-                                key("patient_serial").value(SAMPLE.PATIENT_SERIAL),
-                                key("extensions").value(
-                                    select(
-                                        jsonArrayAgg(
-                                            jsonObject(
-                                                key("id").value(SAMPLE_EXTENSION.EXTENSION_ID),
-                                                key("value").value(SAMPLE_EXTENSION.VALUE)
-                                            )
-                                        )
-                                    ).from(SAMPLE_EXTENSION)
-                                        .where(SAMPLE.ID.eq(SAMPLE_EXTENSION.SAMPLE_ID))
+                    key("patient").value(
+                        jsonObject(
+                            key("serial").value(PATIENT.SERIAL),
+                            key("name").value(PATIENT.NAME),
+                            key("sex").value(PATIENT.SEX),
+                            key("birth_year").value(PATIENT.BIRTH_YEAR),
+                            key("birth_month").value(PATIENT.BIRTH_MONTH),
+                            key("birth_day").value(PATIENT.BIRTH_DAY),
+                            key("organization").value(
+                                jsonObject(
+                                    key("id").value(ORGANIZATION.ID),
+                                    key("name").value(ORGANIZATION.NAME),
+                                    key("type").value(ORGANIZATION.TYPE),
+                                    key("registration_number").value(ORGANIZATION.REGISTRATION_NUMBER),
+                                    key("nursing_number").value(ORGANIZATION.NURSING_NUMBER)
                                 )
                             )
-                        ).from(SAMPLE).where(REQUEST.SAMPLE_ID.eq(SAMPLE.ID))
-                    )
-                ).`as`("patient")
+                        )
+                    ),
+                    key("extensions").value(
+                        select(
+                            jsonArrayAgg(
+                                jsonObject(
+                                    key("id").value(SAMPLE_EXTENSION.EXTENSION_ID),
+                                    key("value").value(SAMPLE_EXTENSION.VALUE)
+                                )
+                            )
+                        ).from(SAMPLE_EXTENSION).where(SAMPLE.ID.eq(SAMPLE_EXTENSION.SAMPLE_ID))
+                    ),
+                ).`as`("sample")
             ).from(ORDER)
                 .join(REQUEST).on(ORDER.ID.eq(REQUEST.ORDER_ID))
                 .join(SAMPLE).on(REQUEST.SAMPLE_ID.eq(SAMPLE.ID))
@@ -294,6 +290,9 @@ interface RequestDao {
                         )
                 )
                 .join(SERVICE).on(REQUEST.SERVICE_ID.eq(SERVICE.ID))
+                .join(SAMPLE_TYPE).on(SAMPLE.SAMPLE_TYPE_ID.eq(SAMPLE_TYPE.ID))
+                .join(ORGANIZATION).on(ORGANIZATION.ID.eq(PATIENT.ORGANIZATION_ID)
+                    .and(ORGANIZATION.USER_ID.eq(PATIENT.USER_ID)))
                 .where(REQUEST.ORDER_ID.eq(orderId)
                     .and(REQUEST.SAMPLE_ID.eq(sampleId))
                     .and(REQUEST.SERVICE_ID.eq(serviceId)))
