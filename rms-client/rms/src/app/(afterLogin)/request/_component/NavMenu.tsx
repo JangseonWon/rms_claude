@@ -19,12 +19,16 @@ export default function NavMenu() {
     const segment = useSelectedLayoutSegment();
     const [showServicesDropdown, setShowServicesDropdown] = useState(false);
     const [showDashboardDropdown, setShowDashboardDropdown] = useState(false);
+    const [showResultDropdown, setShowResultDropdown] = useState(false);
 
     const toggleServicesDropdown = () => {
         setShowServicesDropdown(!showServicesDropdown);
     }
     const toggleDashboardDropdown = () => {
         setShowDashboardDropdown(!showDashboardDropdown);
+    }
+    const toggleResultDropdown = () => {
+        setShowResultDropdown(!showResultDropdown);
     }
     return (
         <li className={style.navPill}>
@@ -100,14 +104,26 @@ export default function NavMenu() {
                         <span className={segment === 'order' ? style.clickSpan : ''}>Request Order</span>
                     </Link>
                 </li>
-                <li>
-                    <Link href={"/request/result"}>
-                        <FontAwesomeIcon
-                            className={segment === 'result' ? style.clickIcon : style.icon}
-                            icon={faCircleCheck}/>
-                        <span className={segment === 'result' ? style.clickSpan : ''}>Result</span>
-                    </Link>
+                <li onClick={toggleResultDropdown}>
+                    <FontAwesomeIcon
+                        className={segment === 'result' ? style.clickIcon : style.icon}
+                        icon={faCircleCheck}/>
+                    <span className={segment === 'result' ? style.clickSpan : ''}>Result</span>
                 </li>
+                {showResultDropdown && (
+                    <>
+                        <ol>
+                            <Link href={"/request/result/download"}>
+                                Download
+                            </Link>
+                        </ol>
+                        <ol>
+                            <Link href={"/request/result/resample"}>
+                                Re-sample
+                            </Link>
+                        </ol>
+                    </>
+                )}
                 <li>
                     <Link href={"/request/qna"}>
                         <FontAwesomeIcon

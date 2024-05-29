@@ -19,4 +19,7 @@ export interface Request {
     outsourcing_cost?: number
     sample?: Sample
     create_at?: Date
+    complete_at?: Date
+    resample_at?: Date
+    serial?: string
 }

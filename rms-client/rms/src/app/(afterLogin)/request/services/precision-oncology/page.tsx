@@ -1,4 +1,4 @@
-import Title from "@/app/(afterLogin)/request/services/_component/Title";
+import Title from "@/app/_component/Title";
 import Order from "@/app/(afterLogin)/request/services/precision-oncology/_component/Order";
 import style from "@/app/(afterLogin)/request/services/precision-oncology/page.module.css"
 import CartModal from "@/app/(afterLogin)/request/services/precision-oncology/_component/CartModal";

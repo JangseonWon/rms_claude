@@ -10,6 +10,7 @@ export interface Sample {
     sample_type?: SampleType
     quantity?: number
     barcode?: string
+    resample_reason?: string
     patient?: Patient
     extensions?: Extension[]
 }
