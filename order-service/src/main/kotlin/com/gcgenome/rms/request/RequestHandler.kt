@@ -93,12 +93,12 @@ class RequestHandler(
         }
     }
 
-    fun patientUpdateProcess(userId: String, patient: Patient, trx: Configuration): Mono<Patient> {
+    fun sampleUpdateProcess(userId: String, sample: Sample, trx: Configuration): Mono<Patient> {
         return trx.dsl().run {
-            Mono.from(isValidDate(patient))
-                .then(insertPatient(patient, userId))
-                .then(updateSample(patient.sample!!,patient.organization!!.id))
-                .then(deletePatientById(patient, userId))
+            Mono.from(isValidDate(sample.patient!!))
+                .then(insertPatient(sample.patient, userId))
+                .then(updateSample(sample,sample.patient.organization!!.id))
+                .then(deletePatientById(sample.patient, userId))
         }
     }
 
@@ -124,8 +124,8 @@ class RequestHandler(
                 checkRequest(request.orderId!!, request.sampleId!!, request.serviceId!!)
                     .flatMap { req ->
                         checkUserStatusAndRole(user, req.status)
-                            .then(patientUpdateProcess(user.id!!, request.patient!!, trx))
-                            .then(updateSampleExtensionProcess(request.patient.sample!!, trx)
+                            .then(sampleUpdateProcess(user.id!!, request.sample!!, trx))
+                            .then(updateSampleExtensionProcess(request.sample, trx)
                             .then(updateRequest(request, trx)))
                 }
             }
@@ -164,29 +164,29 @@ class RequestHandler(
 
         val progressCondition: List<Condition?> = mutableListOf()
         when {
-            status.equals("resample") -> {
+            status == "resample" -> {
                 (progressCondition as MutableList).add(field("resample_at").isNotNull)
             }
-            status.equals("inprogress") -> {
+            status == "inprogress" -> {
                 val progress = Status.entries.filter { it != Status.CART && it != Status.FINISHED }
                 progress.forEach { status ->
                     (progressCondition as MutableList).add(field("status").like("%$status%"))
                 }
             }
-            status.equals("result") -> {
+            status == "result" -> {
                 val progress = Status.entries.filter { it == Status.DELIVERED }
                 progress.forEach { status ->
                     (progressCondition as MutableList).add(field("status").like("%$status%"))
                 }
             }
-            status.equals("confirm") -> {
+            status == "confirm" -> {
                 val progress = Status.entries.filter { it == Status.ORDERED }
                 progress.forEach { status ->
                     (progressCondition as MutableList).add(field("status").like("%$status%"))
                 }
             }
             else -> {
-                if (!status.equals("all"))
+                if (status != "all")
                     throw WebInputException()
             }
         }

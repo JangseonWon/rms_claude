@@ -41,8 +41,8 @@ class RequestRouter(
                             orderId = order
                             sampleId = sample
                             serviceId = service
-                            patient!!.sample!!.id = sampleId
-                            patient.sample!!.patientSerial = patient.serial
+                            this.sample!!.id = sampleId
+                            this.sample.patientSerial = patient!!.serial
                         }) }
                    .flatMap { requestHandler.checkRequest(order, sample, service) }
                    .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }

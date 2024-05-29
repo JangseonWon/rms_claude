@@ -111,8 +111,8 @@ data class Request(
                 credit = record.get(REQUEST.CREDIT),
                 price = record.get(REQUEST.PRICE),
                 outsourcingCost = record.get(REQUEST.OUTSOURCING_COST),
-                sample = null,
-                patient = record.get("patient", Patient::class.java)
+                patient = null,
+                sample = record.get("sample", Sample::class.java),
             )
     }
 }

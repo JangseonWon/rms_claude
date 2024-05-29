@@ -34,16 +34,16 @@ data class Sample(
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("create_at")
     val createAt: LocalDateTime?,
-    @JsonProperty("sample_type_id")
-    val sampleTypeId: String?,
-    @JsonProperty("sample_type")
-    val sampleType: List<SampleType>?,
     @JsonProperty("patient_serial")
     var patientSerial: String?,
-    @JsonProperty("organization_id")
-    val organizationId: String?,
     @JsonProperty("user_id")
     val userId: String?,
+    @JsonProperty("organization_id")
+    val organizationId: String?,
+    @JsonProperty("sample_type")
+    val sampleType: SampleType,
+    @JsonProperty("patient")
+    val patient: Patient?,
     @JsonProperty("extensions")
     val extensions: List<Extension>?,
 )
