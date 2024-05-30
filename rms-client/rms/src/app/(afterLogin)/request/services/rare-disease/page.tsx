@@ -1,5 +1,5 @@
 import style from "@/app/(afterLogin)/request/services/rare-disease/page.module.css";
-import Title from "@/app/(afterLogin)/request/services/_component/Title";
+import Title from "@/app/_component/Title";
 import Order from "@/app/(afterLogin)/request/services/rare-disease/_component/Order";
 
 export default async function Page() {

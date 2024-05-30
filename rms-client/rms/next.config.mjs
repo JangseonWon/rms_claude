@@ -23,6 +23,11 @@ const nextConfig = {
                 destination: `https://rms-test.gcgenome.com/w-api/organization-service/:path*`,
             },
             {
+                source: '/w-api/order-service/:path*',
+                // destination: `http://localhost:9886/w-api/order-service/:path*`,
+                destination: `https://rms-test.gcgenome.com/w-api/order-service/:path*`,
+            },
+            {
                 source: '/w-api/dashboard-service/:path*',
                 destination: `https://rms-test.gcgenome.com/w-api/dashboard-service/:path*`,
             },

@@ -1,6 +1,6 @@
 "use client"
 
-import style from "@/app/(afterLogin)/request/services/_component/title.module.css"
+import style from "@/app/_component/title.module.css"
 import {usePathname} from "next/navigation";
 
 export default function Title() {
@@ -21,6 +21,12 @@ export default function Title() {
             break;
         case 'health-checkup':
             correctedValue = 'Health Checkup'
+            break;
+        case 'download':
+            correctedValue = 'Download'
+            break;
+        case 'resample':
+            correctedValue = 'Re-sample'
             break;
         case 'others':
             correctedValue = 'Others'
