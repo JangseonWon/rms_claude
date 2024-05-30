@@ -1,20 +1,12 @@
 package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.Request
-import com.gcgenome.rms.data.Status
 import com.gcgenome.rms.tables.references.REQUEST
 import org.jooq.DSLContext
 import reactor.core.publisher.Mono
 import java.time.LocalDateTime
-import java.util.*
 
 interface RequestDao {
-
-    fun DSLContext.selectRequestById(orderId: UUID, sampleId: UUID, serviceId: String): Mono<Request> {
-        return Mono.from(selectFrom(REQUEST).where(REQUEST.ORDER_ID.eq(orderId).and(REQUEST.SAMPLE_ID.eq(sampleId))))
-            .map { it.into(Request::class.java) }
-    }
-
     fun DSLContext.insertRequest(request: Request): Mono<Request> {
         return Mono.from(
             insertInto(REQUEST)

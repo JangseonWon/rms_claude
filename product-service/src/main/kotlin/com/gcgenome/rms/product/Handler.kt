@@ -2,14 +2,14 @@ package com.gcgenome.rms.product
 
 import com.gcgenome.rms.authentication.User
 import com.gcgenome.rms.dao.*
-import com.gcgenome.rms.data.*
-import org.jooq.Configuration
+import com.gcgenome.rms.data.Organization
+import com.gcgenome.rms.data.Request
+import com.gcgenome.rms.data.SampleType
+import com.gcgenome.rms.data.Service
 import org.jooq.DSLContext
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 @Component

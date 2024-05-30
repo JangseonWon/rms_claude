@@ -3,7 +3,7 @@ package com.gcgenome.rms.product
 import com.gcgenome.rms.data.Organization
 import com.gcgenome.rms.data.Request
 import com.gcgenome.rms.data.SampleType
-import com.gcgenome.rms.exception.*
+import com.gcgenome.rms.exception.AuthenticationNotFoundException
 import com.gcgenome.rms.service.AuthenticationHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -14,7 +14,6 @@ import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.router
 import reactor.core.publisher.Mono
 import java.util.*
-import kotlin.jvm.optionals.getOrNull
 
 @Configuration
 class Router (
