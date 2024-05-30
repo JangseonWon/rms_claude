@@ -25,7 +25,7 @@ class OrderHandler(
     val dslContext: DSLContext
 ): PatientDao, OrderDao, OrganizationDao, RequestDao, ExtensionDao, SampleDao, UserDao, UserServiceDao, ServiceSampleTypeDao {
 
-    fun insertOrderProcess(userId: String, orders: List<Order>): Flux<Order> {
+    /*fun insertOrderProcess(userId: String, orders: List<Order>): Flux<Order> {
         return Flux.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
                 Flux.fromIterable(orders).concatMap { order ->
@@ -83,14 +83,14 @@ class OrderHandler(
         return trx.dsl().run {
             checkOrganization(userId, patient.organization?.id
                 ?: throw OrganizationNotFoundException(userId, patient.organization?.id ?: ""), trx)
-                .then(insertPatient(patient.organization.id, userId, patient))
+                .then(insertPatient(userId, patient))
         }
     }
 
     fun insertSampleProcess(serviceId: String, barcode: String, sample: Sample, createTime: LocalDateTime?, userId: String, trx: Configuration): Mono<Sample> {
         return trx.dsl().run {
             checkServiceSampleTypeById(sample.sampleType!!.id!!, serviceId, trx)
-                .then(insertSample(sample.patient!!, barcode, sample, userId, createTime))
+                .then(insertSample(barcode, sample, userId, createTime))
                 .flatMap { sample -> selectSampleById(sample.id!!) }
         }
     }
@@ -134,5 +134,5 @@ class OrderHandler(
         return trx.dsl().selectOrderSerial(serialPrefix)
             .map { "${serialPrefix}${"%04d".format(it.takeLast(4).toLong() + 1)}" }
             .switchIfEmpty(Mono.just("${serialPrefix}0001"))
-    }
+    }*/
 }

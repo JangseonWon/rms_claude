@@ -34,7 +34,7 @@ export default function Info() {
     const onClickClose = () => {
         router.back();
     };
-    const handleChange = (path: string, value: any) => {
+    const handleRequestChange = (path: string, value: any) => {
         setRequest(prevState => ({
             ...prevState,
             ...setNestedValue({ ...prevState }, path, value)
@@ -131,8 +131,8 @@ export default function Info() {
                                 value={request.sample?.patient?.organization?.name}
                                 options={organizationOptions}
                                 onChange={(value) => {
-                                    handleChange('sample.patient.organization.id', value.value)
-                                    handleChange('sample.patient.organization.name', value.name)
+                                    handleRequestChange('sample.patient.organization.id', value.value)
+                                    handleRequestChange('sample.patient.organization.name', value.name)
                                 }}
                             />
                         </div>
@@ -149,29 +149,28 @@ export default function Info() {
                             <InputBox
                                 label={"Name*"}
                                 value={request.sample?.patient?.name}
-                                onChange={(value) => handleChange('sample.patient.name', value)}
+                                onChange={(value) => handleRequestChange('sample.patient.name', value)}
                                 required={true}
                             />
                             <InputBox
                                 label={"MRN*"}
                                 value={request.sample?.patient?.serial}
-                                onChange={(value) => handleChange('sample.patient.serial', value)}
+                                onChange={(value) => handleRequestChange('sample.patient.serial', value)}
                                 required={true}
                             />
                             <DatePickerBox
                                 label={"Date of Birth"}
                                 value={getDateFromComponents(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}
                                 onChange={(date) => {
-                                    handleChange('sample.patient.birth_year', date.getFullYear());
-                                    handleChange('sample.patient.birth_month', date.getMonth());
-                                    handleChange('sample.patient.birth_day', date.getDay());
+                                    handleRequestChange('sample.patient.birth_year', date.getFullYear());
+                                    handleRequestChange('sample.patient.birth_month', date.getMonth());
+                                    handleRequestChange('sample.patient.birth_day', date.getDay());
                                 }}
                             />
                             <InputBox
                                 label={"Age"}
                                 value={request.sample?.age}
-                                disabled={false}
-                                onChange={(value) => handleChange('sample.age', value)}
+                                onChange={(value) => handleRequestChange('sample.age', value)}
                             />
                         </div>
                         <div className={style.content}>
@@ -181,27 +180,25 @@ export default function Info() {
                                 value={request.sample?.sample_type?.name}
                                 options={sampleTypeOptions}
                                 onChange={(value) => {
-                                    handleChange('sample.sample_type.id', value.value)
-                                    handleChange('sample.sample_type.name', value.name)
+                                    handleRequestChange('sample.sample_type.id', value.value)
+                                    handleRequestChange('sample.sample_type.name', value.name)
                                 }}
                             />
                             <DatePickerBox
                                 label={"Date or collection*"}
                                 value={request.sample?.sampling_on}
-                                onChange={(date) => handleChange('sample.sampling_on', date)}
+                                onChange={(date) => handleRequestChange('sample.sampling_on', date)}
                             />
                             <InputBox
                                 label={"Quantity*"}
                                 value={request.sample?.quantity?.toString()}
-                                disabled={false}
                                 required={true}
-                                onChange={(value) => handleChange('sample.quantity', value)}
+                                onChange={(value) => handleRequestChange('sample.quantity', value)}
                             />
                             <InputBox
                                 label={"Memo"}
                                 value={request.memo}
-                                disabled={false}
-                                onChange={(value) => handleChange('memo', value)}
+                                onChange={(value) => handleRequestChange('memo', value)}
                             />
                         </div>
                         <div className={style.content}>
@@ -209,20 +206,17 @@ export default function Info() {
                             <InputBox
                                 label={"Medical Department"}
                                 value={request.department}
-                                disabled={false}
-                                onChange={(value) => handleChange('department', value)}
+                                onChange={(value) => handleRequestChange('department', value)}
                             />
                             <InputBox
                                 label={"Ward"}
                                 value={request.ward}
-                                disabled={false}
-                                onChange={(value) => handleChange('ward', value)}
+                                onChange={(value) => handleRequestChange('ward', value)}
                             />
                             <InputBox
                                 label={"Physician Name"}
                                 value={request.physician}
-                                disabled={false}
-                                onChange={(value) => handleChange('physician', value)}
+                                onChange={(value) => handleRequestChange('physician', value)}
                             />
                         </div>
                         <div className={style.modalBottom}>

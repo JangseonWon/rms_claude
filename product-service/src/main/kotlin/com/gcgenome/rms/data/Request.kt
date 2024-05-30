@@ -18,6 +18,8 @@ data class Request(
     val service: Service?,
     @JsonProperty("sample_id")
     var sampleId: UUID?,
+    @JsonProperty("service_id")
+    var serviceId: String?,
     @JsonProperty("serial")
     val serial: String?,
     @JsonProperty("user_service_id")

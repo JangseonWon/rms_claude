@@ -1,5 +1,5 @@
 import style from "@/app/_component/selectBox.module.css"
-import React, {useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {faChevronDown, faChevronUp} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
@@ -7,13 +7,16 @@ import {SelectBoxOption} from "@/model/SelectBoxOption";
 type Props = {
     options: SelectBoxOption[]
     label: string
-    value?: string
+    value?: any
     onChange?: (selectedValue: any) => void;
+    required?: boolean
 }
 
-export default function SelectBox({ label, value, options, onChange }: Props) {
+export default function SelectBox({ label, value, options, onChange, required=false }: Props) {
     const [selectedLanguage, setSelectedLanguage] = useState<string>('');
     const [isOpen, setIsOpen] = useState<boolean>(false)
+    const [hasError, setHasError] = useState(false);
+    const selectBoxRef = useRef<HTMLDivElement>(null);
 
     const handleOptionClick = (option: SelectBoxOption) => {
         setSelectedLanguage(option.name!);
@@ -23,10 +26,22 @@ export default function SelectBox({ label, value, options, onChange }: Props) {
     const toggleList = () => {
         setIsOpen(!isOpen)
     }
+    const handleClickOutside = (event: MouseEvent) => {
+        if (selectBoxRef.current && !selectBoxRef.current.contains(event.target as Node)) {
+            setIsOpen(false);
+        }
+    };
+    useEffect(() => {
+        setHasError(!selectedLanguage && required);
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [selectedLanguage, value]);
 
     return (
-        <div>
-            <section className={style.selectSection}>
+        <div ref={selectBoxRef}>
+            <section className={`${style.selectSection} ${hasError ? style.error : ""}`}>
                 <p className={style.label}>{label}</p>
                 <button className={`${style.btnSelect} ${isOpen ? style.open : ''}`} onClick={toggleList}>
                     <div>{selectedLanguage || value || '-'}</div>

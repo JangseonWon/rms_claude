@@ -63,7 +63,7 @@ export default function OrderModal() {
             sample: {
                 quantity: Number(quantity),
                 age: Number(age),
-                sampling_on: `${collectionDate?.year}-${selectedMonthFormatted}-${selectedDayFormatted}`,
+                //sampling_on: `${collectionDate?.year}-${selectedMonthFormatted}-${selectedDayFormatted}`,
                 sample_type: {
                     id: type
                 },

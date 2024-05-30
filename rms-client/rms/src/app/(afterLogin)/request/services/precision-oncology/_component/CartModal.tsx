@@ -62,7 +62,7 @@ export default function CartModal() {
             sample: {
                 quantity: Number(quantity),
                 age: Number(age),
-                sampling_on: `${collectionDate?.year}-${selectedMonthFormatted}-${selectedDayFormatted}`,
+                //sampling_on: `${collectionDate?.year}-${selectedMonthFormatted}-${selectedDayFormatted}`,
                 sample_type: {
                     id: type
                 },

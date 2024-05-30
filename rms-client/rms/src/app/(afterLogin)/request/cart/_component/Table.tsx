@@ -56,12 +56,19 @@ export default function Table() {
     const handleRowClick = (row: RequestWithSelected) => {
         router.push(`/request/cart/info?order=${row.order_id}&service=${row.service!.id}&sample=${row.sample!.id}&user_id=${row.sample!.patient!.organization!.user!.id}`);
     };
-    const handleDeleteCart = () => {
-        requestData.map((request) => {
-            const res = deleteRequest(request)
-
-        })
-    }
+    const handleDeleteCart = async () => {
+        try {
+            const selectedRequests = requestData.filter(request => request.isSelected);
+            await Promise.all(selectedRequests.map(async request => {
+                const res = await deleteRequest(request);
+                if (!res.ok) throw new Error(`Failed to delete request with order_id: ${request.order_id}`);
+            }));
+            alert("delete!");
+            fetchData(page);
+        } catch (error) {
+            alert(`fail: ${error}`);
+        }
+    };
 
     return (
         <div className={style.container}>

@@ -18,12 +18,12 @@ class OrderRouter (
     private val handler: OrderHandler,
     private val authentication: AuthenticationHandler
 ){
-    @Bean("OrderServiceRouter")
+    /*@Bean("OrderServiceRouter")
     fun route() = router {
         PUT("/w-api/product-service/orders", ::orders)
-    }
+    }*/
 
-    private fun orders(request: ServerRequest): Mono<ServerResponse> {
+    /*private fun orders(request: ServerRequest): Mono<ServerResponse> {
         return authentication.principal(request)
             .zipWith(request.bodyToMono(object : ParameterizedTypeReference<List<Order>>() {}))
             .flatMap { handler.insertOrderProcess(it.t1.user.id!!, it.t2).collectList() }
@@ -35,5 +35,5 @@ class OrderRouter (
             .onErrorResume (ExtensionIdNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
             .onErrorResume (ServerWebInputException::class.java) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("Request body type error.") }
             .onErrorResume { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("Request body error.") }
-    }
+    }*/
 }

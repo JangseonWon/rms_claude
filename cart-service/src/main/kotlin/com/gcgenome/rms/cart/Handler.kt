@@ -12,7 +12,7 @@ import java.util.*
 
 @Component
 class Handler(val dslContext: DSLContext ) :
-    RequestDao, OrganizationDao, SampleTypeDao, PatientDao, SampleDao
+    RequestDao, OrganizationDao, SampleTypeDao, PatientDao, SampleDao, OrderDao, SampleExtensionDao
 {
 
     fun getCartInfo(orderId: UUID, sampleId: UUID, serviceId: String): Mono<Request> {
@@ -53,5 +53,21 @@ class Handler(val dslContext: DSLContext ) :
     }
     fun sampleTypes(serviceId: String): Flux<SampleType> {
         return dslContext.selectSampleTypeByServiceId(serviceId)
+    }
+    fun deleteCart(orderId: UUID, sampleId: UUID, serviceId: String): Mono<Void> {
+        return Mono.from(dslContext.transactionPublisher { trx ->
+            trx.dsl().run {
+                selectRequestById(orderId, sampleId, serviceId)
+                    .flatMap { request ->
+                        deleteRequest(request)
+                            .then(deleteOrderById(request.orderId!!))
+                            .then(deleteSampleExtensionBySampleId(request.sample!!.id!!))
+                            .then(deleteSampleById(request.sample!!.id!!))
+                            .then(deletePatientById(request.sample!!.patient!!))
+                            .then()
+                    }
+
+            }
+        })
     }
 }

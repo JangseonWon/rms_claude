@@ -13,9 +13,11 @@ body * {
     border: none;
 }
 .react-datepicker__input-container input{
-    border: 1px solid #C4C4C4;
-    border-radius: 10px;
-    padding: 5px 15px;
+    min-width: 200px;
+    border: 1px solid #DAE2ED;
+    border-radius: 20px;
+    padding: 8px 12px;
+    box-shadow: 0 2px 2px #F3F6F9;
 }
 .react-datepicker__input-container input:hover,
 .react-datepicker__input-container input:focus{

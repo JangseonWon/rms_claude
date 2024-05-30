@@ -7,20 +7,14 @@ import OrderModal from "@/app/(afterLogin)/request/services/precision-oncology/_
 export default async function Page() {
     return(
         <div className={style.container}>
-            <section className={style.titleContainer}>
+            <div className={style.titleContainer}>
                 <Title/>
-            </section>
-            <section className={style.sideContainer}>
+            </div>
+            <div className={style.orderContainerWrapper}>
                 <div className={style.orderContainer}>
-                    <div className={style.order}>
-                        <Order/>
-                    </div>
-                    <div className={style.cartAndOrder}>
-                        <CartModal/>
-                        <OrderModal/>
-                    </div>
+                    <Order/>
                 </div>
-            </section>
+            </div>
         </div>
     )
 }

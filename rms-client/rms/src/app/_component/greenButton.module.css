@@ -1,14 +1,22 @@
 .greenButton {
-    background-color: white;
+    background: white;
     font-weight: 700;
     font-size: 0.875rem;
-    padding: 8px 15px;
+    padding: 6px 10px;
+    min-width: 110px;
     border-radius: 15px;
     border: 1px solid #90BA2D;
     cursor: pointer;
+    margin: 0 5px;
 }
 .greenButton:hover {
     background: linear-gradient(135deg, #a1b86a, #dae8ba);
     color: #ffffff;
     border: solid #dae8ba thin;
+}
+.greenButton.disable {
+    background: #999999;
+    border: 1px solid #999999;
+    cursor: default;
+    color: #ffffff
 }
