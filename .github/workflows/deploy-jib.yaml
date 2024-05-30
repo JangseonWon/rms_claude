@@ -10,6 +10,8 @@ on:
       - dashboard-service/**
       - product-service/**
       - organization-service/**
+      - order-service/**
+      - cart-service/**
 permissions: write-all
 jobs:
   extract:
@@ -32,6 +34,8 @@ jobs:
           "$module_name" == "login-service" || 
           "$module_name" == "dashboard-service" ||
           "$module_name" == "organization-service" ||
+          "$module_name" == "order-service" ||
+          "$module_name" == "cart-service" ||
           "$module_name" == "product-service" ]] && module_names+=("$module_name")
           done
           module_names=($(printf '%s\n' "${module_names[@]}" | sort -u))

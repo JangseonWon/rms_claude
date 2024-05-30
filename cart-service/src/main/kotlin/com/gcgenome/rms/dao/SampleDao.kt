@@ -1,10 +1,12 @@
 package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.Sample
+import com.gcgenome.rms.tables.references.REQUEST
 import com.gcgenome.rms.tables.references.SAMPLE
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import reactor.core.publisher.Mono
+import java.util.*
 
 interface SampleDao {
     fun DSLContext.updateSample(sample: Sample): Mono<Sample> {
@@ -19,6 +21,19 @@ interface SampleDao {
                 .set(SAMPLE.ORGANIZATION_ID, DSL.coalesce(DSL.`val`(sample.patient!!.organization!!.id), SAMPLE.ORGANIZATION_ID))
                 .where(SAMPLE.ID.eq(sample.id))
                 .returning()
+        ).map { it.into(Sample::class.java) }
+    }
+    fun DSLContext.deleteSampleById(sampleId: UUID): Mono<Sample> {
+        return Mono.from(
+            deleteFrom(SAMPLE)
+                .where(
+                    SAMPLE.ID.eq(sampleId)
+                    .andNotExists(
+                        selectOne()
+                            .from(REQUEST)
+                            .where(REQUEST.SAMPLE_ID.eq(sampleId))
+                    )
+                ).returning()
         ).map { it.into(Sample::class.java) }
     }
 }

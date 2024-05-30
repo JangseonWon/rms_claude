@@ -18,7 +18,7 @@ interface RequestDao {
             selectCount()
                 .from(REQUEST)
                 .join(ORDER).on(REQUEST.ORDER_ID.eq(ORDER.ID))
-                .where(REQUEST.STATUS.ne(Status.CART.toString())
+                .where(REQUEST.STATUS.eq(Status.CART.toString())
                     .and(`when`(`val`(user.role).eq("USER"), ORDER.USER_ID.eq(user.id)).else_(true)))
 
         ).map { it.into(Int::class.java) }
@@ -35,6 +35,15 @@ interface RequestDao {
                 .set(REQUEST.LAST_MODIFY_AT, LocalDateTime.now())
                 .where(REQUEST.ORDER_ID.eq(request.orderId).and(REQUEST.SAMPLE_ID.eq(request.sampleId).and(REQUEST.SERVICE_ID.eq(request.serviceId))))
                 .returning()
+        ).map { it.into(Request::class.java) }
+    }
+    fun DSLContext.deleteRequest(request: Request): Mono<Request> {
+        return Mono.from(
+            deleteFrom(REQUEST).where(
+                REQUEST.ORDER_ID.eq(request.orderId)
+                    .and(REQUEST.SAMPLE_ID.eq(request.sample!!.id))
+                    .and(REQUEST.SERVICE_ID.eq(request.service!!.id))
+            ).returning()
         ).map { it.into(Request::class.java) }
     }
     fun DSLContext.selectRequestByUserId(user: User, query: Query): Flux<Request> {
