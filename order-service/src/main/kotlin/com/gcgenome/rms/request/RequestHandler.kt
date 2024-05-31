@@ -185,6 +185,12 @@ class RequestHandler(
                     (progressCondition as MutableList).add(field("status").like("%$status%"))
                 }
             }
+            status == "order" -> {
+                val progress = Status.entries.filter { it == Status.ORDERED || it == Status.INPROGRESS }
+                progress.forEach { status ->
+                    (progressCondition as MutableList).add(field("status").like("%$status%"))
+                }
+            }
             else -> {
                 if (status != "all")
                     throw WebInputException()
