@@ -18,7 +18,6 @@ export default function SearchInputBox() {
                     label={"Search"}
                 />
             </div>
-            <button className={style.searchButton}>Search</button>
         </div>
     );
 }

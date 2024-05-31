@@ -1,7 +1,16 @@
+import style from "@/app/(afterLogin)/request/order/page.module.css";
+import OrderTitle from "@/app/(afterLogin)/request/order/_component/OrderTitle";
+import OrderTable from "@/app/(afterLogin)/request/order/_component/OrderTable";
+
 export default async function Page() {
     return(
-        <>
-            Request Order
-        </>
+        <div className={style.container}>
+            <div className={style.title}>
+                <OrderTitle/>
+            </div>
+            <div className={style.contents}>
+                <OrderTable/>
+            </div>
+        </div>
     )
 }
