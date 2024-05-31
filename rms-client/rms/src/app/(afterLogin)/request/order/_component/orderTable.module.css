@@ -132,3 +132,6 @@
 .checkbox input:checked + .checkmark:after {
     display: block;
 }
+.info:hover {
+    color: #002b49;
+}

@@ -9,6 +9,7 @@ import type {Page} from "@/model/Page";
 import {format} from "date-fns";
 import {useRouter} from "next/navigation";
 import {getRequestOrders} from "@/app/(afterLogin)/request/order/_api/getRequestOrders";
+import {faFileLines} from "@fortawesome/free-regular-svg-icons/faFileLines";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -44,6 +45,10 @@ export default function OrderTable() {
             prevData.map((row) => ({ ...row, isSelected }))
         );
     };
+
+    const handleInfoOnclick = () => {
+        alert("test");
+    }
 
     const fetchData = async (page: Page) => {
         const response = await getRequestOrders(page);
@@ -84,6 +89,7 @@ export default function OrderTable() {
                     <th>Collection Date<br/>(DD/MM/YYYY)</th>
                     <th>MRN</th>
                     <th>Service Code</th>
+                    <th>Info</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -108,6 +114,9 @@ export default function OrderTable() {
                         <td>{row.sample?.sampling_on ? format(new Date(row.sample.sampling_on), "dd-MM-yyyy") : '-'}</td>
                         <td>{row.sample?.patient?.serial}</td>
                         <td>{row.service?.id}</td>
+                        <td>
+                            <FontAwesomeIcon icon={faFileLines} className={style.info} onClick={handleInfoOnclick}/>
+                        </td>
                     </tr>
                 ))}
                 </tbody>
