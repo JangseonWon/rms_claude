@@ -5,7 +5,7 @@ import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useRouter, useSearchParams} from "next/navigation";
 import SelectBox from "@/app/_component/SelectBox"
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {getRequest} from "@/app/(afterLogin)/request/cart/_api/getRequest";
 import {Request} from "@/model/Request"
 import InputBox from "@/app/_component/InputBox";
@@ -26,10 +26,10 @@ export default function Info() {
     const [sampleTypeOptions, setSampleTypeOptions] = useState<SelectBoxOption[]>([])
     const router = useRouter();
     const searchParams = useSearchParams()
-    const orderId = searchParams.get("order")
-    const serviceId = searchParams.get("service")
-    const sampleId = searchParams.get("sample")
-    const userId = searchParams.get("user_id")
+    const orderId = searchParams!.get("order")
+    const serviceId = searchParams!.get("service")
+    const sampleId = searchParams!.get("sample")
+    const userId = searchParams!.get("user_id")
 
     const onClickClose = () => {
         router.back();
@@ -53,33 +53,24 @@ export default function Info() {
             [firstKey]: setNestedValue(object[firstKey] || {}, remainingPathSegments.join('.'), newValue),
         };
     };
+    const fetchRequest = useCallback(async () => {
+        const response = await getRequest(orderId!, serviceId!, sampleId!)
+        const json = response.json()
+        setRequest(json as Request)
+    },[orderId, serviceId, sampleId]);
 
-    useEffect(() => {
-        fetchRequest()
-        fetchOrganization()
-        fetchSampleType()
-        const handleKeyPress = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') {router.back();}
-        };
-        window.addEventListener('keydown', handleKeyPress);
-        return () => {window.removeEventListener('keydown', handleKeyPress);};
-    }, [router]);
-
-    const fetchRequest = async () => {
-        const response = await getRequest(orderId!, serviceId!, sampleId!);
-        const data = await response.json();
-        setRequest(data as Request)
-    };
-    const fetchOrganization = async () => {
+    const fetchOrganizations = useCallback(async () => {
         const response = await getOrganization(userId!);
         const data = await response.json();
         setOrganizationOptions(transformOrganizationsToOptions(data as Organization[]));
-    };
-    const fetchSampleType = async () => {
+    },[userId]);
+
+    const fetchSampleType = useCallback(async () => {
         const response = await getSampleType(serviceId!)
-        const data = await response.json();
-        setSampleTypeOptions(transformSampleTypeToOptions(data as SampleType[]))
-    }
+        const json = await response.json()
+        setSampleTypeOptions(transformSampleTypeToOptions(json as SampleType[]))
+    },[serviceId])
+
     const transformOrganizationsToOptions = (organizations: Organization[]): SelectBoxOption[] => {
         return organizations.map(org => ({
             value: org.id,
@@ -112,6 +103,17 @@ export default function Info() {
         if (!year || !month || !day) return undefined;
         return new Date(year, month - 1, day);  // Month is zero-based in JavaScript Date
     }
+
+    useEffect(() => {
+        fetchRequest()
+        fetchOrganizations()
+        fetchSampleType()
+        const handleKeyPress = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {router.back();}
+        };
+        window.addEventListener('keydown', handleKeyPress);
+        return () => {window.removeEventListener('keydown', handleKeyPress);};
+    }, [fetchRequest, fetchOrganizations, fetchSampleType, router]);
 
     return (
         <div className={style.modalBackground}>

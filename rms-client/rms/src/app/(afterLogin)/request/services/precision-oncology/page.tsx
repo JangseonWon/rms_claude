@@ -1,8 +1,6 @@
 import Title from "@/app/_component/Title";
 import Order from "@/app/(afterLogin)/request/services/precision-oncology/_component/Order";
 import style from "@/app/(afterLogin)/request/services/precision-oncology/page.module.css"
-import CartModal from "@/app/(afterLogin)/request/services/precision-oncology/_component/CartModal";
-import OrderModal from "@/app/(afterLogin)/request/services/precision-oncology/_component/OrderModal";
 
 export default async function Page() {
     return(

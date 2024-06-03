@@ -3,6 +3,8 @@ import Avatar from '@mui/material/Avatar';
 import Stack from '@mui/material/Stack';
 import Link from "next/link";
 import React from "react";
+import Image from "next/image";
+import footerImg from "@/../public/footer-img.png"
 
 export default function Footer() {
     return (
@@ -40,7 +42,7 @@ export default function Footer() {
                         </Stack>
                     </div>
                     <div className={style.div4Menu}>
-                        <img src='/footer-img.png' alt="img"/>
+                        <Image src={footerImg} alt="img"/>
                     </div>
                 </div>
             </div>

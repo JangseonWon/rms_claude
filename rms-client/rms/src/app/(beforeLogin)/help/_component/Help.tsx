@@ -2,12 +2,14 @@
 
 import React from "react";
 import style from "@/app/(beforeLogin)/help/_component/help.module.css"
+import Image from "next/image";
+import loginImg from "@/../public/login-img2.png"
 
 export default function Help() {
     return (
         <div className={style.container}>
             <div className={style.left}>
-                <img src='/login-img2.png' alt="img"/>
+                <Image src={loginImg} alt="img"/>
             </div>
             <div className={style.right}>
                 <div className={style.labelContainer1}>

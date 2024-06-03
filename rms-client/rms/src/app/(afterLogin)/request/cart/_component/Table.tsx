@@ -24,11 +24,11 @@ export default function Table() {
     const isSelectedAll = requestData.every((row) => row.isSelected); // Check if all or none are selected
 
     useEffect(() => {
-        fetchData(page)
-    }, [page.number, page.size]);
+        fetchData(page.size, page.number)
+    }, [page.size, page.number]);
 
-    const fetchData = async (page: Page) => {
-        const response = await getRequests(page);
+    const fetchData = async (pageSize: number, pageNumber: number) => {
+        const response = await getRequests(pageSize, pageNumber);
         const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
         const data = await response.json();
         setRequestData(data as Request[]);
@@ -64,7 +64,7 @@ export default function Table() {
                 if (!res.ok) throw new Error(`Failed to delete request with order_id: ${request.order_id}`);
             }));
             alert("delete!");
-            fetchData(page);
+            fetchData(page.size, page.number);
         } catch (error) {
             alert(`fail: ${error}`);
         }

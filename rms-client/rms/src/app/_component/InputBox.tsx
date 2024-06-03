@@ -21,7 +21,7 @@ export default function InputBox({label, value, disabled=false, onChange, requir
     useEffect(() => {
         setInputValue(value || '');
         setHasError(!value && required)
-    }, [value]);
+    }, [required, value]);
 
     return (
         <div className={`${style.inputBox} ${hasError ? style.error : ""}`}>

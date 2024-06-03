@@ -1,10 +1,9 @@
 'use client';
 
 import style from "@/app/(afterLogin)/request/services/precision-oncology/_component/order.module.css"
-import InputExtension from "@/app/(afterLogin)/request/services/precision-oncology/_component/InputExtension";
 import SelectBox from "@/app/_component/SelectBox";
 import InputBox from "@/app/_component/InputBox";
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {Organization} from "@/model/Organization";
 import {getOrganization} from "@/app/(afterLogin)/request/services/precision-oncology/_api/getOrganization";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
@@ -16,7 +15,6 @@ import {SampleType} from "@/model/SampleType";
 import {getSampleType} from "@/app/(afterLogin)/request/services/precision-oncology/_api/getSampleType"
 import GreenButton from "@/app/_component/GreenButton";
 import BlueButton from "@/app/_component/BlueButton";
-import {updateRequest} from "@/app/(afterLogin)/request/cart/_api/updateRequest";
 import {putRequest} from "@/app/(afterLogin)/request/services/precision-oncology/_api/putRequest";
 import {useRouter} from "next/navigation";
 
@@ -25,27 +23,26 @@ export default function Order() {
     const [serviceOptions, setServiceOptions] = useState<SelectBoxOption[]>([])
     const [sampleTypeOptions, setSampleTypeOptions] = useState<SelectBoxOption[]>([])
     const [request, setRequest] = useState<Request>({})
-    const router = useRouter();
 
-    useEffect(() => {
-        fetchOrganizations()
-        fetchServices()
-    }, []);
-    const fetchOrganizations = async () => {
+    const fetchOrganizations = useCallback(async () => {
         const response = await getOrganization()
         const data = await response.json();
         setOrganizationOptions(transformOrganizationToOptions(data as Organization[]))
-    };
-    const fetchServices = async () => {
+    },[]);
+    const fetchServices = useCallback(async () => {
         const response = await getServices()
         const data = await response.json();
         setServiceOptions(transformServiceToOptions(data as Service[]))
-    };
+    }, []);
     const fetchSampleType = async (serviceId: string) => {
         const response = await getSampleType(serviceId)
         const data = await response.json();
         setSampleTypeOptions(transformSampleTypeToOptions(data as SampleType[]))
     }
+    useEffect(() => {
+        fetchOrganizations()
+        fetchServices()
+    }, [fetchOrganizations, fetchServices]);
 
     const publishRequest = (status:string) => {
         const updateRequest = {
@@ -214,9 +211,6 @@ export default function Order() {
                     onChange={(value) => handleRequestChange('physician', value)}
                 />
             </div>
-            <section className={style.bottomSection}>
-                <InputExtension/>
-            </section>
         </div>
     )
 }

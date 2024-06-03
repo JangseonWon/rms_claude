@@ -37,7 +37,7 @@ export default function SelectBox({ label, value, options, onChange, required=fa
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [selectedLanguage, value]);
+    }, [selectedLanguage, required, value]);
 
     return (
         <div ref={selectBoxRef}>

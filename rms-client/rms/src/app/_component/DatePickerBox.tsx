@@ -33,6 +33,7 @@ const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(
         </div>
     )
 );
+CustomInput.displayName = "CustomInput";
 export default function DatePickerBox({label, value, onChange, required=false}: Props) {
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(value);
     const [hasError, setHasError] = useState(false);
@@ -43,7 +44,7 @@ export default function DatePickerBox({label, value, onChange, required=false}: 
     };
     useEffect(() => {
         setHasError(!selectedDate && required)
-    }, [selectedDate]);
+    }, [selectedDate, required]);
 
     return (
         <div className={`${style.dateBox} ${hasError ? style.error : ""}`}>

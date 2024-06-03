@@ -1,30 +1,25 @@
 import type {Metadata} from "next";
-import {Inter} from "next/font/google";
+import {Manrope} from 'next/font/google'
 import "./globals.css";
-import {SessionProvider} from "next-auth/react";
+import AuthSession from "@/app/_component/AuthSession";
 
-const inter = Inter({ subsets: ["latin"] });
+const manrope = Manrope({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "RMS Plus",
   description: "rms.gcgenome.com",
 };
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+type Props = {
+  children: React.ReactNode
+}
+export default function RootLayout({children}:Props){
   return (
-      <SessionProvider>
-        <html lang="en">
-        <head>
-          <link rel="preconnect" href="https://fonts.googleapis.com"/>
-          <link rel="preconnect" href="https://fonts.gstatic.com"/>
-          <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet"/>
-        </head>
-        <body className={inter.className}>{children}</body>
-        </html>
-      </SessionProvider>
+    <html lang="en">
+    <body className={manrope.className}>
+    <AuthSession>
+        {children}
+    </AuthSession>
+    </body>
+    </html>
   );
 }

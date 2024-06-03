@@ -2,11 +2,6 @@ body{
     margin: 0;
     background-color: #EBECEE;
 }
-body * {
-    font-family: "Manrope", sans-serif;
-    font-optical-sizing: auto;
-}
-
 /*react-datepicker*/
 .react-datepicker{
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);

@@ -1,9 +1,11 @@
+import Image from "next/image";
+import homeMainImg from "@/../public/home_main.jpg"
 import style from "@/app/(afterLogin)/home/_component/MainImage.module.css";
 
 export default function MainImage() {
     return (
         <div className={style.imageContainer}>
-            <img src={"/home_main.jpg"} alt={"genome"}/>
+            <Image src={homeMainImg} alt={"genome"}/>
             <div className={style.text}>
                 <p className={style.mainText}>The Smart Solution</p>
                 <p className={style.mainText}>For Rare Disease Testing</p>

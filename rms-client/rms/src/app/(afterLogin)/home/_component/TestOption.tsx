@@ -2,6 +2,8 @@
 
 import style from "@/app/(afterLogin)/home/_component/testOption.module.css"
 import Link from "next/link";
+import Image from "next/image";
+import homeMainImg from "@/../public/home_main.jpg"
 
 export default function TestOption() {
     return (
@@ -12,25 +14,25 @@ export default function TestOption() {
             <div className={style.cardContainer}>
                 <Link href={"/request/services/precision-oncology"}>
                     <div className={style.card}>
-                            <img src={"/home_main.jpg"} alt={"Precision Oncology"}/>
+                            <Image src={homeMainImg} alt={"Precision Oncology"}/>
                             <div className={style.cardLabel}>Precision Oncology</div>
                     </div>
                 </Link>
                 <Link href={"/request/services/pre-and-neonatal"}>
                     <div className={style.card}>
-                            <img src={"/home_main.jpg"} alt={">Pre & neonatal"}/>
+                            <Image src={homeMainImg} alt={">Pre & neonatal"}/>
                             <div className={style.cardLabel}>Pre & neonatal</div>
                     </div>
                 </Link>
                 <Link href={"/request/services/rare-disease"}>
                     <div className={style.card}>
-                            <img src={"/home_main.jpg"} alt={"Rare disease"}/>
+                            <Image src={homeMainImg} alt={"Rare disease"}/>
                             <div className={style.cardLabel}>Rare disease</div>
                     </div>
                 </Link>
                 <Link href={"/request/services/health-checkup"}>
                     <div className={style.card}>
-                        <img src={"/home_main.jpg"} alt={"Health Checkup & Others"}/>
+                        <Image src={homeMainImg} alt={"Health Checkup & Others"}/>
                         <div className={style.cardLabel}>Health Checkup & Others</div>
                     </div>
                 </Link>
