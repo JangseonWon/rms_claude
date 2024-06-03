@@ -42,7 +42,6 @@ class RequestRouter(
                             sampleId = sample
                             serviceId = service
                             this.sample!!.id = sampleId
-                            this.sample.patientSerial = patient!!.serial
                         }) }
                    .flatMap { requestHandler.checkRequest(order, sample, service) }
                    .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
@@ -74,9 +73,12 @@ class RequestRouter(
         return authenticationHandler.principal(request)
             .zipWith(request.bodyToMono(Query::class.java))
             .flatMap { requestHandler.selectRequests(it.t1.user, status.get(), it.t2.copy(page= it.t2.page - 1)) }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
-            .onErrorResume(DataAccessException::class.java)  {e ->  ColumnNotFoundException(e).toServerResponse()}
-            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
+            .flatMap { ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Total-Page", it.totalPage.toString())
+                .bodyValue(it) }
+//            .onErrorResume(DataAccessException::class.java)  {e ->  ColumnNotFoundException(e).toServerResponse()}
+//            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+//            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
     }
 }

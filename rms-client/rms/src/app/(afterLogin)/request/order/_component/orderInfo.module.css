@@ -1,0 +1,60 @@
+.modalBackground {
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.4);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+.modal {
+    background: #ffffff;
+    position: relative;
+    top: 5%;
+    max-width: 80vw;
+    max-height: 80vh;
+    min-width: 50vw;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    padding: 30px;
+}
+.modalTitle {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+.modalTitle h1 {
+    font-size: 32px;
+}
+.modalTitle button {
+    border: none;
+    background-color: white;
+    border-radius: 50%;
+    font-size: 25px;
+    cursor: pointer;
+}
+.modalTitle button:hover {
+    background-color: #C8C9CB;
+}
+.modalContent .content {
+    display: flex;
+    flex-wrap: wrap;
+}
+.modalContent .content .title {
+    flex-basis: 100%;
+    margin: 20px 0 5px 0;
+    color: #002b49;
+    font-size: 18px;
+    font-weight: 700;
+}
+.modalContent .content > * {
+    padding-right: 20px;
+}
+.modalBottom {
+    padding: 0 20px;
+    display: flex;
+    justify-content: flex-end;
+}

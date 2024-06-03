@@ -31,6 +31,7 @@ interface RequestDao {
                     SERVICE.CATEGORY_ID
                 ).`as`("service"),
                 ORDER.SERIAL,
+                ORDER.ID,
                 REQUEST.USER_SERVICE_ID,
                 REQUEST.STATUS,
                 REQUEST.MEMO,
@@ -78,7 +79,10 @@ interface RequestDao {
                                     key("name").value(ORGANIZATION.NAME),
                                     key("type").value(ORGANIZATION.TYPE),
                                     key("registration_number").value(ORGANIZATION.REGISTRATION_NUMBER),
-                                    key("nursing_number").value(ORGANIZATION.NURSING_NUMBER)
+                                    key("nursing_number").value(ORGANIZATION.NURSING_NUMBER),
+                                    key("user").value(jsonObject(
+                                        key("id").value(ORGANIZATION.USER_ID)
+                                    ))
                                 )
                             )
                         )
@@ -117,7 +121,7 @@ interface RequestDao {
                 .orderBy(field(query.sortBy).sort(asc))
                 .limit(query.size)
                 .offset(query.page*query.size)
-        ).map (Request::toPatientModel)
+        ).map { record -> Request.toPatientModel(record) }
     }
 
     fun DSLContext.selectRequestsCount(query: Query, where: Condition, userDto: User): Mono<Int> {

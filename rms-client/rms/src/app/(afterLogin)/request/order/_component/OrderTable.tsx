@@ -1,25 +1,25 @@
 "use client"
 
-import React, {useEffect, useState} from "react";
-import style from "@/app/(afterLogin)/request/result/resample/_component/reSampleTable.module.css";
-import type {Organization} from "@/model/Organization";
-import type {Page} from "@/model/Page"
-import {faAngleLeft, faAngleRight, faDownload} from "@fortawesome/free-solid-svg-icons";
+import style from "@/app/(afterLogin)/request/order/_component/orderTable.module.css";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {fetchOrganization} from "@/app/(afterLogin)/user/_api/fetchOrganization";
-import {useSession} from "next-auth/react";
+import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
+import React, {useEffect, useState} from "react";
 import type {Request} from "@/model/Request";
-import {fetchFinishedOrder} from "@/app/(afterLogin)/request/result/download/_api/fetchFinishedOrder";
+import type {Page} from "@/model/Page";
+import {format} from "date-fns";
+import {useRouter} from "next/navigation";
+import {getRequestOrders} from "@/app/(afterLogin)/request/order/_api/getRequestOrders";
+import {faFileLines} from "@fortawesome/free-regular-svg-icons/faFileLines";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;
 }
 
-export default function ReSampleTable() {
+export default function OrderTable() {
     const [requestData, setRequestData] = useState<RequestWithSelected[]>([]);
+    const [page, setPage] = useState<Page>({size:5, number:1});
+    const router = useRouter();
     const isSelectedAll = requestData.every((row) => row.isSelected);
-    const [page, setPage] = useState<Page>({size:5, number:1})
-    const { data: session, status } = useSession();
 
     useEffect(() => {
         fetchData(page)
@@ -30,7 +30,7 @@ export default function ReSampleTable() {
     };
     const handlePageSizeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const newSize = parseInt(event.target.value);
-        setPage((prevPage) => ({ ...prevPage, size: newSize }));
+        setPage((prevPage) => ({ ...prevPage, size: newSize, number: 1 }));
     };
 
     const handleSelectChange = (rowIndex: number, isSelected: boolean) => {
@@ -46,21 +46,23 @@ export default function ReSampleTable() {
         );
     };
 
-    const handleRequestOnClick = () => {
-        alert("request");
-    }
-    const handleClosedOnClick = () => {
-        alert("closed");
+    const handleInfoOnclick = () => {
+        alert("test");
     }
 
     const fetchData = async (page: Page) => {
-        const response = await fetchFinishedOrder(session?.user?.id, page);
+        const response = await getRequestOrders(page);
         const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
         const responseData = await response.json();
         const data = responseData.data;
 
         setRequestData(data as Request[]);
         setPage(prevPage => ({ ...prevPage, totalPage: totalPage }));
+    };
+
+
+    const handleRowClick = (row: RequestWithSelected) => {
+        router.push(`/request/cart/info?order=${row.order_id}&service=${row.service!.id}&sample=${row.sample!.id}&user_id=${row.sample!.patient!.organization!.user!.id}`);
     };
 
     return (
@@ -79,13 +81,15 @@ export default function ReSampleTable() {
                             <span className={style.checkmark}></span>
                         </label>
                     </th>
-                    <th>Registration Number</th>
+                    <th>Service Name</th>
                     <th>Patient(s) Name</th>
+                    <th>Patient BOD<br/>(DD/MM/YYYY)</th>
+                    <th>Gender</th>
+                    <th>Physician Name</th>
+                    <th>Collection Date<br/>(DD/MM/YYYY)</th>
                     <th>MRN</th>
-                    <th>Resample Notice<br/>(YYYY/MM/DD)</th>
-                    <th>Reason</th>
-                    <th>Resample</th>
-                    <th>Closed</th>
+                    <th>Service Code</th>
+                    <th>Info</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -102,17 +106,17 @@ export default function ReSampleTable() {
                                 <span className={style.checkmark}></span>
                             </label>
                         </td>
-                        <td>
-                            {row.sample?.barcode
-                                ? `${row.sample.barcode.slice(0, 8)}-${row.sample.barcode.slice(8, 11)}-${row.sample.barcode.slice(11)}`
-                                : ''}
-                        </td>
+                        <td>{row.service?.name}</td>
                         <td>{row.sample?.patient?.name}</td>
+                        <td>{row.sample?.patient?.birth_day}-{row.sample?.patient?.birth_month}-{row.sample?.patient?.birth_year}</td>
+                        <td>{row.sample?.patient?.sex}</td>
+                        <td>{row.physician}</td>
+                        <td>{row.sample?.sampling_on ? format(new Date(row.sample.sampling_on), "dd-MM-yyyy") : '-'}</td>
                         <td>{row.sample?.patient?.serial}</td>
-                        <td>{row.resample_at ? new Date(row.resample_at).toLocaleDateString() : 'N/A'}</td>
-                        <td>{row.sample?.resample_reason}</td>
-                        <td className={style.request} onClick={handleRequestOnClick}>Request</td>
-                        <td className={style.closed} onClick={handleClosedOnClick}>Closed</td>
+                        <td>{row.service?.id}</td>
+                        <td>
+                            <FontAwesomeIcon icon={faFileLines} className={style.info} onClick={handleInfoOnclick}/>
+                        </td>
                     </tr>
                 ))}
                 </tbody>
@@ -120,7 +124,7 @@ export default function ReSampleTable() {
             <div className={style.pagination}>
                 <span>items per page:</span>
                 <div className={style.select}>
-                    <select onChange={handlePageSizeChange}>
+                    <select onChange={handlePageSizeChange} defaultValue={page.size}>
                         <option value="5">5</option>
                         <option value="10">10</option>
                         <option value="20">20</option>
@@ -139,5 +143,5 @@ export default function ReSampleTable() {
                 </button>
             </div>
         </div>
-    );
+    )
 }

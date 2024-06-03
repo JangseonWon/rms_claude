@@ -93,7 +93,11 @@ export default function DownloadTable() {
                                 <span className={style.checkmark}></span>
                             </label>
                         </td>
-                        <td>{row.serial}</td>
+                        <td>
+                            {row.sample?.barcode
+                            ? `${row.sample.barcode.slice(0, 8)}-${row.sample.barcode.slice(8, 11)}-${row.sample.barcode.slice(11)}`
+                            : ''}
+                        </td>
                         <td>{row.sample?.patient?.name}</td>
                         <td>{row.sample?.patient?.serial}</td>
                         <td>{row.sample?.patient?.organization?.id}</td>

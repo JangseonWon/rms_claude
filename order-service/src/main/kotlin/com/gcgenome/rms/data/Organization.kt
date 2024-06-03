@@ -16,5 +16,7 @@ data class Organization(
     @JsonProperty("branch_code")
     val branchCode:String?,
     @JsonProperty("branch_name")
-    val branchName:String?
+    val branchName:String?,
+    @JsonProperty("user")
+    val user: UserId?,
 )
