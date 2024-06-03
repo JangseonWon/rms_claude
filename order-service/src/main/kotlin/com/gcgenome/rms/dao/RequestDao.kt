@@ -52,6 +52,7 @@ interface RequestDao {
                 REQUEST.PRICE,
                 REQUEST.OUTSOURCING_COST,
                 jsonObject(
+                    key("id").value(SAMPLE.ID),
                     key("barcode").value(SAMPLE.BARCODE),
                     key("user_sample_id").value(SAMPLE.USER_SAMPLE_ID),
                     key("quantity").value(SAMPLE.QUANTITY),
@@ -241,6 +242,7 @@ interface RequestDao {
                 REQUEST.PRICE,
                 REQUEST.OUTSOURCING_COST,
                 jsonObject(
+                    key("id").value(SAMPLE.ID),
                     key("barcode").value(SAMPLE.BARCODE),
                     key("user_sample_id").value(SAMPLE.USER_SAMPLE_ID),
                     key("quantity").value(SAMPLE.QUANTITY),
