@@ -220,6 +220,7 @@ interface RequestDao {
                     SERVICE.CATEGORY_ID
                 ).`as`("service"),
                 ORDER.SERIAL,
+                ORDER.ID,
                 REQUEST.USER_SERVICE_ID,
                 REQUEST.STATUS,
                 REQUEST.MEMO,
@@ -267,7 +268,10 @@ interface RequestDao {
                                     key("name").value(ORGANIZATION.NAME),
                                     key("type").value(ORGANIZATION.TYPE),
                                     key("registration_number").value(ORGANIZATION.REGISTRATION_NUMBER),
-                                    key("nursing_number").value(ORGANIZATION.NURSING_NUMBER)
+                                    key("nursing_number").value(ORGANIZATION.NURSING_NUMBER),
+                                    key("user").value(jsonObject(
+                                        key("id").value(ORGANIZATION.USER_ID)
+                                    ))
                                 )
                             )
                         )
@@ -300,5 +304,5 @@ interface RequestDao {
                 .where(REQUEST.ORDER_ID.eq(orderId)
                     .and(REQUEST.SAMPLE_ID.eq(sampleId))
                     .and(REQUEST.SERVICE_ID.eq(serviceId)))
-        ).map(Request::toPatientModel)
+        ).map { record -> Request.toPatientModel(record) }
 }
