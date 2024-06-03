@@ -44,7 +44,7 @@ class ResampleHandler(
                             .then(deleteRequestById(orderId, sampleId, serviceId))
                             .then(deleteSampleExtensionBySampleId(sampleId))
                             .then(deleteSampleById(sampleId))
-                            .flatMap {deletePatientById(request.patient!!, user.id) }
+                            .flatMap {deletePatientById(request.sample!!.patient!!, user.id) }
                             .then(deleteOrderById(orderId))
                     }
             }

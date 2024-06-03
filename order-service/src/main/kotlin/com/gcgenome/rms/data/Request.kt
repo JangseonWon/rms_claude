@@ -8,8 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
 import com.gcgenome.rms.tables.references.ORDER
 import com.gcgenome.rms.tables.references.REQUEST
-import org.jooq.JSON
-import org.jooq.Record22
+import org.jooq.Record
 import java.time.LocalDateTime
 import java.util.*
 
@@ -75,19 +74,15 @@ data class Request(
     val price: Int?,
     @JsonProperty("outsourcing_cost")
     val outsourcingCost: Int?,
-    @JsonProperty("patient")
-    val patient: Patient?,
     @JsonProperty("sample")
     val sample: Sample?
 ) {
     constructor(orderId: UUID, serviceId: String, sampleId: UUID) :
-            this(orderId, serviceId, null, sampleId, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
+            this(orderId, serviceId, null, sampleId, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
     companion object {
-        fun toPatientModel(record: Record22<JSON?, String?, String?, String?, String?, String?, String?, String?,
-                LocalDateTime?, LocalDateTime?, LocalDateTime?, LocalDateTime?, LocalDateTime?, LocalDateTime?,
-                String?, String?, String?, Boolean?, Boolean?, Int?, Int?, JSON?>) =
+        fun toPatientModel(record: Record) =
             Request(
-                orderId = null,
+                orderId = record.get(ORDER.ID),
                 serviceId = null,
                 service = record.get("service", Service::class.java),
                 sampleId = null,
@@ -111,7 +106,6 @@ data class Request(
                 credit = record.get(REQUEST.CREDIT),
                 price = record.get(REQUEST.PRICE),
                 outsourcingCost = record.get(REQUEST.OUTSOURCING_COST),
-                patient = null,
                 sample = record.get("sample", Sample::class.java),
             )
     }
