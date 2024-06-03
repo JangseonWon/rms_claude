@@ -1,6 +1,4 @@
-import {Page} from "@/model/Page";
-
-export async function fetchOrganization(userId: string | undefined, page: Page) {
+export async function fetchOrganization(userId: string | undefined, pageSize: number, pageNumber: number) {
     const res = await fetch(`/w-api/organization-service/organizations`, {
         method: 'POST',
         headers: {
@@ -13,8 +11,8 @@ export async function fetchOrganization(userId: string | undefined, page: Page) 
             }],
             sort_by: "user_id",
             asc: false,
-            size: page.size,
-            page: page.number
+            size: pageSize,
+            page: pageNumber
         }),
         credentials: 'include',
         cache: 'no-store'

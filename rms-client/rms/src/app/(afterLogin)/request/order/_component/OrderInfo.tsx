@@ -1,45 +1,35 @@
 "use client"
 
-import style from "@/app/(afterLogin)/request/cart/_component/info.module.css"
+import style from "@/app/(afterLogin)/request/order/_component/orderInfo.module.css";
 import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useRouter, useSearchParams} from "next/navigation";
-import SelectBox from "@/app/_component/SelectBox"
-import {useEffect, useState} from "react";
-import {getRequest} from "@/app/(afterLogin)/request/cart/_api/getRequest";
+import {useCallback, useEffect, useState} from "react";
 import {Request} from "@/model/Request"
 import InputBox from "@/app/_component/InputBox";
 import Loading from "@/app/(afterLogin)/_component/Loading";
-import {getOrganization} from "@/app/(afterLogin)/request/cart/_api/getOrganization";
-import {Organization} from "@/model/Organization";
-import {SelectBoxOption} from "@/model/SelectBoxOption";
-import GreenButton from "@/app/_component/GreenButton";
-import {updateRequest} from "@/app/(afterLogin)/request/cart/_api/updateRequest";
-import {getSampleType} from "@/app/(afterLogin)/request/cart/_api/getSampleType";
-import {SampleType} from "@/model/SampleType";
-import DatePickerBox from "@/app/_component/DatePickerBox";
+import {getRequestOrderInfo} from "@/app/(afterLogin)/request/order/_api/getRequestOrderInfo";
 
 
 export default function OrderInfo() {
     const [request, setRequest] = useState<Request>()
-    const [organizationOptions, setOrganizationOptions] = useState<SelectBoxOption[]>([])
-    const [sampleTypeOptions, setSampleTypeOptions] = useState<SelectBoxOption[]>([])
     const router = useRouter();
     const searchParams = useSearchParams()
-    const orderId = searchParams.get("order")
-    const serviceId = searchParams.get("service")
-    const sampleId = searchParams.get("sample")
-    const userId = searchParams.get("user_id")
+    const orderId = searchParams!.get("order")
+    const serviceId = searchParams!.get("service")
+    const sampleId = searchParams!.get("sample")
 
     const onClickClose = () => {
         router.back();
     };
+
     const handleRequestChange = (path: string, value: any) => {
         setRequest(prevState => ({
             ...prevState,
             ...setNestedValue({ ...prevState }, path, value)
         }));
     };
+
     const setNestedValue = (object: any, nestedPath: string, newValue: any): any => {
         const [firstKey, ...remainingPathSegments] = nestedPath.split('.');
         if (remainingPathSegments.length === 0) {
@@ -54,64 +44,32 @@ export default function OrderInfo() {
         };
     };
 
+    const fetchRequest = useCallback(async () => {
+        const response = await getRequestOrderInfo(orderId!, serviceId!, sampleId!)
+        const json = await response.json()
+        setRequest(json as Request)
+    },[orderId, serviceId, sampleId]);
+
+    const formatDate = (date: Date): string => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    const getDateFromComponents = (year?: number, month?: number, day?: number): string | undefined => {
+        if (!year || !month || !day) return undefined;
+        const date = new Date(year, month - 1, day);
+        return formatDate(date);
+    };
     useEffect(() => {
         fetchRequest()
-        fetchOrganization()
-        fetchSampleType()
         const handleKeyPress = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {router.back();}
         };
         window.addEventListener('keydown', handleKeyPress);
         return () => {window.removeEventListener('keydown', handleKeyPress);};
-    }, [router]);
-
-    const fetchRequest = async () => {
-        const response = await getRequest(orderId!, serviceId!, sampleId!);
-        const data = await response.json();
-        setRequest(data as Request)
-    };
-    const fetchOrganization = async () => {
-        const response = await getOrganization(userId!);
-        const data = await response.json();
-        setOrganizationOptions(transformOrganizationsToOptions(data as Organization[]));
-    };
-    const fetchSampleType = async () => {
-        const response = await getSampleType(serviceId!)
-        const data = await response.json();
-        setSampleTypeOptions(transformSampleTypeToOptions(data as SampleType[]))
-    }
-    const transformOrganizationsToOptions = (organizations: Organization[]): SelectBoxOption[] => {
-        return organizations.map(org => ({
-            value: org.id,
-            name: org.name
-        }));
-    };
-    const transformSampleTypeToOptions = (sampleTypes: SampleType[]): SelectBoxOption[] => {
-        return sampleTypes.map(sampleType => ({
-            value: sampleType.id,
-            name: sampleType.name
-        }));
-    };
-    const handleEditClick = async () => {
-        if (validateRequest()) {
-            const response = await updateRequest(request!);
-            if (response.ok) alert("Success update")
-            else alert("Fail update")
-        } else {
-            alert("Please fill out all required fields.");
-        }
-    };
-    const validateRequest = () => {
-        if (!request?.sample?.patient?.name) return false;
-        if (!request?.sample?.patient?.serial) return false;
-        if (!request?.sample?.sample_type?.name) return false;
-        if (!request?.sample?.quantity) return false;
-        return true;
-    };
-    const getDateFromComponents = (year?: number, month?: number, day?: number): Date | undefined => {
-        if (!year || !month || !day) return undefined;
-        return new Date(year, month - 1, day);  // Month is zero-based in JavaScript Date
-    }
+    }, [fetchRequest, router]);
 
     return (
         <div className={style.modalBackground}>
@@ -126,14 +84,10 @@ export default function OrderInfo() {
                     <div className={style.modalContent}>
                         <div className={style.content}>
                             <p className={style.title}>Institution name*</p>
-                            <SelectBox
-                                label={""}
+                            <InputBox
+                                label={"Institution"}
                                 value={request.sample?.patient?.organization?.name}
-                                options={organizationOptions}
-                                onChange={(value) => {
-                                    handleRequestChange('sample.patient.organization.id', value.value)
-                                    handleRequestChange('sample.patient.organization.name', value.name)
-                                }}
+                                disabled={true}
                             />
                         </div>
                         <div className={style.content}>
@@ -150,55 +104,46 @@ export default function OrderInfo() {
                                 label={"Name*"}
                                 value={request.sample?.patient?.name}
                                 onChange={(value) => handleRequestChange('sample.patient.name', value)}
-                                required={true}
+                                disabled={true}
                             />
                             <InputBox
                                 label={"MRN*"}
                                 value={request.sample?.patient?.serial}
                                 onChange={(value) => handleRequestChange('sample.patient.serial', value)}
-                                required={true}
+                                disabled={true}
                             />
-                            <DatePickerBox
+                            <InputBox
                                 label={"Date of Birth"}
                                 value={getDateFromComponents(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}
-                                onChange={(date) => {
-                                    handleRequestChange('sample.patient.birth_year', date.getFullYear());
-                                    handleRequestChange('sample.patient.birth_month', date.getMonth());
-                                    handleRequestChange('sample.patient.birth_day', date.getDay());
-                                }}
+                                disabled={true}
                             />
                             <InputBox
                                 label={"Age"}
                                 value={request.sample?.age}
-                                onChange={(value) => handleRequestChange('sample.age', value)}
+                                disabled={true}
                             />
                         </div>
                         <div className={style.content}>
                             <p className={style.title}>Specimen/.Sample Info.</p>
-                            <SelectBox
+                            <InputBox
                                 label={"Type*"}
                                 value={request.sample?.sample_type?.name}
-                                options={sampleTypeOptions}
-                                onChange={(value) => {
-                                    handleRequestChange('sample.sample_type.id', value.value)
-                                    handleRequestChange('sample.sample_type.name', value.name)
-                                }}
+                                disabled={true}
                             />
-                            <DatePickerBox
+                            <InputBox
                                 label={"Date or collection*"}
                                 value={request.sample?.sampling_on}
-                                onChange={(date) => handleRequestChange('sample.sampling_on', date)}
+                                disabled={true}
                             />
                             <InputBox
                                 label={"Quantity*"}
                                 value={request.sample?.quantity?.toString()}
-                                required={true}
-                                onChange={(value) => handleRequestChange('sample.quantity', value)}
+                                disabled={true}
                             />
                             <InputBox
                                 label={"Memo"}
                                 value={request.memo}
-                                onChange={(value) => handleRequestChange('memo', value)}
+                                disabled={true}
                             />
                         </div>
                         <div className={style.content}>
@@ -206,17 +151,17 @@ export default function OrderInfo() {
                             <InputBox
                                 label={"Medical Department"}
                                 value={request.department}
-                                onChange={(value) => handleRequestChange('department', value)}
+                                disabled={true}
                             />
                             <InputBox
                                 label={"Ward"}
                                 value={request.ward}
-                                onChange={(value) => handleRequestChange('ward', value)}
+                                disabled={true}
                             />
                             <InputBox
                                 label={"Physician Name"}
                                 value={request.physician}
-                                onChange={(value) => handleRequestChange('physician', value)}
+                                disabled={true}
                             />
                         </div>
                     </div>

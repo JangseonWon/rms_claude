@@ -1,6 +1,6 @@
 import style from "@/app/_component/selectBox.module.css"
 import React, {useEffect, useRef, useState} from "react";
-import {faChevronDown, faChevronUp} from "@fortawesome/free-solid-svg-icons";
+import {faChevronDown} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 

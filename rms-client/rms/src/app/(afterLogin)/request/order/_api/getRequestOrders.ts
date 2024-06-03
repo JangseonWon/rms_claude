@@ -1,6 +1,4 @@
-import {Page} from "@/model/Page";
-
-export async function getRequestOrders(page: Page) {
+export async function getRequestOrders(pageSize: number, pageNumber: number) {
     const res = await fetch(`/w-api/order-service/requests?status=order`, {
         method: 'POST',
         headers: {
@@ -11,8 +9,8 @@ export async function getRequestOrders(page: Page) {
             }],
             sort_by: "last_modify_at",
             asc: false,
-            size: page.size,
-            page: page.number
+            size: pageSize,
+            page: pageNumber
         }),
         credentials: 'include',
         cache: 'no-store'

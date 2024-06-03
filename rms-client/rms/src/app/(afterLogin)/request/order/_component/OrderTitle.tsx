@@ -1,6 +1,6 @@
 "use client"
 
-import style from "@/app/(afterLogin)/request/cart/_component/title.module.css"
+import style from "@/app/(afterLogin)/request/order/_component/orderTitle.module.css";
 
 export default function OrderTitle() {
     return (

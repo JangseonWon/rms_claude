@@ -1,6 +1,6 @@
 "use client"
 
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import style from "@/app/(afterLogin)/user/_component/institutionTable.module.css";
 import type {Organization} from "@/model/Organization";
 import type {Page} from "@/model/Page"
@@ -15,10 +15,6 @@ export default function InstitutionTable() {
     const [page, setPage] = useState<Page>({size:5, number:1})
     const { data: session, status } = useSession();
 
-    useEffect(() => {
-        fetchData(page)
-    }, [page.number, page.size]);
-
     const handlePageChange = (newPageNumber: number) => {
         setPage(prevPage =>({...prevPage, number: newPageNumber}));
     };
@@ -27,15 +23,19 @@ export default function InstitutionTable() {
         setPage((prevPage) => ({ ...prevPage, size: newSize }));
     };
 
-    const fetchData = async (page: Page) => {
-        const response = await fetchOrganization(session?.user?.id, page);
+    const fetchData = useCallback(async (pageSize: number, pageNumber: number) => {
+        const response = await fetchOrganization(session?.user?.id, pageSize, pageNumber);
         const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
         const responseData = await response.json();
         const data = responseData.data;
 
         setOrganizationData(data as Organization[]);
         setPage(prevPage => ({ ...prevPage, totalPage: totalPage }));
-    };
+    }, [session?.user?.id]);
+
+    useEffect(() => {
+        fetchData(page.size, page.number)
+    }, [page.size, page.number, fetchData]);
 
     return (
         <div className={style.container}>
@@ -51,7 +51,7 @@ export default function InstitutionTable() {
                 </thead>
                 <tbody>
                 {organizationData.map((row) => (
-                    <tr>
+                    <tr key={row.id + row.name! + row.type + row.user}>
                         <td>{row.name}</td>
                         <td>{row.type}</td>
                         <td>{row.registration_number}</td>

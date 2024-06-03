@@ -2,6 +2,7 @@
 
 import style from "@/app/_component/inputBox.module.css"
 import {ChangeEventHandler, useEffect, useState} from "react";
+
 type Props = {
     label?: string
     value?: any

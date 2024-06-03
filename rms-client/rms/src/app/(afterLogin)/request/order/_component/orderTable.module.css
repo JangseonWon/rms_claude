@@ -25,7 +25,7 @@
 }
 .table tbody tr {
     border-bottom: 1px solid #838689;
-    cursor: pointer;
+    /*cursor: pointer;*/
 }
 .table tbody tr:nth-child(even) {
     background-color: #ffffff;
@@ -34,7 +34,7 @@
     background-color: #EBECEE; /* 홀수 행의 배경색을 원하는 색상으로 지정합니다. */
 }
 .table tbody tr:hover {
-    background-color: #D5D5D5;
+    /*background-color: #D5D5D5;*/
 }
 .table tbody tr td {
     color: #666666;
@@ -131,6 +131,9 @@
 
 .checkbox input:checked + .checkmark:after {
     display: block;
+}
+.info {
+    cursor: pointer;
 }
 .info:hover {
     color: #002b49;

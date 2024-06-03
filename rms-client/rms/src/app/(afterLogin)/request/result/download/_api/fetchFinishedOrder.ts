@@ -1,6 +1,4 @@
-import {Page} from "@/model/Page";
-
-export async function fetchFinishedOrder(userId: string | undefined, page: Page) {
+export async function fetchFinishedOrder(userId: string | undefined, pageSize: number, pageNumber: number) {
     const res = await fetch(`/w-api/order-service/requests?status=confirm`, {
         method: 'POST',
         headers: {
@@ -11,8 +9,8 @@ export async function fetchFinishedOrder(userId: string | undefined, page: Page)
             }],
             sort_by: "last_modify_at",
             asc: false,
-            size: page.size,
-            page: page.number
+            size: pageSize,
+            page: pageNumber
         }),
         credentials: 'include',
         cache: 'no-store'

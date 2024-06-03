@@ -1,6 +1,6 @@
 "use client"
 
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import style from "@/app/(afterLogin)/request/result/download/_component/downloadTable.module.css";
 import type {Page} from "@/model/Page"
 import {faAngleLeft, faAngleRight, faDownload} from "@fortawesome/free-solid-svg-icons";
@@ -18,10 +18,6 @@ export default function DownloadTable() {
     const isSelectedAll = requestData.every((row) => row.isSelected);
     const [page, setPage] = useState<Page>({size:5, number:1})
     const { data: session, status } = useSession();
-
-    useEffect(() => {
-        fetchData(page)
-    }, [page.number, page.size]);
 
     const handlePageChange = (newPageNumber: number) => {
         setPage(prevPage =>({...prevPage, number: newPageNumber}));
@@ -44,15 +40,18 @@ export default function DownloadTable() {
         );
     };
 
-    const fetchData = async (page: Page) => {
-        const response = await fetchFinishedOrder(session?.user?.id, page);
+    const fetchData = useCallback(async (pageSize: number, pageNumber: number) => {
+        const response = await fetchFinishedOrder(session?.user?.id, pageSize, pageNumber);
         const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
         const responseData = await response.json();
         const data = responseData.data;
-
         setRequestData(data as Request[]);
         setPage(prevPage => ({ ...prevPage, totalPage: totalPage }));
-    };
+    }, [session?.user?.id]);
+
+    useEffect(() => {
+        fetchData(page.size, page.number)
+    }, [page.size, page.number, fetchData]);
 
     return (
         <div className={style.container}>
@@ -81,7 +80,7 @@ export default function DownloadTable() {
                 </thead>
                 <tbody>
                 {requestData.map((row , rowIndex) => (
-                    <tr>
+                    <tr key={row.order_id! + row.service!.id + row.sample!.id}>
                         <td>
                             <label form="agree" className={style.checkbox}>
                                 <input

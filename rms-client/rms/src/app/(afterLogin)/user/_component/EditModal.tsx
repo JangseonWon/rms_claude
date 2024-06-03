@@ -52,6 +52,8 @@ export default function EditModal(id?: EditModalProps) {
     );
 }
 
+EditModal.displayName = "EditModal";
+
 const Backdrop = React.forwardRef<
     HTMLDivElement,
     { open?: boolean; className: string }
@@ -65,6 +67,8 @@ const Backdrop = React.forwardRef<
         />
     );
 });
+
+Backdrop.displayName = "Backdrop";
 
 const Modal = styled(BaseModal)`
     position: fixed;
