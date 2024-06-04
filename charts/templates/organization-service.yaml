@@ -97,7 +97,7 @@ spec:
               mountPath: /app/resources/authentication.yaml
               subPath: authentication.yaml
           terminationMessagePolicy: File
-          image: 'image-registry.openshift-image-registry.svc:5000/rms-test/organization-service:latest'
+          image: 'image-registry.openshift-image-registry.svc:5000/{{ .Release.Namespace }}/organization-service:latest'
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst
@@ -115,7 +115,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: rms-organization-service
-  namespace: rms-test
+  namespace: {{ .Release.Namespace }}
 spec:
   type: ClusterIP
   ports:
