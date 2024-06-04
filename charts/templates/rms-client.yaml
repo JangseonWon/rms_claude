@@ -1,0 +1,74 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  annotations:
+    alpha.image.policy.openshift.io/resolve-names: '*'
+    app.openshift.io/route-disabled: 'false'
+    app.openshift.io/vcs-uri: 'https://github.com/GC-Genome/rms.git'
+    reloader.stakater.com/auto: 'true'
+  name: client
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: rms-client
+    app.openshift.io/runtime: nodejs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rms-client
+  template:
+    metadata:
+      labels:
+        app: rms-client
+      annotations:
+        sidecar.istio.io/inject: 'true'
+    spec:
+      containers:
+        - resources: {}
+          terminationMessagePath: /dev/termination-log
+          name: rms-client
+          env:
+            - name: TZ
+              value: Asia/Seoul
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          imagePullPolicy: IfNotPresent
+          terminationMessagePolicy: File
+          image: 'image-registry.openshift-image-registry.svc:5000/{{ .Release.Namespace }}/rms-client:latest'
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 2
+  progressDeadlineSeconds: 600
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: rms-client
+  namespace: {{ .Release.Namespace }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: 80-tcp
+      protocol: TCP
+      port: 80
+      targetPort: 3000
+  selector:
+    app: rms-client
+---
+kind: ImageStream
+apiVersion: image.openshift.io/v1
+metadata:
+  name: rms-client
+  namespace: {{ .Release.Namespace }}
+spec:
+  lookupPolicy:
+    local: false
