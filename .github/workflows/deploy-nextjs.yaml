@@ -1,4 +1,4 @@
-name: 백엔드 배포
+name: 프론트엔드 배포
 on:
   push:
     branches:

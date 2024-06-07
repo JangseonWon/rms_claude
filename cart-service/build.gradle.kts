@@ -19,6 +19,7 @@ dependencies {
     implementation(project(":authentication"))
     jooqGenerator("org.postgresql:postgresql:42.6.0")
 }
+
 jib {
     from { image = "eclipse-temurin:17.0.7_7-jre-jammy" }
     container { environment = mapOf(
