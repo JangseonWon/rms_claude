@@ -17,6 +17,7 @@ export default function ProfileButton({session}: Props) {
     const [showDropdown, setShowDropdown] = useState(false);
     const router = useRouter()
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const timerRef = useRef<NodeJS.Timeout | null>(null);
 
     const onLogout = () =>{
         signOut({redirect: false})
@@ -32,8 +33,17 @@ export default function ProfileButton({session}: Props) {
         router.push('/user')
     }
 
-    const toggleDropdown = () => {
-        setShowDropdown((prev) => !prev);
+    const handleMouseEnter = () => {
+        if (timerRef.current) {
+            clearTimeout(timerRef.current);
+        }
+        setShowDropdown(true);
+    };
+
+    const handleMouseLeave = () => {
+        timerRef.current = setTimeout(() => {
+            setShowDropdown(false);
+        }, 300);
     };
 
     const handleClickOutside = (event: MouseEvent) => {
@@ -54,8 +64,8 @@ export default function ProfileButton({session}: Props) {
     }, [showDropdown]);
 
     return(
-        <>
-            <div className={style.profile} onClick={toggleDropdown}>
+        <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+            <div className={style.profile}>
                 <FontAwesomeIcon icon={faUser} />
                 <span>{session?.user?.name}</span>
                 <FontAwesomeIcon icon={faChevronDown} />
@@ -70,6 +80,6 @@ export default function ProfileButton({session}: Props) {
                     </ul>
                 </div>
             )}
-        </>
+        </div>
     )
 }

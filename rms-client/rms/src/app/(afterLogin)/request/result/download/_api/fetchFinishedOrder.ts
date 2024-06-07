@@ -1,5 +1,5 @@
 export async function fetchFinishedOrder(userId: string | undefined, pageSize: number, pageNumber: number) {
-    const res = await fetch(`/w-api/order-service/requests?status=confirm`, {
+    const res = await fetch(`/w-api/order-service/requests?status=deliver`, {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",

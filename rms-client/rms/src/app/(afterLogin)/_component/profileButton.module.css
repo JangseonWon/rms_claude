@@ -16,7 +16,7 @@
 }
 .profileDropdown {
     position: absolute;
-    top: 1%;
+    top: -2%;
     right: 0;
     transform: translate(-20%, 40%);
     background-color: #fff;
