@@ -5,7 +5,11 @@ import com.gcgenome.rms.tables.references.REQUEST
 import com.gcgenome.rms.tables.references.SAMPLE
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
+import org.jooq.impl.DSL.*
 import reactor.core.publisher.Mono
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 interface SampleDao {
@@ -34,6 +38,27 @@ interface SampleDao {
                             .where(REQUEST.SAMPLE_ID.eq(sampleId))
                     )
                 ).returning()
+        ).map { it.into(Sample::class.java) }
+    }
+    fun DSLContext.selectSampleMaxBarcodeById(sampleId: UUID, branchSerial: String): Mono<String> {
+        val currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
+        val baseSerial = "$currentDate$branchSerial"
+        val likePattern = "$baseSerial%"
+        val defaultSerial = baseSerial + "5001"
+
+        return Mono.from(
+            select(coalesce(
+                (max(SAMPLE.BARCODE).cast(Long::class.java).plus(1)).cast(String::class.java), inline(defaultSerial)
+            )).from(SAMPLE).where(SAMPLE.BARCODE.like(likePattern))
+        ).map { it.into(String::class.java) }
+    }
+    fun DSLContext.updateSampleBarcodeAndCreateAtById(sampleId: UUID, barcode: String): Mono<Sample> {
+        return Mono.from(
+            update(SAMPLE)
+                .set(SAMPLE.BARCODE, barcode)
+                .set(SAMPLE.CREATE_AT, LocalDateTime.now())
+                .where(SAMPLE.ID.eq(sampleId))
+                .returning()
         ).map { it.into(Sample::class.java) }
     }
 }

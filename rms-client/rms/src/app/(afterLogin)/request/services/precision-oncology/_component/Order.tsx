@@ -117,7 +117,7 @@ export default function Order() {
                 <BlueButton
                     name={"Order Now"}
                     disabled={!isAllRequiredFilled()}
-                    onClick={() => publishRequest("ORDERD")}
+                    onClick={() => publishRequest("ORDERED")}
                 />
             </div>
             <p className={style.mainName}>Institution name *</p>

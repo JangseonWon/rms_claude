@@ -55,7 +55,7 @@ export default function Info() {
     };
     const fetchRequest = useCallback(async () => {
         const response = await getRequest(orderId!, serviceId!, sampleId!)
-        const json = response.json()
+        const json = await response.json()
         setRequest(json as Request)
     },[orderId, serviceId, sampleId]);
 

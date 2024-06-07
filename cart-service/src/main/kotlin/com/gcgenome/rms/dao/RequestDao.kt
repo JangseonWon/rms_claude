@@ -3,6 +3,7 @@ package com.gcgenome.rms.dao
 import com.gcgenome.rms.authentication.User
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.Request
+import com.gcgenome.rms.data.Role
 import com.gcgenome.rms.data.Status
 import com.gcgenome.rms.tables.references.*
 import org.jooq.*
@@ -22,6 +23,15 @@ interface RequestDao {
                     .and(`when`(`val`(user.role).eq("USER"), ORDER.USER_ID.eq(user.id)).else_(true)))
 
         ).map { it.into(Int::class.java) }
+    }
+    fun DSLContext.updateRequestStatusAndCreateAtById(orderId: UUID, sampleId: UUID, serviceId: String):Mono<Request> {
+        return Mono.from(
+            update(REQUEST)
+                .set(REQUEST.CREATE_AT, LocalDateTime.now())
+                .set(REQUEST.STATUS, Status.ORDERED.toString())
+                .returning()
+        ).map { it.into(Request::class.java) }
+
     }
     fun DSLContext.updateRequest(request: Request): Mono<Request> {
         return Mono.from(
@@ -85,7 +95,9 @@ interface RequestDao {
                             key("registrationNumber").value(ORGANIZATION.REGISTRATION_NUMBER),
                             key("nursingNumber").value(ORGANIZATION.NURSING_NUMBER),
                             key("user").value(jsonObject(
-                                key("id").value(ORGANIZATION.USER_ID)
+                                key("id").value(USER.ID),
+                                key("branchName").value(USER.BRANCH_NAME),
+                                key("branchSerial").value(USER.BRANCH_SERIAL)
                             ))
                         ))
                     ))
@@ -100,15 +112,16 @@ interface RequestDao {
             .join(ORGANIZATION).on(
                 PATIENT.ORGANIZATION_ID.eq(ORGANIZATION.ID)
                     .and(PATIENT.USER_ID.eq(ORGANIZATION.USER_ID)))
+            .join(USER).on(ORGANIZATION.USER_ID.eq(USER.ID))
             .join(SERVICE).on(REQUEST.SERVICE_ID.eq(SERVICE.ID))
             .where(
                 REQUEST.STATUS.eq(Status.CART.toString())
-                    .and(`when`(`val`(user.role).eq("USER"), ORDER.USER_ID.eq(user.id)).else_(true))
+                    .and(`when`(`val`(user.role).eq(Role.USER.toString()), ORDER.USER_ID.eq(user.id)).else_(true))
             )
             .groupBy(REQUEST.ORDER_ID, REQUEST.SERVICE_ID, REQUEST.SAMPLE_ID,
                 SAMPLE.ID,
                 PATIENT.SERIAL, PATIENT.ORGANIZATION_ID, PATIENT.USER_ID,
-                ORGANIZATION.ID, ORGANIZATION.USER_ID,
+                ORGANIZATION.ID, ORGANIZATION.USER_ID, USER.ID,
                 SERVICE.ID
             )
             .orderBy(SAMPLE.BARCODE)

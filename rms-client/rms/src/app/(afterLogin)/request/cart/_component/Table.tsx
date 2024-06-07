@@ -12,6 +12,7 @@ import {useRouter} from "next/navigation";
 import GreenButton from "@/app/_component/GreenButton";
 import BlueButton from "@/app/_component/BlueButton";
 import {deleteRequest} from "@/app/(afterLogin)/request/cart/_api/deleteRequest";
+import {putRequest} from "@/app/(afterLogin)/request/cart/_api/putRequest";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean; // Add an optional property for selection state
@@ -69,12 +70,25 @@ export default function Table() {
             alert(`fail: ${error}`);
         }
     };
+    const handleCartToOrder = async () => {
+        try {
+            const selectedRequests = requestData.filter(request => request.isSelected);
+            await Promise.all(selectedRequests.map(async request => {
+                const res = await putRequest(request);
+                if (!res.ok) throw new Error(`Failed to order: ${request.order_id}`);
+            }));
+            alert("ordered!");
+            fetchData(page.size, page.number);
+        } catch (error) {
+            alert(`fail: ${error}`);
+        }
+    };
 
     return (
         <div className={style.container}>
             <div className={style.buttonSection}>
                 <GreenButton name={"Back"} onClick={handleDeleteCart}/>
-                <BlueButton name={"Save & Order"}/>
+                <BlueButton name={"Save & Order"} onClick={handleCartToOrder}/>
             </div>
             <div>
                 <table className={style.table}>
