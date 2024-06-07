@@ -7,10 +7,12 @@ import {fetchUser} from "@/app/(afterLogin)/user/_api/fetchUser";
 import {User} from "@/model/User";
 import {useSession} from "next-auth/react";
 import {fetchUserUpdate} from "@/app/(afterLogin)/user/_api/fetchUserUpdate";
+import AlertDialog from "@/app/_component/AlertDialog";
 
 export default function Profile() {
     const { data: session, status } = useSession();
     const [user, setUser] = useState<User>();
+    const [showErrorDialog, setShowErrorDialog] = useState(false);
     const userBody: User = {};
     const userId: string | undefined = user?.id;
 
@@ -22,6 +24,7 @@ export default function Profile() {
                     setUser(data);
                 })
                 .catch((error) => {
+                    setShowErrorDialog(true);
                     console.error('Error fetching user:', error);
                 });
         }
@@ -50,54 +53,63 @@ export default function Profile() {
         }
     }
 
+    const closeErrorDialog = () => {
+        setShowErrorDialog(false);
+    };
+
     return (
-        <div className={style.container}>
-            <div className={style.header}>
-                User setting
+        <>
+            {showErrorDialog && (
+                <AlertDialog icon="error" message={'에러 발생했어요'} onClose={closeErrorDialog} />
+            )}
+            <div className={style.container}>
+                <div className={style.header}>
+                    User setting
+                </div>
+                <section className={style.section}>
+                    <div className={style.subTitle}>
+                        Sub Title
+                    </div>
+                    <div className={style.input}>
+                        <div className={style.inputBox}>
+                            <InputBox disabled={true} label={"ID"} value={userId || ""} />
+                        </div>
+                        <div>
+                            <InputBox label={"NAME"}
+                                      value={user?.name || ""}
+                                      onChange={(value) => handleChange('name', value)}/>
+                        </div>
+                    </div>
+                </section>
+                <section className={style.middleSection}>
+                    <div className={style.subTitle}>
+                        Sub Title
+                    </div>
+                    <div className={style.input}>
+                        <div className={style.inputBox}>
+                            <InputBox label={"EMAIL"} value={user?.email || ""}
+                                      onChange={(value) => handleChange('email', value)}/>
+                        </div>
+                        <div>
+                            <InputBox label={"PHONE-NUMBER"} value={user?.phone_number || ""}
+                                      onChange={(value) => handleChange('phone_number', value)}/>
+                        </div>
+                    </div>
+                </section>
+                <section className={style.section}>
+                    <div className={style.detailSentence}>
+                        <div className={style.detailFName}>
+                            To update your Personal details, including FName and LName, contact our
+                        </div>
+                        <div className={style.detailSupport}>
+                            &nbsp;support team.
+                        </div>
+                    </div>
+                    <div className={style.saveButton}>
+                        <GreenButton name={"Save"} onClick={handleOnClickSave} />
+                    </div>
+                </section>
             </div>
-            <section className={style.section}>
-                <div className={style.subTitle}>
-                    Sub Title
-                </div>
-                <div className={style.input}>
-                    <div className={style.inputBox}>
-                        <InputBox disabled={true} label={"ID"} value={userId || ""} />
-                    </div>
-                    <div>
-                        <InputBox label={"NAME"}
-                                  value={user?.name || ""}
-                                  onChange={(value) => handleChange('name', value)}/>
-                    </div>
-                </div>
-            </section>
-            <section className={style.middleSection}>
-                <div className={style.subTitle}>
-                    Sub Title
-                </div>
-                <div className={style.input}>
-                    <div className={style.inputBox}>
-                        <InputBox label={"EMAIL"} value={user?.email || ""}
-                                  onChange={(value) => handleChange('email', value)}/>
-                    </div>
-                    <div>
-                        <InputBox label={"PHONE-NUMBER"} value={user?.phone_number || ""}
-                                  onChange={(value) => handleChange('phone_number', value)}/>
-                    </div>
-                </div>
-            </section>
-            <section className={style.section}>
-                <div className={style.detailSentence}>
-                    <div className={style.detailFName}>
-                        To update your Personal details, including FName and LName, contact our
-                    </div>
-                    <div className={style.detailSupport}>
-                        &nbsp;support team.
-                    </div>
-                </div>
-                <div className={style.saveButton}>
-                    <GreenButton name={"Save"} onClick={handleOnClickSave} />
-                </div>
-            </section>
-        </div>
+        </>
     );
 }
