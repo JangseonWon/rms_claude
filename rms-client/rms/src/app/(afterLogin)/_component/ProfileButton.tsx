@@ -2,7 +2,7 @@
 
 import style from "./profileButton.module.css"
 import {Session} from "@auth/core/types";
-import React, {useEffect, useRef, useState} from "react";
+import React, {useRef, useState} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faUser} from "@fortawesome/free-regular-svg-icons";
 import {faChevronDown} from "@fortawesome/free-solid-svg-icons";
@@ -32,30 +32,17 @@ export default function ProfileButton({session}: Props) {
         router.push('/user')
     }
 
-    const toggleDropdown = () => {
-        setShowDropdown((prev) => !prev);
+    const handleMouseEnter = () => {
+        setShowDropdown(true);
     };
 
-    const handleClickOutside = (event: MouseEvent) => {
-        if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-            setShowDropdown(false);
-        }
+    const handleMouseLeave = () => {
+        setShowDropdown(false);
     };
-
-    useEffect(() => {
-        if (showDropdown) {
-            document.addEventListener("mousedown", handleClickOutside);
-        } else {
-            document.removeEventListener("mousedown", handleClickOutside);
-        }
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [showDropdown]);
 
     return(
-        <>
-            <div className={style.profile} onClick={toggleDropdown}>
+        <div className={style.profileContainer} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+            <div className={style.profile}>
                 <FontAwesomeIcon icon={faUser} />
                 <span>{session?.user?.name}</span>
                 <FontAwesomeIcon icon={faChevronDown} />
@@ -70,6 +57,6 @@ export default function ProfileButton({session}: Props) {
                     </ul>
                 </div>
             )}
-        </>
+        </div>
     )
 }

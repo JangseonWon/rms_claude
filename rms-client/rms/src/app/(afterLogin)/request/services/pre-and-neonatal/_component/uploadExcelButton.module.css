@@ -1,0 +1,18 @@
+.upload {
+    font-size: 0.875rem;
+    padding: 6px 10px;
+    min-width: 110px;
+    border-radius: 5px;
+    border: 1px solid #a1b86a;
+    transition: all 150ms ease;
+    background: linear-gradient(135deg, #a1b86a, #dae8ba);
+    cursor: pointer;
+    color: #182847;
+    font-weight: 600;
+    margin: 5px 5px;
+}
+.upload:hover {
+    background: linear-gradient(135deg, #63792f, #aed658);
+    color: #ffffff;
+    border: solid #dae8ba thin;
+}
