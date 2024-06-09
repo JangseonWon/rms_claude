@@ -1,6 +1,4 @@
-import {Page} from "@/model/Page";
-
-export async function getRequests(page: Page) {
+export async function getRequests(pageSize: number, pageNumber: number) {
     const res = await fetch(`/w-api/dashboard-service/requests`, {
         method: 'POST',
         headers: {
@@ -8,8 +6,8 @@ export async function getRequests(page: Page) {
         },
         body: JSON.stringify({
             page: {
-                size: page.size,
-                number: page.number
+                size: pageSize,
+                number: pageNumber
             }
         }),
         credentials: 'include',

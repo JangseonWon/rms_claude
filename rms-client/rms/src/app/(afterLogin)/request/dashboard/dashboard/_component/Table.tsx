@@ -13,8 +13,8 @@ export default function Table() {
     const [requestData, setRequestData] = useState<Request[]>([])
     const [page, setPage] = useState<Page>({size:5, number:1})
 
-    const fetchData = async (page: Page) => {
-        const response = await getRequests(page);
+    const fetchData = async (pageSize: number, pageNumber: number) => {
+        const response = await getRequests(pageSize, pageNumber);
         const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
         const data = await response.json();
         setRequestData(data as Request[]);
@@ -22,8 +22,8 @@ export default function Table() {
     };
 
     useEffect(() => {
-        fetchData(page)
-    }, [page]);
+        fetchData(page.size, page.number)
+    }, [page.size, page.number]);
 
     const handlePageChange = (newPageNumber: number) => {
         setPage(prevPage =>({...prevPage, number: newPageNumber}));
