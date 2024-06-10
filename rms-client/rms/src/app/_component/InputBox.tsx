@@ -9,8 +9,9 @@ type Props = {
     disabled?: boolean
     onChange?: (value: string) => void
     required?: boolean;
+    type?: string;
 }
-export default function InputBox({label, value, disabled=false, onChange, required=false}: Props) {
+export default function InputBox({label, value, disabled=false, onChange, required=false, type="text"}: Props) {
     const [inputValue, setInputValue] = useState('');
     const [hasError, setHasError] = useState(false);
 
@@ -28,7 +29,8 @@ export default function InputBox({label, value, disabled=false, onChange, requir
         <div className={`${style.inputBox} ${hasError ? style.error : ""}`}>
             <p className={style.label}>{label}</p>
             <input
-                type="text" value={inputValue}
+                type={type}
+                value={inputValue}
                 onChange={onChangeValue}
                 disabled={disabled}/>
         </div>

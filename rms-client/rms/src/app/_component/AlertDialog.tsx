@@ -1,7 +1,7 @@
 import style from './alertDialog.module.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React from "react";
-import {faTriangleExclamation, faCircleCheck, faBomb} from "@fortawesome/free-solid-svg-icons";
+import {faTriangleExclamation, faCircleCheck, faExclamation} from "@fortawesome/free-solid-svg-icons";
 
 type Props = {
     icon: 'warning' | 'good' | 'error';
@@ -19,7 +19,7 @@ export default function AlertDialog({ icon, message, onClose }: Props) {
             selectedIcon = faCircleCheck;
             break;
         case 'error':
-            selectedIcon = faBomb;
+            selectedIcon = faExclamation;
             break;
         default:
             selectedIcon = faTriangleExclamation;

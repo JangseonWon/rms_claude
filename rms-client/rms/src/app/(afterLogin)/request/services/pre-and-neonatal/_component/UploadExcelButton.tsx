@@ -19,7 +19,26 @@ export default function UploadExcelButton({ onFileUpload }: UploadExcelButtonPro
                 const sheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[sheetName];
                 const jsonData: (string | number)[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-                onFileUpload(jsonData);
+
+                const convertExcelDate = (excelDate: number) => {
+                    const date = new Date(Math.round((excelDate - 25569) * 86400 * 1000));
+                    return date.toISOString().split('T')[0];
+                };
+
+                const transformedData = jsonData.map((row, rowIndex) =>
+                    row.map((cell, colIndex) => {
+                        const header = jsonData[0][colIndex];
+                        if (rowIndex !== 0 &&
+                            (header === 'collectionDate' || header === 'patientBOD') &&
+                            typeof cell === 'number' && cell > 25569) {
+
+                            return convertExcelDate(cell);
+                        }
+                        return cell;
+                    })
+                );
+
+                onFileUpload(transformedData);
             };
             reader.readAsArrayBuffer(file);
         }
