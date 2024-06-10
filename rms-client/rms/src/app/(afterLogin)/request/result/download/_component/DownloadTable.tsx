@@ -45,7 +45,7 @@ export default function DownloadTable() {
         const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
         const responseData = await response.json();
         const data = responseData.data;
-        setRequestData(data as Request[]);
+        setRequestData(data as Request[] || []);
         setPage(prevPage => ({ ...prevPage, totalPage: totalPage }));
     }, [session?.user?.id]);
 
