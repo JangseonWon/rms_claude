@@ -34,7 +34,7 @@ const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(
     )
 );
 CustomInput.displayName = "CustomInput";
-export default ({label, value, onChange, required = false}: Props) => {
+export default function DatePickerRangeBox({label, value, onChange, required = false}: Props) {
     const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
     const [startDate, endDate] = dateRange;
 
