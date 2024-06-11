@@ -1,19 +1,24 @@
 .container {
     display: flex;
     width: 100%;
-    /*justify-content: space-between;*/
 }
 .left {
     flex: 1;
 }
-.left img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.left {
+    flex: 1;
+    top: 73px;
+    height: calc(100vh - 73px - 150px);
+    overflow: hidden;
 }
 .right {
     flex: 1;
     margin-left: 5%;
+}
+.left img {
+    width: 100%;
+    object-fit: cover;
+    object-position: center;
 }
 .labelContainer1 {
     display: flex;
@@ -56,22 +61,33 @@
     color: #808080;
     margin-bottom: 20px;
 }
-.contactUs1 {
+.contactUs1,
+.contactUs1:link,
+.contactUs1:visited {
+    display: inline-block;
+    text-align: center;
+    line-height: 46px;
     width: 240px;
     height: 46px;
     border-radius: 10px;
     border: none;
     background: linear-gradient(135deg, #182847, #354e6d);
-    /*background-color: #002B49;*/
     font-weight: 700;
     font-size: 14pt;
     color: #ffffff;
+    text-decoration: none;
 }
 .contactUs1:hover {
     background: linear-gradient(135deg, #1b3351, #3d587e);
     cursor: pointer;
 }
-.contactUs2 {
+
+.contactUs2,
+.contactUs2:link,
+.contactUs2:visited {
+    display: inline-block;
+    text-align: center;
+    line-height: 46px;
     width: 240px;
     height: 46px;
     border-radius: 10px;
@@ -80,6 +96,7 @@
     font-weight: 700;
     font-size: 14pt;
     color: #002B49;
+    text-decoration: none;
 }
 .contactUs2:hover {
     background-color: #efeeee;

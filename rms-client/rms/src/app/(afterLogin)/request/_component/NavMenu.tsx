@@ -42,13 +42,13 @@ export default function NavMenu() {
                 {showDashboardDropdown && (
                     <>
                         <ol>
-                            <Link href={"/request/dashboard/service-catalog"}>
-                                Service Catalog
+                            <Link href={"/request/dashboard/dashboard"}>
+                                Dashboard
                             </Link>
                         </ol>
                         <ol>
-                            <Link href={"/request/dashboard/dashboard"}>
-                                Dashboard
+                            <Link href={"/request/dashboard/service-catalog"}>
+                                Service Catalog
                             </Link>
                         </ol>
                     </>

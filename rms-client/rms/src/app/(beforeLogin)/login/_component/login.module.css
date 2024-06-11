@@ -4,6 +4,8 @@
 }
 .left {
     flex: 1;
+    top: 73px;
+    height: calc(100vh - 73px - 150px);
     overflow: hidden;
 }
 .right {
@@ -12,8 +14,6 @@
 }
 .left img {
     width: 100%;
-    top: 73px;
-    height: calc(100vh - 73px - 150px);
     object-fit: cover;
     object-position: center;
 }

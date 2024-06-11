@@ -16,10 +16,16 @@ export default function InputBox({label, value, disabled=false, onChange, requir
     const [hasError, setHasError] = useState(false);
 
     const onChangeValue: ChangeEventHandler<HTMLInputElement> = (e) => {
-        if(onChange) onChange(e.target.value);
-        setInputValue(e.target.value);
-        setHasError(!e.target.value && required);
+        const { value } = e.target;
+        const regex = /^[a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣\s]*$/;
+
+        if (regex.test(value)) {
+            if (onChange) onChange(value);
+            setInputValue(value);
+            setHasError(!value && required);
+        }
     };
+
     useEffect(() => {
         setInputValue(value || '');
         setHasError(!value && required)
