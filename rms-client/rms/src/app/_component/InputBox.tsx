@@ -17,7 +17,7 @@ export default function InputBox({label, value, disabled=false, onChange, requir
 
     const onChangeValue: ChangeEventHandler<HTMLInputElement> = (e) => {
         const { value } = e.target;
-        const regex = /^[a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣\s]*$/;
+        const regex = /^[a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣0-9\s]*$/;
 
         if (regex.test(value)) {
             if (onChange) onChange(value);
