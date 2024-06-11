@@ -32,17 +32,22 @@ interface RequestDao {
                 }
         ).map(StatusCount::toModel)
     }
-    fun DSLContext.selectRequestCountByUserId(user: User): Mono<Int> {
+    fun DSLContext.selectRequestCountByUserId(user: User, condition: Condition): Mono<Int> {
         return Mono.from(
             selectCount()
                 .from(REQUEST)
                 .join(ORDER).on(REQUEST.ORDER_ID.eq(ORDER.ID))
+                .join(SERVICE).on(REQUEST.SERVICE_ID.eq(SERVICE.ID))
+                .join(SAMPLE).on(REQUEST.SAMPLE_ID.eq(SAMPLE.ID))
+                .join(PATIENT).on(SAMPLE.PATIENT_SERIAL.eq(PATIENT.SERIAL)
+                    .and(SAMPLE.ORGANIZATION_ID.eq(PATIENT.ORGANIZATION_ID))
+                    .and(SAMPLE.USER_ID.eq(PATIENT.USER_ID)))
                 .where(REQUEST.STATUS.ne(Status.CART.toString())
-                    .and(`when`(`val`(user.role).eq("USER"), ORDER.USER_ID.eq(user.id)).else_(true)))
-
+                .and(`when`(`val`(user.role).eq("USER"), ORDER.USER_ID.eq(user.id)).else_(true)))
+                .and(condition)
         ).map { it.into(Int::class.java) }
     }
-    fun DSLContext.selectRequestByUserId(user: User, query: Query): Flux<Request> {
+    fun DSLContext.selectRequestByUserId(user: User, condition: Condition, query: Query): Flux<Request> {
         return Flux.from(
             select(
                 REQUEST.ORDER_ID,
@@ -97,9 +102,9 @@ interface RequestDao {
                 PATIENT.ORGANIZATION_ID.eq(ORGANIZATION.ID)
                     .and(PATIENT.USER_ID.eq(ORGANIZATION.USER_ID)))
             .join(SERVICE).on(REQUEST.SERVICE_ID.eq(SERVICE.ID))
-            .where(
-                REQUEST.STATUS.ne(Status.CART.toString())
-                    .and(`when`(`val`(user.role).eq("USER"), ORDER.USER_ID.eq(user.id)).else_(true))
+            .where(REQUEST.STATUS.ne(Status.CART.toString())
+                .and(`when`(`val`(user.role).eq("USER"), ORDER.USER_ID.eq(user.id)).else_(true))
+                .and(condition)
             )
             .groupBy(REQUEST.ORDER_ID, REQUEST.SERVICE_ID, REQUEST.SAMPLE_ID,
                 SAMPLE.ID,

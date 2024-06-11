@@ -2,6 +2,15 @@
     width: 100%;
     margin: 20px auto;
 }
+.filterContainer {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 10px;
+}
+.filterContainerRight{
+    display: flex;
+}
+
 .table {
     width: 100%;
     border-collapse: collapse;

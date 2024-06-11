@@ -1,15 +1,12 @@
-export async function getRequests(pageSize: number, pageNumber: number) {
+import {Search} from "@/model/Search";
+
+export async function getRequests(search: Search) {
     const res = await fetch(`/w-api/dashboard-service/requests`, {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-            page: {
-                size: pageSize,
-                number: pageNumber
-            }
-        }),
+        body: JSON.stringify(search),
         credentials: 'include',
         cache: 'no-store'
     });

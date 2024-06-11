@@ -5,36 +5,80 @@ import style from "@/app/(afterLogin)/request/dashboard/dashboard/_component/tab
 import type {Request} from "@/model/Request";
 import {getRequests} from "@/app/(afterLogin)/request/dashboard/dashboard/_api/getRequests";
 import {format} from "date-fns";
-import type {Page} from "@/model/Page"
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import InputBox from "@/app/_component/InputBox";
+import SelectBox from "@/app/_component/SelectBox";
+import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
+import {Search} from "@/model/Search";
 
 export default function Table() {
     const [requestData, setRequestData] = useState<Request[]>([])
-    const [page, setPage] = useState<Page>({size:5, number:1})
+    const [search, setSearch] = useState<Search>({page:{size:5, number:1}})
+    const [totalPage, setTotalPage] = useState<number>()
+    const statusList = [
+        {name:"ORDERED", value:"ORDERED"},
+        {name:"INPROGRESS", value:"INPROGRESS"},
+        {name:"TESTFAILED", value:"TESTFAILED"},
+        {name:"DELIVERED", value:"DELIVERED"},
+        {name:"COMPLETE", value:"FINISHED"}
+    ]
 
-    const fetchData = async (pageSize: number, pageNumber: number) => {
-        const response = await getRequests(pageSize, pageNumber);
+    const fetchData = async (search: Search) => {
+        const response = await getRequests(search)
         const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
         const data = await response.json();
         setRequestData(data as Request[]);
-        setPage(prevPage => ({ ...prevPage, totalPage: totalPage }));
-    };
+        setTotalPage(totalPage)
+    }
 
     useEffect(() => {
-        fetchData(page.size, page.number)
-    }, [page.size, page.number]);
+        fetchData(search)
+    }, [search]);
 
     const handlePageChange = (newPageNumber: number) => {
-        setPage(prevPage =>({...prevPage, number: newPageNumber}));
+        setSearch(prevPage =>({...prevPage, page:{ ...prevPage.page, number: newPageNumber}}));
     };
     const handlePageSizeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const newSize = parseInt(event.target.value);
-        setPage((prevPage) => ({ ...prevPage, size: newSize })); // Reset page number when size changes
+        setSearch(prevSearch => ({
+            ...prevSearch,
+            page: {
+                ...prevSearch.page,
+                size: newSize
+            }
+        }));
+    };
+    const handleSearchChange = (newFilter: { field: string; value: string }) => {
+        setSearch((prevSearch) => {
+            const updatedFilters = prevSearch.filters?.slice() || [];
+            const existingFilterIndex = updatedFilters.findIndex((filter) => filter.field === newFilter.field)
+            if (existingFilterIndex !== -1) updatedFilters[existingFilterIndex] = newFilter;
+            else updatedFilters.push(newFilter);
+            return { ...prevSearch, filters: updatedFilters }
+        });
     };
 
     return (
         <div className={style.container}>
+            <div className={style.filterContainer}>
+                <div className={style.filterContainerRight}>
+                    <DatePickerRangeBox
+                        label={"from-to"}
+                        onChange={(from, to) =>{
+                            handleSearchChange({ field: "date_from", value: format(from, "yyyy-MM-dd")})
+                            handleSearchChange({ field: "date_to", value: format(to, "yyyy-MM-dd")})
+                        }}/>
+                    <SelectBox options={statusList} label={"status"} onChange={(value) =>{
+                        handleSearchChange({field: "status", value: value.value})
+                    }}/>
+                </div>
+                <div>
+                    <InputBox label={"search"} onChange={(value) =>{
+                        handleSearchChange({field: "search", value: value})
+                    }}></InputBox>
+                </div>
+            </div>
             <table className={style.table}>
                 <thead>
                 <tr>
@@ -74,15 +118,15 @@ export default function Table() {
                         <option value="20">20</option>
                     </select>
                 </div>
-                <span> 1-{page.totalPage} of {page.number} </span>
+                <span> 1-{totalPage} of {search.page.number} </span>
                 <button
-                    disabled={page.number === 1}
-                    onClick={() => handlePageChange(page.number - 1)}
+                    disabled={search.page.number === 1}
+                    onClick={() => handlePageChange(search.page.number - 1)}
                 ><FontAwesomeIcon icon={faAngleLeft}/>
                 </button>
                 <button
-                    disabled={page.number === page.totalPage}
-                    onClick={() => handlePageChange(page.number + 1)}
+                    disabled={search.page.number === totalPage}
+                    onClick={() => handlePageChange(search.page.number + 1)}
                 ><FontAwesomeIcon icon={faAngleRight}/>
                 </button>
             </div>

@@ -1,7 +1,6 @@
 package com.gcgenome.rms.dashboard
 
 import com.gcgenome.rms.auth.AuthenticationHandler
-import com.gcgenome.rms.data.Page
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.Request
 import com.gcgenome.rms.exception.AuthenticationNotFoundException
