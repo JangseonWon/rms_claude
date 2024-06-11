@@ -16,6 +16,7 @@
     top: 73px;
     height: calc(100vh - 73px - 150px);
     width: 100%;
+    z-index: 1;
 }
 .bottomSection {
     position: fixed;
@@ -24,4 +25,5 @@
     width: 100%;
     height: 150px;
     background-color: #f0f0f0;
+    z-index: 0;
 }

@@ -4,6 +4,7 @@
 }
 .left {
     flex: 1;
+    overflow: hidden;
 }
 .right {
     flex: 1;
@@ -11,8 +12,10 @@
 }
 .left img {
     width: 100%;
-    height: 100%;
+    top: 73px;
+    height: calc(100vh - 73px - 150px);
     object-fit: cover;
+    object-position: center;
 }
 .horizontalLogo {
     display: flex;
@@ -95,4 +98,24 @@
 }
 .healthcareButton:active {
     box-shadow: 1px 1px 0 rgb(0,0,0,0.5);
+}
+.spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border-left-color: #fff;
+    animation: spin 1s ease infinite;
+}
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+.errorMessage {
+    color: red;
+    margin-top: 10px;
 }
