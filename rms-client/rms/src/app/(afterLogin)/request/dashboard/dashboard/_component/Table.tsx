@@ -59,9 +59,20 @@ export default function Table() {
         });
     };
 
-    const formatDate = (year: number, month: number, day: number) => {
-        const date = new Date(year, month - 1, day);
-        return format(date, "yyyy-MMM-dd");
+    const formatDate = (year: number | undefined, month: number | undefined, day: number | undefined) => {
+        const parts = [];
+
+        if (year !== undefined) {
+            parts.push(year.toString());
+        }
+        if (month !== undefined) {
+            parts.push(format(new Date(year ?? 0, month - 1, 1), "MMM"));
+        }
+        if (day !== undefined) {
+            parts.push(day.toString());
+        }
+
+        return parts.length > 0 ? parts.join('-') : '-';
     };
 
     return (
@@ -108,7 +119,7 @@ export default function Table() {
                         <td>{row.sample!.patient!.name}</td>
                         <td>{row.sample!.patient!.serial}</td>
                         <td>{row.sample?.patient ?
-                            formatDate(row.sample.patient.birth_year!, row.sample.patient.birth_month!, row.sample.patient.birth_day!) : '-'}
+                            formatDate(row.sample.patient.birth_year, row.sample.patient.birth_month, row.sample.patient.birth_day) : '-'}
                         </td>
                         <td>{row.status}</td>
                         <td>{row.create_at ? format(new Date(row.create_at), "yyyy-MMM-dd") : '-'}</td>
