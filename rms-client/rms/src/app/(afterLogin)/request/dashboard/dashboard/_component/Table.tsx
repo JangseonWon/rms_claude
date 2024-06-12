@@ -78,7 +78,7 @@ export default function Table() {
                         handleSearchChange({field: "status", value: value.value})
                     }}/>
                 </div>
-                <div>
+                <div className={style.filterContainerLeft}>
                     <InputBox label={"search"} onChange={(value) =>{
                         handleSearchChange({field: "search", value: value})
                     }}></InputBox>

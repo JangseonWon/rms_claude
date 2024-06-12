@@ -10,7 +10,12 @@
 .filterContainerRight{
     display: flex;
 }
-
+.filterContainerRight > *{
+    padding-right: 20px;
+}
+.filterContainerLeft{
+    width: 450px;
+}
 .table {
     width: 100%;
     border-collapse: collapse;

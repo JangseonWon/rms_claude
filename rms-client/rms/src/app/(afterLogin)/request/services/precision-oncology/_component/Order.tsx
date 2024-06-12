@@ -16,7 +16,7 @@ import {getSampleType} from "@/app/(afterLogin)/request/services/precision-oncol
 import GreenButton from "@/app/_component/GreenButton";
 import BlueButton from "@/app/_component/BlueButton";
 import {putRequest} from "@/app/(afterLogin)/request/services/precision-oncology/_api/putRequest";
-import {useRouter} from "next/navigation";
+import {format} from "date-fns";
 
 export default function Order() {
     const [organizationOptions, setOrganizationOptions] = useState<SelectBoxOption[]>([])
@@ -68,6 +68,10 @@ export default function Order() {
     const setNestedValue = (object: any, nestedPath: string, newValue: any): any => {
         const [firstKey, ...remainingPathSegments] = nestedPath.split('.');
         if (remainingPathSegments.length === 0) {
+            if (newValue === null) {
+                const { [firstKey]: removed, ...rest } = object;
+                return rest;
+            }
             return { ...object, [firstKey]: newValue };
         }
         if (!object[firstKey]) {
@@ -97,6 +101,15 @@ export default function Order() {
             name: value.name
         }));
     };
+    const setAge = (birthDate: Date, samplingDate: Date): number => {
+        let age = samplingDate.getFullYear() - birthDate.getFullYear();
+        const monthDifference = samplingDate.getMonth() - birthDate.getMonth()
+        if (monthDifference < 0 || (monthDifference === 0 && samplingDate.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age;
+    }
+
     const isAllRequiredFilled = () => {
         if (!request?.sample?.patient?.name) return false;
         if (!request?.sample?.patient?.serial) return false;
@@ -108,6 +121,7 @@ export default function Order() {
 
     return (
         <div className={style.container}>
+            <div>{JSON.stringify(request)}</div>
             <div className={style.buttonSection}>
                 <GreenButton
                     name={"Add to Cart"}
@@ -160,14 +174,25 @@ export default function Order() {
                 <DatePickerBox
                     label={"Date of Birth"}
                     onChange={(date) => {
-                        handleRequestChange('sample.patient.birth_year', date.getFullYear());
-                        handleRequestChange('sample.patient.birth_month', date.getMonth());
-                        handleRequestChange('sample.patient.birth_day', date.getDay());
+                        if (date) {
+                            handleRequestChange('sample.patient.birth_year', date.getFullYear());
+                            handleRequestChange('sample.patient.birth_month', date.getMonth() + 1);
+                            handleRequestChange('sample.patient.birth_day', date.getDate());
+                            if (request.sample?.sampling_on) {
+                                handleRequestChange('sample.age', setAge(date, new Date(request.sample.sampling_on)));
+                            }
+                        } else {
+                            handleRequestChange('sample.patient.birth_year', null);
+                            handleRequestChange('sample.patient.birth_month', null);
+                            handleRequestChange('sample.patient.birth_day', null);
+                            handleRequestChange('sample.age', null);
+                        }
                     }}
                 />
                 <InputBox
                     label={"Age"}
-                    onChange={(value) => handleRequestChange('sample.age', value)}
+                    disabled={true}
+                    value={request.sample?.age}
                 />
             </div>
             <p className={style.mainName}>Specimen/ .Sample Info.</p>
@@ -184,7 +209,20 @@ export default function Order() {
                 <DatePickerBox
                     label={"Date of Collection*"}
                     required={true}
-                    onChange={(date) => handleRequestChange('sample.sampling_on', date)}
+                    onChange={(date) => {
+                        if(date) {
+                            handleRequestChange('sample.sampling_on', format(date, "yyyy-MM-dd"))
+                            if (request.sample?.patient?.birth_year
+                                && request.sample?.patient?.birth_month
+                                && request.sample?.patient?.birth_day) {
+                                handleRequestChange('sample.age', setAge(new Date(`${request.sample.patient.birth_year}-${request.sample.patient.birth_month}-${request.sample.patient.birth_day}`), date));
+                            }
+                        }else {
+                            handleRequestChange('sample.sampling_on', null)
+                            handleRequestChange('sample.age', null);
+                        }
+
+                    }}
                 />
                 <InputBox
                     label={"Quantity*"}
