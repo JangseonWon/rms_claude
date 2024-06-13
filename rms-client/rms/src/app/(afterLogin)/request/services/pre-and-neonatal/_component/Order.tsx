@@ -7,7 +7,7 @@ import DownloadExcelButton from "@/app/(afterLogin)/request/services/pre-and-neo
 import UploadExcelButton from "@/app/(afterLogin)/request/services/pre-and-neonatal/_component/UploadExcelButton";
 import React, {useState} from "react";
 import {format} from "date-fns";
-import {putOrder} from "@/app/(afterLogin)/request/services/pre-and-neonatal/_api/putRequest";
+import {putRequest} from "@/app/(afterLogin)/request/services/pre-and-neonatal/_api/putRequest";
 
 type RequestData = {
     registrationDate: string; // 등록일자
@@ -88,7 +88,7 @@ export default function Order() {
     const handleOrderNowClick = async () => {
         const orderData = transformDataToFormat(requestData, "ORDERED");
         try {
-            const response = await putOrder(orderData);
+            const response = await putRequest(orderData);
             if (response.ok) {
                 alert("Order placed successfully!");
                 console.log(orderData);
@@ -106,7 +106,7 @@ export default function Order() {
     const handleAddToCartClick = async () => {
         const cartData = transformDataToFormat(requestData, "CART");
         try {
-            const response = await putOrder(cartData);
+            const response = await putRequest(cartData);
             if (response.ok) {
                 alert("successfully!");
             } else {
