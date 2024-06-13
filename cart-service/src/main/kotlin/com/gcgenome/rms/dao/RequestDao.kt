@@ -29,6 +29,10 @@ interface RequestDao {
             update(REQUEST)
                 .set(REQUEST.CREATE_AT, LocalDateTime.now())
                 .set(REQUEST.STATUS, Status.ORDERED.toString())
+                .where(REQUEST.ORDER_ID.eq(orderId)
+                    .and(REQUEST.SERVICE_ID.eq(serviceId))
+                    .and(REQUEST.SAMPLE_ID.eq(sampleId))
+                )
                 .returning()
         ).map { it.into(Request::class.java) }
 

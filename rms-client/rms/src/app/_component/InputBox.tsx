@@ -27,7 +27,7 @@ export default function InputBox({label, value, disabled=false, onChange, requir
     };
 
     useEffect(() => {
-        setInputValue(value || '');
+        setInputValue(value !== undefined && value !== null ? value : '');
         setHasError(!value && required)
     }, [required, value]);
 

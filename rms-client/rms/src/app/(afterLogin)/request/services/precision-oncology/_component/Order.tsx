@@ -121,7 +121,6 @@ export default function Order() {
 
     return (
         <div className={style.container}>
-            <div>{JSON.stringify(request)}</div>
             <div className={style.buttonSection}>
                 <GreenButton
                     name={"Add to Cart"}
