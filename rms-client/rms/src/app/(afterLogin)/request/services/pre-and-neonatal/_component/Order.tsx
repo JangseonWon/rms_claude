@@ -6,19 +6,23 @@ import BlueButton from "@/app/_component/BlueButton";
 import DownloadExcelButton from "@/app/(afterLogin)/request/services/pre-and-neonatal/_component/DownloadExcelButton";
 import UploadExcelButton from "@/app/(afterLogin)/request/services/pre-and-neonatal/_component/UploadExcelButton";
 import React, {useState} from "react";
+import {format} from "date-fns";
 
 type RequestData = {
-    Institution: string;
-    patientName: string;
-    patientBOD: string;
-    gender: string;
-    physicianName: string;
-    collectionDate: string;
-    mrn: string;
-    serviceCode: string;
-    pregnant: string;
-    weight: string;
-    fetus: string;
+    registrationDate: string; // 등록일자
+    ward: string;             // 병동
+    patientName: string;      // 환자 이름
+    personalID: string;       // 주민등록번호
+    gender: string;           // 성별
+    physician: string;        // 의사 이름
+    collectionDate: string;   // 채취일자
+    chartNumber: string;      // 차트 번호
+    code: string;             // 코드
+    gestationalAge: string;   // 임신 기간
+    weight: string;           // 몸무게
+    fetuses: string;          // 태아 수
+    notes: string;            // 메모
+    race: string;             // 인종
 };
 
 export default function Order() {
@@ -33,12 +37,29 @@ export default function Order() {
 
     const [requestData, setRequestData] = useState<RequestData[]>([]);
 
+    function convertExcelSerialToDate(serial: number): Date {
+        const excelEpochInMs = new Date(1899, 11, 30).getTime();
+        const dateInMs = excelEpochInMs + (serial - 1) * 24 * 60 * 60 * 1000;
+
+        return new Date(dateInMs);
+    }
+
     const handleFileUpload = (jsonData: (string | number)[][]) => {
         const headers = jsonData[0] as string[];
         const rows = jsonData.slice(1).map(row => {
             let rowData: Partial<RequestData> = {};
             headers.forEach((header, index) => {
-                (rowData as any)[header] = row[index] as string | number;
+                const value = row[index];
+                if (header === 'registrationDate' || header === 'personalID' || header === 'collectionDate') {
+                    if (typeof value === 'number') {
+                        const date = convertExcelSerialToDate(value);
+                        (rowData as any)[header] = date;
+                    } else {
+                        (rowData as any)[header] = value;
+                    }
+                } else {
+                    (rowData as any)[header] = value;
+                }
             });
             return rowData as RequestData;
         });
@@ -62,33 +83,39 @@ export default function Order() {
                     <table className={style.table}>
                         <thead>
                         <tr>
-                            <th>Institution</th>
-                            <th>Patient(s) Name</th>
-                            <th>Patient BOD<br/>(YYYY/MM/DD)</th>
-                            <th>Gender</th>
-                            <th>Physician<br/>Name</th>
+                            <th>Registration Date<br/>(YYYY/MM/DD)</th>
+                            <th>Ward</th>
+                            <th>Patient Name</th>
+                            <th>Personal ID Number<br/>(YYYY/MM/DD)</th>
+                            <th>Gender<br/>(Male, Female)</th>
+                            <th>Physician</th>
                             <th>Collection Date<br/>(YYYY/MM/DD)</th>
-                            <th>MRN</th>
-                            <th>Service<br/>Code</th>
-                            <th>Pregnant<br/>(Week + day)</th>
+                            <th>Chart Number</th>
+                            <th>Code</th>
+                            <th>Gestational Age</th>
                             <th>Weight</th>
-                            <th>Fetus</th>
+                            <th>Fetuses<br/>(1 or 2)</th>
+                            <th>Notes</th>
+                            <th>Race<br/>(Genome Health Premium)</th>
                         </tr>
                         </thead>
                         <tbody>
                         {requestData.map((row, rowIndex) => (
                             <tr key={rowIndex}>
-                                <td>{row.Institution}</td>
+                                <td>{row.registrationDate ? format(new Date(row.registrationDate), "yyyy/MMM/dd") : '-'}</td>
+                                <td>{row.ward}</td>
                                 <td>{row.patientName}</td>
-                                <td>{row.patientBOD}</td>
+                                <td>{row.personalID ? format(new Date(row.personalID), "yyyy/MMM/dd") : '-'}</td>
                                 <td>{row.gender}</td>
-                                <td>{row.physicianName}</td>
-                                <td>{row.collectionDate}</td>
-                                <td>{row.mrn}</td>
-                                <td>{row.serviceCode}</td>
-                                <td>{row.pregnant}</td>
+                                <td>{row.physician}</td>
+                                <td>{row.collectionDate ? format(new Date(row.collectionDate), "yyyy/MMM/dd") : '-'}</td>
+                                <td>{row.chartNumber}</td>
+                                <td>{row.code}</td>
+                                <td>{row.gestationalAge}</td>
                                 <td>{row.weight}</td>
-                                <td>{row.fetus}</td>
+                                <td>{row.fetuses}</td>
+                                <td>{row.notes}</td>
+                                <td>{row.race}</td>
                             </tr>
                         ))}
                         </tbody>
