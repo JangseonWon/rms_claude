@@ -25,7 +25,7 @@ class Router (
         GET("/w-api/product-service/organizations", :: getOrganizations)
         GET("/w-api/product-service/services", :: getServices)
         GET("/w-api/product-service/sample_types", :: getSampleTypes)
-        PUT("/w-api/product-service/requests", :: saveRequest)
+        PUT("/w-api/product-service/requests", :: saveRequests)
     }
 
     private fun getOrganizations(request: ServerRequest): Mono<ServerResponse> {
@@ -52,10 +52,10 @@ class Router (
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
     }
-    private fun saveRequest(request: ServerRequest): Mono<ServerResponse> {
+    private fun saveRequests(request: ServerRequest): Mono<ServerResponse> {
         return authentication.principal(request)
-            .zipWith(request.bodyToMono(Request::class.java))
-            .flatMap { handler.saveRequest(it.t1.user, it.t2) }
+            .zipWith(request.bodyToMono(Array<Request>::class.java))
+            .flatMap { handler.saveRequest(it.t1.user, it.t2).collectList() }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), Request::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}

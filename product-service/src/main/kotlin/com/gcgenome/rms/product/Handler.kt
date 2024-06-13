@@ -25,20 +25,22 @@ class Handler(val dslContext: DSLContext):
     fun getSampleTypes(serviceId: String): Flux<SampleType> {
         return dslContext.selectSampleTypeByServicId(serviceId)
     }
-    fun saveRequest(user: User, request: Request): Mono<Request> {
-        return Mono.from(dslContext.transactionPublisher { trx ->
+    fun saveRequest(user: User, requests: Array<Request>): Flux<Request> {
+        return Flux.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
-                insertOrder(user.id!!, request.status!!)
-                    .flatMap { order ->
-                        insertPatient(user.id!!, request.sample!!.patient!!)
-                            .then(insertSample(user, request.sample, request.status))
-                            .flatMap {
-                                insertRequest(request.apply {
-                                    this.orderId = order.id
-                                    this.sample!!.id = it.id
-                                })
-                            }
-                    }
+                Flux.fromArray(requests).flatMap { request ->
+                    insertOrder(user.id!!, request.status!!)
+                        .flatMap { order ->
+                            insertPatient(user.id!!, request.sample!!.patient!!)
+                                .then(insertSample(user, request.sample, request.status))
+                                .flatMap {
+                                    insertRequest(request.apply {
+                                        this.orderId = order.id
+                                        this.sample!!.id = it.id
+                                    })
+                                }
+                        }
+                }
             }
         })
     }

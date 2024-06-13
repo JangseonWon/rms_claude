@@ -1,6 +1,6 @@
 import {Request} from "@/model/Request";
 
-export async function putRequest(request: Request) {
+export async function putRequest(request: Request[]) {
     return await fetch(`/w-api/product-service/requests`, {
         method: 'PUT',
         headers: {

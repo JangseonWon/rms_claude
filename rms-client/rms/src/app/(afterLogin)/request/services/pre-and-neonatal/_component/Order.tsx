@@ -7,6 +7,7 @@ import DownloadExcelButton from "@/app/(afterLogin)/request/services/pre-and-neo
 import UploadExcelButton from "@/app/(afterLogin)/request/services/pre-and-neonatal/_component/UploadExcelButton";
 import React, {useState} from "react";
 import {format} from "date-fns";
+import {putOrder} from "@/app/(afterLogin)/request/services/pre-and-neonatal/_api/putRequest";
 
 type RequestData = {
     registrationDate: string; // 등록일자
@@ -21,19 +22,101 @@ type RequestData = {
     gestationalAge: string;   // 임신 기간
     weight: string;           // 몸무게
     fetuses: string;          // 태아 수
+    quantity: number;         // 샘플 수
     notes: string;            // 메모
     race: string;             // 인종
 };
 
 export default function Order() {
 
-    const handleAddToCartClick = () => {
-        alert("cart");
-    }
+    const transformDataToFormat = (data: RequestData[], status: string): any => {
+        return data.map((item) => {
+            const birthDate = new Date(item.personalID);
+            const birthYear = birthDate.getFullYear();
+            const birthMonth = birthDate.getMonth() + 1;
+            const birthDay = birthDate.getDate() + 1;
 
-    const handleOrderNowClick = () => {
-        alert("order");
-    }
+            return {
+                service: {
+                    id: item.code
+                },
+                memo: item.notes,
+                ward: item.ward,
+                physician: item.physician,
+                status: status,
+                sample: {
+                    quantity: item.quantity,
+                    sampling_on: item.collectionDate,
+                    sample_type: {
+                        id: "2"
+                    },
+                    patient: {
+                        serial: item.chartNumber,
+                        sex: item.gender,
+                        name: item.patientName,
+                        birth_year: birthYear,
+                        birth_month: birthMonth,
+                        birth_day: birthDay,
+                        organization: {
+                            id: "test1234",
+                            name: "patchname12345123"
+                        }
+                    },
+                    extensions: [
+                        {
+                            id: "TA0003",
+                            value: item.gestationalAge
+                        },
+                        {
+                            id: "TA0004",
+                            value: item.fetuses
+                        },
+                        {
+                            id: "TA0007",
+                            value: "quad"
+                        },
+                        {
+                            id: "TA0008",
+                            value: 3
+                        }
+                    ]
+                }
+            };
+        })
+    };
+
+    const handleOrderNowClick = async () => {
+        const orderData = transformDataToFormat(requestData, "ORDERED");
+        try {
+            const response = await putOrder(orderData);
+            if (response.ok) {
+                alert("Order placed successfully!");
+                console.log(orderData);
+            } else {
+                console.log(orderData);
+                alert("Failed to place the order.");
+            }
+        } catch (error) {
+            console.log(orderData);
+            console.error("Error placing order:", error);
+            alert("An error occurred while placing the order.");
+        }
+    };
+
+    const handleAddToCartClick = async () => {
+        const cartData = transformDataToFormat(requestData, "CART");
+        try {
+            const response = await putOrder(cartData);
+            if (response.ok) {
+                alert("successfully!");
+            } else {
+                alert(cartData);
+            }
+        } catch (error) {
+            alert(error);
+        }
+    };
+
 
     const [requestData, setRequestData] = useState<RequestData[]>([]);
 
@@ -95,6 +178,7 @@ export default function Order() {
                             <th>Gestational Age</th>
                             <th>Weight</th>
                             <th>Fetuses<br/>(1 or 2)</th>
+                            <th>Quantity</th>
                             <th>Notes</th>
                             <th>Race<br/>(Genome Health Premium)</th>
                         </tr>
@@ -114,6 +198,7 @@ export default function Order() {
                                 <td>{row.gestationalAge}</td>
                                 <td>{row.weight}</td>
                                 <td>{row.fetuses}</td>
+                                <td>{row.quantity}</td>
                                 <td>{row.notes}</td>
                                 <td>{row.race}</td>
                             </tr>

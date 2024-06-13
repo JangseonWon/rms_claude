@@ -45,9 +45,9 @@ export default function Order() {
     }, [fetchOrganizations, fetchServices]);
 
     const publishRequest = (status:string) => {
-        const updateRequest = {
+        const updateRequest = [{
             ...request, ...{status: status}
-        }
+        }]
         putRequest(updateRequest)
             .then((res) =>{
                 if(res.ok) {
