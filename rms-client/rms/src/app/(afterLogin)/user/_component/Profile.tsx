@@ -7,12 +7,10 @@ import {fetchUser} from "@/app/(afterLogin)/user/_api/fetchUser";
 import {User} from "@/model/User";
 import {useSession} from "next-auth/react";
 import {fetchUserUpdate} from "@/app/(afterLogin)/user/_api/fetchUserUpdate";
-import AlertDialog from "@/app/_component/AlertDialog";
 
 export default function Profile() {
     const { data: session, status } = useSession();
     const [user, setUser] = useState<User>();
-    const [showErrorDialog, setShowErrorDialog] = useState(false);
     const userBody: User = {};
     const userId: string | undefined = user?.id;
 
@@ -24,7 +22,6 @@ export default function Profile() {
                     setUser(data);
                 })
                 .catch((error) => {
-                    setShowErrorDialog(true);
                     console.error('Error fetching user:', error);
                 });
         }
@@ -53,15 +50,8 @@ export default function Profile() {
         }
     }
 
-    const closeErrorDialog = () => {
-        setShowErrorDialog(false);
-    };
-
     return (
         <>
-            {showErrorDialog && (
-                <AlertDialog icon="error" message={'에러 발생했어요'} onClose={closeErrorDialog} />
-            )}
             <div className={style.container}>
                 <div className={style.header}>
                     User setting

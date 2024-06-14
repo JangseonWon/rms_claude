@@ -1,44 +1,38 @@
 import style from './changePassword.module.css';
-import AlertDialog from "@/app/_component/AlertDialog";
 import * as React from "react";
 import {useState} from "react";
 import InputBox from "@/app/_component/InputBox";
 import GreenButton from "@/app/_component/GreenButton";
 import {useSession} from "next-auth/react";
 import {fetchUserPassword} from "@/app/(afterLogin)/user/_api/fetchUserPassword";
+import {useOpenAlertDialog, useSetIconAlertDialog, useSetMessageAlertDialog} from "@/store/useAlertDialogStore";
 
 export default function ChangePassword() {
-    const [showAlertDialog, setShowAlertDialog] = useState(false);
-    const [alertMessage, setAlertMessage] = useState('');
-    const [icon, setIcon] = useState<'good' | 'error' | 'warning'>('good');
     const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const { data: session, status } = useSession();
 
-    const closeAlertDialog = () => {
-        setShowAlertDialog(false);
-    };
+    const setShowAlertDialog = useOpenAlertDialog();
+    const setMessage = useSetMessageAlertDialog();
+    const setIcon = useSetIconAlertDialog();
 
     const handleSave = async () => {
         if (newPassword !== confirmPassword) {
             setIcon('warning');
-            setAlertMessage('New Password and Confirm Password do not match.');
+            setMessage('New Password and Confirm Password do not match.');
             setShowAlertDialog(true);
             return;
         }
 
         await fetchUserPassword(session?.user.id!, newPassword, confirmPassword);
         setIcon('good');
-        setAlertMessage('Password changed successfully.');
+        setMessage('Password changed successfully.');
         setShowAlertDialog(true);
     };
 
     return (
         <>
-            {showAlertDialog && (
-                <AlertDialog icon={icon} message={alertMessage} onClose={closeAlertDialog} />
-            )}
             <div className={style.container}>
                 <div className={style.header}>
                     Change Password

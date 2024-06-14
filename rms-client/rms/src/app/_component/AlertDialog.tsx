@@ -2,14 +2,16 @@ import style from './alertDialog.module.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React from "react";
 import {faTriangleExclamation, faCircleCheck, faExclamation} from "@fortawesome/free-solid-svg-icons";
+import {useOpenAlertDialog} from "@/store/useAlertDialogStore";
 
 type Props = {
     icon: 'warning' | 'good' | 'error';
     message: string;
-    onClose: () => void;
 };
 
-export default function AlertDialog({ icon, message, onClose }: Props) {
+export default function AlertDialog({ icon, message}: Props) {
+    const setShowDialog = useOpenAlertDialog();
+
     let selectedIcon;
     switch (icon) {
         case 'warning':
@@ -24,6 +26,9 @@ export default function AlertDialog({ icon, message, onClose }: Props) {
         default:
             selectedIcon = faTriangleExclamation;
     }
+    const handleCloseDialog = () => {
+        setShowDialog(false);
+    }
 
     return (
         <div className={style.alertDialogContainer}>
@@ -32,7 +37,7 @@ export default function AlertDialog({ icon, message, onClose }: Props) {
                 <p>Alert Dialog</p>
                 <hr />
                 <p className={style.message}>{message}</p>
-                <button onClick={onClose}>OK</button>
+                <button onClick={handleCloseDialog}>OK</button>
             </div>
         </div>
     );

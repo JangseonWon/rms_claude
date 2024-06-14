@@ -3,18 +3,16 @@
 import style from './downloadExcelButton.module.css';
 import {faDownload} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import React, {useState} from "react";
-import AlertDialog from "@/app/_component/AlertDialog";
+import React from "react";
+import {useOpenAlertDialog, useSetMessageAlertDialog} from "@/store/useAlertDialogStore";
 
 export default function DownloadExcelButton() {
-    const [showDialog, setShowDialog] = useState(false);
+    const setShowAlertDialog = useOpenAlertDialog();
+    const setMessage = useSetMessageAlertDialog();
 
     const handleDownloadClick = () => {
-        setShowDialog(true);
-    }
-
-    const handleCloseDialog = () => {
-        setShowDialog(false);
+        setShowAlertDialog(true);
+        setMessage('다운로드 받을 파일이 없습니다.')
     }
 
     return (
@@ -26,13 +24,6 @@ export default function DownloadExcelButton() {
                 Download Excel&nbsp;
                 <FontAwesomeIcon className={style.downloadIcon} icon={faDownload} />
             </button>
-            {showDialog && (
-                <AlertDialog
-                    icon= 'warning'
-                    message="다운로드 받을 파일이 없습니다."
-                    onClose={handleCloseDialog}
-                />
-            )}
         </>
     );
 }
