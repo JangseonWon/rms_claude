@@ -1,12 +1,12 @@
 import {Request} from "@/model/Request"
 
-export async function putRequest(request: Request) {
-    return await fetch(`/w-api/cart-service/orders/${request.order_id}/services/${request.service!.id}/samples/${request.sample!.id}`, {
+export async function putRequest(requests: Request[]) {
+    return await fetch(`/w-api/cart-service/requests`, {
         method: 'PUT',
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify(request),
+        body: JSON.stringify(requests),
         credentials: 'include',
         cache: 'no-store'
     });

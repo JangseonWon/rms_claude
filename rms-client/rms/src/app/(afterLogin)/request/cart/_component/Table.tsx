@@ -71,17 +71,11 @@ export default function Table() {
         }
     };
     const handleCartToOrder = async () => {
-        try {
-            const selectedRequests = requestData.filter(request => request.isSelected);
-            await Promise.all(selectedRequests.map(async request => {
-                const res = await putRequest(request);
-                if (!res.ok) throw new Error(`Failed to order: ${request.order_id}`);
-            }));
-            alert("ordered!");
-            fetchData(page.size, page.number);
-        } catch (error) {
-            alert(`fail: ${error}`);
-        }
+        const selectedRequests = requestData.filter(request => request.isSelected);
+        const response = await putRequest(selectedRequests)
+        if(response.ok) alert("ordered!");
+        else alert(`fail`);
+        fetchData(page.size, page.number);
     };
 
     return (

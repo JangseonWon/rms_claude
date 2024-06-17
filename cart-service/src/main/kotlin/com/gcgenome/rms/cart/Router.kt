@@ -23,7 +23,7 @@ class Router (
         GET("/w-api/cart-service/orders/{order_id}/services/{service_id}/samples/{sample_id}", ::cartInfo)
         GET("/w-api/cart-service/organizations", :: organizations)
         POST("/w-api/cart-service/requests", :: requests)
-        PUT("/w-api/cart-service/orders/{order_id}/services/{service_id}/samples/{sample_id}", :: cartToOrder)
+        PUT("/w-api/cart-service/requests", :: cartToOrder)
         PATCH("/w-api/cart-service/orders/{order_id}/services/{service_id}/samples/{sample_id}", :: updateRequest)
         GET("/w-api/cart-service/sample_types", :: sampleTypes)
         DELETE("/w-api/cart-service/orders/{order_id}/services/{service_id}/samples/{sample_id}", :: deleteCart)
@@ -60,19 +60,10 @@ class Router (
             .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
     }
     private fun cartToOrder(request: ServerRequest): Mono<ServerResponse> {
-        val orderIdPathVar = UUID.fromString(request.pathVariable("order_id"))
-        val sampleIdPathVar = UUID.fromString(request.pathVariable("sample_id"))
-        val serviceIdPathVar = request.pathVariable("service_id")
         return principal(request)
-            .flatMap { request.bodyToMono(Request::class.java) }
-            .flatMap { handler.cartToOrder(
-                it.apply {
-                    orderId = orderIdPathVar
-                    sampleId = sampleIdPathVar
-                    serviceId = serviceIdPathVar
-                }
-            ) }
-            .flatMap { ServerResponse.ok().bodyValue(it)}
+            .flatMap { request.bodyToMono(Array<Request>::class.java) }
+            .flatMap { handler.cartToOrder(it).collectList() }
+            .flatMap { ServerResponse.ok().build()}
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
     }

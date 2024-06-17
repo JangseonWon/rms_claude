@@ -51,15 +51,15 @@ class Handler(val dslContext: DSLContext ) :
             }
         })
     }
-    fun cartToOrder(request: Request): Mono<Request> {
-        return Mono.from(dslContext.transactionPublisher{trx ->
+    fun cartToOrder(requests: Array<Request>): Flux<Request> {
+        return Flux.from(dslContext.transactionPublisher{trx ->
             trx.dsl().run {
-                selectOrderMaxSerialByUserId(request.sample!!.patient!!.organization!!.user!!.id!!)
-                    .flatMap { serial -> updateOrderSerialAndCreatedAtById(request.orderId!!, serial) }
-                    .then(updateRequestStatusAndCreateAtById(request.orderId!!, request.sampleId!!, request.serviceId!!))
-                    .then(selectSampleMaxBarcodeById(request.sample!!.id!!, request.sample!!.patient!!.organization!!.user!!.branchSerial!!) )
-                    .flatMap { barcode -> updateSampleBarcodeAndCreateAtById(request.sampleId!!, barcode) }
-                    .then(selectRequestById(request.orderId!!, request.sampleId!!, request.serviceId!!))
+                Flux.fromArray(requests).flatMap { request ->
+                    updateOrderSerialAndCreatedAtById(request.orderId!!, request.sample!!.patient!!.organization!!.user!!.id!!)
+                        .then(updateRequestStatusAndCreateAtById(request.orderId!!, request.sample!!.id!!, request.service!!.id!!))
+                        .then(updateSampleBarcodeAndCreateAtById(request.sample!!.id!!, request.sample!!.patient!!.organization!!.user!!.branchSerial!!))
+                        .then(selectRequestById(request.orderId!!, request.sample!!.id!!, request.service!!.id!!))
+                }
             }
         })
     }

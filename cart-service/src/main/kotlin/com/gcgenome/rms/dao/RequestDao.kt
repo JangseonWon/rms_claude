@@ -135,8 +135,8 @@ interface RequestDao {
         ).map { it.into(Request::class.java) }
     }
 
-    fun DSLContext.selectRequestById(orderId: UUID, sampleId: UUID, serviceId: String): Mono<Request> =
-        Mono.from(
+    fun DSLContext.selectRequestById(orderId: UUID, sampleId: UUID, serviceId: String): Mono<Request> {
+        return Mono.from(
             select(
                 REQUEST.ORDER_ID,
                 REQUEST.USER_SERVICE_ID,
@@ -198,19 +198,22 @@ interface RequestDao {
                 .join(SAMPLE_TYPE).on(SAMPLE.SAMPLE_TYPE_ID.eq(SAMPLE_TYPE.ID))
                 .join(PATIENT).on(
                     SAMPLE.PATIENT_SERIAL.eq(PATIENT.SERIAL)
-                    .and(SAMPLE.ORGANIZATION_ID.eq(PATIENT.ORGANIZATION_ID))
-                    .and(SAMPLE.USER_ID.eq(PATIENT.USER_ID))
-                    )
+                        .and(SAMPLE.ORGANIZATION_ID.eq(PATIENT.ORGANIZATION_ID))
+                        .and(SAMPLE.USER_ID.eq(PATIENT.USER_ID))
+                )
                 .join(ORGANIZATION).on(
                     PATIENT.ORGANIZATION_ID.eq(ORGANIZATION.ID)
-                    .and(PATIENT.USER_ID.eq(ORGANIZATION.USER_ID)))
+                        .and(PATIENT.USER_ID.eq(ORGANIZATION.USER_ID)))
                 .join(USER).on(ORGANIZATION.USER_ID.eq(USER.ID))
                 .where(
                     REQUEST.ORDER_ID.eq(orderId)
-                    .and(REQUEST.SERVICE_ID.eq(serviceId))
-                    .and(REQUEST.SAMPLE_ID.eq(sampleId))
+                        .and(REQUEST.SERVICE_ID.eq(serviceId))
+                        .and(REQUEST.SAMPLE_ID.eq(sampleId))
                 )
 
         ).map{it.into(Request::class.java)}
+    }
+
+
 
 }

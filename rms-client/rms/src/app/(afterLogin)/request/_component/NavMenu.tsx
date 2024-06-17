@@ -124,14 +124,6 @@ export default function NavMenu() {
                         </ol>
                     </>
                 )}
-                <li>
-                    <Link href={"/request/qna"}>
-                        <FontAwesomeIcon
-                            className={segment === 'qna' ? style.clickIcon : style.icon}
-                            icon={faCircleQuestion}/>
-                        <span className={segment === 'qna' ? style.clickSpan : ''}>QnA</span>
-                    </Link>
-                </li>
             </ul>
         </li>
     )
