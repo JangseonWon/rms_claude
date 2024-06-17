@@ -26,8 +26,7 @@ class Router (
         PUT("/w-api/cart-service/requests", :: cartToOrder)
         PATCH("/w-api/cart-service/orders/{order_id}/services/{service_id}/samples/{sample_id}", :: updateRequest)
         GET("/w-api/cart-service/sample_types", :: sampleTypes)
-        DELETE("/w-api/cart-service/orders/{order_id}/services/{service_id}/samples/{sample_id}", :: deleteCart)
-
+        DELETE("/w-api/cart-service/requests", :: deleteCart)
     }
 
     private fun cartInfo(request: ServerRequest): Mono<ServerResponse> {
@@ -94,11 +93,9 @@ class Router (
             .onErrorResume(OrderNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
     }
     private fun deleteCart(request: ServerRequest): Mono<ServerResponse> {
-        val orderId = UUID.fromString(request.pathVariable("order_id"))
-        val sampleId = UUID.fromString(request.pathVariable("sample_id"))
-        val serviceId = request.pathVariable("service_id")
         return principal(request)
-            .flatMap { handler.deleteCart(orderId, sampleId, serviceId) }
+            .flatMap { request.bodyToMono(Array<Request>::class.java) }
+            .flatMap { handler.deleteCart(it).collectList() }
             .then(ServerResponse.ok().build())
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(OrderNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }

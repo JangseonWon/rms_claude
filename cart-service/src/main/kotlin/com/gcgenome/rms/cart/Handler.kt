@@ -66,19 +66,18 @@ class Handler(val dslContext: DSLContext ) :
     fun sampleTypes(serviceId: String): Flux<SampleType> {
         return dslContext.selectSampleTypeByServiceId(serviceId)
     }
-    fun deleteCart(orderId: UUID, sampleId: UUID, serviceId: String): Mono<Void> {
-        return Mono.from(dslContext.transactionPublisher { trx ->
+    fun deleteCart(requests: Array<Request>): Flux<Request> {
+        return Flux.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
-                selectRequestById(orderId, sampleId, serviceId)
-                    .flatMap { request ->
+                Flux.fromArray(requests).flatMap { request ->
                         deleteRequest(request)
                             .then(deleteOrderById(request.orderId!!))
                             .then(deleteSampleExtensionBySampleId(request.sample!!.id!!))
                             .then(deleteSampleById(request.sample!!.id!!))
                             .then(deletePatientById(request.sample!!.patient!!))
-                            .then()
-                    }
+                            .then(selectRequestById(request.orderId!!, request.sample!!.id!!, request.service!!.id!!))
 
+                }
             }
         })
     }

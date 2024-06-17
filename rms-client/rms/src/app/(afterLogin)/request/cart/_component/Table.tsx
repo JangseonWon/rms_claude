@@ -58,17 +58,11 @@ export default function Table() {
         router.push(`/request/cart/info?order=${row.order_id}&service=${row.service!.id}&sample=${row.sample!.id}&user_id=${row.sample!.patient!.organization!.user!.id}`);
     };
     const handleDeleteCart = async () => {
-        try {
-            const selectedRequests = requestData.filter(request => request.isSelected);
-            await Promise.all(selectedRequests.map(async request => {
-                const res = await deleteRequest(request);
-                if (!res.ok) throw new Error(`Failed to delete request with order_id: ${request.order_id}`);
-            }));
-            alert("delete!");
-            fetchData(page.size, page.number);
-        } catch (error) {
-            alert(`fail: ${error}`);
-        }
+        const selectedRequests = requestData.filter(request => request.isSelected);
+        const response = await deleteRequest(selectedRequests)
+        if(response.ok) alert("deleted!")
+        else alert("fail")
+        fetchData(page.size, page.number)
     };
     const handleCartToOrder = async () => {
         const selectedRequests = requestData.filter(request => request.isSelected);

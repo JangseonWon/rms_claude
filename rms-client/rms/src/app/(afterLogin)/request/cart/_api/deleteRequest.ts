@@ -1,7 +1,7 @@
 import {Request} from "@/model/Request"
 
-export async function deleteRequest(request: Request) {
-    return await fetch(`/w-api/cart-service/orders/${request.order_id}/services/${request.service!.id}/samples/${request.sample!.id}`, {
+export async function deleteRequest(request: Request[]) {
+    return await fetch(`/w-api/cart-service/requests`, {
         method: 'DELETE',
         headers: {
             "Content-Type": "application/json",
