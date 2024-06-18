@@ -1,6 +1,7 @@
 package com.gcgenome.rms.download
 
 import com.gcgenome.rms.auth.AuthenticationHandler
+import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.exception.AuthenticationNotFoundException
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -18,7 +19,10 @@ class Router (
     private val authenticationHandler: AuthenticationHandler
 ) {
     @Bean("com.gcgenome.rms.service-download.Router.Bean")
-    fun route() = router { GET("/w-api/order-service/orders/{order_id}/services/{service_id}/samples/{sample_id}/form", ::download) }
+    fun route() = router {
+        GET("/w-api/order-service/orders/{order_id}/services/{service_id}/samples/{sample_id}/form", ::download)
+        GET("/w-api/order-service/requests/reports/{report_id}/file", ::downloadRequest)
+    }
 
     private fun download(request: ServerRequest): Mono<ServerResponse> {
         val orderId = request.pathVariable("order_id")
@@ -37,12 +41,22 @@ class Router (
                 ServerResponse.badRequest().bodyValue(e)
             }
     }
-}
 
-fun interface HandlerAdapter : (ServerRequest) -> Mono<ServerResponse>
+    private fun downloadRequest(request: ServerRequest): Mono<ServerResponse> {
+        val requestId = request.pathVariable("report_id")
+        return principal(request)
+            .flatMap { user -> handler.downloadByRequestId(user, requestId) }
+            .flatMap { byteArray -> ServerResponse.ok().contentType(MediaType.APPLICATION_PDF)
+                    .header("Content-Disposition", "attachment; filename=$requestId.pdf")
+                    .bodyValue(byteArray) }
+            .switchIfEmpty(ServerResponse.status(HttpStatus.NO_CONTENT).build())
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}") }
+            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Error code: $e") }
+    }
 
-fun ((ServerRequest) -> Mono<ServerResponse>).toHandlerFunction(): HandlerAdapter {
-    return HandlerAdapter { request ->
-        this.invoke(request)
+
+    private fun principal(request: ServerRequest): Mono<UserAuthentication> {
+        return request.principal().switchIfEmpty(Mono.error(AuthenticationNotFoundException()))
+            .cast(UserAuthentication::class.java)
     }
 }

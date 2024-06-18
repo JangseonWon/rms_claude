@@ -18,9 +18,15 @@ spring:
         header: Authorization
         jwt:
           secret: ${SECURITY_PUBLIC_KEY}
-server:
-  port: 9886
-
 logging:
   level:
     io.r2dbc.postgresql.QUERY: TRACE # for queries
+aws:
+  credentials:
+    access-key: 1MI7K07L3RZF4G7XXK0J
+    secret-key: xvCHemrdHb9tJj6KhHDyBKlU20piGBoiF1Ok7SED
+  s3:
+    endpoint: https://s3.apps.gcgenome.com
+    bucket: rms-test-721be7ef-c1c6-459b-8bc6-0fb160f4d167
+server:
+  port: 9886

@@ -1,20 +1,27 @@
 package com.gcgenome.rms.download
 
+import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.dao.PatientDao
 import com.gcgenome.rms.dao.SampleExtensionDao
 import com.gcgenome.rms.data.Patient
 import com.gcgenome.rms.tables.pojos.SampleExtension
 import org.jooq.DSLContext
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
-import java.util.UUID
+import software.amazon.awssdk.core.async.AsyncResponseTransformer
+import software.amazon.awssdk.services.s3.S3AsyncClient
+import software.amazon.awssdk.services.s3.model.GetObjectRequest
+import java.util.*
 
 
 @Service
 class DownloadHandler(
     private val dslContext: DSLContext,
     private val niptHandler: NiptHandler,
-    private val genomeHealthHandler: GenomeHealthHandler
+    private val genomeHealthHandler: GenomeHealthHandler,
+    private val s3Client: S3AsyncClient,
+    @Value("\${aws.s3.bucket}") private val bucketName: String
 ): SampleExtensionDao, PatientDao {
 
     fun selectSampleExtensions(sampleId : UUID) : Mono<List<SampleExtension>>{
@@ -34,5 +41,22 @@ class DownloadHandler(
                 }
             }
         })
+    }
+
+    fun downloadByRequestId(authentication: UserAuthentication, requestId: String): Mono<ByteArray> {
+        val userId = authentication.user.id
+        val year = requestId.substring(0, 4)
+        val month = requestId.substring(4, 6)
+        val day = requestId.substring(6, 8)
+
+        val s3Key = "reports/$userId/$year/$month/$day/$requestId.pdf"
+        val getObjectRequest = GetObjectRequest.builder()
+            .bucket(bucketName)
+            .key(s3Key)
+            .build()
+
+        return Mono.fromFuture {
+            s3Client.getObject(getObjectRequest, AsyncResponseTransformer.toBytes())
+        }.map { it.asByteArray() }
     }
 }

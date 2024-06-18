@@ -8,6 +8,8 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useSession} from "next-auth/react";
 import type {Request} from "@/model/Request";
 import {fetchFinishedOrder} from "@/app/(afterLogin)/request/result/download/_api/fetchFinishedOrder";
+import {fetchDownloadFile} from "@/app/(afterLogin)/request/result/download/_api/fetchDownloadFile";
+import {useOpenAlertDialog, useSetIconAlertDialog, useSetMessageAlertDialog} from "@/store/useAlertDialogStore";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -18,6 +20,10 @@ export default function DownloadTable() {
     const isSelectedAll = requestData.every((row) => row.isSelected);
     const [page, setPage] = useState<Page>({size:5, number:1})
     const { data: session, status } = useSession();
+
+    const setShowAlertDialog = useOpenAlertDialog();
+    const setMessage = useSetMessageAlertDialog();
+    const setIcon = useSetIconAlertDialog();
 
     const handlePageChange = (newPageNumber: number) => {
         setPage(prevPage =>({...prevPage, number: newPageNumber}));
@@ -52,6 +58,29 @@ export default function DownloadTable() {
     useEffect(() => {
         fetchData(page.size, page.number)
     }, [page.size, page.number, fetchData]);
+
+    const handleDownloadOnClick = async (requestId: string) => {
+        try {
+            const response = await fetchDownloadFile(requestId);
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${requestId}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            } else {
+                setMessage(response.statusText);
+                setShowAlertDialog(true);
+                setIcon('error');
+            }
+        } catch (error) {
+            console.error("Failed to fetch download file:", error);
+        }
+    };
 
     return (
         <div className={style.container}>
@@ -103,7 +132,10 @@ export default function DownloadTable() {
                         <td>{row.physician}</td>
                         <td>{row.complete_at ? new Date(row.complete_at).toLocaleDateString() : 'N/A'}</td>
                         <td>
-                            <FontAwesomeIcon className={style.downloadIcon} icon={faDownload}/>
+                            <FontAwesomeIcon
+                                className={style.downloadIcon}
+                                icon={faDownload}
+                                onClick={() => handleDownloadOnClick(`${row.sample?.barcode}_${row.service?.id}` || '')}/>
                         </td>
                     </tr>
                 ))}

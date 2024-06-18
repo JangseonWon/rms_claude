@@ -21,6 +21,8 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.4")
     implementation("org.apache.pdfbox:pdfbox:2.0.29")
     jooqGenerator("org.postgresql:postgresql:42.6.0")
+    implementation("software.amazon.awssdk:s3:2.20.118")
+    implementation("software.amazon.awssdk:netty-nio-client:2.20.117")
 }
 jib {
     from { image = "eclipse-temurin:17.0.7_7-jre-jammy" }
