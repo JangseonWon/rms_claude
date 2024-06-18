@@ -12,7 +12,7 @@ data:
         import:
           - classpath:authentication.yaml
           - classpath:database.yaml
-          - classpath:aws-s3.yaml
+          - classpath:s3.yaml
       main:
         web-application-type: reactive
     server:
@@ -56,9 +56,9 @@ spec:
           configMap:
             name: database
             defaultMode: 420
-        - name: aws-s3-config
+        - name: s3-config
           configMap:
-            name: aws-s3
+            name: s3
             defaultMode: 420
       containers:
         - resources: {}
@@ -101,9 +101,9 @@ spec:
             - name: authentication-config
               mountPath: /app/resources/authentication.yaml
               subPath: authentication.yaml
-            - name: aws-s3-config
-              mountPath: /app/resources/aws-s3.yaml
-              subPath: aws-s3.yaml
+            - name: s3-config
+              mountPath: /app/resources/s3.yaml
+              subPath: s3.yaml
           terminationMessagePolicy: File
           image: 'image-registry.openshift-image-registry.svc:5000/{{ .Release.Namespace }}/order-service:latest'
       restartPolicy: Always
