@@ -12,6 +12,8 @@ data class User(
     val id: String?,
     @JsonProperty("name")
     val name: String?,
+    @JsonProperty("phone_number")
+    val phoneNumber: String?,
     @JsonProperty("branch_name")
     val branchName: String?,
     @JsonProperty("branch_serial")
