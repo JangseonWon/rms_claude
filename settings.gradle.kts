@@ -2,7 +2,6 @@ rootProject.name = "rms"
 
 include("entity")
 include("management-service")
-include("user")
 //include("alis-api")
 include("alis-sync")
 include("api")
