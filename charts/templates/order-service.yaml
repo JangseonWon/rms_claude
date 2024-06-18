@@ -56,6 +56,10 @@ spec:
           configMap:
             name: database
             defaultMode: 420
+        - name: aws-s3-config
+          configMap:
+            name: aws-s3
+            defaultMode: 420
       containers:
         - resources: {}
           terminationMessagePath: /dev/termination-log
@@ -97,6 +101,9 @@ spec:
             - name: authentication-config
               mountPath: /app/resources/authentication.yaml
               subPath: authentication.yaml
+            - name: aws-s3-config
+              mountPath: /app/resources/aws-s3.yaml
+              subPath: application.yaml
           terminationMessagePolicy: File
           image: 'image-registry.openshift-image-registry.svc:5000/{{ .Release.Namespace }}/order-service:latest'
       restartPolicy: Always
