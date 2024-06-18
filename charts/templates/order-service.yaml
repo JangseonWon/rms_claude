@@ -12,6 +12,7 @@ data:
         import:
           - classpath:authentication.yaml
           - classpath:database.yaml
+          - classpath:aws-s3.yaml
       main:
         web-application-type: reactive
     server:

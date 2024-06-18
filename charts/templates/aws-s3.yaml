@@ -1,0 +1,14 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: aws-s3
+  namespace: {{ .Release.Namespace }}
+data:
+  authorization.yaml: |
+    aws:
+      credentials:
+        access-key: ${rms-s3-credentials.access-key}
+        secret-key: ${rms-s3-credentials.secret-key}
+      s3:
+        endpoint: ${rms-s3-credentials.endpoint}
+        bucket: ${rms-s3-credentials.bucket}
