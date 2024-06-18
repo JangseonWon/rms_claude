@@ -103,7 +103,7 @@ spec:
               subPath: authentication.yaml
             - name: aws-s3-config
               mountPath: /app/resources/aws-s3.yaml
-              subPath: application.yaml
+              subPath: aws-s3.yaml
           terminationMessagePolicy: File
           image: 'image-registry.openshift-image-registry.svc:5000/{{ .Release.Namespace }}/order-service:latest'
       restartPolicy: Always

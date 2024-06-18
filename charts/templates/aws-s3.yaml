@@ -4,7 +4,7 @@ metadata:
   name: aws-s3
   namespace: {{ .Release.Namespace }}
 data:
-  application.yaml: |
+  aws-s3.yaml: |
     aws:
       credentials:
         access-key: ${rms-s3-credentials.access-key}
