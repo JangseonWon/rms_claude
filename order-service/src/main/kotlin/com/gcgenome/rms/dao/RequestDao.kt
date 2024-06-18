@@ -16,6 +16,17 @@ import java.time.LocalDateTime
 import java.util.*
 
 interface RequestDao {
+    fun DSLContext.changeStatusToFinished(serviceId: String, barcode: String): Mono<Request> {
+        return Mono.from(
+            update(REQUEST)
+                .set(REQUEST.STATUS, "FINISHED")
+                .from(SAMPLE)
+                .where(REQUEST.SERVICE_ID.eq(serviceId))
+                .and(SAMPLE.BARCODE.eq(barcode))
+                .and(SAMPLE.ID.eq(REQUEST.SAMPLE_ID))
+                .returning()
+        ).map { it.into(Request::class.java) }
+    }
 
     fun DSLContext.selectRequests(query: Query, where: Condition, userDto: User): Flux<Request> {
         val asc : SortOrder = when (query.asc) {

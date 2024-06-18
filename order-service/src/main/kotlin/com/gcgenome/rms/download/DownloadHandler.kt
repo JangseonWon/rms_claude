@@ -2,6 +2,7 @@ package com.gcgenome.rms.download
 
 import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.dao.PatientDao
+import com.gcgenome.rms.dao.RequestDao
 import com.gcgenome.rms.dao.SampleExtensionDao
 import com.gcgenome.rms.data.Patient
 import com.gcgenome.rms.tables.pojos.SampleExtension
@@ -22,7 +23,7 @@ class DownloadHandler(
     private val genomeHealthHandler: GenomeHealthHandler,
     private val s3Client: S3AsyncClient,
     @Value("\${aws.s3.bucket}") private val bucketName: String
-): SampleExtensionDao, PatientDao {
+): RequestDao, SampleExtensionDao, PatientDao {
 
     fun selectSampleExtensions(sampleId : UUID) : Mono<List<SampleExtension>>{
         return dslContext.selectSampleExtensions(sampleId).collectList()
@@ -45,6 +46,9 @@ class DownloadHandler(
 
     fun downloadByRequestId(authentication: UserAuthentication, requestId: String): Mono<ByteArray> {
         val userId = authentication.user.id
+        val parts = requestId.split("_")
+        val barcode = parts[0]
+        val serviceId = parts[1]
         val year = requestId.substring(0, 4)
         val month = requestId.substring(4, 6)
         val day = requestId.substring(6, 8)
@@ -55,8 +59,14 @@ class DownloadHandler(
             .key(s3Key)
             .build()
 
-        return Mono.fromFuture {
+        val downloadMono = Mono.fromFuture {
             s3Client.getObject(getObjectRequest, AsyncResponseTransformer.toBytes())
         }.map { it.asByteArray() }
+
+        val updateStatus = dslContext.changeStatusToFinished(serviceId, barcode)
+
+        return downloadMono.flatMap { byteArray ->
+            updateStatus.thenReturn(byteArray)
+        }
     }
 }
