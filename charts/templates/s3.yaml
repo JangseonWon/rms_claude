@@ -7,8 +7,8 @@ data:
   s3.yaml: |
     aws:
       credentials:
-        access-key: 1MI7K07L3RZF4G7XXK0J
-        secret-key: xvCHemrdHb9tJj6KhHDyBKlU20piGBoiF1Ok7SED
+        access-key: ${rms-s3-credentials.access-key}
+        secret-key: ${rms-s3-credentials.secret-key}
       s3:
         endpoint: ${rms-s3-credentials.endpoint}
         bucket: ${rms-s3-credentials.bucket}
