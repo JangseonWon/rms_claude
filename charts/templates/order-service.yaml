@@ -85,16 +85,6 @@ spec:
                 secretKeyRef:
                   name: jwt
                   key: public
-            - name: rms-s3-credentials.access-key
-              valueFrom:
-                secretKeyRef:
-                  name: rms-s3-credentials
-                  key: access-key
-            - name: rms-s3-credentials.secret-key
-              valueFrom:
-                secretKeyRef:
-                  name: rms-s3-credentials
-                  key: secret-key
             - name: rms-s3-credentials.endpoint
               valueFrom:
                 secretKeyRef:
