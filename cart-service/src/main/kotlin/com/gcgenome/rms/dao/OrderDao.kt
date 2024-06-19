@@ -1,7 +1,6 @@
 package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.Order
-import com.gcgenome.rms.data.Status
 import com.gcgenome.rms.tables.references.ORDER
 import com.gcgenome.rms.tables.references.REQUEST
 import org.jooq.DSLContext
