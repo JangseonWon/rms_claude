@@ -1,17 +1,12 @@
-export async function fetchFinishedOrder(userId: string | undefined, pageSize: number, pageNumber: number) {
+import {Paging} from "@/model/Paging";
+
+export async function fetchFinishedOrder(search: Paging) {
     const res = await fetch(`/w-api/order-service/requests?status=download`, {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-            filter: [{
-            }],
-            sort_by: "status",
-            asc: true,
-            size: pageSize,
-            page: pageNumber
-        }),
+        body: JSON.stringify(search),
         credentials: 'include',
         cache: 'no-store'
     });

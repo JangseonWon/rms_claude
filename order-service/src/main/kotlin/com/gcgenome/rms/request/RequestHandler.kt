@@ -7,6 +7,9 @@ import com.gcgenome.rms.exception.RequestForbiddenException
 import com.gcgenome.rms.exception.RequestNotFoundException
 import com.gcgenome.rms.exception.WebInputException
 import com.gcgenome.rms.tables.records.SampleExtensionRecord
+import com.gcgenome.rms.tables.references.PATIENT
+import com.gcgenome.rms.tables.references.REQUEST
+import com.gcgenome.rms.tables.references.SAMPLE
 import org.jooq.Condition
 import org.jooq.Configuration
 import org.jooq.DSLContext
@@ -15,7 +18,6 @@ import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 @Service
@@ -133,33 +135,23 @@ class RequestHandler(
     }
 
     fun buildFilterWhereClause(filters: List<Query.Companion.Filter>, status: String): Condition {
-        var conditions : List<Condition?> = mutableListOf()
-        conditions = filters.map { filter ->
-            var key = filter.key
-            val value = filter.value
-            key?.let {
-                value?.takeIf { it.isNotBlank() }?.let {
-                    if (!key.equals("createFrom") && !key.equals("createTo")) {
-                        if (key.equals("serial") || key.equals("name"))
-                            key = "PATIENT." + key
-                        field(key).likeIgnoreCase("%$it%") as Condition?
+        var conditions: Condition = noCondition()
+        filters.let {
+            for (filter in it) {
+                conditions = when (filter.key) {
+                    "date_from" -> conditions.and(REQUEST.CREATE_AT.ge(LocalDate.parse(filter.value).atStartOfDay()))
+                    "date_to" -> conditions.and(REQUEST.CREATE_AT.le(LocalDate.parse(filter.value).plusDays(1).atStartOfDay()))
+                    "status" -> conditions.and(REQUEST.STATUS.eq(filter.value))
+                    "search" -> {
+                        conditions.and(SAMPLE.BARCODE.like("%${filter.value}%"))
+                            .or(PATIENT.NAME.like("%${filter.value}%"))
+                            .or(PATIENT.SERIAL.like("%${filter.value}%"))
+                            .or(REQUEST.PHYSICIAN.like("%${filter.value}%"))
                     }
-                    else {
-                        null
-                    }
+
+                    else -> conditions
                 }
             }
-        }
-
-        val fromDate = filters.find { it.key.equals( "createFrom") }?.value
-        val toDate = filters.find { it.key.equals("createTo") }?.value
-
-        if (fromDate != null && toDate != null) {
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-            val startDate = LocalDate.parse(fromDate, formatter).atStartOfDay()
-            val endDate = LocalDate.parse(toDate, formatter).plusDays(1).atStartOfDay()
-            val betweenCondition = field("REQUEST.create_at").between(startDate, endDate)
-            (conditions as MutableList).add(betweenCondition)
         }
 
         val progressCondition: List<Condition?> = mutableListOf()
@@ -209,14 +201,10 @@ class RequestHandler(
             }
         }
 
-        val andCondition = conditions.reduceOrNull { acc, condition ->
-            acc?.and(condition) ?: condition
-        } ?: trueCondition()
-
         val orCondition = progressCondition.filterNotNull().reduceOrNull { acc, condition ->
             acc.or(condition) ?: condition
         } ?: trueCondition()
 
-        return andCondition.and(orCondition)
+        return conditions.and(orCondition)
     }
 }

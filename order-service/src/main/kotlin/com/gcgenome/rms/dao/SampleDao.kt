@@ -24,6 +24,17 @@ interface SampleDao {
             }
     }
 
+    fun DSLContext.selectSampleUserIdByBarcode(barcodePrefix: String): Mono<String> {
+        return Mono.from(select(SAMPLE.USER_ID)
+            .from(SAMPLE)
+            .where(SAMPLE.BARCODE.like("$barcodePrefix%"))
+            .orderBy(SAMPLE.BARCODE.desc())
+            .limit(1))
+            .mapNotNull { result ->
+                result?.component1()
+            }
+    }
+
     fun DSLContext.deleteSampleById(sampleId: UUID): Mono<Sample> {
         return Mono.from(
             deleteFrom(SAMPLE).where(SAMPLE.ID.eq(sampleId))

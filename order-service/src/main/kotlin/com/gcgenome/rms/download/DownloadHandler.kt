@@ -3,6 +3,7 @@ package com.gcgenome.rms.download
 import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.dao.PatientDao
 import com.gcgenome.rms.dao.RequestDao
+import com.gcgenome.rms.dao.SampleDao
 import com.gcgenome.rms.dao.SampleExtensionDao
 import com.gcgenome.rms.data.Patient
 import com.gcgenome.rms.tables.pojos.SampleExtension
@@ -23,7 +24,7 @@ class DownloadHandler(
     private val genomeHealthHandler: GenomeHealthHandler,
     private val s3Client: S3AsyncClient,
     @Value("\${aws.s3.bucket}") private val bucketName: String
-): RequestDao, SampleExtensionDao, PatientDao {
+): RequestDao, SampleDao, SampleExtensionDao, PatientDao {
 
     fun selectSampleExtensions(sampleId : UUID) : Mono<List<SampleExtension>>{
         return dslContext.selectSampleExtensions(sampleId).collectList()
@@ -45,28 +46,30 @@ class DownloadHandler(
     }
 
     fun downloadByRequestId(authentication: UserAuthentication, requestId: String): Mono<ByteArray> {
-        val userId = authentication.user.id
         val parts = requestId.split("_")
         val barcode = parts[0]
         val serviceId = parts[1]
         val year = requestId.substring(0, 4)
         val month = requestId.substring(4, 6)
         val day = requestId.substring(6, 8)
+        val userIdMono = dslContext.selectSampleUserIdByBarcode(barcode)
 
-        val s3Key = "reports/$userId/$year/$month/$day/$requestId.pdf"
-        val getObjectRequest = GetObjectRequest.builder()
-            .bucket(bucketName)
-            .key(s3Key)
-            .build()
+        return userIdMono.flatMap { userId ->
+            val s3Key = "reports/$userId/$year/$month/$day/$requestId.pdf"
+            val getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(s3Key)
+                .build()
 
-        val downloadMono = Mono.fromFuture {
-            s3Client.getObject(getObjectRequest, AsyncResponseTransformer.toBytes())
-        }.map { it.asByteArray() }
+            val downloadMono = Mono.fromFuture {
+                s3Client.getObject(getObjectRequest, AsyncResponseTransformer.toBytes())
+            }.map { it.asByteArray() }
 
-        val updateStatus = dslContext.changeStatusToFinished(serviceId, barcode)
+            val updateStatus = dslContext.changeStatusToFinished(serviceId, barcode)
 
-        return downloadMono.flatMap { byteArray ->
-            updateStatus.thenReturn(byteArray)
+            downloadMono.flatMap { byteArray ->
+                updateStatus.thenReturn(byteArray)
+            }
         }
     }
 }
