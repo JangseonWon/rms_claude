@@ -8,6 +8,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useSession} from "next-auth/react";
 import type {Request} from "@/model/Request";
 import {fetchFinishedOrder} from "@/app/(afterLogin)/request/result/download/_api/fetchFinishedOrder";
+import {Paging} from "@/model/Paging";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -15,16 +16,24 @@ interface RequestWithSelected extends Request {
 
 export default function ReSampleTable() {
     const [requestData, setRequestData] = useState<RequestWithSelected[]>([]);
-    const isSelectedAll = requestData.every((row) => row.isSelected);
-    const [page, setPage] = useState<Page>({size:5, number:1})
+    const isSelectedAll = requestData && requestData.length > 0 ? requestData.every((row) => row.isSelected) : false;
+    const [search, setSearch] =
+        useState<Paging>({filters: [], sort_by:"status", asc: true, size:5, page:1});
+    const [totalPage, setTotalPage] = useState<number>(0);
     const { data: session, status } = useSession();
 
     const handlePageChange = (newPageNumber: number) => {
-        setPage(prevPage =>({...prevPage, number: newPageNumber}));
+        setSearch(prevPage =>({
+            ...prevPage,
+            page: newPageNumber
+        }));
     };
     const handlePageSizeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const newSize = parseInt(event.target.value);
-        setPage((prevPage) => ({ ...prevPage, size: newSize }));
+        setSearch(prevSearch => ({
+            ...prevSearch,
+            size: newSize
+        }));
     };
 
     const handleSelectChange = (rowIndex: number, isSelected: boolean) => {
@@ -47,18 +56,24 @@ export default function ReSampleTable() {
         alert("closed");
     }
 
-    const fetchData = useCallback(async (pageSize: number, pageNumber: number) => {
-        const response = await fetchFinishedOrder(session?.user?.id, pageSize, pageNumber);
-        const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
-        const responseData = await response.json();
-        const data = responseData.data;
-        setRequestData(data as Request[] || []);
-        setPage(prevPage => ({ ...prevPage, totalPage: totalPage }));
-    }, [session?.user?.id]);
+    const fetchData = async (search: Paging) => {
+        try {
+            const response = await fetchFinishedOrder(search)
+            const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
+            const responseData = await response.json();
+            const data = responseData.data;
+            setRequestData(data as Request[]);
+            setTotalPage(totalPage)
+        } catch(error) {
+            console.error("Failed to fetch data:", error);
+            setRequestData([]);
+            setTotalPage(0);
+        }
+    }
 
     useEffect(() => {
-        fetchData(page.size, page.number)
-    }, [page.size, page.number, fetchData]);
+        fetchData(search)
+    }, [search]);
 
     return (
         <div className={style.container}>
@@ -86,7 +101,7 @@ export default function ReSampleTable() {
                 </tr>
                 </thead>
                 <tbody>
-                {requestData.map((row, rowIndex) => (
+                {requestData && requestData.length > 0 && requestData.map((row, rowIndex) => (
                     <tr key={row.order_id! + row.service!.id + row.sample!.id}>
                         <td>
                             <label form="agree" className={style.checkbox}>
@@ -123,15 +138,15 @@ export default function ReSampleTable() {
                         <option value="20">20</option>
                     </select>
                 </div>
-                <span> 1-{page.totalPage} of {page.number} </span>
+                <span> 1-{totalPage} of {search.page} </span>
                 <button
-                    disabled={page.number === 1}
-                    onClick={() => handlePageChange(page.number - 1)}
+                    disabled={search.page === 1}
+                    onClick={() => handlePageChange(search.page - 1)}
                 ><FontAwesomeIcon icon={faAngleLeft}/>
                 </button>
                 <button
-                    disabled={page.number === page.totalPage}
-                    onClick={() => handlePageChange(page.number + 1)}
+                    disabled={search.page === totalPage}
+                    onClick={() => handlePageChange(search.page + 1)}
                 ><FontAwesomeIcon icon={faAngleRight}/>
                 </button>
             </div>
