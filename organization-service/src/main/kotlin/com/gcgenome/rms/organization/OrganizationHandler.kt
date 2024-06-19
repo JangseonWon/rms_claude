@@ -1,12 +1,11 @@
 package com.gcgenome.rms.organization
 
 import com.gcgenome.rms.dao.OrganizationDao
-import com.gcgenome.rms.data.PatchOrganization
 import com.gcgenome.rms.data.Page
+import com.gcgenome.rms.data.PatchOrganization
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.exception.OrganizationNotFoundException
 import com.gcgenome.rms.tables.pojos.Organization
-import com.gcgenome.rms.tables.references.ORGANIZATION
 import org.jooq.Condition
 import org.jooq.DSLContext
 import org.jooq.impl.DSL

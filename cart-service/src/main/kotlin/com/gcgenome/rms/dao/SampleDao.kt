@@ -4,7 +4,6 @@ import com.gcgenome.rms.data.Sample
 import com.gcgenome.rms.tables.references.REQUEST
 import com.gcgenome.rms.tables.references.SAMPLE
 import org.jooq.DSLContext
-import org.jooq.impl.DSL
 import org.jooq.impl.DSL.*
 import reactor.core.publisher.Mono
 import java.time.LocalDateTime
