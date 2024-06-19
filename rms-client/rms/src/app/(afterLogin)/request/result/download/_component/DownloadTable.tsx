@@ -119,7 +119,7 @@ export default function DownloadTable() {
             <section className={style.filterContainer}>
                 <div className={style.filterContainerLeft}>
                     <DatePickerRangeBox
-                        label={"from-to"}
+                        label={"date-from-to"}
                         onChange={(from, to) => {
                             handleSearchChange({key: "date_from", value: format(from, "yyyy-MM-dd")})
                             handleSearchChange({key: "date_to", value: format(to, "yyyy-MM-dd")})
