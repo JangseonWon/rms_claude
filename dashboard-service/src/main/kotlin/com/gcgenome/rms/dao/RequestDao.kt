@@ -1,12 +1,13 @@
 package com.gcgenome.rms.dao
 
-import com.gcgenome.rms.data.StatusCount
 import com.gcgenome.rms.authentication.User
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.Request
 import com.gcgenome.rms.data.Status
+import com.gcgenome.rms.data.StatusCount
 import com.gcgenome.rms.tables.references.*
-import org.jooq.*
+import org.jooq.Condition
+import org.jooq.DSLContext
 import org.jooq.impl.DSL.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
