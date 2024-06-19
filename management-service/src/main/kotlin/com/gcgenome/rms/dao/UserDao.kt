@@ -1,14 +1,13 @@
 package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.Query
-import com.gcgenome.rms.data.UpdateUser
 import com.gcgenome.rms.data.User
 import com.gcgenome.rms.tables.references.ORGANIZATION
 import com.gcgenome.rms.tables.references.USER
 import org.jooq.Condition
 import org.jooq.DSLContext
 import org.jooq.SortOrder
-import org.jooq.impl.DSL
+import org.jooq.impl.*
 import org.jooq.impl.DSL.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -103,18 +102,18 @@ interface UserDao{
         ).map{it.into(User::class.java)}
     }
 
-    fun DSLContext.updateUserById(userId: String, password: String?, userDto: UpdateUser): Mono<User> {
+    fun DSLContext.updateUserById(user: User): Mono<User> {
         return Mono.from(
             update(USER)
-                .set(USER.NAME, DSL.coalesce(DSL.`val`(userDto.name), USER.NAME))
-                .set(USER.PASSWORD, DSL.coalesce(DSL.`val`(password), USER.PASSWORD))
-                .set(USER.ROLE, DSL.coalesce(DSL.`val`(userDto.role), USER.ROLE))
-                .set(USER.TYPE, DSL.coalesce(DSL.`val`(userDto.type), USER.TYPE))
-                .set(USER.EMAIL, DSL.coalesce(DSL.`val`(userDto.email), USER.EMAIL))
-                .set(USER.PHONE_NUMBER, DSL.coalesce(DSL.`val`(userDto.phoneNumber), USER.PHONE_NUMBER))
-                .set(USER.STATE, DSL.coalesce(DSL.`val`(userDto.state), USER.STATE))
-                .where(USER.ID.eq(userId))
-                .returningResult(USER.ID,USER.NAME,USER.ROLE,USER.TYPE,USER.EMAIL,USER.PHONE_NUMBER,USER.KEY,USER.STATE,USER.BRANCH_SERIAL,USER.BRANCH_NAME,USER.CREATE_AT)
+                .set(USER.NAME, coalesce(`val`(user.name), USER.NAME))
+                .set(USER.PASSWORD, coalesce(`val`(user.password), USER.PASSWORD))
+                .set(USER.ROLE, coalesce(`val`(user.role), USER.ROLE))
+                .set(USER.TYPE, coalesce(`val`(user.type), USER.TYPE))
+                .set(USER.EMAIL, coalesce(`val`(user.email), USER.EMAIL))
+                .set(USER.PHONE_NUMBER, coalesce(`val`(user.phoneNumber), USER.PHONE_NUMBER))
+                .set(USER.STATE, coalesce(`val`(user.state), USER.STATE))
+                .where(USER.ID.eq(user.id))
+                .returningResult(USER.ID,USER.NAME,USER.ROLE,USER.TYPE,USER.EMAIL,USER.PHONE_NUMBER,USER.STATE,USER.BRANCH_SERIAL,USER.BRANCH_NAME,USER.CREATE_AT)
         ).map{it.into(User::class.java)}
     }
 }

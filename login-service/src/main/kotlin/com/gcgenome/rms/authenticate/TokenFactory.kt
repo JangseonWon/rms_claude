@@ -27,20 +27,11 @@ class TokenFactory(
         val payload = Token(
             nbf = iat,
             exp = iat + duration,
-            iss = "rms.gcgenome.com",
-            aud = "rms.gcgenome.com",
+            iss = "rms-test.gcgenome.com",
+            aud = "rms-test.gcgenome.com",
             iat = iat,
             jti = UUID.randomUUID().toString(),
             user = user.apply { password = null }
-            /*userId = user.id!!,
-            name = user.name!!,
-            role = user.role!!,
-            type = user.type!!,
-            email = user.email,
-            phoneNumber = user.phoneNumber,
-            state = user.state!!,
-            branchSerial =  user.branchSerial!!,
-            branchName = user.branchName!!,*/
         )
         return sign(payload)
     }

@@ -8,7 +8,6 @@ import com.gcgenome.rms.data.*
 import com.gcgenome.rms.exception.*
 import com.gcgenome.rms.tables.pojos.Organization
 import org.jooq.Condition
-import org.jooq.Configuration
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.jooq.impl.DSL.field
@@ -84,37 +83,22 @@ class UserHandler(
             }.map { it }
         })
     }
-
-    fun updateUserById(authentication: UserAuthentication, userId: String, userDto: UpdateUser): Mono<User> {
+    fun updateUserById(authentication: UserAuthentication, user: User): Mono<User> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
-                managerAuthenticationHandler.chkMySelf(authentication, userId)
-                    .switchIfEmpty(managerAuthenticationHandler.chkManager(authentication))
-                    .filterWhen{checkPassword(userDto)}.switchIfEmpty(Mono.error(PasswordNotMatchException()))
-                    .then(selectUserById(userId).switchIfEmpty(Mono.error(UserNotFoundException(userId))))
-                    .flatMap { updateUser(userId,userDto,trx) }
-                    .flatMap { updateOrganizationNameByUserId(it)
-                        .map { organization -> it.organization = organization; it } }
-            }.map { it }
+                if (isAuthorized(authentication, user)) {
+                    user.password = user.password?.takeIf { it.isNotBlank() }?.let { encoder.encode(it) }
+                    updateUserById(user)
+                } else {
+                    Mono.error(ManagerAuthenticationException())
+                }
+            }
         })
     }
-
-    private fun checkPassword(userDto: UpdateUser):Mono<Boolean>{
-        return userDto.password?.let { pw ->
-            Mono.just(pw.password == pw.passwordConfirm)
-        } ?: Mono.just(true)
+    private fun isAuthorized(authentication: UserAuthentication, user: User): Boolean {
+        return authentication.user.role in listOf(Role.ADMIN.toString(), Role.MANAGER.toString()) ||
+                authentication.user.id == user.id
     }
-
-    fun updateUser(userId:String, userDto: UpdateUser, trx:Configuration): Mono<User>{
-        var password:String? = null
-        if (userDto.password!=null)
-            password = encoder.encode(userDto.password.password)
-
-        return Mono.from(trx.dsl().run {
-            updateUserById(userId, password,userDto)
-        })
-    }
-
     fun insertUserOrganization(userId: String, authentication: UserAuthentication, organization: Organization): Mono<Organization_> {
         val organizationDto = Organization_(
             id = organization.id!!,

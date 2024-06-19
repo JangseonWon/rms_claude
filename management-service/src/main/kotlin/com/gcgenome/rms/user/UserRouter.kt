@@ -94,8 +94,8 @@ class UserRouter(
 
     private fun updateUser(request: ServerRequest): Mono<ServerResponse> {
         val userId = request.pathVariable("userId")
-        return Mono.zip(authenticationHandler.principal(request), request.bodyToMono(UpdateUser::class.java))
-            .flatMap { p -> userHandler.updateUserById(p.t1, userId, p.t2) }
+        return Mono.zip(authenticationHandler.principal(request), request.bodyToMono(User::class.java))
+            .flatMap { p -> userHandler.updateUserById(p.t1, p.t2.apply { id = userId }) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), User::class.java) }
             .onErrorResume(MatchUserException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}") }
             .onErrorResume (ServerWebInputException::class.java) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue(WebInputException().message.toString()) }

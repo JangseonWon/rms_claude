@@ -1,7 +1,7 @@
 import {User} from "@/model/User";
 
-export async function fetchUserUpdate(user: User, userId: string | undefined) {
-    const res = await fetch(`/w-api/management-service/users/${userId}`, {
+export async function fetchUserUpdate(user: User) {
+    return await fetch(`/w-api/management-service/users/${user.id}`, {
         method: 'PATCH',
         headers: {
             "Content-Type": "application/json",
@@ -10,7 +10,4 @@ export async function fetchUserUpdate(user: User, userId: string | undefined) {
         credentials: 'include',
         cache: 'no-store'
     });
-    if (!res.ok) throw new Error('Failed to fetch data');
-
-    return await res.json();
 }

@@ -9,24 +9,24 @@ import java.time.LocalDateTime
 import java.util.*
 
 data class User(
-    val id: String,
-    val name: String?,
-    val password: String?,
-    val role: String,
-    val type: String?,
-    val email: String?,
+    var id: String,
+    var name: String?,
+    var password: String?,
+    var role: String,
+    var type: String?,
+    var email: String?,
     @JsonProperty("phone_number")
-    val phoneNumber: String?,
-    val key: UUID?,
-    val state: String?,
+    var phoneNumber: String?,
+    var key: UUID?,
+    var state: String?,
     @JsonProperty("branch_serial")
-    val branchSerial:String?,
+    var branchSerial:String?,
     @JsonProperty("branch_name")
-    val branchName:String?,
+    var branchName:String?,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("create_at")
-    val createAt: LocalDateTime?,
+    var createAt: LocalDateTime?,
     var organization: Organization_?,
-    val service:Service_?
+    var service:Service_?
 )

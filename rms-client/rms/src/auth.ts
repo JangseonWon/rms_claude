@@ -3,7 +3,6 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import JWTParser from "jsonwebtoken"
 import {cookies} from "next/headers";
 import cookie from 'cookie'
-import {UUID} from "node:crypto";
 
 declare module 'next-auth' {
     interface Session {
@@ -13,11 +12,10 @@ declare module 'next-auth' {
             branch_serial: string,
             email: string,
             name: string,
+            phone_number: string,
             role: string,
             state: string,
-            type: string,
-            phone_number: string,
-            key: UUID
+            type: string
         } & DefaultSession['user']
     }
 }
@@ -30,20 +28,15 @@ declare module '@auth/core/jwt' {
             branch_serial: string,
             email: string,
             name: string,
+            phone_number: string,
             role: string,
             state: string,
-            type: string,
-            phone_number: string,
-            key: UUID
+            type: string
         }
     }
 }
 
-export const{
-    handlers: {GET, POST},
-    auth,
-    signIn
-} = NextAuth({
+export const{handlers: {GET, POST}, auth} = NextAuth({
     pages:{
         signIn: '/login'
     },
@@ -60,7 +53,6 @@ export const{
             session.user.role = token.user.role
             session.user.state = token.user.state
             session.user.type = token.user.type
-            session.user.key = token.user.key
             session.user.phone_number = token.user.phone_number
             return session
         }
