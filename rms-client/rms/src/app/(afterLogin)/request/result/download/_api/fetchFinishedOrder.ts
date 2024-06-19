@@ -1,5 +1,5 @@
 export async function fetchFinishedOrder(userId: string | undefined, pageSize: number, pageNumber: number) {
-    const res = await fetch(`/w-api/order-service/requests?status=deliver`, {
+    const res = await fetch(`/w-api/order-service/requests?status=download`, {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
@@ -7,8 +7,8 @@ export async function fetchFinishedOrder(userId: string | undefined, pageSize: n
         body: JSON.stringify({
             filter: [{
             }],
-            sort_by: "last_modify_at",
-            asc: false,
+            sort_by: "status",
+            asc: true,
             size: pageSize,
             page: pageNumber
         }),

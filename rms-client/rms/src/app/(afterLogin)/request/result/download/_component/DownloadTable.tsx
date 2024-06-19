@@ -72,6 +72,7 @@ export default function DownloadTable() {
                 a.click();
                 document.body.removeChild(a);
                 window.URL.revokeObjectURL(url);
+                fetchData(page.size, page.number);
             } else {
                 setMessage(response.statusText);
                 setShowAlertDialog(true);
@@ -104,6 +105,7 @@ export default function DownloadTable() {
                     <th>Institution</th>
                     <th>Physician Name</th>
                     <th>Report out<br/>(YYYY/MM/DD)</th>
+                    <th>Status</th>
                     <th>Report Download</th>
                 </tr>
                 </thead>
@@ -131,6 +133,7 @@ export default function DownloadTable() {
                         <td>{row.sample?.patient?.organization?.id}</td>
                         <td>{row.physician}</td>
                         <td>{row.complete_at ? new Date(row.complete_at).toLocaleDateString() : 'N/A'}</td>
+                        <td>{row.status}</td>
                         <td>
                             <FontAwesomeIcon
                                 className={style.downloadIcon}

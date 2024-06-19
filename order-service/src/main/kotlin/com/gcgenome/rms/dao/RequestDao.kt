@@ -130,7 +130,7 @@ interface RequestDao {
                 .apply {
                     when { userDto.role.equals("USER") -> and(ORDER.USER_ID.eq(userDto.id)) }
                 }
-                .orderBy(field(query.sortBy).sort(asc))
+                .orderBy(field(query.sortBy).sort(asc), SAMPLE.BARCODE.desc())
                 .limit(query.size)
                 .offset(query.page*query.size)
         ).map { record -> Request.toPatientModel(record) }

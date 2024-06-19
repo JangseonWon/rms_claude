@@ -197,6 +197,12 @@ class RequestHandler(
                     (progressCondition as MutableList).add(field("status").like("%$status%"))
                 }
             }
+            status == "download" -> {
+                val progress = Status.entries.filter { it == Status.DELIVERED || it == Status.FINISHED}
+                progress.forEach { status ->
+                    (progressCondition as MutableList).add(field("status").like("%$status%"))
+                }
+            }
             else -> {
                 if (status != "all")
                     throw WebInputException()
