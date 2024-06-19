@@ -148,7 +148,6 @@ class RequestHandler(
                             .or(PATIENT.SERIAL.like("%${filter.value}%"))
                             .or(REQUEST.PHYSICIAN.like("%${filter.value}%"))
                     }
-
                     else -> conditions
                 }
             }
