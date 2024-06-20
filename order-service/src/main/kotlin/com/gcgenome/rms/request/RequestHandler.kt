@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.time.LocalDate
-import java.util.UUID
+import java.util.*
 
 @Service
 class RequestHandler(
@@ -143,10 +143,11 @@ class RequestHandler(
                     "date_to" -> conditions.and(REQUEST.CREATE_AT.le(LocalDate.parse(filter.value).plusDays(1).atStartOfDay()))
                     "status" -> conditions.and(REQUEST.STATUS.eq(filter.value))
                     "search" -> {
-                        conditions.and(SAMPLE.BARCODE.like("%${filter.value}%"))
-                            .or(PATIENT.NAME.like("%${filter.value}%"))
-                            .or(PATIENT.SERIAL.like("%${filter.value}%"))
-                            .or(REQUEST.PHYSICIAN.like("%${filter.value}%"))
+                        conditions.and(SAMPLE.BARCODE.likeIgnoreCase("%${filter.value}%"))
+                            .or(PATIENT.NAME.likeIgnoreCase("%${filter.value}%"))
+                            .or(PATIENT.SERIAL.likeIgnoreCase("%${filter.value}%"))
+                            .or(REQUEST.PHYSICIAN.likeIgnoreCase("%${filter.value}%"))
+                            .or(PATIENT.ORGANIZATION_ID.likeIgnoreCase("%${filter.value}%"))
                     }
                     else -> conditions
                 }
@@ -201,7 +202,7 @@ class RequestHandler(
         }
 
         val orCondition = progressCondition.filterNotNull().reduceOrNull { acc, condition ->
-            acc.or(condition) ?: condition
+            acc.or(condition)
         } ?: trueCondition()
 
         return conditions.and(orCondition)
