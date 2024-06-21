@@ -1,14 +1,16 @@
 "use client"
 
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import style from "@/app/(afterLogin)/request/result/resample/_component/reSampleTable.module.css";
-import type {Page} from "@/model/Page"
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useSession} from "next-auth/react";
 import type {Request} from "@/model/Request";
 import {fetchFinishedOrder} from "@/app/(afterLogin)/request/result/download/_api/fetchFinishedOrder";
 import {Paging} from "@/model/Paging";
+import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
+import {format} from "date-fns";
+import InputBox from "@/app/_component/InputBox";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -43,6 +45,17 @@ export default function ReSampleTable() {
             return updatedData;
         });
     };
+
+    const handleSearchChange = (newFilter: { key: string; value: string }) => {
+        setSearch((prevSearch) => {
+            const updatedFilters = prevSearch.filters?.slice() || [];
+            const existingFilterIndex = updatedFilters.findIndex((filter) => filter.key === newFilter.key)
+            if (existingFilterIndex !== -1) updatedFilters[existingFilterIndex] = newFilter;
+            else updatedFilters.push(newFilter);
+            return { ...prevSearch, filters: updatedFilters }
+        });
+    };
+
     const handleSelectAll = (isSelected: boolean) => {
         setRequestData((prevData) =>
             prevData.map((row) => ({ ...row, isSelected }))
@@ -76,80 +89,98 @@ export default function ReSampleTable() {
     }, [search]);
 
     return (
-        <div className={style.container}>
-            <table className={style.table}>
-                <thead>
-                <tr>
-                    <th>
-                        <label form="agree" className={style.checkbox}>
-                            <input
-                                type="checkbox"
-                                checked={isSelectedAll}
-                                onChange={() => handleSelectAll(!isSelectedAll)}
-                                className={style.checkbox}
-                            />
-                            <span className={style.checkmark}></span>
-                        </label>
-                    </th>
-                    <th>Registration Number</th>
-                    <th>Patient(s) Name</th>
-                    <th>MRN</th>
-                    <th>Resample Notice<br/>(YYYY/MM/DD)</th>
-                    <th>Reason</th>
-                    <th>Resample</th>
-                    <th>Closed</th>
-                </tr>
-                </thead>
-                <tbody>
-                {requestData && requestData.length > 0 && requestData.map((row, rowIndex) => (
-                    <tr key={row.order_id! + row.service!.id + row.sample!.id}>
-                        <td>
+        <>
+            <section className={style.filterContainer}>
+                <div className={style.filterContainerLeft}>
+                    <DatePickerRangeBox
+                        label={"date-from-to"}
+                        onChange={(from, to) => {
+                            handleSearchChange({key: "date_from", value: format(from, "yyyy-MM-dd")})
+                            handleSearchChange({key: "date_to", value: format(to, "yyyy-MM-dd")})
+                        }}/>
+                </div>
+                <div className={style.filterContainerRight}>
+                    <InputBox label={"search"} onChange={(value) => {
+                        handleSearchChange({key: "search", value: value})
+                    }}></InputBox>
+                </div>
+            </section>
+            <section>
+                <button className={style.reSampleButton}>
+                    Re-Sample
+                </button>
+            </section>
+            <section className={style.tableContainer}>
+                <table className={style.table}>
+                    <thead>
+                    <tr>
+                        <th>
                             <label form="agree" className={style.checkbox}>
                                 <input
                                     type="checkbox"
-                                    checked={row.isSelected || false}
-                                    onChange={() => handleSelectChange(rowIndex, !row.isSelected)}
+                                    checked={isSelectedAll}
+                                    onChange={() => handleSelectAll(!isSelectedAll)}
                                     className={style.checkbox}
                                 />
                                 <span className={style.checkmark}></span>
                             </label>
-                        </td>
-                        <td>
-                            {row.sample?.barcode
-                                ? `${row.sample.barcode.slice(0, 8)}-${row.sample.barcode.slice(8, 11)}-${row.sample.barcode.slice(11)}`
-                                : ''}
-                        </td>
-                        <td>{row.sample?.patient?.name}</td>
-                        <td>{row.sample?.patient?.serial}</td>
-                        <td>{row.resample_at ? new Date(row.resample_at).toLocaleDateString() : 'N/A'}</td>
-                        <td>{row.sample?.resample_reason}</td>
-                        <td className={style.request} onClick={handleRequestOnClick}>Request</td>
-                        <td className={style.closed} onClick={handleClosedOnClick}>Closed</td>
+                        </th>
+                        <th>Registration Number</th>
+                        <th>Patient(s) Name</th>
+                        <th>MRN</th>
+                        <th>Resample Notice<br/>(YYYY/MM/DD)</th>
+                        <th>Reason</th>
+                        <th>Resample</th>
+                        <th>Closed</th>
                     </tr>
-                ))}
-                </tbody>
-            </table>
-            <div className={style.pagination}>
-                <span>items per page:</span>
-                <div className={style.select}>
-                    <select onChange={handlePageSizeChange}>
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="20">20</option>
-                    </select>
+                    </thead>
+                    <tbody>
+                    {requestData && requestData.length > 0 && requestData.map((row, rowIndex) => (
+                        <tr key={row.order_id! + row.service!.id + row.sample!.id}>
+                            <td>
+                                <label form="agree" className={style.checkbox}>
+                                    <input
+                                        type="checkbox"
+                                        checked={row.isSelected || false}
+                                        onChange={() => handleSelectChange(rowIndex, !row.isSelected)}
+                                        className={style.checkbox}
+                                    />
+                                    <span className={style.checkmark}></span>
+                                </label>
+                            </td>
+                            <td>{row.sample?.barcode}</td>
+                            <td>{row.sample?.patient?.name}</td>
+                            <td>{row.sample?.patient?.serial}</td>
+                            <td>{row.resample_at ? new Date(row.resample_at).toLocaleDateString() : 'N/A'}</td>
+                            <td>{row.sample?.resample_reason}</td>
+                            <td className={style.request} onClick={handleRequestOnClick}>Request</td>
+                            <td className={style.closed} onClick={handleClosedOnClick}>Closed</td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+                <div className={style.pagination}>
+                    <span>items per page:</span>
+                    <div className={style.select}>
+                        <select onChange={handlePageSizeChange}>
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                        </select>
+                    </div>
+                    <span> 1-{totalPage} of {search.page} </span>
+                    <button
+                        disabled={search.page === 1}
+                        onClick={() => handlePageChange(search.page - 1)}
+                    ><FontAwesomeIcon icon={faAngleLeft}/>
+                    </button>
+                    <button
+                        disabled={search.page === totalPage}
+                        onClick={() => handlePageChange(search.page + 1)}
+                    ><FontAwesomeIcon icon={faAngleRight}/>
+                    </button>
                 </div>
-                <span> 1-{totalPage} of {search.page} </span>
-                <button
-                    disabled={search.page === 1}
-                    onClick={() => handlePageChange(search.page - 1)}
-                ><FontAwesomeIcon icon={faAngleLeft}/>
-                </button>
-                <button
-                    disabled={search.page === totalPage}
-                    onClick={() => handlePageChange(search.page + 1)}
-                ><FontAwesomeIcon icon={faAngleRight}/>
-                </button>
-            </div>
-        </div>
+            </section>
+        </>
     );
 }
