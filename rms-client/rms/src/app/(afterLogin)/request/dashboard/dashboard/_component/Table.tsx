@@ -12,6 +12,7 @@ import SelectBox from "@/app/_component/SelectBox";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import {useStatus} from "@/app/(afterLogin)/request/dashboard/dashboard/store/useStatusStore";
 import {Paging} from "@/model/Paging";
+import DownloadExcelButton from "@/app/(afterLogin)/request/dashboard/dashboard/_component/DownloadExcelButton";
 
 export default function Table() {
     const [requestData, setRequestData] = useState<Request[]>([]);
@@ -101,9 +102,12 @@ export default function Table() {
                     }}/>
                 </div>
                 <div className={style.filterContainerLeft}>
-                    <InputBox label={"search"} onChange={(value) =>{
-                        handleSearchChange({key: "search", value: value})
-                    }}></InputBox>
+                    <DownloadExcelButton requestData={requestData} status={status} />
+                    <div className={style.search}>
+                        <InputBox label={"search"} onChange={(value) =>{
+                            handleSearchChange({key: "search", value: value})
+                        }}></InputBox>
+                    </div>
                 </div>
             </div>
             <table className={style.table}>
