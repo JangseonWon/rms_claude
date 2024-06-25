@@ -141,7 +141,13 @@ class RequestHandler(
                 conditions = when (filter.key) {
                     "date_from" -> conditions.and(REQUEST.CREATE_AT.ge(LocalDate.parse(filter.value).atStartOfDay()))
                     "date_to" -> conditions.and(REQUEST.CREATE_AT.le(LocalDate.parse(filter.value).plusDays(1).atStartOfDay()))
-                    "status" -> conditions.and(REQUEST.STATUS.eq(filter.value))
+                    "status" -> {
+                        if (filter.value != "all") {
+                            conditions.and(REQUEST.STATUS.eq(filter.value))
+                        } else {
+                            conditions
+                        }
+                    }
                     "search" -> {
                         conditions.and(SAMPLE.BARCODE.likeIgnoreCase("%${filter.value}%"))
                             .or(PATIENT.NAME.likeIgnoreCase("%${filter.value}%"))

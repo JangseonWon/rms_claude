@@ -1,0 +1,8 @@
+export enum Status {
+    TOTAL = "all",
+    ORDERED = "ORDERED",
+    INPROGRESS = "INPROGRESS",
+    TESTFAILED = "TESTFAILED",
+    DELIVERED = "DELIVERED",
+    COMPLETE = "FINISHED"
+}

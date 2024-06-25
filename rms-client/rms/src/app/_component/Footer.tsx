@@ -27,17 +27,17 @@ export default function Footer() {
                 <div className={style.flex}>
                     <div>
                         <Stack className={style.div3Menu} direction="row" spacing={2}>
-                            <Link href={"https://oversea.gcgenome.com/"}>
-                                <Avatar alt="Test1" src="/gc-logo_avatar.png" />
+                            <Link href={"https://oversea.gcgenome.com/"} target={"_blank"}>
+                                <Avatar alt="gc" src="/gc-logo_avatar.png" />
                             </Link>
-                            <Link href={"https://www.instagram.com/gcgenome/"}>
-                                <Avatar alt="Test2" src="/insta_avatar.png" />
+                            <Link href={"https://www.instagram.com/gcgenome/"} target={"_blank"}>
+                                <Avatar alt="insta" src="/insta_avatar.png" />
                             </Link>
-                            <Link href={"https://www.youtube.com/@gcgenome2121"}>
-                                <Avatar alt="Test3" src="/youtube_avatar.png" />
+                            <Link href={"https://www.youtube.com/@gcgenome2121"} target={"_blank"}>
+                                <Avatar alt="youtube" src="/youtube_avatar.png" />
                             </Link>
-                            <Link href={"https://www.linkedin.com/company/73449146/admin/feed/posts/"}>
-                                <Avatar alt="Test4" src="/linkdin_avatar.png" />
+                            <Link href={"https://www.linkedin.com/company/73449146/admin/feed/posts/"} target={"_blank"}>
+                                <Avatar alt="linkedin" src="/linkdin_avatar.png" />
                             </Link>
                         </Stack>
                     </div>

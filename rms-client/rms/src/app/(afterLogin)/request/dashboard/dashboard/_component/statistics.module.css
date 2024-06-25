@@ -38,6 +38,10 @@
     padding: 20px;
     height: 100px;
 }
+.card:hover {
+    box-shadow: 0 15px 15px rgba(0, 0, 0.2, 0.3);
+    cursor: pointer;
+}
 .card img {
     width: 25%;
     height: auto;

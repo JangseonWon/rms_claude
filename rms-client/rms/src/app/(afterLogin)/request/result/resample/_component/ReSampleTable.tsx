@@ -22,7 +22,6 @@ export default function ReSampleTable() {
     const [search, setSearch] =
         useState<Paging>({filters: [], sort_by:"status", asc: true, size:5, page:1});
     const [totalPage, setTotalPage] = useState<number>(0);
-    const { data: session, status } = useSession();
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage =>({

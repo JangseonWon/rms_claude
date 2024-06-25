@@ -13,13 +13,13 @@ type Props = {
 }
 
 export default function SelectBox({ label, value, options, onChange, required=false }: Props) {
-    const [selectedLanguage, setSelectedLanguage] = useState<string>('');
+    const [selectedValue, setSelectedValue] = useState<string>('');
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const [hasError, setHasError] = useState(false);
     const selectBoxRef = useRef<HTMLDivElement>(null);
 
     const handleOptionClick = (option: SelectBoxOption) => {
-        setSelectedLanguage(option.name!);
+        setSelectedValue(option.name!);
         setIsOpen(!isOpen);
         onChange?.(option);
     };
@@ -32,19 +32,19 @@ export default function SelectBox({ label, value, options, onChange, required=fa
         }
     };
     useEffect(() => {
-        setHasError(!selectedLanguage && required);
+        setHasError(!selectedValue && required);
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [selectedLanguage, required, value]);
+    }, [selectedValue, required, value]);
 
     return (
         <div ref={selectBoxRef}>
             <section className={`${style.selectSection} ${hasError ? style.error : ""}`}>
                 <p className={style.label}>{label}</p>
                 <button className={`${style.btnSelect} ${isOpen ? style.open : ''}`} onClick={toggleList}>
-                    <div>{selectedLanguage || value || '-'}</div>
+                    <div>{selectedValue || value || '-'}</div>
                     <FontAwesomeIcon icon={faChevronDown} />
                 </button>
                 <ul className={`${style.listMember} ${isOpen ? style.open : ''}`}>

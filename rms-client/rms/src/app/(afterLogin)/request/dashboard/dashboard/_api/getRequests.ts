@@ -1,7 +1,8 @@
-import {Search} from "@/model/Search";
+import {Paging} from "@/model/Paging";
 
-export async function getRequests(search: Search) {
-    const res = await fetch(`/w-api/dashboard-service/requests`, {
+export async function getRequests(search: Paging) {
+    // const res = await fetch(`/w-api/dashboard-service/requests`, {
+    const res = await fetch(`/w-api/order-service/requests`, {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
