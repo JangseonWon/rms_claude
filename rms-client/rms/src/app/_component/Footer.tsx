@@ -14,15 +14,6 @@ export default function Footer() {
                     <div className={style.div1Menu}>
                         <label className={style.followUsOn}>Follow Us On</label>
                     </div>
-                    <div className={style.div2Menu}>
-                        <Link href={"https://www.linkedin.com/company/73449146/admin/feed/posts"} className={style.footerMenu}>Visit our webpage</Link>
-                        <Link href={"/home"} className={style.footerMenu}>Contact us</Link>
-                        <Link href={"/home"} className={style.footerMenu}>imprint</Link>
-                        <Link href={"/home"} className={style.footerMenu}>CentoCard® Instructions</Link>
-                        <Link href={"/home"} className={style.footerMenu}>Data protection</Link>
-                        <Link href={"/home"} className={style.footerMenu}>Terms of use</Link>
-                        <Link href={"/home"} className={style.footerMenu}>Terms and conditions</Link>
-                    </div>
                 </div>
                 <div className={style.flex}>
                     <div>

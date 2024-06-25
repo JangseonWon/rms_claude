@@ -22,8 +22,6 @@ export default function Header() {
         <header className={style.header}>
             <div>
                 <Link href={"/login"} className={style.gPortalLogo}>G-Portal</Link>
-                <Link href={"https://oversea.gcgenome.com/ "} className={style.headerMenu}>Home</Link>
-                <Link href={"https://www.linkedin.com/company/73449146/admin/feed/posts"} className={style.headerMenu}>LINKED IN</Link>
             </div>
             <div>
                 <button className={helpClassName} onClick={handleNeedHelpClick}>
