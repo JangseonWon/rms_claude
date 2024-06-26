@@ -74,7 +74,7 @@ class DownloadHandler(
     }
 
     fun downloadByServiceSampleFile(serviceName: String): Mono<ByteArray> {
-        val s3Key = "reports/download/$serviceName/${serviceName}_form.xlsx"
+        val s3Key = "services/$serviceName/${serviceName}_form.xlsx"
         val getObjectRequest = GetObjectRequest.builder()
             .bucket(bucketName)
             .key(s3Key)

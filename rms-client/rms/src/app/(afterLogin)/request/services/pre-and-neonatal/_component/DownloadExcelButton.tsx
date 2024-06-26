@@ -15,24 +15,19 @@ export default function DownloadExcelButton() {
     const setMessage = useSetMessageAlertDialog();
 
     const handleDownloadClick = async (serviceName: string) => {
-        try {
-            const response = await fetchServiceSampleFileDownload(serviceName);
+        const response = await fetchServiceSampleFileDownload(serviceName);
 
-            if (response.ok) {
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${serviceName}_form.xlsx`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                window.URL.revokeObjectURL(url);
-            } else {
-                setShowAlertDialog(true);
-                setMessage('다운로드 받을 파일이 없습니다.');
-            }
-        } catch (error) {
+        if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${serviceName}_form.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        } else {
             setShowAlertDialog(true);
             setMessage('다운로드 에러 발생 했습니다.');
         }
