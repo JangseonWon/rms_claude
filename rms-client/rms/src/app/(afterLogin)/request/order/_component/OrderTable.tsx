@@ -64,7 +64,7 @@ export default function OrderTable() {
                 </tr>
                 </thead>
                 <tbody>
-                {requestData.map((row, rowIndex) => (
+                {requestData && requestData.length > 0 && requestData.map((row) => (
                     <tr key={row.order_id! + row.service!.id + row.sample!.id}>
                         <td>{row.service?.name}</td>
                         <td>{row.sample?.patient?.name}</td>

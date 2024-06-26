@@ -1,16 +1,72 @@
+'use client';
+
 import style from "@/app/(afterLogin)/request/services/pre-and-neonatal/_component/uploadExcelButton.module.css";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import React, {ChangeEvent} from "react";
-import {faUpload} from "@fortawesome/free-solid-svg-icons/faUpload";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { ChangeEvent, useEffect, useState, DragEvent } from "react";
 import * as XLSX from "xlsx";
+import { faUpload, faFileExcel, faArrowUpFromBracket, faXmark } from "@fortawesome/free-solid-svg-icons";
 
 type UploadExcelButtonProps = {
     onFileUpload: (data: any[][]) => void;
 };
 
 export default function UploadExcelButton({ onFileUpload }: UploadExcelButtonProps) {
+    const [modalOpen, setModalOpen] = useState(false);
+    const [dragging, setDragging] = useState(false);
+    const [file, setFile] = useState<File | null>(null);
+
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        };
+        document.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
+
+    const openModal = () => {
+        setModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setModalOpen(false);
+        setFile(null);
+    };
+
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
+        const selectedFile = e.target.files?.[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+        }
+        e.target.value = '';
+    };
+
+    const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragging(true);
+    };
+
+    const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragging(false);
+    };
+
+    const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragging(false);
+        const droppedFile = e.dataTransfer.files?.[0];
+        if (droppedFile) {
+            setFile(droppedFile);
+        }
+    };
+
+    const processFile = () => {
         if (file) {
             const reader = new FileReader();
             reader.onload = (event) => {
@@ -31,18 +87,16 @@ export default function UploadExcelButton({ onFileUpload }: UploadExcelButtonPro
                         if (rowIndex !== 0 &&
                             (header === 'collectionDate' || header === 'patientBOD') &&
                             typeof cell === 'number' && cell > 25569) {
-
                             return convertExcelDate(cell);
                         }
                         return cell;
                     })
                 );
-
                 onFileUpload(transformedData);
+                closeModal();
             };
             reader.readAsArrayBuffer(file);
         }
-        e.target.value = '';
     };
 
     const handleUploadClick = () => {
@@ -50,20 +104,61 @@ export default function UploadExcelButton({ onFileUpload }: UploadExcelButtonPro
     };
 
     return (
-        <>
-            <input
-                type="file"
-                id="excelFileInput"
-                accept=".xlsx, .xls"
-                style={{ display: 'none' }}
-                onChange={handleFileChange}
-            />
+        <div>
             <button
                 className={style.upload}
-                onClick={handleUploadClick}>
+                onClick={openModal}>
                 Upload Excel&nbsp;
                 <FontAwesomeIcon className={style.downloadIcon} icon={faUpload} />
             </button>
-        </>
+
+            {modalOpen && (
+                <div className={style.modalBackground}>
+                    <div className={style.modal}>
+                        <section className={style.modalTop}>
+                            <div>Upload files</div>
+                            <div className={style.modalClose} onClick={closeModal}>
+                                <FontAwesomeIcon icon={faXmark} />
+                            </div>
+                        </section>
+                        <div
+                            className={`${style.modalBody} ${dragging ? style.dragging : ''}`}
+                            onDragOver={handleDragOver}
+                            onDragLeave={handleDragLeave}
+                            onDrop={handleDrop}
+                        >
+                            {!file ? (
+                                <>
+                                    <FontAwesomeIcon style={{ fontSize: '40px' }} icon={faArrowUpFromBracket} />
+                                    <div className={style.word}>Drag and drop</div>
+                                    <div className={style.selectLink}>
+                                        <div>or&nbsp;</div>
+                                        <>
+                                            <input
+                                                type="file"
+                                                id="excelFileInput"
+                                                accept=".xlsx, .xls"
+                                                style={{ display: 'none' }}
+                                                onChange={handleFileChange}
+                                            />
+                                            <div className={style.link} onClick={handleUploadClick}>Select file</div>
+                                        </>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <FontAwesomeIcon style={{ fontSize: '40px', marginBottom: '10px' }} icon={faFileExcel} />
+                                    <div>{file.name}</div>
+                                </>
+                            )}
+                        </div>
+                        <section className={style.modalBottom}>
+                            <button className={style.button} onClick={processFile}>Confirm</button>
+                            <button className={style.button} onClick={closeModal}>Cancel</button>
+                        </section>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 }

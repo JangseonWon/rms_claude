@@ -10,9 +10,75 @@
     color: #182847;
     font-weight: 600;
     margin: 5px 5px;
+    outline: none;
 }
 .upload:hover {
     background: linear-gradient(135deg, #63792f, #aed658);
     color: #ffffff;
     border: solid #dae8ba thin;
+}
+.modalBackground {
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    top: 15vh;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+.modal {
+    background: #ffffff;
+    border: solid #f0f0f0 2px;
+    position: relative;
+    top: 5%;
+    max-width: 50vw;
+    max-height: 35vh;
+    min-width: 30vw;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    padding: 30px;
+}
+.modalTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 10px;
+    border-bottom: solid #C8C9CB 2px;
+}
+.modalClose:hover {
+    cursor: pointer;
+}
+.modalBody {
+    margin-top: 20px;
+    min-width: 20vw;
+    min-height: 20vh;
+    background-color: #eff0f3;
+    border: solid #e3e4e6 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+.modalBody.dragging {
+    background-color: #d3d3d3;
+}
+.word {
+    margin: 10px 0;
+}
+.selectLink {
+    display: flex;
+    font-size: 14px;
+}
+.link {
+    color: #859fbf;
+    cursor: pointer;
+}
+.link:active {
+    color: #7a93b2;
+}
+.modalBottom {
+
 }

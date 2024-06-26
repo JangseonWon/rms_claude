@@ -4,6 +4,7 @@
 }
 .downloadButton {
     margin-right: auto;
+    display: flex;
 }
 .orderAndCartButton {
     margin-left: auto;
