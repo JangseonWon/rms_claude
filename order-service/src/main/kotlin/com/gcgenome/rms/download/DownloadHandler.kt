@@ -72,4 +72,16 @@ class DownloadHandler(
             }
         }
     }
+
+    fun downloadByServiceSampleFile(serviceName: String): Mono<ByteArray> {
+        val s3Key = "reports/download/$serviceName/${serviceName}_form.xlsx"
+        val getObjectRequest = GetObjectRequest.builder()
+            .bucket(bucketName)
+            .key(s3Key)
+            .build()
+
+        return Mono.fromFuture {
+            s3Client.getObject(getObjectRequest, AsyncResponseTransformer.toBytes())
+        }.map { it.asByteArray() }
+    }
 }

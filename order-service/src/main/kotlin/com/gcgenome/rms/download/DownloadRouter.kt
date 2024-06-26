@@ -22,13 +22,12 @@ class Router (
     fun route() = router {
         GET("/w-api/order-service/orders/{order_id}/services/{service_id}/samples/{sample_id}/form", ::download)
         GET("/w-api/order-service/requests/reports/{report_id}/file", ::downloadRequest)
+        GET("/w-api/order-service/requests/services/{service_name}/file", ::downloadServiceFile)
     }
 
     private fun download(request: ServerRequest): Mono<ServerResponse> {
-        val orderId = request.pathVariable("order_id")
         val serviceId = request.pathVariable("service_id")
         val sampleId = request.pathVariable("sample_id")
-        val type = request.queryParam("type")
         return  authenticationHandler.principal(request)
             .flatMap { handler.handleDownloadByService(it.user.name!!, serviceId, UUID.fromString(sampleId)) }
             .flatMap { byteArray -> ServerResponse.ok().contentType(MediaType.APPLICATION_PDF)
@@ -54,6 +53,20 @@ class Router (
             .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Error code: $e") }
     }
 
+    private fun downloadServiceFile(request: ServerRequest): Mono<ServerResponse> {
+        val serviceName = request.pathVariable("service_name")
+        return principal(request)
+            .then(handler.downloadByServiceSampleFile(serviceName))
+            .flatMap { byteArray ->
+                ServerResponse.ok()
+                    .contentType(MediaType("application", "vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                    .header("Content-Disposition", "attachment; filename=${serviceName}_form.xlsx")
+                    .bodyValue(byteArray)
+            }
+            .switchIfEmpty(ServerResponse.status(HttpStatus.NO_CONTENT).build())
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}") }
+            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Error code: $e") }
+    }
 
     private fun principal(request: ServerRequest): Mono<UserAuthentication> {
         return request.principal().switchIfEmpty(Mono.error(AuthenticationNotFoundException()))
