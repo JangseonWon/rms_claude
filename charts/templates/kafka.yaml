@@ -1,0 +1,19 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: kafka
+  namespace: {{ .Release.Namespace }}
+data:
+  kafka.yaml: |
+    spring:
+      cloud:
+        stream:
+          function:
+            definition: subscribe;
+          bindings:
+            subscribe-in-0:
+              destination: report
+              group: rms-test-subscriber
+          kafka:
+            binder:
+              brokers: ${kafka.gemini}, ${kafka.pisces}, ${kafka.aries}, ${kafka.taurus}, ${kafka.libra}

@@ -3,6 +3,7 @@ rootProject.name = "rms"
 include("entity")
 include("management-service")
 //include("alis-api")
+include("lims-service")
 include("alis-sync")
 include("api")
 include("login-service")

@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: rms-lims-service
+  main:
+    web-application-type: reactive
+  cloud:
+    stream:
+      function:
+        definition: subscribe;
+      bindings:
+        subscribe-in-0:
+          destination: report
+          group: report-subscriber-test
+      kafka:
+        binder:
+          brokers: 172.19.208.171, 172.19.208.172, 172.19.208.101, 172.19.208.102, 172.19.208.111
+  r2dbc:
+    url: r2dbc:postgresql://${POSTGRES_URL}/report_service?schema=rms_dev
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+    pool:
+      initial-size: 2
+      max-size: 10
+      max-idle-time: 30m
+      validation-query: SELECT 1
+aws:
+  credentials:
+    access-key: 1MI7K07L3RZF4G7XXK0J
+    secret-key: xvCHemrdHb9tJj6KhHDyBKlU20piGBoiF1Ok7SED
+  s3:
+    endpoint: https://s3.apps.gcgenome.com
+    bucket: rms-test-721be7ef-c1c6-459b-8bc6-0fb160f4d167
+
+logging:
+  level:
+    io.r2dbc.postgresql.QUERY: TRACE
+
+server:
+  port: 9090
