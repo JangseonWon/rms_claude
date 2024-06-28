@@ -1,19 +1,19 @@
 .navPill {
     display: inline-flex;
     background-color: white;
-    margin: 23px;
+    margin: 1vh 1vw;
     border-radius: 15px;
-    width: 270px;
+    width: 15vw;
 }
 .navPill ul {
-    padding: 10px;
+    padding: 1vh 0.5vw;
 }
 .navPill ul ol {
-    margin: 15px 0 0 40px;
-    font-size: 15px;
+    margin: 1.5vh 0 0 2vw;
+    font-size: 0.8vw;
     font-optical-sizing: auto;
     font-weight: 400;
-    padding: 3px 50px 3px 20px;
+    padding: 0.3vh 2vw 0.3vh 1.2vw;
     border-radius: 15px;
     display: flex;
     justify-content: space-between;
@@ -31,16 +31,16 @@
 }
 .navPill li{
     list-style-type: none;
-    margin: 20px;
+    margin: 1.5vh 0.8vw;
     cursor: pointer;
 }
 .navPill li a {
     text-decoration: none;
 }
 .navPill li span {
-    margin: 0 15px;
+    margin: 0 1vw;
     color: #666666;
-    font-size: 18px;
+    font-size: 0.9vw;
     font-optical-sizing: auto;
     font-weight: 400;
 }

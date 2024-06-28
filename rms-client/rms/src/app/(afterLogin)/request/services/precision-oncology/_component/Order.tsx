@@ -3,7 +3,7 @@
 import style from "@/app/(afterLogin)/request/services/precision-oncology/_component/order.module.css"
 import SelectBox from "@/app/_component/SelectBox";
 import InputBox from "@/app/_component/InputBox";
-import {useCallback, useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {Organization} from "@/model/Organization";
 import {getOrganization} from "@/app/(afterLogin)/request/services/precision-oncology/_api/getOrganization";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
@@ -209,14 +209,14 @@ export default function Order() {
                     label={"Date of Collection*"}
                     required={true}
                     onChange={(date) => {
-                        if(date) {
+                        if (date) {
                             handleRequestChange('sample.sampling_on', format(date, "yyyy-MM-dd"))
                             if (request.sample?.patient?.birth_year
                                 && request.sample?.patient?.birth_month
                                 && request.sample?.patient?.birth_day) {
                                 handleRequestChange('sample.age', setAge(new Date(`${request.sample.patient.birth_year}-${request.sample.patient.birth_month}-${request.sample.patient.birth_day}`), date));
                             }
-                        }else {
+                        } else {
                             handleRequestChange('sample.sampling_on', null)
                             handleRequestChange('sample.age', null);
                         }

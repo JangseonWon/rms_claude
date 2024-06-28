@@ -1,23 +1,23 @@
 .container {
     width: 100%;
-    margin: 20px auto;
+    margin: 3vh auto;
 }
 .filterContainer {
     display: flex;
     justify-content: space-between;
-    padding-bottom: 10px;
+    padding-bottom: 1vh;
 }
 .filterContainerRight{
     display: flex;
 }
 .filterContainerRight > *{
-    padding-right: 20px;
+    padding-right: 2vw;
 }
 .filterContainerLeft{
     display: flex;
 }
 .search {
-    width: 450px;
+    width: 20vw;
 }
 .table {
     width: 100%;
@@ -26,7 +26,7 @@
 .table thead {
     background-color: #838689;
     color: #ffffff;
-    font-size: 16px;
+    font-size: 0.8vw;
     font-weight: 600;
 }
 .table thead tr th:first-child {
@@ -39,19 +39,19 @@
     font-weight: 300;
 }
 .table tbody tr {
-    border-bottom: 1px solid #838689;
+    border-bottom: 0.1vh solid #838689;
 }
 .table tbody tr td {
     color: #666666;
-    font-size: 16px;
-    padding: 10px;
+    font-size: 0.8vw;
+    padding: 1vh 1vw;
 }
 .table tbody tr:nth-child(even) {
     background-color: #ffffff;
 }
 .table th,
 .table td {
-    padding: 8px;
+    padding: 0.7vh 0.7vh;
     text-align: center;
 }
 .pagination {
@@ -60,19 +60,19 @@
     justify-content: flex-end;
 }
 .pagination span {
-    padding: 10px 20px;
-    font-size: 16px;
+    padding: 1vh 1vw;
+    font-size: 0.8vw;
     color: #1a1a1a;
     align-items: center;
 }
 .pagination span:first-child {
-    padding: 10px 5px 10px 0;
+    padding: 1vh 0.5vw 1vh 0;
 }
 .pagination button {
     border: none;
     border-radius: 18px;
-    font-size: 18px;
-    padding: 15px;
+    font-size: 1vw;
+    padding: 1.5vh 0.8vw;
 }
 .pagination button:hover:not([disabled]) {
     background-color: #d3d3d3;
@@ -80,15 +80,15 @@
 }
 .select {
     position: relative;
-    width: 50px;
+    width: 3vw;
 }
 
 .select select {
-    appearance: none; /* 기본 스타일 제거 */
+    appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
     width: 100%;
-    padding: 10px;
+    padding: 1vh 0.5vw;
     border: 1px solid #ccc;
     border-radius: 15px;
     background-color: #f8f8f8;
@@ -96,14 +96,14 @@
 }
 
 .select::after {
-    content: '\25BC'; /* 화살표 아이콘 */
-    font-size: 12px;
+    content: '\25BC';
+    font-size: 0.6vw;
     color: #555;
     position: absolute;
     top: 50%;
-    right: 10px;
+    right: 0.5vw;
     transform: translateY(-50%);
-    pointer-events: none; /* 화살표를 클릭 가능하도록 함 */
+    pointer-events: none;
 }
 .select select:focus {
     outline: none;

@@ -1,17 +1,17 @@
 .download {
-    font-size: 0.875rem;
-    padding: 6px 10px;
-    max-height: 30px;
-    min-width: 110px;
+    font-size: 0.8vw;
+    padding: 0.5vh 0.7vw;
+    max-height: 3.3vh;
+    min-width: 7vw;
     border-radius: 5px;
-    border: 1px solid #182847;
+    border: 0.1vh solid #182847;
     transition: all 150ms ease;
     cursor: pointer;
     background: linear-gradient(135deg, #182847, #354e6d);
     color: #ffffff;
-    margin: 20px 20px 0 0;
+    margin: 2.4vh 1.6vw 0 0;
 }
 .download:hover {
     background: linear-gradient(135deg, #708094, #a1b6d2);
-    border: 1px solid #a1b6d2;
+    border: 0.1vh solid #a1b6d2;
 }

@@ -1,7 +1,7 @@
 import React from "react";
-import style from "@/app/(afterLogin)/request/dashboard/dashboard/page.module.css"
-import Statistics from "@/app/(afterLogin)/request/dashboard/dashboard/_component/Statistics";
-import Table from "@/app/(afterLogin)/request/dashboard/dashboard/_component/Table";
+import style from "@/app/(afterLogin)/request/dashboard/page.module.css"
+import Statistics from "@/app/(afterLogin)/request/dashboard/_component/Statistics";
+import Table from "@/app/(afterLogin)/request/dashboard/_component/Table";
 
 export default async function Page() {
     return(

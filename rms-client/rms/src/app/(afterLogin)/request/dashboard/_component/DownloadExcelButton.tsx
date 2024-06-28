@@ -1,6 +1,6 @@
 'use client';
 
-import style from '@/app/(afterLogin)/request/dashboard/dashboard/_component/downloadExcelButton.module.css';
+import style from '@/app/(afterLogin)/request/dashboard/_component/downloadExcelButton.module.css';
 import {faDownload} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React from "react";

@@ -1,5 +1,5 @@
 .container {
-    padding: 0 30px;
+    padding: 0 2vw;
 }
 .buttonSection {
     position: sticky;
@@ -12,10 +12,10 @@
     display: flex;
 }
 .section > * {
-    padding-right: 20px;
+    padding-right: 1vw;
 }
 .mainName {
     color: #002b49;
     font-weight: 800;
-    font-size: 16px;
+    font-size: 0.8vw;
 }

@@ -1,18 +1,18 @@
 "use client"
 
 import React, {useEffect, useState} from "react";
-import style from "@/app/(afterLogin)/request/dashboard/dashboard/_component/table.module.css"
+import style from "@/app/(afterLogin)/request/dashboard/_component/table.module.css"
 import type {Request} from "@/model/Request";
-import {getRequests} from "@/app/(afterLogin)/request/dashboard/dashboard/_api/getRequests";
+import {getRequests} from "@/app/(afterLogin)/request/dashboard/_api/getRequests";
 import {format} from "date-fns";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
 import SelectBox from "@/app/_component/SelectBox";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
-import {useStatus} from "@/app/(afterLogin)/request/dashboard/dashboard/store/useStatusStore";
+import {useStatus} from "@/app/(afterLogin)/request/dashboard/store/useStatusStore";
 import {Paging} from "@/model/Paging";
-import DownloadExcelButton from "@/app/(afterLogin)/request/dashboard/dashboard/_component/DownloadExcelButton";
+import DownloadExcelButton from "@/app/(afterLogin)/request/dashboard/_component/DownloadExcelButton";
 
 export default function Table() {
     const [requestData, setRequestData] = useState<Request[]>([]);

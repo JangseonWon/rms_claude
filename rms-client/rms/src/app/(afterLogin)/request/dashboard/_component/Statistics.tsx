@@ -1,11 +1,11 @@
 "use client"
 
-import style from "@/app/(afterLogin)/request/dashboard/dashboard/_component/statistics.module.css"
+import style from "@/app/(afterLogin)/request/dashboard/_component/statistics.module.css"
 import {useEffect, useState} from "react";
-import {getStatisticsRequest} from "@/app/(afterLogin)/request/dashboard/dashboard/_api/getStatisticsRequest";
+import {getStatisticsRequest} from "@/app/(afterLogin)/request/dashboard/_api/getStatisticsRequest";
 import type {Statistics} from "@/model/Statistics";
 import Loading from "@/app/(afterLogin)/_component/Loading";
-import {useSetStatus, useStatus} from "@/app/(afterLogin)/request/dashboard/dashboard/store/useStatusStore";
+import {useSetStatus, useStatus} from "@/app/(afterLogin)/request/dashboard/store/useStatusStore";
 import {Status} from "@/model/Status";
 
 export default function Statistics() {

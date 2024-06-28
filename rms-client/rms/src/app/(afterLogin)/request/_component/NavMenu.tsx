@@ -5,10 +5,11 @@ import Link from "next/link";
 import {
     faBorderAll,
     faCircleCheck,
-    faCircleQuestion,
     faGripLines,
     faHouse,
-    faPlus
+    faList,
+    faPlus,
+    faTableColumns
 } from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React, {useState} from "react";
@@ -18,14 +19,10 @@ import {useSelectedLayoutSegment} from "next/navigation";
 export default function NavMenu() {
     const segment = useSelectedLayoutSegment();
     const [showServicesDropdown, setShowServicesDropdown] = useState(false);
-    const [showDashboardDropdown, setShowDashboardDropdown] = useState(false);
     const [showResultDropdown, setShowResultDropdown] = useState(false);
 
     const toggleServicesDropdown = () => {
         setShowServicesDropdown(!showServicesDropdown);
-    }
-    const toggleDashboardDropdown = () => {
-        setShowDashboardDropdown(!showDashboardDropdown);
     }
     const toggleResultDropdown = () => {
         setShowResultDropdown(!showResultDropdown);
@@ -33,26 +30,30 @@ export default function NavMenu() {
     return (
         <li className={style.navPill}>
             <ul>
-                <li onClick={toggleDashboardDropdown}>
-                    <FontAwesomeIcon
-                        className={segment === 'dashboard' ? style.clickIcon : style.icon}
-                        icon={faHouse}/>
-                    <span className={segment === 'dashboard' ? style.clickSpan : ''}>Dashboard</span>
+                <li>
+                    <Link href={"/home"}>
+                        <FontAwesomeIcon
+                            className={segment === 'home' ? style.clickIcon : style.icon}
+                            icon={faHouse}/>
+                        <span className={segment === 'home' ? style.clickSpan : ''}>Home</span>
+                    </Link>
                 </li>
-                {showDashboardDropdown && (
-                    <>
-                        <ol>
-                            <Link href={"/request/dashboard/dashboard"}>
-                                Dashboard
-                            </Link>
-                        </ol>
-                        <ol>
-                            <Link href={"/request/dashboard/service-catalog"}>
-                                Service Catalog
-                            </Link>
-                        </ol>
-                    </>
-                )}
+                <li>
+                    <Link href={"/request/dashboard"}>
+                        <FontAwesomeIcon
+                            className={segment === 'dashboard' ? style.clickIcon : style.icon}
+                            icon={faTableColumns}/>
+                        <span className={segment === 'dashboard' ? style.clickSpan : ''}>Dashboard</span>
+                    </Link>
+                </li>
+                <li>
+                    <Link href={"/request/service-catalog"}>
+                        <FontAwesomeIcon
+                            className={segment === '/request/service-catalog' ? style.clickIcon : style.icon}
+                            icon={faList}/>
+                        <span className={segment === 'service-catalog' ? style.clickSpan : ''}>Service Catalog</span>
+                    </Link>
+                </li>
                 <li onClick={toggleServicesDropdown}>
                     <FontAwesomeIcon
                         className={segment === 'services' ? style.clickIcon : style.icon}
