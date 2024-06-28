@@ -1,16 +1,17 @@
 .inputBox p {
-    font-size: 12px;
+    font-size: 0.7vw;
     color: #666666;
     margin: 0 0 5px 0;
 }
 .inputBox input {
     width: 100%;
-    min-width: 200px;
+    height: 3.5vh;
+    min-width: 20vw;
     border: 1px solid #DAE2ED;
     border-radius: 20px;
     padding: 8px 12px;
     box-sizing: border-box;
-    font-size: 12px;
+    font-size: 0.6vw;
     box-shadow: 0 2px 2px #F3F6F9;
 }
 .inputBox.error input{

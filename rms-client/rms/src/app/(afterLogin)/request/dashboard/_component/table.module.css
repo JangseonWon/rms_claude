@@ -84,6 +84,7 @@
 }
 
 .select select {
+    font-size: 0.6vw;
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;

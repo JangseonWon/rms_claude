@@ -1,6 +1,6 @@
 
 .label{
-    font-size: 12px;
+    font-size: 0.65vw;
     color: #666666;
     margin-bottom: 5px;
 }
@@ -18,16 +18,16 @@
 .btnSelect {
     display: flex;
     width: 100%;
-    min-width: 200px;
+    min-width: 9vw;
     justify-content: space-between;
     align-items: center;
-    border: 1px solid #DAE2ED;
+    border: 0.1vw solid #DAE2ED;
     border-radius: 20px;
-    padding: 8px 12px 8px 12px;
-    margin-bottom: 5px;
-    font-size: 12px;
+    padding: 1vh 1vw;
+    margin-bottom: 0.4vh;
+    font-size: 0.6vw;
     background-color: #fff;
-    box-shadow: 0 2px 2px #F3F6F9;
+    box-shadow: 0 0.2vh 0.2vw #F3F6F9;
     cursor: pointer;
 }
 .selectSection.error .btnSelect {
@@ -37,18 +37,18 @@
     color: red;
 }
 .btnSelect:hover {
-    outline: 2px solid #CCE492;
+    outline: 0.1vw solid #CCE492;
     border: 1px solid #90BA2D;
 }
 .btnSelect.open {
-    outline: 2px solid #CCE492;
+    outline: 0.1vw solid #CCE492;
     border: 1px solid #90BA2D;
 }
 
 .listMember {
     position: absolute;
     overflow: hidden;
-    outline: 1px solid #C4C4C4;
+    outline: 0.05vw solid #C4C4C4;
     border-radius: 10px;
     display: none;
 }
@@ -57,15 +57,15 @@
     display: block;
 }
 .listMember li {
-    width: 200px;
+    width: 9vw;
 }
 
 .listMember li button {
     width: 100%;
     background-color: #fff;
-    font-size: 12px;
+    font-size: 0.6vw;
     text-align: left;
-    padding: 7px 20px 7px;
+    padding: 0.8vh 1vw;
     border: none;
     cursor: pointer;
 }
