@@ -1,10 +1,10 @@
 .container{
-    padding: 20px 10%;
+    padding: 2vh 10%;
     background-color: #fff;
 }
 .container h1 {
     color: #002b49;
-    font-size: 26px;
+    font-size: 1.5vw;
 }
 .container p {
     color: #666666;
@@ -12,14 +12,14 @@
 }
 .line {
     width: 4%;
-    height: 5px;
+    height: 0.5vh;
     background-color: #002b49;
 }
 .cardContainer {
     display: flex;
 }
 .cardContainer a {
-    margin: 0 20px;
+    margin: 0 1vw;
     text-decoration: none;
 }
 .cardContainer a:first-child {
@@ -34,9 +34,9 @@
     flex-direction: column;
     flex-grow: 1;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-    border-radius: 10px;
+    border-radius: 1vh;
     justify-content: space-between;
-    height: 200px;
+    height: 23vh;
     background-color: #fff;
     cursor:pointer;
 }
@@ -50,8 +50,8 @@
     overflow: hidden;
 }
 .cardLabel{
-    font-size: 18px;
+    font-size: 0.9vw;
     color:#666666;
     font-weight: 600;
-    padding: 5px 15px;
+    padding: 0.5vh 1vw;
 }

@@ -1,20 +1,20 @@
 .container {
-    padding: 20px 10%;
+    padding: 2vh 10%;
 }
 .container h1 {
     color: #002b49;
-    font-size: 26px;
+    font-size: 1.6vw;
 }
 .container h1 span button {
     cursor: pointer;
-    margin-left: 10px;
-    padding: 3px 10px;
-    border-radius: 15px;
-    font-size: 18px;
+    margin-left: 1vw;
+    padding: 0.3vh 0.8vw;
+    border-radius: 15vh;
+    font-size: 1vw;
     color: #002b49;
     font-weight: 600;
     background-color: #fff;
-    border: 1px solid #002b49;
+    border: 0.1vh solid #002b49;
 }
 .container h1 span button:hover {
     color: #fff;
@@ -30,13 +30,14 @@
     display: flex;
     flex-grow: 1;
     flex-direction: column;
-    border-radius: 10px;
+    border-radius: 1vh;
     justify-content: space-between;
-    padding: 20px;
-    height: 100px;
+    padding: 1vh 1vw;
+    width: 20vw;
+    height: 11vh;
     background-color: #fff;
     color:#002b49;
-    margin: 20px
+    margin: 1vh 1vw
 }
 .card:first-child{
     margin-left: 0;
@@ -49,17 +50,17 @@
     background: linear-gradient(to right, #002b49, #3d587e);
 }
 .cardLabel{
-    font-size: 18px;
+    font-size: 1vw;
     font-weight: 500;
     text-align: left;
 }
 .line {
     width: 4%;
-    height: 5px;
+    height: 0.5vh;
     background-color: #002b49;
 }
 .cardValue{
-    font-size: 30px;
+    font-size: 1.7vw;
     font-weight: 600;
     text-align: right;
 }

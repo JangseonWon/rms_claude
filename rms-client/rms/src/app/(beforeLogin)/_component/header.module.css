@@ -1,54 +1,41 @@
 .header {
     background-color: #182847;
-    padding: 10px 80px 15px 80px;
+    padding: 1vh 8vw 1.5vh 8vw;
+    min-height: 5.5vh;
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
-.headerMenu {
-    font-size: 16px;
-    font-weight: normal;
-    color: #fff;
-    text-decoration: none;
-    padding: 10px 15px 5px 10px;
-    margin-left: 50px;
-    transition: background-color 0.3s ease;
-}
-.headerMenu:hover {
-    border-bottom: solid #90BA2D ;
-    cursor: pointer;
-}
 .gPortalLogo{
     text-decoration: none;
     color: #ffffff;
-    font-size: 35px;
+    font-size: 2vw;
     font-optical-sizing: auto;
     font-weight: 600;
     font-style: normal;
-    margin-right: 50px;
 }
 .needHelp {
     background-color: #80B700;
-    border-radius: 25px;
-    padding: 8px 20px 8px 20px;
+    border-radius: 2.5vh;
+    padding: 0.8vh 1.4vw;
     color: #ffffff;
-    font-size: 14pt;
+    font-size: 1vw;
     font-weight: 300;
     border: none;
     text-decoration: none;
 }
 .needHelp:hover {
     background-color: #6a9600;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0.5vh 1.5vh rgba(0, 0, 0, 0.3);
     cursor: pointer;
 }
 .needHelpActive {
     background-color: #ffffff;
-    border-radius: 25px;
-    padding: 8px 20px 8px 20px;
+    border-radius: 2.5vh;
+    padding: 0.8vh 1.4vw;
     color: #182847;
     font-weight: bold;
-    font-size: 14pt;
+    font-size: 1vw;
     border: none;
     text-decoration: none;
 }

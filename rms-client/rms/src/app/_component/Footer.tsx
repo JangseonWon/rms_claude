@@ -19,16 +19,16 @@ export default function Footer() {
                     <div>
                         <Stack className={style.div3Menu} direction="row" spacing={2}>
                             <Link href={"https://oversea.gcgenome.com/"} target={"_blank"}>
-                                <Avatar alt="gc" src="/gc-logo_avatar.png" />
+                                <Avatar alt="gc" src="/gc-logo_avatar.png" style={{ width: '4.5vh', height: '4.5vh'}}/>
                             </Link>
                             <Link href={"https://www.instagram.com/gcgenome/"} target={"_blank"}>
-                                <Avatar alt="insta" src="/insta_avatar.png" />
+                                <Avatar alt="insta" src="/insta_avatar.png" style={{ width: '4.5vh', height: '4.5vh'}}/>
                             </Link>
                             <Link href={"https://www.youtube.com/@gcgenome2121"} target={"_blank"}>
-                                <Avatar alt="youtube" src="/youtube_avatar.png" />
+                                <Avatar alt="youtube" src="/youtube_avatar.png" style={{ width: '4.5vh', height: '4.5vh'}}/>
                             </Link>
                             <Link href={"https://www.linkedin.com/company/73449146/admin/feed/posts/"} target={"_blank"}>
-                                <Avatar alt="linkedin" src="/linkdin_avatar.png" />
+                                <Avatar alt="linkedin" src="/linkdin_avatar.png" style={{ width: '4.5vh', height: '4.5vh'}}/>
                             </Link>
                         </Stack>
                     </div>
