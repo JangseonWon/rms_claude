@@ -14,6 +14,7 @@ import software.amazon.awssdk.core.async.AsyncRequestBody
 import software.amazon.awssdk.services.s3.S3AsyncClient
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.*
 
 @Service
@@ -26,7 +27,7 @@ class Handler(
         return Mono.from(dslContext.run {
             selectSampleByBarcode(message.sample.toString(), message.institution!!)
                 .switchIfEmpty(Mono.empty())
-                .flatMap { selectRequestBySampleIdAndServiceId(it.id!!, message.service!!) }
+                .flatMap { sample -> selectRequestBySampleIdAndServiceId(sample.id!!, message.service!!) }
                 .switchIfEmpty(Mono.empty())
                 .flatMap { request -> updateRequestStatusById(request.orderId!!, request.serviceId!!, request.sampleId!!) }
                 .flatMap { request ->
@@ -34,18 +35,23 @@ class Handler(
                     val year = barcode.substring(0, 4)
                     val month = barcode.substring(4, 6)
                     val day = barcode.substring(6, 8)
+                    val now = LocalDateTime.now()
+                    val timestamp = now.toInstant(ZoneOffset.UTC).toEpochMilli()
 
-                    insertReport(Report(
-                        id = UUID.randomUUID(),
-                        type = "PDF",
-                        value = "reports/${message.institution}/${year}/${month}/${day}/${message.sample}_${message.service}.pdf",
-                        createAt = LocalDateTime.now(),
-                        reportedAt = null,
-                        isLatest = true,
-                        orderId = request.orderId,
-                        serviceId = request.serviceId,
-                        sampleId = request.sampleId)
-                    )
+                    updateReportIsLatestBySampleIdAndServiceId(request.orderId!!, request.sampleId!!, request.serviceId!!)
+                        .then(
+                            insertReport(Report(
+                                id = UUID.randomUUID(),
+                                type = "PDF",
+                                value = "reports/${message.institution}/${year}/${month}/${day}/${barcode}/${barcode}_${message.service}_${timestamp}.pdf",
+                                createAt = now,
+                                reportedAt = null,
+                                isLatest = true,
+                                orderId = request.orderId,
+                                serviceId = request.serviceId,
+                                sampleId = request.sampleId)
+                            )
+                        )
                 }
                 .flatMap { report ->
                     val putObjectRequest = PutObjectRequest.builder()
