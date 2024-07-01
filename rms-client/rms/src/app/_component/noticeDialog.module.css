@@ -1,0 +1,66 @@
+.noticeDialogContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1001;
+}
+
+.noticeDialog {
+    background-color: white;
+    padding: 2vh 1vw;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    color: #002b49;
+    font-weight: 600;
+    font-size: 1.5vw;
+    width: 20vw;
+    max-width: 90%;
+}
+
+.noticeDialog hr {
+    margin: 1vh 0;
+    border: none;
+    border-top: 0.1vh solid #eee;
+}
+.cancelButton {
+    width: 8vw;
+    padding: 0.5vh 2vw;
+    border-radius: 15px;
+    background-color: #ffffff;
+    border: solid 1px #ba2d2d;
+    color: #b6b146;
+    cursor: pointer;
+    font-size: 0.8vw;
+    font-weight: 600;
+}
+.cancelButton:hover {
+    background: linear-gradient(135deg, #b8706a, #e8bac5);
+    color: #ffffff;
+    border: solid 1px #dae8ba;
+}
+.okButton {
+    margin-left: 1vw;
+    width: 8vw;
+    padding: 0.5vh 2vw;
+    border-radius: 15px;
+    background-color: #ffffff;
+    border: solid 1px #90BA2D;
+    color: #002b49;
+    cursor: pointer;
+    font-size: 0.8vw;
+    font-weight: 600;
+}
+.okButton:hover {
+    background: linear-gradient(135deg, #a1b86a, #dae8ba);
+    color: #ffffff;
+    border: solid 1px #dae8ba;
+}
+.message {
+    font-size: 1vw;
+}

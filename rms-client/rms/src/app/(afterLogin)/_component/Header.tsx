@@ -18,7 +18,6 @@ export default function Header({session}: Props) {
                 <Link href={"/home"} className={style.gPortalLogo}>G-Portal</Link>
                 <Link href={"/request/dashboard"} className={segment?.includes('request') ? style.headerMenuActive : style.headerMenu }>Request order</Link>
                 <Link href={"/qna"} className={segment?.includes('qna') ? style.headerMenuActive : style.headerMenu }>QnA</Link>
-                <Link href={"/request/cart"} className={segment?.includes('cart') ? style.headerMenuActive : style.headerMenu }>Cart</Link>
             </div>
             <ProfileButton session={session}/>
         </header>

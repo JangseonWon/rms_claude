@@ -5,10 +5,16 @@ import GreenButton from "@/app/_component/GreenButton";
 import BlueButton from "@/app/_component/BlueButton";
 import DownloadExcelButton from "@/app/(afterLogin)/request/services/pre-and-neonatal/_component/DownloadExcelButton";
 import UploadExcelButton from "@/app/(afterLogin)/request/services/pre-and-neonatal/_component/UploadExcelButton";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {format} from "date-fns";
 import {putRequest} from "@/app/(afterLogin)/request/services/pre-and-neonatal/_api/putRequest";
 import {useOpenAlertDialog, useSetIconAlertDialog, useSetMessageAlertDialog} from "@/store/useAlertDialogStore";
+import {
+    useOkNotice,
+    useOpenNoticeDialog,
+    useSetMessageNoticeDialog,
+    useSetOkNotice
+} from "@/store/useNoticeDialogStore";
 
 type RequestData = {
     registrationDate: string; // 등록일자
@@ -30,8 +36,12 @@ type RequestData = {
 
 export default function Order() {
     const setShowAlertDialog = useOpenAlertDialog();
-    const setMessage = useSetMessageAlertDialog();
+    const setAlertMessage = useSetMessageAlertDialog();
     const setIcon = useSetIconAlertDialog();
+    const setShowNoticeDialog = useOpenNoticeDialog();
+    const setNoticeMessage = useSetMessageNoticeDialog();
+    const okNotice = useOkNotice();
+    const setOkNotice = useSetOkNotice();
 
     const transformDataToFormat = (data: RequestData[], status: string): any => {
         return data.map((item) => {
@@ -91,6 +101,7 @@ export default function Order() {
 
     const handleOrderNowClick = async () => {
         const orderData = transformDataToFormat(requestData, "ORDERED");
+
         try {
             const response = await putRequest(orderData);
             if (response.ok) {
@@ -101,15 +112,21 @@ export default function Order() {
                 alert("Failed to place the order.");
             }
         } catch (error) {
-            console.log(orderData);
             console.error("Error placing order:", error);
             alert("An error occurred while placing the order.");
         }
     };
 
-    const handleAddToCartClick = async () => {
-        const cartData = transformDataToFormat(requestData, "CART");
+    useEffect(() => {
+        if (okNotice) {
+            handleConfirmedAddToCart();
+            setOkNotice(false);
+        }
+    }, [okNotice]);
+
+    const handleConfirmedAddToCart = async () => {
         try {
+            const cartData = transformDataToFormat(requestData, "CART");
             const response = await putRequest(cartData);
             if (response.ok) {
                 alert("successfully!");
@@ -119,6 +136,11 @@ export default function Order() {
         } catch (error) {
             alert(error);
         }
+    };
+
+    const handleAddToCartClick = () => {
+        setShowNoticeDialog(true);
+        setNoticeMessage('Do you want to add items to the cart?');
     };
 
 
@@ -158,7 +180,7 @@ export default function Order() {
 
         if (invalidData) {
             setShowAlertDialog(true);
-            setMessage('잘못된 값이 존재합니다.');
+            setAlertMessage('잘못된 값이 존재합니다.');
             setIcon('error');
         }
 
