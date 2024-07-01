@@ -1,7 +1,7 @@
 .upload {
     font-size: 0.875rem;
     padding: 6px 10px;
-    min-width: 110px;
+    min-width: 3vw;
     border-radius: 5px;
     border: 1px solid #a1b86a;
     transition: all 150ms ease;

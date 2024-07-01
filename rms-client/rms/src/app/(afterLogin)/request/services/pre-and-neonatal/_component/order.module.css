@@ -107,3 +107,6 @@
 .select select:hover {
     border-color: #1a1a1a;
 }
+.invalid {
+    background-color: #bcf3b2;
+}

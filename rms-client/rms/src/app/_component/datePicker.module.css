@@ -1,21 +1,26 @@
+.dateBox {
+    position: relative;
+}
 .dateBox p {
-    font-size: 12px;
+    font-size: 0.65vw;
     color: #666666;
-    margin: 0 0 5px 0;
+    margin: 0 0 0.27vw 0;
 }
 .dateBox.error p{
     color: red;
 }
-.dateBox {
-    position: relative;
-}
 .icon {
     position: absolute;
-    right: 10px;
+    right: 1vw;
     top: 50%;
+    font-size: 2vh;
     transform: translateY(-50%);
     pointer-events: none;
 }
 .dateBox.error input{
     border: 1px solid red;
+}
+.testBox input {
+    width: 8vw;
+    height: 1.65vh;
 }

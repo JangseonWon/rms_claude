@@ -8,6 +8,7 @@ import UploadExcelButton from "@/app/(afterLogin)/request/services/pre-and-neona
 import React, {useState} from "react";
 import {format} from "date-fns";
 import {putRequest} from "@/app/(afterLogin)/request/services/pre-and-neonatal/_api/putRequest";
+import {useOpenAlertDialog, useSetIconAlertDialog, useSetMessageAlertDialog} from "@/store/useAlertDialogStore";
 
 type RequestData = {
     registrationDate: string; // 등록일자
@@ -28,6 +29,9 @@ type RequestData = {
 };
 
 export default function Order() {
+    const setShowAlertDialog = useOpenAlertDialog();
+    const setMessage = useSetMessageAlertDialog();
+    const setIcon = useSetIconAlertDialog();
 
     const transformDataToFormat = (data: RequestData[], status: string): any => {
         return data.map((item) => {
@@ -146,7 +150,32 @@ export default function Order() {
             });
             return rowData as RequestData;
         });
+        const invalidData = rows.some(row =>
+            !isValid(row.gender, 'gender') ||
+            !isValid(row.fetuses, 'fetuses') ||
+            !isValid(row.quantity.toString(), 'quantity')
+        );
+
+        if (invalidData) {
+            setShowAlertDialog(true);
+            setMessage('잘못된 값이 존재합니다.');
+            setIcon('error');
+        }
+
         setRequestData(rows);
+    };
+
+    const isValid = (value: string | number, type: string): boolean => {
+        switch (type) {
+            case 'gender':
+                return value === 'Male' || value === 'Female';
+            case 'quantity':
+                return !isNaN(Number(value)) && Number(value) > 0;
+            case 'fetuses':
+                return value === 1 || value === 2;
+            default:
+                return true;
+        }
     };
 
     return (
@@ -186,19 +215,19 @@ export default function Order() {
                         <tbody>
                         {requestData.map((row, rowIndex) => (
                             <tr key={rowIndex}>
-                                <td>{row.registrationDate ? format(new Date(row.registrationDate), "yyyy/MMM/dd") : '-'}</td>
+                                <td className={!isValid(row.registrationDate, 'date') ? style.invalid : ''}>{row.registrationDate ? format(new Date(row.registrationDate), "yyyy/MM/dd") : '-'}</td>
                                 <td>{row.ward}</td>
                                 <td>{row.patientName}</td>
-                                <td>{row.personalID ? format(new Date(row.personalID), "yyyy/MMM/dd") : '-'}</td>
-                                <td>{row.gender}</td>
+                                <td className={!isValid(row.personalID, 'date') ? style.invalid : ''}>{row.personalID ? format(new Date(row.personalID), "yyyy/MM/dd") : '-'}</td>
+                                <td className={!isValid(row.gender, 'gender') ? style.invalid : ''}>{row.gender}</td>
                                 <td>{row.physician}</td>
-                                <td>{row.collectionDate ? format(new Date(row.collectionDate), "yyyy/MMM/dd") : '-'}</td>
+                                <td className={!isValid(row.collectionDate, 'date') ? style.invalid : ''}>{row.collectionDate ? format(new Date(row.collectionDate), "yyyy/MM/dd") : '-'}</td>
                                 <td>{row.chartNumber}</td>
                                 <td>{row.code}</td>
                                 <td>{row.gestationalAge}</td>
                                 <td>{row.weight}</td>
-                                <td>{row.fetuses}</td>
-                                <td>{row.quantity}</td>
+                                <td className={!isValid(row.fetuses, 'fetuses') ? style.invalid : ''}>{row.fetuses}</td>
+                                <td className={!isValid(row.quantity.toString(), 'quantity') ? style.invalid : ''}>{row.quantity}</td>
                                 <td>{row.notes}</td>
                                 <td>{row.race}</td>
                             </tr>

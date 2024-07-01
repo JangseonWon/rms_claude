@@ -8,10 +8,10 @@ body{
     border: none;
 }
 .react-datepicker__input-container input{
-    min-width: 200px;
+    /*min-width: 10vw;*/
     border: 1px solid #DAE2ED;
     border-radius: 20px;
-    padding: 8px 12px;
+    padding: 0.8vh 0.8vw;
     box-shadow: 0 2px 2px #F3F6F9;
 }
 .react-datepicker__input-container input:hover,
