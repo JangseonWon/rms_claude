@@ -48,7 +48,10 @@ class UserRouter(
     private fun findUsers(request: ServerRequest): Mono<ServerResponse> {
         return Mono.zip(authenticationHandler.principal(request),request.bodyToMono(Query::class.java))
             .flatMap { p -> userHandler.selectUsers(p.t1,p.t2.copy(page=p.t2.page - 1)) }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
+            .flatMap { ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Total-Page", it.totalPage.toString())
+                .bodyValue(it) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(ServerWebInputException::class.java) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue(WebInputException().message.toString()) }
             .onErrorResume(DataAccessException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue(ColumnNotFoundException(e).message) }

@@ -1,0 +1,122 @@
+.filterContainer {
+    margin: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+}
+.filterContainerLeft {
+    display: flex;
+}
+.filterContainerRight {
+    width: 350px;
+}
+.addButton {
+    display: flex;
+    margin: 2vh 2vw 0 auto;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #182847, #354e6d);
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    color: #ffffff;
+    width: 4vw;
+    height: 3vh;
+    padding: 0.5vh 1.3vw;
+    border: none;
+    font-weight: 500;
+    font-size: 0.8vw;
+    cursor: pointer;
+}
+.tableContainer {
+    margin: 2vh 2vw;
+}
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.table thead {
+    background-color: #838689;
+    color: #ffffff;
+    font-size: 0.8vw;
+    font-weight: 600;
+}
+.table thead tr th:first-child {
+    border-radius: 20px 0 0 0;
+}
+.table thead tr th:last-child {
+    border-radius: 0 20px 0 0;
+}
+.table tbody {
+    font-weight: 300;
+}
+.table tbody tr {
+    border-bottom: 1px solid #838689;
+}
+.table tbody tr td {
+    color: #666666;
+    font-size: 0.7vw;
+    padding: 10px;
+}
+.table tbody tr:nth-child(even) {
+    background-color: #ffffff;
+}
+.table th,
+.table td {
+    padding: 0.6vh 0.6vw;
+    text-align: center;
+}
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+.pagination span {
+    padding: 1vh 1vw;
+    font-size: 0.8vw;
+    color: #1a1a1a;
+    align-items: center;
+}
+.pagination span:first-child {
+    padding: 1vh 0.5vw 1vh 0;
+}
+.pagination button {
+    border: none;
+    border-radius: 18px;
+    font-size: 1vw;
+    padding: 1.5vh 0.8vw;
+}
+.pagination button:hover:not([disabled]) {
+    background-color: #d3d3d3;
+    cursor: pointer;
+}
+.select {
+    position: relative;
+    width: 3vw;
+}
+
+.select select {
+    font-size: 0.6vw;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 100%;
+    padding: 1vh 0.5vw;
+    border: 1px solid #ccc;
+    border-radius: 15px;
+    background-color: #f8f8f8;
+    cursor: pointer;
+}
+
+.select::after {
+    content: '\25BC';
+    font-size: 0.6vw;
+    color: #555;
+    position: absolute;
+    top: 50%;
+    right: 0.5vw;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+.select select:focus {
+    outline: none;
+}
+.select select:hover {
+    border-color: #1a1a1a;
+}
