@@ -9,17 +9,20 @@ import {
     faHouse,
     faList,
     faPlus,
-    faTableColumns
+    faTableColumns,
+    faUsers
 } from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React, {useState} from "react";
 import {useSelectedLayoutSegment} from "next/navigation";
-
+import {useSession} from "next-auth/react";
 
 export default function NavMenu() {
     const segment = useSelectedLayoutSegment();
     const [showServicesDropdown, setShowServicesDropdown] = useState(false);
     const [showResultDropdown, setShowResultDropdown] = useState(false);
+    const [showManagementDropdown, setShowManagementDropdown] = useState(false);
+    const { data: session } = useSession();
 
     const toggleServicesDropdown = () => {
         setShowServicesDropdown(!showServicesDropdown);
@@ -27,38 +30,49 @@ export default function NavMenu() {
     const toggleResultDropdown = () => {
         setShowResultDropdown(!showResultDropdown);
     }
+    const toggleManagementDropdown = () => {
+        setShowManagementDropdown(!showManagementDropdown);
+    }
     return (
         <li className={style.navPill}>
             <ul>
                 <li>
                     <Link href={"/home"}>
-                        <FontAwesomeIcon
-                            className={segment === 'home' ? style.clickIcon : style.icon}
-                            icon={faHouse}/>
-                        <span className={segment === 'home' ? style.clickSpan : ''}>Home</span>
+                        <div className={style.navItem}>
+                            <FontAwesomeIcon
+                                className={segment === 'home' ? style.clickIcon : style.icon}
+                                icon={faHouse}/>
+                            <span className={segment === 'home' ? style.clickSpan : ''}>Home</span>
+                        </div>
                     </Link>
                 </li>
                 <li>
                     <Link href={"/request/dashboard"}>
-                        <FontAwesomeIcon
-                            className={segment === 'dashboard' ? style.clickIcon : style.icon}
-                            icon={faTableColumns}/>
-                        <span className={segment === 'dashboard' ? style.clickSpan : ''}>Dashboard</span>
+                        <div className={style.navItem}>
+                            <FontAwesomeIcon
+                                className={segment === 'dashboard' ? style.clickIcon : style.icon}
+                                icon={faTableColumns}/>
+                            <span className={segment === 'dashboard' ? style.clickSpan : ''}>Dashboard</span>
+                        </div>
                     </Link>
                 </li>
                 <li>
                     <Link href={"/request/service-catalog"}>
-                        <FontAwesomeIcon
-                            className={segment === '/request/service-catalog' ? style.clickIcon : style.icon}
-                            icon={faList}/>
-                        <span className={segment === 'service-catalog' ? style.clickSpan : ''}>Service Catalog</span>
+                        <div className={style.navItem}>
+                            <FontAwesomeIcon
+                                className={segment === '/request/service-catalog' ? style.clickIcon : style.icon}
+                                icon={faList}/>
+                            <span className={segment === 'service-catalog' ? style.clickSpan : ''}>Service Catalog</span>
+                        </div>
                     </Link>
                 </li>
                 <li onClick={toggleServicesDropdown}>
-                    <FontAwesomeIcon
-                        className={segment === 'services' ? style.clickIcon : style.icon}
-                        icon={faBorderAll}/>
-                    <span className={segment === 'services' ? style.clickSpan : ''}>Services</span>
+                    <div className={style.navItem}>
+                        <FontAwesomeIcon
+                            className={segment === 'services' ? style.clickIcon : style.icon}
+                            icon={faBorderAll}/>
+                        <span className={segment === 'services' ? style.clickSpan : ''}>Services</span>
+                    </div>
                 </li>
                 {showServicesDropdown && (
                     <>
@@ -91,25 +105,31 @@ export default function NavMenu() {
                 )}
                 <li>
                     <Link href={"/request/cart"}>
-                        <FontAwesomeIcon
-                            className={segment === 'cart' ? style.clickIcon : style.icon}
-                            icon={faPlus}/>
-                        <span className={segment === 'cart' ? style.clickSpan : ''}>Cart</span>
+                        <div className={style.navItem}>
+                            <FontAwesomeIcon
+                                className={segment === 'cart' ? style.clickIcon : style.icon}
+                                icon={faPlus}/>
+                            <span className={segment === 'cart' ? style.clickSpan : ''}>Cart</span>
+                        </div>
                     </Link>
                 </li>
                 <li>
                     <Link href={"/request/order"}>
-                        <FontAwesomeIcon
-                            className={segment === 'order' ? style.clickIcon : style.icon}
-                            icon={faGripLines}/>
-                        <span className={segment === 'order' ? style.clickSpan : ''}>Request Order</span>
+                        <div className={style.navItem}>
+                            <FontAwesomeIcon
+                                className={segment === 'order' ? style.clickIcon : style.icon}
+                                icon={faGripLines}/>
+                            <span className={segment === 'order' ? style.clickSpan : ''}>Request Order</span>
+                        </div>
                     </Link>
                 </li>
                 <li onClick={toggleResultDropdown}>
-                    <FontAwesomeIcon
-                        className={segment === 'result' ? style.clickIcon : style.icon}
-                        icon={faCircleCheck}/>
-                    <span className={segment === 'result' ? style.clickSpan : ''}>Result</span>
+                    <div className={style.navItem}>
+                        <FontAwesomeIcon
+                            className={segment === 'result' ? style.clickIcon : style.icon}
+                            icon={faCircleCheck}/>
+                        <span className={segment === 'result' ? style.clickSpan : ''}>Result</span>
+                    </div>
                 </li>
                 {showResultDropdown && (
                     <>
@@ -121,6 +141,40 @@ export default function NavMenu() {
                         <ol>
                             <Link href={"/request/result/resample"}>
                                 Re-sample
+                            </Link>
+                        </ol>
+                    </>
+                )}
+                {session?.user.role !== 'USER' && (
+                    <li onClick={toggleManagementDropdown}>
+                        <div className={style.navItem}>
+                            <FontAwesomeIcon
+                                className={segment === 'management' ? style.clickIcon : style.icon}
+                                icon={faUsers}/>
+                            <span className={segment === 'management' ? style.clickSpan : ''}>User Management</span>
+                        </div>
+                    </li>
+                    )}
+                {showManagementDropdown && session?.user.role !== 'USER' && (
+                    <>
+                        <ol>
+                            <Link href={"/request/management/user"}>
+                                User Management
+                            </Link>
+                        </ol>
+                        <ol>
+                            <Link href={"/request/management/institution"}>
+                                Institution Management
+                            </Link>
+                        </ol>
+                        <ol>
+                            <Link href={"/request/management/service"}>
+                                Service Management
+                            </Link>
+                        </ol>
+                        <ol>
+                            <Link href={"/request/management/category"}>
+                                Category Management
                             </Link>
                         </ol>
                     </>

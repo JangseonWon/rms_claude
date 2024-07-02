@@ -11,7 +11,6 @@ export default async function Page() {
             <div className={style.contents}>
                 <Table/>
             </div>
-
         </div>
     )
 }

@@ -11,7 +11,7 @@ export default function ChangePassword() {
     const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const { data: session, status } = useSession();
+    const { data: session } = useSession();
 
     const setShowAlertDialog = useOpenAlertDialog();
     const setMessage = useSetMessageAlertDialog();

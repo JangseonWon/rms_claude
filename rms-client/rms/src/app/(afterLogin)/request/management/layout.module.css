@@ -1,0 +1,11 @@
+.layout {
+    display: flex;
+    flex-direction: column;
+    height: 77vh;
+}
+.title {
+    flex: 0;
+}
+.content {
+    flex: 1;
+}

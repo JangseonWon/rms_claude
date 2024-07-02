@@ -31,7 +31,7 @@
 }
 .navPill li{
     list-style-type: none;
-    margin: 1.5vh 0.8vw;
+    margin: 3vh 0.8vw;
     cursor: pointer;
 }
 .navPill li a {
@@ -51,13 +51,21 @@
 .navPill li a svg {
     color: #666666;
 }
-.navPill li:hover .icon {
+.navPill li:hover {
+    color: #90BA2D;
+}
+.navPill li:hover .navItem svg {
     color: #90BA2D;
 }
 .navPill li .clickIcon {
+    width: 1vw;
+    margin-right: 0.3vw;
     color: #90BA2D !important;
 }
 .navPill li .clickSpan {
     color: #002b49 !important;
     font-weight: 800 !important;
+}
+.icon {
+    width: 1vw;
 }
