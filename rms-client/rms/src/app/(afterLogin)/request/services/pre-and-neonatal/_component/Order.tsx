@@ -5,7 +5,7 @@ import GreenButton from "@/app/_component/GreenButton";
 import BlueButton from "@/app/_component/BlueButton";
 import DownloadExcelButton from "@/app/(afterLogin)/request/services/pre-and-neonatal/_component/DownloadExcelButton";
 import UploadExcelButton from "@/app/(afterLogin)/request/services/pre-and-neonatal/_component/UploadExcelButton";
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {format} from "date-fns";
 import {putRequest} from "@/app/(afterLogin)/request/services/pre-and-neonatal/_api/putRequest";
 import {useOpenAlertDialog, useSetIconAlertDialog, useSetMessageAlertDialog} from "@/store/useAlertDialogStore";
@@ -117,14 +117,9 @@ export default function Order() {
         }
     };
 
-    useEffect(() => {
-        if (okNotice) {
-            handleConfirmedAddToCart();
-            setOkNotice(false);
-        }
-    }, [okNotice]);
+    const [requestData, setRequestData] = useState<RequestData[]>([]);
 
-    const handleConfirmedAddToCart = async () => {
+    const handleConfirmedAddToCart = useCallback(async () => {
         try {
             const cartData = transformDataToFormat(requestData, "CART");
             const response = await putRequest(cartData);
@@ -136,15 +131,19 @@ export default function Order() {
         } catch (error) {
             alert(error);
         }
-    };
+    }, [requestData]);
+
+    useEffect(() => {
+        if (okNotice) {
+            handleConfirmedAddToCart();
+            setOkNotice(false);
+        }
+    }, [okNotice, handleConfirmedAddToCart, setOkNotice]);
 
     const handleAddToCartClick = () => {
         setShowNoticeDialog(true);
         setNoticeMessage('Do you want to add items to the cart?');
     };
-
-
-    const [requestData, setRequestData] = useState<RequestData[]>([]);
 
     function convertExcelSerialToDate(serial: number): Date {
         const excelEpochInMs = new Date(1899, 11, 30).getTime();

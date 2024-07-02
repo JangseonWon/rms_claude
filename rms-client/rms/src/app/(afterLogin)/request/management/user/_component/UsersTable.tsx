@@ -90,7 +90,7 @@ export default function UsersTable() {
                 </thead>
                     <tbody>
                     {userData && userData.length > 0 && userData.map((row, rowIndex) => (
-                        <tr>
+                        <tr key={rowIndex}>
                             <td>{row.id}</td>
                             <td>{row.name}</td>
                             <td>{row.email}</td>
