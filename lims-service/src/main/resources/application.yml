@@ -32,7 +32,7 @@ aws:
     secret-key: ${S3_SECRET_KEY}
   s3:
     endpoint: ${S3_ENDPOINT}
-    bucket: ${S3_BUCKET}
+    bucket: ${S3_BUCKET_NAME}
 
 logging:
   level:
