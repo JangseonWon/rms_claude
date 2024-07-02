@@ -4,13 +4,16 @@ spring:
   main:
     web-application-type: reactive
   cloud:
+    function:
+      definition: reportSubscribe;workflowSubscribe;
     stream:
-      function:
-        definition: subscribe;
       bindings:
-        subscribe-in-0:
+        reportSubscribe-in-0:
           destination: report
           group: report-subscriber-test
+        workflowSubscribe-in-0:
+          destination: workflow-event
+          group: rms-test-subscriber-dev
       kafka:
         binder:
           brokers: 172.19.208.171, 172.19.208.172, 172.19.208.101, 172.19.208.102, 172.19.208.111
@@ -25,11 +28,11 @@ spring:
       validation-query: SELECT 1
 aws:
   credentials:
-    access-key: 1MI7K07L3RZF4G7XXK0J
-    secret-key: xvCHemrdHb9tJj6KhHDyBKlU20piGBoiF1Ok7SED
+    access-key: ${S3_ACCESS_KEY}
+    secret-key: ${S3_SECRET_KEY}
   s3:
-    endpoint: https://s3.apps.gcgenome.com
-    bucket: rms-test-721be7ef-c1c6-459b-8bc6-0fb160f4d167
+    endpoint: ${S3_ENDPOINT}
+    bucket: ${S3_BUCKET}
 
 logging:
   level:

@@ -7,12 +7,15 @@ data:
   kafka.yaml: |
     spring:
       cloud:
+        function:
+          definition: reportSubscribe;workflowSubscribe;
         stream:
-          function:
-            definition: subscribe;
           bindings:
-            subscribe-in-0:
+            reportSubscribe-in-0:
               destination: report
+              group: rms-test-subscriber
+            workflowSubscribe-in-0:
+              destination: workflow-event
               group: rms-test-subscriber
           kafka:
             binder:

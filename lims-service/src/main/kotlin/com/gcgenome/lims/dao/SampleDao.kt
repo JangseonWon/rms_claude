@@ -6,9 +6,9 @@ import org.jooq.DSLContext
 import reactor.core.publisher.Mono
 
 interface SampleDao {
-    fun DSLContext.selectSampleByBarcode(barcode: String, institution: String): Mono<Sample> {
+    fun DSLContext.selectSampleByBarcode(barcode: String): Mono<Sample> {
         return Mono.from(
-            select(SAMPLE).from(SAMPLE).where(SAMPLE.BARCODE.eq(barcode)).and(SAMPLE.USER_ID.eq(institution))
+            select(SAMPLE).from(SAMPLE).where(SAMPLE.BARCODE.eq(barcode))
         ).map { it.into(Sample::class.java) }
     }
 }

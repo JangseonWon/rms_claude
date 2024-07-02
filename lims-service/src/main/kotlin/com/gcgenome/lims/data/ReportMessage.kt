@@ -2,7 +2,7 @@ package com.gcgenome.lims.data
 
 import java.time.LocalDate
 
-data class Message(
+data class ReportMessage(
     var institutionName: String?,
     var departmentName: String?,
     var wardName: String?,

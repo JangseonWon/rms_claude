@@ -4,8 +4,9 @@ package com.gcgenome.lims.subscriber
 import com.gcgenome.lims.dao.ReportDao
 import com.gcgenome.lims.dao.RequestDao
 import com.gcgenome.lims.dao.SampleDao
-import com.gcgenome.lims.data.Message
-import com.gcgenome.lims.data.Report
+import com.gcgenome.lims.data.*
+import com.gcgenome.lims.exception.InvalidWorkflowException
+import com.gcgenome.lims.exception.NotFoundBarcodeException
 import org.jooq.DSLContext
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -23,13 +24,24 @@ class Handler(
     private val s3Client: S3AsyncClient,
     @Value("\${aws.s3.bucket}") private val bucketName: String
 ) : SampleDao, ReportDao, RequestDao {
-    fun saveReport(message: Message): Mono<Report> {
+    fun updateRequest(message: WorkflowMessage): Mono<Request> {
         return Mono.from(dslContext.run {
-            selectSampleByBarcode(message.sample.toString(), message.institution!!)
-                .switchIfEmpty(Mono.empty())
+            if(message.process  == "SPECIFIED" && message.type == "COMPLETE"){
+                selectSampleByBarcode(message.request.samples[0].id.toString())
+                    .switchIfEmpty(Mono.error(NotFoundBarcodeException("not found barcode: ${message.request.samples[0].id}")))
+                    .flatMap { sample -> selectRequestBySampleIdAndServiceId(sample.id!!, message.request.service.id) }
+                    .flatMap { request -> updateRequestStatusById(request.orderId!!, request.serviceId!!, request.sampleId!!, "INPROGRESS") }
+            }else{
+                Mono.error(InvalidWorkflowException("It is not in specified & complete - barcode: ${message.request.samples[0].id}, service: ${message.request.service.id}, status: ${message.process}, type: ${message.type}"))
+            }
+        })
+    }
+    fun saveReport(message: ReportMessage): Mono<Report> {
+        return Mono.from(dslContext.run {
+            selectSampleByBarcode(message.sample.toString())
+                .switchIfEmpty(Mono.error(NotFoundBarcodeException("not found barcode: ${message.sample}")))
                 .flatMap { sample -> selectRequestBySampleIdAndServiceId(sample.id!!, message.service!!) }
-                .switchIfEmpty(Mono.empty())
-                .flatMap { request -> updateRequestStatusById(request.orderId!!, request.serviceId!!, request.sampleId!!) }
+                .flatMap { request -> updateRequestStatusById(request.orderId!!, request.serviceId!!, request.sampleId!!, "DELIVERED") }
                 .flatMap { request ->
                     val barcode = message.sample.toString()
                     val year = barcode.substring(0, 4)
