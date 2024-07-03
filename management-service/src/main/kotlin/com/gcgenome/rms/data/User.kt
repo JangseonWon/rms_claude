@@ -12,7 +12,7 @@ data class User(
     var id: String,
     var name: String?,
     var password: String?,
-    var role: String,
+    var role: String?,
     var type: String?,
     var email: String?,
     @JsonProperty("phone_number")

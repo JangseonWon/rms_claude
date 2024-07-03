@@ -8,7 +8,7 @@ import InputBox from "@/app/_component/InputBox";
 import {getUser} from "@/app/(afterLogin)/user/_api/getUser";
 import {User} from "@/model/User";
 import {useSession} from "next-auth/react";
-import {fetchUserUpdate} from "@/app/(afterLogin)/user/_api/fetchUserUpdate";
+import {fetchUserUpdate} from "@/app/(afterLogin)/_api/fetchUserUpdate";
 import Loading from "@/app/(afterLogin)/_component/Loading";
 
 export default function Profile() {

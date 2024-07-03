@@ -8,6 +8,8 @@ import InputBox from "@/app/_component/InputBox";
 import {Paging} from "@/model/Paging";
 import {User} from "@/model/User";
 import {getUsers} from "@/app/(afterLogin)/request/management/user/_api/getUsers";
+import SwitchButton from "@/app/_component/SwitchButton";
+import {fetchUserUpdate} from "@/app/(afterLogin)/_api/fetchUserUpdate";
 
 interface UserWithSelected extends User {
     isSelected?: boolean;
@@ -17,7 +19,8 @@ export default function UsersTable() {
     const [userData, setUserData] = useState<UserWithSelected[]>([]);
     const [totalPage, setTotalPage] = useState<number>(0);
     const [search, setSearch] =
-        useState<Paging>({filters: [], sort_by:"name", asc: true, size:5, page:1});
+        useState<Paging>({filters: [], sort_by:"name", asc: true, size:10, page:1});
+    const [searchKey, setSearchKey] = useState<string>("id");
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage =>({
@@ -37,10 +40,18 @@ export default function UsersTable() {
         setSearch((prevSearch) => {
             const updatedFilters = prevSearch.filters?.slice() || [];
             const existingFilterIndex = updatedFilters.findIndex((filter) => filter.key === newFilter.key)
-            if (existingFilterIndex !== -1) updatedFilters[existingFilterIndex] = newFilter;
-            else updatedFilters.push(newFilter);
+            const filterWithOperator = { ...newFilter, operator: "LIKE" };
+            if (existingFilterIndex !== -1) {
+                updatedFilters[existingFilterIndex] = filterWithOperator;
+            } else {
+                updatedFilters.push(filterWithOperator);
+            }
             return { ...prevSearch, filters: updatedFilters }
         });
+    };
+
+    const handleSearchValueChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSearchKey(event.target.value);
     };
 
     const fetchData = async (search: Paging) => {
@@ -58,6 +69,17 @@ export default function UsersTable() {
         }
     }
 
+    const handleToggle = async (id: string, checked: boolean) => {
+        const state = checked ? 'ACTIVE' : 'INACTIVE';
+        const userUpdate = { id, state };
+        await fetchUserUpdate(userUpdate);
+        await fetchData(search);
+    };
+
+    const handleUserAddClick = () => {
+        alert('add click');
+    }
+
     useEffect(() => {
         fetchData(search)
     }, [search]);
@@ -65,24 +87,33 @@ export default function UsersTable() {
     return (
         <>
             <section className={style.filterContainer}>
-                <button className={style.addButton}>
+                <button className={style.addButton} onClick={handleUserAddClick}>
                     Add
                 </button>
+                <select className={style.selectSearchKey} onChange={handleSearchValueChange}>
+                    <option value="id">ID</option>
+                    <option value="name">Name</option>
+                    <option value="email">Email</option>
+                    <option value="phone_number">Phone Number</option>
+                    <option value="branch_name">Institution</option>
+                    <option value="branch_serial">Serial</option>
+                    <option value="role">Role</option>
+                </select>
                 <div className={style.filterContainerRight}>
                     <InputBox label={"search"} onChange={(value) => {
-                        handleSearchChange({key: "search", value: value})
+                        handleSearchChange({key: searchKey, value: value})
                     }}></InputBox>
                 </div>
             </section>
             <section className={style.tableContainer}>
                 <table className={style.table}>
-                <thead>
-                <tr>
-                    <th>Id</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone Number</th>
-                    <th>Institution</th>
+                    <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone Number</th>
+                        <th>Institution</th>
                     <th>Serial</th>
                     <th>Role</th>
                     <th>State</th>
@@ -98,7 +129,12 @@ export default function UsersTable() {
                             <td>{row.branch_name}</td>
                             <td>{row.branch_serial}</td>
                             <td>{row.role}</td>
-                            <td>{row.state}</td>
+                            <td>
+                                <SwitchButton id={row.id}
+                                              checked={row.state === 'ACTIVE'}
+                                              onToggle={handleToggle}
+                                />
+                            </td>
                         </tr>
                     ))}
                     </tbody>
@@ -107,9 +143,9 @@ export default function UsersTable() {
                     <span>items per page:</span>
                     <div className={style.select}>
                         <select onChange={handlePageSizeChange}>
-                            <option value="5">5</option>
                             <option value="10">10</option>
                             <option value="20">20</option>
+                            <option value="50">50</option>
                         </select>
                     </div>
                     <span> 1-{totalPage} of {search.page} </span>

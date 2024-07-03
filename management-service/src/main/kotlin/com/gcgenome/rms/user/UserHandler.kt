@@ -58,7 +58,7 @@ class UserHandler(
                     val value = filter.value!!
                     val condition = when (filter.operator) {
                         "=" -> field(key).eq(value)
-                        "LIKE" -> field(key).like("%$value%")
+                        "LIKE" -> field(key).likeIgnoreCase("%$value%")
                         ">" -> field(key).gt(value)
                         "<" -> field(key).lt(value)
                         ">=" -> field(key).ge(value)

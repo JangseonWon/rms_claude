@@ -1,7 +1,7 @@
 .layout {
     display: flex;
     flex-direction: column;
-    height: 77vh;
+    padding-bottom: 10vh;
 }
 .title {
     flex: 0;

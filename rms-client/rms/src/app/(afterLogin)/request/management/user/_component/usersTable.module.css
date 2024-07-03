@@ -11,18 +11,33 @@
 }
 .addButton {
     display: flex;
-    margin: 2vh 2vw 0 auto;
+    margin: 2.5vh 0.5vw 0 auto;
     border-radius: 15px;
     background: linear-gradient(135deg, #182847, #354e6d);
     box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     color: #ffffff;
     width: 4vw;
-    height: 3vh;
-    padding: 0.5vh 1.3vw;
+    height: 3.5vh;
+    padding: 0.7vh 1.2vw;
     border: none;
-    font-weight: 500;
+    font-weight: 700;
     font-size: 0.8vw;
     cursor: pointer;
+}
+.addButton:active {
+    background: linear-gradient(135deg, #546b98, #4f6e92);
+}
+.selectSearchKey {
+    padding: 0.2vh 0.2vw 0.2vh 0.2vw;
+    margin: 2.5vh 1vw 0 1vw;
+    height: 3.5vh;
+    width: 6vw;
+    font-size: 0.6vw;
+    border-radius: 15px;
+    border: 1px solid #DAE2ED;
+    box-shadow: 0 2px 2px #F3F6F9;
+    color: #666666;
+    outline: none;
 }
 .tableContainer {
     margin: 2vh 2vw;
