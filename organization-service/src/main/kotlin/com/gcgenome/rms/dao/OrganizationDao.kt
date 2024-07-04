@@ -44,21 +44,21 @@ interface OrganizationDao {
             .map { it.into(Organization::class.java) }
     }
 
-    fun DSLContext.selectOrganizations(query: Query, where: Condition, userId: String): Flux<Organization> {
+    fun DSLContext.selectOrganizations(query: Query, where: Condition): Flux<Organization> {
         val asc : SortOrder = when (query.asc) {
             true -> SortOrder.ASC
             false -> SortOrder.DESC
         }
 
-        return Flux.from(selectFrom(ORGANIZATION).where(where.and(ORGANIZATION.USER_ID.eq(userId)))
+        return Flux.from(selectFrom(ORGANIZATION).where(where)
             .orderBy(field(query.sortBy).sort(asc))
             .limit(query.size)
             .offset(query.page*query.size)
         ).map{it.into(Organization::class.java)}
     }
 
-    fun DSLContext.selectOrganizationsCount(query: Query, where: Condition, userId: String): Mono<Int> {
-        return Mono.from(selectCount().from(ORGANIZATION).where(where.and(ORGANIZATION.USER_ID.eq(userId))))
+    fun DSLContext.selectOrganizationsCount(where: Condition): Mono<Int> {
+        return Mono.from(selectCount().from(ORGANIZATION).where(where))
             .map { it.component1() }
     }
 }

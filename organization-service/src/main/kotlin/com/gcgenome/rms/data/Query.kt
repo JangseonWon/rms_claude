@@ -17,6 +17,7 @@ data class Query(
     companion object {
         data class Filter(
             val key: String?,
+            val operator: String?,
             val value: String?
         )
     }

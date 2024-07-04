@@ -1,22 +1,20 @@
 "use client"
 
 import React, {useEffect, useState} from "react";
-import style from "@/app/(afterLogin)/request/management/user/_component/usersTable.module.css";
+import style from "@/app/(afterLogin)/request/management/institution/_component/institutionTable.module.css";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
 import {Paging} from "@/model/Paging";
-import {User} from "@/model/User";
-import {getUsers} from "@/app/(afterLogin)/request/management/user/_api/getUsers";
-import SwitchButton from "@/app/_component/SwitchButton";
-import {fetchUserUpdate} from "@/app/(afterLogin)/_api/fetchUserUpdate";
+import {Organization} from "@/model/Organization";
+import {getInstitution} from "@/app/(afterLogin)/request/management/institution/_api/getInstitution";
 
-interface UserWithSelected extends User {
+interface InstitutionWithSelected extends Organization {
     isSelected?: boolean;
 }
 
-export default function UsersTable() {
-    const [userData, setUserData] = useState<UserWithSelected[]>([]);
+export default function InstitutionTable() {
+    const [institutionData, setInstitutionData] = useState<InstitutionWithSelected[]>([]);
     const [totalPage, setTotalPage] = useState<number>(0);
     const [search, setSearch] =
         useState<Paging>({filters: [], sort_by:"name", asc: true, size:10, page:1});
@@ -33,7 +31,8 @@ export default function UsersTable() {
         const newSize = parseInt(event.target.value);
         setSearch(prevSearch => ({
             ...prevSearch,
-            size: newSize
+            size: newSize,
+            page: 1
         }));
     };
 
@@ -49,35 +48,25 @@ export default function UsersTable() {
         const key = event.target.value;
         setSearchKey(key);
         handleSearchChange({key: key, value: searchValue});
-        console.log(search);
-        console.log(searchValue);
-        console.log(searchKey);
     };
 
     const fetchData = async (search: Paging) => {
         try {
-            const response = await getUsers(search)
+            const response = await getInstitution(search)
             const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
             const responseData = await response.json();
             const data = responseData.data;
-            setUserData(data as User[]);
+            setInstitutionData(data as Organization[]);
             setTotalPage(totalPage)
         } catch(error) {
             console.error("Failed to fetch data:", error);
-            setUserData([]);
+            setInstitutionData([]);
             setTotalPage(0);
         }
     }
 
-    const handleToggle = async (id: string, checked: boolean) => {
-        const state = checked ? 'ACTIVE' : 'INACTIVE';
-        const userUpdate = { id, state };
-        await fetchUserUpdate(userUpdate);
-        await fetchData(search);
-    };
-
     const handleUserAddClick = () => {
-        alert('add click');
+        alert('sync complete');
     }
 
     useEffect(() => {
@@ -94,11 +83,8 @@ export default function UsersTable() {
                     <select className={style.selectSearchKey} onChange={handleSearchKeyChange}>
                         <option value="id">ID</option>
                         <option value="name">Name</option>
-                        <option value="email">Email</option>
-                        <option value="phone_number">Phone Number</option>
-                        <option value="branch_name">Institution</option>
-                        <option value="branch_serial">Serial</option>
-                        <option value="role">Role</option>
+                        <option value="type">Type</option>
+                        <option value="registration_number">Code</option>
                     </select>
                 </div>
                 <div className={style.filterContainerRight}>
@@ -114,30 +100,17 @@ export default function UsersTable() {
                     <tr>
                         <th>Id</th>
                         <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone Number</th>
-                        <th>Institution</th>
-                    <th>Serial</th>
-                    <th>Role</th>
-                    <th>State</th>
-                </tr>
-                </thead>
+                        <th>Type</th>
+                        <th>Code</th>
+                    </tr>
+                    </thead>
                     <tbody>
-                    {userData && userData.length > 0 && userData.map((row, rowIndex) => (
+                    {institutionData && institutionData.length > 0 && institutionData.map((row, rowIndex) => (
                         <tr key={rowIndex}>
                             <td>{row.id}</td>
                             <td>{row.name}</td>
-                            <td>{row.email}</td>
-                            <td>{row.phone_number}</td>
-                            <td>{row.branch_name}</td>
-                            <td>{row.branch_serial}</td>
-                            <td>{row.role}</td>
-                            <td>
-                                <SwitchButton id={row.id}
-                                              checked={row.state === 'ACTIVE'}
-                                              onToggle={handleToggle}
-                                />
-                            </td>
+                            <td>{row.type}</td>
+                            <td>{row.registration_number}</td>
                         </tr>
                     ))}
                     </tbody>
