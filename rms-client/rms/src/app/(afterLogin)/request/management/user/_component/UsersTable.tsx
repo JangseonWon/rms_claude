@@ -23,6 +23,8 @@ export default function UsersTable() {
         useState<Paging>({filters: [], sort_by:"name", asc: true, size:10, page:1});
     const [searchKey, setSearchKey] = useState<string>("id");
     const [searchValue, setSearchValue] = useState<string>("");
+    const [modalOpen, setModalOpen] = useState<boolean>(false);
+    const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage =>({
@@ -86,7 +88,13 @@ export default function UsersTable() {
     }
 
     const handleServiceIconClick = (id: string) => {
-        alert(`${id} add click`);
+        setSelectedUserId(id);
+        setModalOpen(true);
+    }
+
+    const closeModal = () => {
+        setModalOpen(false);
+        setSelectedUserId(null);
     }
 
     useEffect(() => {
@@ -149,7 +157,12 @@ export default function UsersTable() {
                                 />
                             </td>
                             <td>
-                                <ServiceModal id={row.id}/>
+                                {/*<ServiceModal id={row.id}/>*/}
+                                <FontAwesomeIcon
+                                    className={style.icon}
+                                    icon={faMagnifyingGlass}
+                                    onClick={()=> handleServiceIconClick(row.id)}
+                                />
                             </td>
                             <td>
                                 <SwitchButton
@@ -184,6 +197,9 @@ export default function UsersTable() {
                     </button>
                 </div>
             </section>
+            {selectedUserId && (
+                <ServiceModal id={selectedUserId} open={modalOpen} closeModal={closeModal}/>
+            )}
         </>
     );
 }
