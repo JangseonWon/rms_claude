@@ -163,11 +163,6 @@ export default function NavMenu() {
                             </Link>
                         </ol>
                         <ol>
-                            <Link href={"/request/management/institution"}>
-                                Institution Management
-                            </Link>
-                        </ol>
-                        <ol>
                             <Link href={"/request/management/service"}>
                                 Service Management
                             </Link>

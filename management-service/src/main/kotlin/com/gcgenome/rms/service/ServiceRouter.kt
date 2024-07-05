@@ -22,6 +22,7 @@ class ServiceRouter (
 ) {
     @Bean("ServicesRouter")
     fun route() = router {
+        GET("/w-api/management-service/services/users/{user_id}", ::selectUserServices)
         POST("/w-api/management-service/services", ::selectServices)
         POST("/w-api/management-service/services/{service_id}/extensions", ::selectServiceExtensions)
         POST("/w-api/management-service/services/{service_id}/sample-types", ::selectSampleTypes)
@@ -38,6 +39,16 @@ class ServiceRouter (
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(AdminAuthenticationException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(ServiceNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
+            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
+    }
+
+    private fun selectUserServices(request: ServerRequest): Mono<ServerResponse> {
+        val userId = request.pathVariable("user_id")
+        return authenticationHandler.principal(request)
+            .flatMap { serviceHandler.selectServiceByUserId(userId).collectList() }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
             .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
     }

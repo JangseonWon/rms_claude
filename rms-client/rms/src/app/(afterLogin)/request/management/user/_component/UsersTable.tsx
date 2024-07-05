@@ -2,7 +2,7 @@
 
 import React, {useEffect, useState} from "react";
 import style from "@/app/(afterLogin)/request/management/user/_component/usersTable.module.css";
-import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
+import {faAngleLeft, faAngleRight, faBuildingColumns, faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
 import {Paging} from "@/model/Paging";
@@ -10,6 +10,7 @@ import {User} from "@/model/User";
 import {getUsers} from "@/app/(afterLogin)/request/management/user/_api/getUsers";
 import SwitchButton from "@/app/_component/SwitchButton";
 import {fetchUserUpdate} from "@/app/(afterLogin)/_api/fetchUserUpdate";
+import ServiceModal from "@/app/(afterLogin)/request/management/user/_component/ServiceModal";
 
 interface UserWithSelected extends User {
     isSelected?: boolean;
@@ -76,8 +77,16 @@ export default function UsersTable() {
         await fetchData(search);
     };
 
-    const handleUserAddClick = () => {
+    const handleAlisSyncButtonClick = () => {
         alert('add click');
+    }
+
+    const handleInstitutionIconClick = (id: string) => {
+        alert(`${id} add click`);
+    }
+
+    const handleServiceIconClick = (id: string) => {
+        alert(`${id} add click`);
     }
 
     useEffect(() => {
@@ -88,7 +97,7 @@ export default function UsersTable() {
         <>
             <section className={style.filterContainer}>
                 <div className={style.filterContainerLeft}>
-                    <button className={style.alisSync} onClick={handleUserAddClick}>
+                    <button className={style.alisSync} onClick={handleAlisSyncButtonClick}>
                         Alis-Sync
                     </button>
                     <select className={style.selectSearchKey} onChange={handleSearchKeyChange}>
@@ -116,12 +125,13 @@ export default function UsersTable() {
                         <th>Name</th>
                         <th>Email</th>
                         <th>Phone Number</th>
+                        <th>Serial</th>
+                        <th>Role</th>
                         <th>Institution</th>
-                    <th>Serial</th>
-                    <th>Role</th>
-                    <th>State</th>
-                </tr>
-                </thead>
+                        <th>Service</th>
+                        <th>State</th>
+                    </tr>
+                    </thead>
                     <tbody>
                     {userData && userData.length > 0 && userData.map((row, rowIndex) => (
                         <tr key={rowIndex}>
@@ -129,13 +139,23 @@ export default function UsersTable() {
                             <td>{row.name}</td>
                             <td>{row.email}</td>
                             <td>{row.phone_number}</td>
-                            <td>{row.branch_name}</td>
                             <td>{row.branch_serial}</td>
                             <td>{row.role}</td>
                             <td>
-                                <SwitchButton id={row.id}
-                                              checked={row.state === 'ACTIVE'}
-                                              onToggle={handleToggle}
+                                <FontAwesomeIcon
+                                    className={style.icon}
+                                    icon={faMagnifyingGlass}
+                                    onClick={()=> handleInstitutionIconClick(row.id)}
+                                />
+                            </td>
+                            <td>
+                                <ServiceModal id={row.id}/>
+                            </td>
+                            <td>
+                                <SwitchButton
+                                    id={row.id}
+                                    checked={row.state === 'ACTIVE'}
+                                    onToggle={handleToggle}
                                 />
                             </td>
                         </tr>

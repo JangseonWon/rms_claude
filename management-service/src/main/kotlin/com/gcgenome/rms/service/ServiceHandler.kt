@@ -37,6 +37,10 @@ class ServiceHandler(
         return Flux.from(dslContext.selectServiceByNameOrId(whereClause))
     }
 
+    fun selectServiceByUserId(userId: String): Flux<Service_> {
+        return Flux.from(dslContext.selectServiceByUserId(userId))
+    }
+
     fun selectServiceExtensions(filter: Query.Companion.Filter, serviceId: String): Flux<Extension> {
         val whereClause = buildExtensionIdOrNameWhereClause(filter)
         return Flux.from(dslContext.run {

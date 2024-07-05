@@ -135,3 +135,6 @@
 .select select:hover {
     border-color: #1a1a1a;
 }
+.icon:hover {
+    cursor: pointer;
+}

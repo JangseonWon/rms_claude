@@ -1,0 +1,120 @@
+.icon:hover {
+    cursor: pointer;
+}
+.modalBackground {
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    top: 15vh;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+.modal {
+    background: rgb(255, 255, 255);
+    border: solid #f0f0f0 2px;
+    position: relative;
+    top: 5%;
+    max-width: 70vw;
+    max-height: 65vh;
+    min-width: 50vw;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    padding: 1vh 1vw;
+}
+.modalTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: solid #C8C9CB 2px;
+}
+.modalClose {
+    margin-left: auto;
+}
+.modalClose:hover {
+    cursor: pointer;
+}
+.bodyTitle {
+    display: flex;
+    justify-content: space-between;
+    margin: 0 6.5vw;
+}
+.modalBody {
+    min-height: 40vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.rightBody {
+    min-height: 40vh;
+    margin: 0 1vw;
+}
+.centerBody {
+    min-height: 40vh;
+    margin: 0 1vw;
+}
+.leftBody {
+    min-width: 18vw;
+    min-height: 40vh;
+    margin: 0 1vw;
+}
+.serviceTable {
+    background-color: #f8f8f8;
+    width: 100%;
+    border-collapse: collapse;
+}
+.serviceTable thead {
+    background-color: #838689;
+    color: #ffffff;
+    font-size: 0.7vw;
+    font-weight: 600;
+}
+.serviceTable thead tr th:first-child {
+    border-radius: 15px 0 0 0;
+}
+.serviceTable thead tr th:last-child {
+    border-radius: 0 20px 0 0;
+}
+.serviceTable tbody {
+    font-weight: 300;
+}
+.serviceTable tbody tr {
+    border-bottom: 1px solid #838689;
+}
+.serviceTable tbody tr td {
+    color: #666666;
+    font-size: 0.7vw;
+    padding: 10px;
+}
+.serviceTable tbody tr:hover {
+    background-color: #e0e0e0 !important;
+    cursor: pointer;
+}
+.serviceTable th,
+.serviceTable td {
+    padding: 0.6vh 0.6vw;
+    text-align: center;
+}
+.word {
+    margin: 10px 0;
+}
+.selectLink {
+    display: flex;
+    font-size: 14px;
+}
+.link {
+    color: #859fbf;
+    cursor: pointer;
+}
+.link:active {
+    color: #7a93b2;
+}
+.title {
+    font-size: 2vw;
+}
+.serviceTitle {
+    margin: 2.5vh 0 2vh auto;
+    font-size: 1vw;
+}
