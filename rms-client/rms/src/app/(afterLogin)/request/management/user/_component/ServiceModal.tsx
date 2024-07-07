@@ -67,7 +67,7 @@ export default function ServiceModal({id, open, closeModal}: Props) {
                     </div>
                     <div className={style.centerBody}>
                         <h2>Sample Type</h2>
-                        <table className={style.table}>
+                        <table className={style.serviceTable}>
                             <thead>
                             <tr>
                                 <th>Code</th>
@@ -88,7 +88,7 @@ export default function ServiceModal({id, open, closeModal}: Props) {
                     </div>
                     <div className={style.rightBody}>
                         <h2>Extension</h2>
-                        <table className={style.table}>
+                        <table className={style.serviceTable}>
                             <thead>
                             <tr>
                                 <th>Code</th>
