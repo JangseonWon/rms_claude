@@ -15,7 +15,7 @@
     border: solid #f0f0f0 2px;
     position: relative;
     top: 5%;
-    max-width: 70vw;
+    max-width: 30vw;
     max-height: 65vh;
     min-width: 50vw;
     border-radius: 16px;
@@ -69,73 +69,38 @@
     min-height: 40vh;
     margin: 0 1vw;
 }
-.serviceTable {
+.institutionTable {
+    min-width: 44vw;
     background-color: #f8f8f8;
     width: 100%;
     border-collapse: collapse;
+    margin: 3vh 1vw;
 }
-.serviceTable thead {
+.institutionTable thead {
     background-color: #838689;
     color: #ffffff;
     font-size: 0.7vw;
     font-weight: 600;
 }
-.serviceTable thead tr th:first-child {
+.institutionTable thead tr th:first-child {
     border-radius: 15px 0 0 0;
 }
-.serviceTable thead tr th:last-child {
+.institutionTable thead tr th:last-child {
     border-radius: 0 20px 0 0;
 }
-.serviceTable tbody {
+.institutionTable tbody {
     font-weight: 300;
 }
-.serviceTable tbody tr {
+.institutionTable tbody tr {
     border-bottom: 1px solid #838689;
 }
-.serviceTable tbody tr td {
+.institutionTable tbody tr td {
     color: #666666;
     font-size: 0.7vw;
     padding: 10px;
 }
-.serviceTable tbody tr:hover {
-    background-color: #e0e0e0 !important;
-    cursor: pointer;
-}
-.serviceTable th,
-.serviceTable td {
-    padding: 0.6vh 0.6vw;
-    text-align: center;
-}
-.sideTable {
-    background-color: #f8f8f8;
-    width: 100%;
-    border-collapse: collapse;
-}
-.sideTable thead {
-    background-color: #838689;
-    color: #ffffff;
-    font-size: 0.7vw;
-    font-weight: 600;
-}
-.sideTable thead tr th:first-child {
-    border-radius: 15px 0 0 0;
-}
-.sideTable thead tr th:last-child {
-    border-radius: 0 20px 0 0;
-}
-.sideTable tbody {
-    font-weight: 300;
-}
-.sideTable tbody tr {
-    border-bottom: 1px solid #838689;
-}
-.sideTable tbody tr td {
-    color: #666666;
-    font-size: 0.7vw;
-    padding: 10px;
-}
-.sideTable th,
-.sideTable td {
+.institutionTable th,
+.institutionTable td {
     padding: 0.6vh 0.6vw;
     text-align: center;
 }
@@ -156,8 +121,7 @@
 .title {
     font-size: 2vw;
 }
-.serviceTitle {
-    float: right;
-    margin: 2.5vh 0 2vh 2vw;
+.institutionTitle {
+    margin: 2.5vh 0 2vh auto;
     font-size: 1vw;
 }

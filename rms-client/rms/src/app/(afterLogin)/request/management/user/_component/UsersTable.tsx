@@ -11,6 +11,7 @@ import {getUsers} from "@/app/(afterLogin)/request/management/user/_api/getUsers
 import SwitchButton from "@/app/_component/SwitchButton";
 import {fetchUserUpdate} from "@/app/(afterLogin)/_api/fetchUserUpdate";
 import ServiceModal from "@/app/(afterLogin)/request/management/user/_component/ServiceModal";
+import InstitutionModal from "@/app/(afterLogin)/request/management/user/_component/InstitutionModal";
 
 interface UserWithSelected extends User {
     isSelected?: boolean;
@@ -23,8 +24,11 @@ export default function UsersTable() {
         useState<Paging>({filters: [], sort_by:"name", asc: true, size:10, page:1});
     const [searchKey, setSearchKey] = useState<string>("id");
     const [searchValue, setSearchValue] = useState<string>("");
-    const [modalOpen, setModalOpen] = useState<boolean>(false);
-    const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+    const [serviceModalOpen, setServiceModalOpen] = useState<boolean>(false);
+    const [selectedServiceUserId, setSelectedServiceUserId] = useState<string | null>(null);
+    const [institutionModalOpen, setInstitutionModalOpen] = useState<boolean>(false);
+    const [selectedInstitutionUser, setSelectedInstitutionUser] = useState<{id: string; name: string} | null>(null);
+
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage =>({
@@ -83,18 +87,21 @@ export default function UsersTable() {
         alert('add click');
     }
 
-    const handleInstitutionIconClick = (id: string) => {
-        alert(`${id} add click`);
+    const handleInstitutionIconClick = (id: string, name: string | undefined) => {
+        setSelectedInstitutionUser({ id, name: name ?? '' });
+        setInstitutionModalOpen(true);
     }
 
     const handleServiceIconClick = (id: string) => {
-        setSelectedUserId(id);
-        setModalOpen(true);
+        setSelectedServiceUserId(id);
+        setServiceModalOpen(true);
     }
 
     const closeModal = () => {
-        setModalOpen(false);
-        setSelectedUserId(null);
+        setServiceModalOpen(false);
+        setInstitutionModalOpen(false);
+        setSelectedServiceUserId(null);
+        setSelectedInstitutionUser(null);
     }
 
     useEffect(() => {
@@ -153,11 +160,10 @@ export default function UsersTable() {
                                 <FontAwesomeIcon
                                     className={style.icon}
                                     icon={faMagnifyingGlass}
-                                    onClick={()=> handleInstitutionIconClick(row.id)}
+                                    onClick={()=> handleInstitutionIconClick(row.id, row.name)}
                                 />
                             </td>
                             <td>
-                                {/*<ServiceModal id={row.id}/>*/}
                                 <FontAwesomeIcon
                                     className={style.icon}
                                     icon={faMagnifyingGlass}
@@ -197,8 +203,11 @@ export default function UsersTable() {
                     </button>
                 </div>
             </section>
-            {selectedUserId && (
-                <ServiceModal id={selectedUserId} open={modalOpen} closeModal={closeModal}/>
+            {selectedServiceUserId && (
+                <ServiceModal id={selectedServiceUserId} open={serviceModalOpen} closeModal={closeModal}/>
+            )}
+            {selectedInstitutionUser && (
+                <InstitutionModal id={selectedInstitutionUser.id} name={selectedInstitutionUser.name} open={institutionModalOpen} closeModal={closeModal}/>
             )}
         </>
     );

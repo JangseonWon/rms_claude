@@ -36,13 +36,15 @@ export default function ServiceModal({id, open, closeModal}: Props) {
     return (
         <div className={style.modalBackground}>
             <div className={style.modal}>
-                <div className={style.modalClose} onClick={closeModal}>
-                    <FontAwesomeIcon icon={faXmark}/>
-                </div>
-                <section className={style.modalTop}>
-                    <div className={style.title}>Service Details</div>
-                    <div className={style.serviceTitle}>
-                        User Id : {id} / Service Name : {selectService?.name || 'No Service Selected'}
+                <section className={style.modalHeader}>
+                    <div className={style.modalClose} onClick={closeModal}>
+                        <FontAwesomeIcon icon={faXmark}/>
+                    </div>
+                    <div className={style.modalTop}>
+                        <div className={style.title}>Service Details</div>
+                        <div className={style.serviceTitle}>
+                            User Id : {id} / Service Name : {selectService?.name || 'No Service Selected'}
+                        </div>
                     </div>
                 </section>
                 <section className={style.modalBody}>
@@ -67,7 +69,7 @@ export default function ServiceModal({id, open, closeModal}: Props) {
                     </div>
                     <div className={style.centerBody}>
                         <h2>Sample Type</h2>
-                        <table className={style.serviceTable}>
+                        <table className={style.sideTable}>
                             <thead>
                             <tr>
                                 <th>Code</th>
@@ -88,7 +90,7 @@ export default function ServiceModal({id, open, closeModal}: Props) {
                     </div>
                     <div className={style.rightBody}>
                         <h2>Extension</h2>
-                        <table className={style.serviceTable}>
+                        <table className={style.sideTable}>
                             <thead>
                             <tr>
                                 <th>Code</th>

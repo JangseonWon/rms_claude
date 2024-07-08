@@ -38,7 +38,7 @@ interface OrganizationDao{
 
     fun DSLContext.selectOrganizationByUserId(userId: String): Flux<Organization> {
         return Flux.from(
-            select(ORGANIZATION.ID, ORGANIZATION.NAME).from(ORGANIZATION).where(ORGANIZATION.USER_ID.eq(userId))
+            selectFrom(ORGANIZATION).where(ORGANIZATION.USER_ID.eq(userId))
         ).map { it.into(Organization::class.java) }
     }
 
