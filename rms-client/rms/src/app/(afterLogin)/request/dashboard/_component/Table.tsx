@@ -10,9 +10,10 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
 import SelectBox from "@/app/_component/SelectBox";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
-import {useStatus} from "@/app/(afterLogin)/request/dashboard/store/useStatusStore";
+import {useSetStatus, useStatus} from "@/app/(afterLogin)/request/dashboard/store/useStatusStore";
 import {Paging} from "@/model/Paging";
 import DownloadExcelButton from "@/app/(afterLogin)/request/dashboard/_component/DownloadExcelButton";
+import {Status} from "@/model/Status";
 
 export default function Table() {
     const [requestData, setRequestData] = useState<Request[]>([]);
@@ -20,12 +21,14 @@ export default function Table() {
         useState<Paging>({filters: [], sort_by:"status", asc: true, size:5, page:1});
     const [totalPage, setTotalPage] = useState<number>();
     const status = useStatus();
+    const setStatus = useSetStatus();
     const statusList = [
-        {name:"ORDERED", value:"ORDERED"},
-        {name:"INPROGRESS", value:"INPROGRESS"},
-        {name:"TESTFAILED", value:"TESTFAILED"},
-        {name:"DELIVERED", value:"DELIVERED"},
-        {name:"COMPLETE", value:"FINISHED"}
+        {name: "ALL", value: Status.TOTAL},
+        {name: "ORDERED", value: Status.ORDERED},
+        {name: "INPROGRESS", value: Status.INPROGRESS},
+        {name: "TESTFAILED", value: Status.TESTFAILED},
+        {name: "DELIVERED", value: Status.DELIVERED},
+        {name: "COMPLETE", value: Status.COMPLETE}
     ]
 
     const fetchData = async (search: Paging) => {
@@ -42,6 +45,7 @@ export default function Table() {
     }, [search]);
 
     useEffect(() => {
+        console.log('status changed:', status);
         handleSearchChange({key: "status", value: status})
     }, [status]);
 
@@ -71,6 +75,10 @@ export default function Table() {
         });
     };
 
+    const handleSelectStatusChange = (status: Status) => {
+        setStatus(status);
+    }
+
     const formatDate = (year: number | undefined, month: number | undefined, day: number | undefined) => {
         const parts = [];
 
@@ -97,8 +105,8 @@ export default function Table() {
                             handleSearchChange({ key: "date_from", value: format(from, "yyyy-MM-dd")})
                             handleSearchChange({ key: "date_to", value: format(to, "yyyy-MM-dd")})
                         }}/>
-                    <SelectBox value={status} options={statusList} label={"status"} onChange={(value) =>{
-                        handleSearchChange({key: "status", value: status})
+                    <SelectBox value={status} options={statusList} label={"status"} onChange={(selectedOption) =>{
+                        handleSelectStatusChange(selectedOption.value);
                     }}/>
                 </div>
                 <div className={style.filterContainerLeft}>
