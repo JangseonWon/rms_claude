@@ -1,7 +1,7 @@
 import {Paging} from "@/model/Paging";
 
-export async function getInstitution(search: Paging) {
-    return await fetch(`/w-api/organization-service/organizations`, {
+export async function getServiceCategory(search: Paging) {
+    return await fetch(`/w-api/management-service/service_category`, {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",

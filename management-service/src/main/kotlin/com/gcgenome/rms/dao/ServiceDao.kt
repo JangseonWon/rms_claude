@@ -1,11 +1,13 @@
 package com.gcgenome.rms.dao
 
+import com.gcgenome.rms.data.Query
+import com.gcgenome.rms.data.ServiceCategory
 import com.gcgenome.rms.data.Service_
 import com.gcgenome.rms.tables.pojos.Service
 import com.gcgenome.rms.tables.references.*
 import org.jooq.Condition
 import org.jooq.DSLContext
-import org.jooq.impl.DSL
+import org.jooq.SortOrder
 import org.jooq.impl.DSL.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -59,6 +61,31 @@ interface ServiceDao{
         return Flux.from(
             selectFrom(SERVICE).where(whereClause)
         ).map { it.into(Service::class.java) }
+    }
+
+    fun DSLContext.selectServiceAndCategory(query: Query, whereClause: Condition): Flux<ServiceCategory> {
+        val asc: SortOrder = when(query.asc) {
+            true -> SortOrder.ASC
+            false -> SortOrder.DESC
+            else -> SortOrder.DEFAULT
+        }
+
+        return Flux.from(
+            select(SERVICE.ID.`as`("service_id"), SERVICE.NAME.`as`("service_name"),
+                CATEGORY.ID.`as`("category_id"), CATEGORY.NAME.`as`("category_name"))
+                .from(SERVICE).leftJoin(CATEGORY).on(SERVICE.CATEGORY_ID.eq(CATEGORY.ID))
+                .where(whereClause)
+                .orderBy(CATEGORY.ID.sort(asc))
+                .limit(query.size)
+                .offset(query.page*query.size)
+        ).map { it.into(ServiceCategory::class.java) }
+    }
+
+    fun DSLContext.selectServicesAndCategoryCount(whereClause:Condition): Mono<Int> {
+        return Mono.from(
+            selectCount().from(SERVICE).leftJoin(CATEGORY).on(SERVICE.CATEGORY_ID.eq(CATEGORY.ID))
+                .where(whereClause)
+        ).map { it.component1() }
     }
 
     fun DSLContext.updateServiceById(service: Service): Mono<Service> {

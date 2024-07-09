@@ -44,7 +44,7 @@ export default function SelectBox({ label, value, options, onChange, required=fa
             <section className={`${style.selectSection} ${hasError ? style.error : ""}`}>
                 <p className={style.label}>{label}</p>
                 <button className={`${style.btnSelect} ${isOpen ? style.open : ''}`} onClick={toggleList}>
-                    <div>{selectedValue || value || '-'}</div>
+                    <div>{value || '-'}</div>
                     <FontAwesomeIcon icon={faChevronDown} />
                 </button>
                 <ul className={`${style.listMember} ${isOpen ? style.open : ''}`}>

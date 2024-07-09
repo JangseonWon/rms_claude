@@ -6,19 +6,19 @@ import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
 import {Paging} from "@/model/Paging";
-import {Organization} from "@/model/Organization";
-import {getInstitution} from "@/app/(afterLogin)/request/management/service/_api/getInstitution";
+import {getServiceCategory} from "@/app/(afterLogin)/request/management/service/_api/getServiceCategory";
+import {ServiceManage} from "@/model/ServiceManage";
 
-interface InstitutionWithSelected extends Organization {
+interface InstitutionWithSelected extends ServiceManage {
     isSelected?: boolean;
 }
 
 export default function ServiceTable() {
-    const [institutionData, setInstitutionData] = useState<InstitutionWithSelected[]>([]);
+    const [serviceManageData, setServiceManageData] = useState<InstitutionWithSelected[]>([]);
     const [totalPage, setTotalPage] = useState<number>(0);
     const [search, setSearch] =
         useState<Paging>({filters: [], sort_by:"name", asc: true, size:10, page:1});
-    const [searchKey, setSearchKey] = useState<string>("id");
+    const [searchKey, setSearchKey] = useState<string>("service_id");
     const [searchValue, setSearchValue] = useState<string>("");
 
     const handlePageChange = (newPageNumber: number) => {
@@ -52,21 +52,25 @@ export default function ServiceTable() {
 
     const fetchData = async (search: Paging) => {
         try {
-            const response = await getInstitution(search)
+            const response = await getServiceCategory(search)
             const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
             const responseData = await response.json();
             const data = responseData.data;
-            setInstitutionData(data as Organization[]);
+            setServiceManageData(data as ServiceManage[]);
             setTotalPage(totalPage)
         } catch(error) {
             console.error("Failed to fetch data:", error);
-            setInstitutionData([]);
+            setServiceManageData([]);
             setTotalPage(0);
         }
     }
 
     const handleUserAddClick = () => {
         alert('sync complete');
+    }
+
+    const handleServiceEditClick = (serviceCode: string) => {
+        alert(`${serviceCode} service edit`);
     }
 
     useEffect(() => {
@@ -81,10 +85,10 @@ export default function ServiceTable() {
                         Alis-Sync
                     </button>
                     <select className={style.selectSearchKey} onChange={handleSearchKeyChange}>
-                        <option value="id">ID</option>
-                        <option value="name">Name</option>
-                        <option value="type">Type</option>
-                        <option value="registration_number">Code</option>
+                        <option value="service_id">Service Id</option>
+                        <option value="service_name">Service Name</option>
+                        <option value="category_id">Category Id</option>
+                        <option value="category_name">Category Name</option>
                     </select>
                 </div>
                 <div className={style.filterContainerRight}>
@@ -100,17 +104,21 @@ export default function ServiceTable() {
                     <tr>
                         <th>Id</th>
                         <th>Name</th>
-                        <th>Type</th>
-                        <th>Code</th>
+                        <th>Category Name</th>
+                        <th>Edit</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {institutionData && institutionData.length > 0 && institutionData.map((row, rowIndex) => (
+                    {serviceManageData && serviceManageData.length > 0 && serviceManageData.map((row, rowIndex) => (
                         <tr key={rowIndex}>
-                            <td>{row.id}</td>
-                            <td>{row.name}</td>
-                            <td>{row.type}</td>
-                            <td>{row.registration_number}</td>
+                            <td>{row.service_id}</td>
+                            <td>{row.service_name}</td>
+                            <td>{row.category_name}</td>
+                            <td>
+                                <button onClick={()=> handleServiceEditClick(row.service_id!)}>
+                                    Edit
+                                </button>
+                            </td>
                         </tr>
                     ))}
                     </tbody>
