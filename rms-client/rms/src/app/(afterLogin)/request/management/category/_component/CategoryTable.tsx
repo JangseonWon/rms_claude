@@ -4,6 +4,8 @@ import React, {useEffect, useState} from "react";
 import style from "@/app/(afterLogin)/request/management/category/_component/categoryTable.module.css";
 import {Categories} from "@/model/Categories";
 import {getCategories} from "@/app/(afterLogin)/request/management/category/_api/getCategories";
+import {faPen, faTrash, faXmark} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 export default function CategoryTable() {
     const [categoryData, setCategoryData] = useState<Categories[]>([]);
@@ -23,16 +25,24 @@ export default function CategoryTable() {
         fetchData()
     }, []);
 
-    const handleAlisSyncButtonClick = () => {
-        alert('add click');
+    const handleAddCategoryClick = () => {
+        alert('add category click');
+    }
+
+    const handleEditClick = (id: string) => {
+        alert(`${id} edit`);
+    }
+
+    const handleDeleteClick = (id: string) => {
+        alert(`${id} delete`);
     }
 
     return (
         <>
             <section className={style.filterContainer}>
                 <div className={style.filterContainerLeft}>
-                    <button className={style.alisSync} onClick={handleAlisSyncButtonClick}>
-                        Alis-Sync
+                    <button className={style.addCategory} onClick={handleAddCategoryClick}>
+                        Add Category
                     </button>
                 </div>
             </section>
@@ -42,6 +52,8 @@ export default function CategoryTable() {
                     <tr>
                         <th>Name</th>
                         <th>Type</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -49,6 +61,20 @@ export default function CategoryTable() {
                         <tr key={rowIndex}>
                             <td>{row.name}</td>
                             <td>{row.order_type}</td>
+                            <td>
+                                <FontAwesomeIcon
+                                    className={style.edit}
+                                    icon={faPen}
+                                    onClick={()=> handleEditClick(row.id)}
+                                />
+                            </td>
+                            <td>
+                                <FontAwesomeIcon
+                                    className={style.delete}
+                                    icon={faTrash}
+                                    onClick={()=> handleDeleteClick(row.id)}
+                                />
+                            </td>
                         </tr>
                     ))}
                     </tbody>

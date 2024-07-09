@@ -9,16 +9,16 @@
 .filterContainerRight {
     width: 350px;
 }
-.alisSync {
+.addCategory {
     display: flex;
     margin: 2.5vh 2vw 0 0;
     border-radius: 15px;
     background: linear-gradient(135deg, #182847, #354e6d);
     box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     color: #ffffff;
-    width: 7vw;
+    width: 9vw;
     height: 3.5vh;
-    padding: 0.8vh 1.6vw;
+    padding: 0.8vh 1.85vw;
     border: none;
     font-weight: 700;
     font-size: 0.8vw;
@@ -80,61 +80,9 @@
     padding: 0.6vh 0.6vw;
     text-align: center;
 }
-.pagination {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-}
-.pagination span {
-    padding: 1vh 1vw;
-    font-size: 0.8vw;
-    color: #1a1a1a;
-    align-items: center;
-}
-.pagination span:first-child {
-    padding: 1vh 0.5vw 1vh 0;
-}
-.pagination button {
-    border: none;
-    border-radius: 18px;
-    font-size: 1vw;
-    padding: 1.5vh 0.8vw;
-}
-.pagination button:hover:not([disabled]) {
-    background-color: #d3d3d3;
+.edit {
     cursor: pointer;
 }
-.select {
-    position: relative;
-    width: 3vw;
-}
-
-.select select {
-    font-size: 0.6vw;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    width: 100%;
-    padding: 1vh 0.5vw;
-    border: 1px solid #ccc;
-    border-radius: 15px;
-    background-color: #f8f8f8;
+.delete {
     cursor: pointer;
-}
-
-.select::after {
-    content: '\25BC';
-    font-size: 0.6vw;
-    color: #555;
-    position: absolute;
-    top: 50%;
-    right: 0.5vw;
-    transform: translateY(-50%);
-    pointer-events: none;
-}
-.select select:focus {
-    outline: none;
-}
-.select select:hover {
-    border-color: #1a1a1a;
 }
