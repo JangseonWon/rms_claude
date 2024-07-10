@@ -23,6 +23,9 @@ export default function Order() {
     const [serviceOptions, setServiceOptions] = useState<SelectBoxOption[]>([])
     const [sampleTypeOptions, setSampleTypeOptions] = useState<SelectBoxOption[]>([])
     const [request, setRequest] = useState<Request>({})
+    const [selectedOrganization, setSelectedOrganization] = useState<SelectBoxOption | null>(null);
+    const [selectedService, setSelectedService] = useState<SelectBoxOption | null>(null);
+    const [selectedSampleType, setSelectedSampleType] = useState<SelectBoxOption | null>(null);
 
     const fetchOrganizations = useCallback(async () => {
         const response = await getOrganization()
@@ -30,7 +33,7 @@ export default function Order() {
         setOrganizationOptions(transformOrganizationToOptions(data as Organization[]))
     },[]);
     const fetchServices = useCallback(async () => {
-        const response = await getServices()
+        const response = await getServices('38fecf42-1404-490f-ab97-37ed7eeecd78')
         const data = await response.json();
         setServiceOptions(transformServiceToOptions(data as Service[]))
     }, []);
@@ -138,10 +141,12 @@ export default function Order() {
                 <SelectBox
                     label={""}
                     options={organizationOptions}
+                    value={selectedOrganization}
                     required={true}
                     onChange={(value) => {
                         handleRequestChange('sample.patient.organization.id', value.value)
                         handleRequestChange('sample.patient.organization.name', value.name)
+                        setSelectedOrganization(value.name);
                     }}
                 />
             </div>
@@ -149,10 +154,12 @@ export default function Order() {
             <div className={style.section}>
                 <SelectBox
                     label={"Service*"}
+                    value={selectedService}
                     options={serviceOptions}
                     required={true}
                     onChange={(value) => {
                         handleServiceChange(value)
+                        setSelectedService(value.name);
                         handleRequestChange('service.id', value.value)
                         handleRequestChange('service.name', value.name)
                     }}
@@ -198,11 +205,13 @@ export default function Order() {
             <div className={style.section}>
                 <SelectBox
                     label={"Type*"}
+                    value={selectedSampleType}
                     options={sampleTypeOptions}
                     required={true}
                     onChange={(value) => {
                         handleRequestChange('sample.sample_type.id', value.value)
                         handleRequestChange('sample.sample_type.name', value.name)
+                        setSelectedSampleType(value.name);
                     }}
                 />
                 <DatePickerBox
