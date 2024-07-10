@@ -35,7 +35,7 @@ export default function InstitutionTable() {
 
     useEffect(() => {
         fetchData(page.size, page.number)
-    }, [page.size, page.number, fetchData]);
+    }, [page.size, page.number]);
 
     return (
         <div className={style.container}>
