@@ -18,13 +18,15 @@ import {useSelectedLayoutSegment} from "next/navigation";
 import {useSession} from "next-auth/react";
 import {Categories} from "@/model/Categories";
 import {getCategories} from "@/app/(afterLogin)/_api/getCategories";
+import {useCategory, useSetCategory} from "@/store/useCategoryStore";
 
 export default function NavMenu() {
     const segment = useSelectedLayoutSegment();
     const [showServicesDropdown, setShowServicesDropdown] = useState(false);
     const [showResultDropdown, setShowResultDropdown] = useState(false);
     const [showManagementDropdown, setShowManagementDropdown] = useState(false);
-    const [categoryData, setCategoryData] = useState<Categories[]>([]);
+    const categoryData = useCategory();
+    const setCategoryData = useSetCategory();
     const { data: session } = useSession();
 
     const fetchData = async () => {
@@ -36,9 +38,11 @@ export default function NavMenu() {
     const toggleServicesDropdown = () => {
         setShowServicesDropdown(!showServicesDropdown);
     }
+
     const toggleResultDropdown = () => {
         setShowResultDropdown(!showResultDropdown);
     }
+
     const toggleManagementDropdown = () => {
         setShowManagementDropdown(!showManagementDropdown);
     }
@@ -92,8 +96,7 @@ export default function NavMenu() {
                     <>
                         {categoryData.map(category => (
                             <ol key={category.id}>
-                                <Link
-                                    href={`/request/services/${category.name}/${category.order_type === 'SINGLE' ? 'single' : 'multi'}`}>
+                                <Link href={`/request/services/${category.name}/${category.order_type === 'SINGLE' ? 'single' : 'multi'}`}>
                                     {category.name}
                                 </Link>
                             </ol>

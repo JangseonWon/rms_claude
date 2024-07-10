@@ -4,12 +4,14 @@ import style from "@/app/(afterLogin)/home/_component/testOption.module.css"
 import Link from "next/link";
 import Image from "next/image";
 import homeMainImg from "@/../public/home_main.jpg"
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import {getCategories} from "@/app/(afterLogin)/_api/getCategories";
 import {Categories} from "@/model/Categories";
+import {useCategory, useSetCategory} from "@/store/useCategoryStore";
 
 export default function TestOption() {
-    const [categoryData, setCategoryData] = useState<Categories[]>([]);
+    const categoryData = useCategory();
+    const setCategoryData = useSetCategory();
 
     const fetchData = async () => {
         const response = await getCategories()

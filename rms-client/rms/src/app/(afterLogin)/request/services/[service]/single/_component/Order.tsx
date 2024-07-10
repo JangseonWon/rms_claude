@@ -17,6 +17,9 @@ import GreenButton from "@/app/_component/GreenButton";
 import BlueButton from "@/app/_component/BlueButton";
 import {putRequest} from "@/app/(afterLogin)/request/services/[service]/single/_api/putRequest";
 import {format} from "date-fns";
+import {getCategories} from "@/app/(afterLogin)/_api/getCategories";
+import {usePathname} from "next/navigation";
+import {Categories} from "@/model/Categories";
 
 export default function Order() {
     const [organizationOptions, setOrganizationOptions] = useState<SelectBoxOption[]>([])
@@ -26,26 +29,50 @@ export default function Order() {
     const [selectedOrganization, setSelectedOrganization] = useState<SelectBoxOption | null>(null);
     const [selectedService, setSelectedService] = useState<SelectBoxOption | null>(null);
     const [selectedSampleType, setSelectedSampleType] = useState<SelectBoxOption | null>(null);
+    const [category, setCategory] = useState<Categories>();
+
+    const pathname = usePathname();
+    const pathSegments = pathname.split('/');
+    const secondLastValue = decodeURIComponent(pathSegments[pathSegments.length - 2]);
+
+    const fetchCategory = useCallback( async () => {
+        const response = await getCategories();
+        const data = await response.json();
+
+        const matchingCategory = data.find((category: { name: string; }) => category.name === secondLastValue);
+        if (matchingCategory) {
+            setCategory(matchingCategory);
+        }
+    }, [secondLastValue]);
 
     const fetchOrganizations = useCallback(async () => {
         const response = await getOrganization()
         const data = await response.json();
         setOrganizationOptions(transformOrganizationToOptions(data as Organization[]))
     },[]);
-    const fetchServices = useCallback(async () => {
-        const response = await getServices('38fecf42-1404-490f-ab97-37ed7eeecd78')
+
+    const fetchServices = useCallback(async (categoryId: string) => {
+        const response = await getServices(categoryId);
         const data = await response.json();
-        setServiceOptions(transformServiceToOptions(data as Service[]))
+        setServiceOptions(transformServiceToOptions(data as Service[]));
     }, []);
+
     const fetchSampleType = async (serviceId: string) => {
         const response = await getSampleType(serviceId)
         const data = await response.json();
         setSampleTypeOptions(transformSampleTypeToOptions(data as SampleType[]))
     }
+
     useEffect(() => {
-        fetchOrganizations()
-        fetchServices()
-    }, [fetchOrganizations, fetchServices]);
+        fetchOrganizations();
+        fetchCategory();
+    }, [fetchCategory, fetchOrganizations]);
+
+    useEffect(() => {
+        if (category) {
+            fetchServices(category.id);
+        }
+    }, [category, fetchServices]);
 
     const publishRequest = (status:string) => {
         const updateRequest = [{
