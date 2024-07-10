@@ -10,7 +10,7 @@ import {
     useSetQuantity,
     useSetType,
     useSetWard
-} from "@/app/(afterLogin)/request/services/precision-oncology/store/useInputOrderStore";
+} from "@/app/(afterLogin)/request/services/[service]/single/store/useInputOrderStore";
 import {
     usePushExtensions,
     useSetPushExtensions,
@@ -38,7 +38,7 @@ import {
     useSetTA0092,
     useSetTA0093,
     useSetTA0095
-} from "@/app/(afterLogin)/request/services/precision-oncology/store/useInputExtensionStore";
+} from "@/app/(afterLogin)/request/services/[service]/single/store/useInputExtensionStore";
 
 interface InputTextFieldProps {
     value: string;

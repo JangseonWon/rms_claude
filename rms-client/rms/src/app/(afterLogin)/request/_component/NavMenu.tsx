@@ -17,7 +17,7 @@ import React, {useEffect, useState} from "react";
 import {useSelectedLayoutSegment} from "next/navigation";
 import {useSession} from "next-auth/react";
 import {Categories} from "@/model/Categories";
-import {getCategories} from "@/app/(afterLogin)/request/management/category/_api/getCategories";
+import {getCategories} from "@/app/(afterLogin)/_api/getCategories";
 
 export default function NavMenu() {
     const segment = useSelectedLayoutSegment();
