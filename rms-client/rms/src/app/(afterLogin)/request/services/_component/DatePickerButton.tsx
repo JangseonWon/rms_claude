@@ -6,7 +6,7 @@ import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
 import {
     useSelectBirth,
     useSelectCollection
-} from "@/app/(afterLogin)/request/services/precision-oncology/store/useDatePickerStore";
+} from "@/app/(afterLogin)/request/services/[service]/single/store/useDatePickerStore";
 import dayjs from "dayjs";
 
 interface SelectDate {

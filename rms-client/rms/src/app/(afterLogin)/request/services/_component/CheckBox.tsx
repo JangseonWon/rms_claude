@@ -11,7 +11,7 @@ import {
     useSetTA0016,
     useSetTA0017,
     useSetTA0094
-} from "@/app/(afterLogin)/request/services/precision-oncology/store/useInputExtensionStore";
+} from "@/app/(afterLogin)/request/services/[service]/single/store/useInputExtensionStore";
 import {ChangeEvent} from "react";
 
 interface extensionId {

@@ -29,6 +29,7 @@ export default function TestOption() {
             <div className={style.cardContainer}>
                 {categoryData.map(category => (
                     <Link
+                        key={category.id}
                         href={`/request/services/${category.name}/${category.order_type === 'SINGLE' ? 'single' : 'multi'}`}>
                         <div className={style.card}>
                             <Image src={homeMainImg} alt={`${category.name}`}/>
