@@ -50,7 +50,7 @@ export default function InstitutionTable() {
                 </tr>
                 </thead>
                 <tbody>
-                {organizationData.map((row) => (
+                {organizationData && organizationData.length > 0 && organizationData.map((row) => (
                     <tr key={row.id + row.name! + row.type + row.user}>
                         <td>{row.name}</td>
                         <td>{row.type}</td>
