@@ -13,16 +13,25 @@ import {
     faUsers
 } from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useSelectedLayoutSegment} from "next/navigation";
 import {useSession} from "next-auth/react";
+import {Categories} from "@/model/Categories";
+import {getCategories} from "@/app/(afterLogin)/request/management/category/_api/getCategories";
 
 export default function NavMenu() {
     const segment = useSelectedLayoutSegment();
     const [showServicesDropdown, setShowServicesDropdown] = useState(false);
     const [showResultDropdown, setShowResultDropdown] = useState(false);
     const [showManagementDropdown, setShowManagementDropdown] = useState(false);
+    const [categoryData, setCategoryData] = useState<Categories[]>([]);
     const { data: session } = useSession();
+
+    const fetchData = async () => {
+        const response = await getCategories()
+        const data = await response.json();
+        setCategoryData(data as Categories[]);
+    }
 
     const toggleServicesDropdown = () => {
         setShowServicesDropdown(!showServicesDropdown);
@@ -33,6 +42,11 @@ export default function NavMenu() {
     const toggleManagementDropdown = () => {
         setShowManagementDropdown(!showManagementDropdown);
     }
+
+    useEffect(() => {
+        fetchData()
+    }, []);
+
     return (
         <li className={style.navPill}>
             <ul>
@@ -76,31 +90,14 @@ export default function NavMenu() {
                 </li>
                 {showServicesDropdown && (
                     <>
-                        <ol>
-                            <Link href={"/request/services/precision-oncology"}>
-                                Precision Oncology
-                            </Link>
-                        </ol>
-                        <ol>
-                            <Link href={"/request/services/pre-and-neonatal"}>
-                                Pre & neonatal
-                            </Link>
-                        </ol>
-                        <ol>
-                            <Link href={"/request/services/rare-disease"}>
-                                Rare disease
-                            </Link>
-                        </ol>
-                        <ol>
-                            <Link href={"/request/services/health-checkup"}>
-                                Health Checkup
-                            </Link>
-                        </ol>
-                        <ol>
-                            <Link href={"/request/services/others"}>
-                                Others
-                            </Link>
-                        </ol>
+                        {categoryData.map(category => (
+                            <ol key={category.id}>
+                                <Link
+                                    href={`/request/services/${category.name}/${category.order_type === 'SINGLE' ? 'single' : 'multi'}`}>
+                                    {category.name}
+                                </Link>
+                            </ol>
+                        ))}
                     </>
                 )}
                 <li>

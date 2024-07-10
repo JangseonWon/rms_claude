@@ -1,13 +1,13 @@
 'use client';
 
-import style from "@/app/(afterLogin)/request/services/pre-and-neonatal/_component/order.module.css";
+import style from "@/app/(afterLogin)/request/services/[service]/multi/_component/order.module.css";
 import GreenButton from "@/app/_component/GreenButton";
 import BlueButton from "@/app/_component/BlueButton";
-import DownloadExcelButton from "@/app/(afterLogin)/request/services/pre-and-neonatal/_component/DownloadExcelButton";
-import UploadExcelButton from "@/app/(afterLogin)/request/services/pre-and-neonatal/_component/UploadExcelButton";
+import DownloadExcelButton from "@/app/(afterLogin)/request/services/[service]/multi/_component/DownloadExcelButton";
+import UploadExcelButton from "@/app/(afterLogin)/request/services/[service]/multi/_component/UploadExcelButton";
 import React, {useCallback, useEffect, useState} from "react";
 import {format} from "date-fns";
-import {putRequest} from "@/app/(afterLogin)/request/services/pre-and-neonatal/_api/putRequest";
+import {putRequest} from "@/app/(afterLogin)/request/services/[service]/multi/_api/putRequest";
 import {useOpenAlertDialog, useSetIconAlertDialog, useSetMessageAlertDialog} from "@/store/useAlertDialogStore";
 import {
     useOkNotice,

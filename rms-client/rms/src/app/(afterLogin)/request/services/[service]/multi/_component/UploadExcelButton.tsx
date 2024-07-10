@@ -1,6 +1,6 @@
 'use client';
 
-import style from "@/app/(afterLogin)/request/services/pre-and-neonatal/_component/uploadExcelButton.module.css";
+import style from "@/app/(afterLogin)/request/services/[service]/multi/_component/uploadExcelButton.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { ChangeEvent, useEffect, useState, DragEvent } from "react";
 import * as XLSX from "xlsx";

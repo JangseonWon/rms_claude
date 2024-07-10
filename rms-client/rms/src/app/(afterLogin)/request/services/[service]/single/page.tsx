@@ -1,6 +1,6 @@
 import Title from "@/app/_component/Title";
-import Order from "@/app/(afterLogin)/request/services/precision-oncology/_component/Order";
-import style from "@/app/(afterLogin)/request/services/precision-oncology/page.module.css"
+import Order from "@/app/(afterLogin)/request/services/[service]/single/_component/Order";
+import style from "@/app/(afterLogin)/request/services/[service]/single/page.module.css"
 
 export default async function Page() {
     return(

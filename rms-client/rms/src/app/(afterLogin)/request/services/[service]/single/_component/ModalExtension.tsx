@@ -1,6 +1,6 @@
 'use client';
 
-import style from "@/app/(afterLogin)/request/services/precision-oncology/_component/modalExtension.module.css";
+import style from "@/app/(afterLogin)/request/services/[service]/single/_component/modalExtension.module.css";
 import * as React from "react";
 import {
     useExtensions,
@@ -35,7 +35,7 @@ import {
     useTA0093,
     useTA0094,
     useTA0095
-} from "@/app/(afterLogin)/request/services/precision-oncology/store/useInputExtensionStore";
+} from "@/app/(afterLogin)/request/services/[service]/single/store/useInputExtensionStore";
 
 interface Extension {
     id: string;

@@ -1,6 +1,6 @@
-import style from "@/app/(afterLogin)/request/services/pre-and-neonatal/page.module.css";
+import style from "@/app/(afterLogin)/request/services/[service]/multi/page.module.css";
 import Title from "@/app/_component/Title";
-import Order from "@/app/(afterLogin)/request/services/pre-and-neonatal/_component/Order";
+import Order from "@/app/(afterLogin)/request/services/[service]/multi/_component/Order";
 
 export default async function Page() {
     return(

@@ -5,31 +5,16 @@ import {usePathname} from "next/navigation";
 
 export default function Title() {
     const pathname = usePathname();
-    const lastValue = pathname.split('/').pop();
+    const pathSegments = pathname.split('/');
+    const lastValue = decodeURIComponent(pathSegments.pop() || '');
+    const secondLastValue = decodeURIComponent(pathSegments.pop() || '');
 
     let correctedValue;
 
     switch (lastValue) {
-        case 'precision-oncology':
-            correctedValue = 'Precision Oncology'
-            break;
-        case 'pre-and-neonatal':
-            correctedValue = 'Pre & neonatal';
-            break;
-        case 'rare-disease':
-            correctedValue = 'Rare disease'
-            break;
-        case 'health-checkup':
-            correctedValue = 'Health Checkup'
-            break;
-        case 'download':
-            correctedValue = 'Download'
-            break;
-        case 'resample':
-            correctedValue = 'Re-sample'
-            break;
-        case 'others':
-            correctedValue = 'Others'
+        case 'single':
+        case 'multi':
+            correctedValue = secondLastValue
             break;
         default:
             correctedValue = lastValue;

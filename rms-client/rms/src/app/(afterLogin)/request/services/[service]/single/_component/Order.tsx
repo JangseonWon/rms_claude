@@ -1,21 +1,21 @@
 'use client';
 
-import style from "@/app/(afterLogin)/request/services/precision-oncology/_component/order.module.css"
+import style from "@/app/(afterLogin)/request/services/[service]/single/_component/order.module.css"
 import SelectBox from "@/app/_component/SelectBox";
 import InputBox from "@/app/_component/InputBox";
 import React, {useCallback, useEffect, useState} from "react";
 import {Organization} from "@/model/Organization";
-import {getOrganization} from "@/app/(afterLogin)/request/services/precision-oncology/_api/getOrganization";
+import {getOrganization} from "@/app/(afterLogin)/request/services/[service]/single/_api/getOrganization";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
-import {getServices} from "@/app/(afterLogin)/request/services/precision-oncology/_api/getServices";
+import {getServices} from "@/app/(afterLogin)/request/services/[service]/single/_api/getServices";
 import {Service} from "@/model/Service";
 import {Request} from "@/model/Request";
 import DatePickerBox from "@/app/_component/DatePickerBox";
 import {SampleType} from "@/model/SampleType";
-import {getSampleType} from "@/app/(afterLogin)/request/services/precision-oncology/_api/getSampleType"
+import {getSampleType} from "@/app/(afterLogin)/request/services/[service]/single/_api/getSampleType"
 import GreenButton from "@/app/_component/GreenButton";
 import BlueButton from "@/app/_component/BlueButton";
-import {putRequest} from "@/app/(afterLogin)/request/services/precision-oncology/_api/putRequest";
+import {putRequest} from "@/app/(afterLogin)/request/services/[service]/single/_api/putRequest";
 import {format} from "date-fns";
 
 export default function Order() {

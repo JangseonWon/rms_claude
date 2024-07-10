@@ -5,10 +5,7 @@ import {faDownload} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React from "react";
 import {useOpenAlertDialog, useSetMessageAlertDialog} from "@/store/useAlertDialogStore";
-import {
-    fetchServiceSampleFileDownload
-} from "@/app/(afterLogin)/request/services/pre-and-neonatal/_api/fetchServiceSampleFileDownload";
-import {putRequest} from "@/app/(afterLogin)/request/services/pre-and-neonatal/_api/putRequest";
+import {fetchServiceSampleFileDownload} from "@/app/(afterLogin)/request/services/[service]/multi/_api/fetchServiceSampleFileDownload";
 
 export default function DownloadExcelButton() {
     const setShowAlertDialog = useOpenAlertDialog();
