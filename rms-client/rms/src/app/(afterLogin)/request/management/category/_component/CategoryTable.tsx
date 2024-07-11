@@ -4,11 +4,16 @@ import React, {useEffect, useState} from "react";
 import style from "@/app/(afterLogin)/request/management/category/_component/categoryTable.module.css";
 import {Categories} from "@/model/Categories";
 import {getCategories} from "@/app/(afterLogin)/request/management/category/_api/getCategories";
-import {faPen, faTrash, faXmark} from "@fortawesome/free-solid-svg-icons";
+import {faPen, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import CategoryModal from "@/app/(afterLogin)/request/management/category/_component/CategoryModal";
+import {deleteCategories} from "@/app/(afterLogin)/request/management/category/_api/deleteCategories";
 
 export default function CategoryTable() {
     const [categoryData, setCategoryData] = useState<Categories[]>([]);
+    const [categoryAddModalOpen, setCategoryAddModalOpen] = useState<boolean>(false);
+    const [categoryEditModalOpen, setCategoryEditModalOpen] = useState<boolean>(false);
+    const [selectCategory, setSelectCategory] = useState<Categories>();
 
     const fetchData = async () => {
         try {
@@ -23,18 +28,34 @@ export default function CategoryTable() {
 
     useEffect(() => {
         fetchData()
-    }, []);
+    }, [categoryAddModalOpen, categoryEditModalOpen]);
 
     const handleAddCategoryClick = () => {
-        alert('add category click');
+        setCategoryAddModalOpen(true);
     }
 
-    const handleEditClick = (id: string) => {
-        alert(`${id} edit`);
+    const handleEditCategoryClick = (category: Categories) => {
+        setCategoryEditModalOpen(true);
+        setSelectCategory(category);
     }
 
-    const handleDeleteClick = (id: string) => {
-        alert(`${id} delete`);
+    const handleDeleteClick = async (category: Categories) => {
+        try {
+            const response = await deleteCategories(category);
+            if (response.status === 200) {
+                alert("Delete complete");
+                fetchData();
+            } else {
+                alert("Failed to delete category");
+            }
+        } catch (error) {
+            alert("Failed to delete category");
+        }
+    }
+
+    const closeModal = () => {
+        setCategoryAddModalOpen(false);
+        setCategoryEditModalOpen(false);
     }
 
     return (
@@ -65,14 +86,14 @@ export default function CategoryTable() {
                                 <FontAwesomeIcon
                                     className={style.edit}
                                     icon={faPen}
-                                    onClick={()=> handleEditClick(row.id)}
+                                    onClick={()=> handleEditCategoryClick(row)}
                                 />
                             </td>
                             <td>
                                 <FontAwesomeIcon
                                     className={style.delete}
                                     icon={faTrash}
-                                    onClick={()=> handleDeleteClick(row.id)}
+                                    onClick={()=> handleDeleteClick(row)}
                                 />
                             </td>
                         </tr>
@@ -80,6 +101,12 @@ export default function CategoryTable() {
                     </tbody>
                 </table>
             </section>
+            {categoryAddModalOpen && (
+                <CategoryModal open={categoryAddModalOpen} closeModal={closeModal}/>
+            )}
+            {categoryEditModalOpen && (
+                <CategoryModal category={selectCategory} open={categoryEditModalOpen} closeModal={closeModal}/>
+            )}
         </>
     );
 }

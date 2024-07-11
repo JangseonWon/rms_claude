@@ -31,6 +31,15 @@ class CategoriesHandler(
             .then(dslContext.insertCategory(category))
     }
 
+    fun deleteCategories(category: Category): Mono<Category> {
+        return dslContext.deleteCategory(category)
+    }
+
+    fun updateCategories(category: Category): Mono<Category> {
+        return checkCategoryOrderType(category)
+            .then(dslContext.updateCategory(category))
+    }
+
     fun selectServiceInfoByCategoryId(categoryId: UUID, filter: Query.Companion.Filter): Flux<Service_> {
         val whereClause = buildServiceIdOrNameWhereClause(filter)
         return Flux.from(checkCategoryById(categoryId)

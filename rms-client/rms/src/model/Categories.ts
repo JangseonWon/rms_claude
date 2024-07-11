@@ -1,5 +1,5 @@
 export interface Categories {
-    id: string,
+    id?: string,
     name: string,
     order_type: string
 }

@@ -70,7 +70,7 @@ export default function Order() {
 
     useEffect(() => {
         if (category) {
-            fetchServices(category.id);
+            fetchServices(category.id!);
         }
     }, [category, fetchServices]);
 

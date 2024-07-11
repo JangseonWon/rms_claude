@@ -25,6 +25,23 @@ interface CategoryDao {
         ).map { it.into(Category::class.java) }
     }
 
+    fun DSLContext.deleteCategory(category: Category): Mono<Category> {
+        return Mono.from(
+            deleteFrom(CATEGORY).where(CATEGORY.ID.eq(category.id))
+                .returning()
+        ).map { it.into(Category::class.java) }
+    }
+
+    fun DSLContext.updateCategory(category: Category): Mono<Category> {
+        return Mono.from(
+            update(CATEGORY)
+                .set(CATEGORY.NAME, category.name)
+                .set(CATEGORY.ORDER_TYPE, category.orderType)
+                .where(CATEGORY.ID.eq(category.id))
+                .returning()
+        ).map { it.into(Category::class.java) }
+    }
+
     fun DSLContext.selectCategoryById(categoryId: UUID): Mono<Category> {
         return Mono.from(
             selectFrom(CATEGORY).where(CATEGORY.ID.eq(categoryId))
