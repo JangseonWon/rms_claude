@@ -39,6 +39,7 @@ export default function CategoryModal({category, open, closeModal}: Props) {
                 name: categoryName,
                 order_type: selectedCategoryType
             });
+            alert('Add Complete');
             return await response.json();
         } else {
             alert("Please Select Category Type")
@@ -52,25 +53,20 @@ export default function CategoryModal({category, open, closeModal}: Props) {
                 name: categoryName,
                 order_type: selectedCategoryType
             });
+            alert('Update Complete');
             return await response.json();
         } else {
             alert("Error: No Search Category Info")
         }
     }
 
-    const formatAlertMessage = (result: Categories) => {
-        return `id = ${result.id}\nname = ${result.name}\norder type = ${result.order_type}`;
-    }
-
     const handleAddButtonClick = async () => {
-        const result = await addCategory();
-        alert(formatAlertMessage(result));
+        await addCategory();
         closeModal()
     }
 
     const handleUpdateButtonClick = async () => {
-        const result = await updateCategory();
-        alert(formatAlertMessage(result));
+        await updateCategory();
         closeModal()
     }
 
@@ -93,6 +89,7 @@ export default function CategoryModal({category, open, closeModal}: Props) {
                             <InputBox
                                 label={"Category Name"}
                                 value={categoryName}
+                                required={true}
                                 onChange={setCategoryName}
                                 type="categoryName"
                             />
