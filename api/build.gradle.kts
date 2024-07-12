@@ -7,6 +7,7 @@ plugins {
     id("org.springframework.boot")
     id("io.spring.dependency-management")
     id("org.jetbrains.kotlin.plugin.spring")
+    id("com.google.cloud.tools.jib")
     id("nu.studer.jooq") 
 }
 dependencies {
@@ -21,6 +22,13 @@ dependencies {
 configurations { all { exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging") } }
 dependencyManagement { imports { mavenBom(libs.spring.cloud.bom.get().toString()) } }
 tasks.processResources { exclude("application.yml") }
+jib {
+    from { image = "eclipse-temurin:17.0.7_7-jre-jammy" }
+    container { environment = mapOf(
+        "LANG" to "C.UTF-8",
+        "TZ" to "Asia/Seoul",
+    )}
+}
 jooq {
     version.set("3.18.2")
     edition.set(JooqEdition.OSS)
