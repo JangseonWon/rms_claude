@@ -13,17 +13,14 @@ dependencies {
     implementation(libs.bundles.kotlin.webflux)
     implementation(libs.bundles.spring.client)
     implementation(libs.bundles.r2dbc.postgres)
-    implementation(libs.spring.gateway)
-    implementation(libs.spring.actuator)
     implementation(libs.bundles.jooq)
-    implementation("software.amazon.awssdk:s3:2.20.118")
-    implementation("software.amazon.awssdk:netty-nio-client:2.20.117")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
     jooqGenerator("org.postgresql:postgresql:42.6.0")
 
 }
 configurations { all { exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging") } }
 dependencyManagement { imports { mavenBom(libs.spring.cloud.bom.get().toString()) } }
-tasks.processResources { if(project.gradle.startParameter.taskNames.contains("jib")) exclude("application.yml") }
+tasks.processResources { exclude("application.yml") }
 jooq {
     version.set("3.18.2")
     edition.set(JooqEdition.OSS)

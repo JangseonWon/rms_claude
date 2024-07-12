@@ -15,12 +15,9 @@ logging:
   level:
     io.r2dbc.postgresql.QUERY: TRACE
     #io.r2dbc.postgresql.PARAM: TRACE
-aws:
-  credentials:
-    access-key: 8331SD7MTPDP6I16OJZT
-    secret-key: mjZJcgLb8dvOlrkEWCoc9g4xEm7TZFd0otGmhqDM
-  s3:
-    endpoint: https://s3.apps.gcgenome.com
-    bucket: bucket-86994bb8-28b7-4cbf-9842-4f314caae474
+alis:
+  private:
+    modulus: ${ALIS_PRIVATE_MODULUS}
+    exponent: ${ALIS_PRIVATE_EXPONENT}
 server:
   port: 9090

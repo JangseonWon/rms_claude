@@ -13,6 +13,7 @@ on:
       - order-service/**
       - cart-service/**
       - lims-service/**
+      - api/**
 permissions: write-all
 jobs:
   extract:
@@ -38,6 +39,7 @@ jobs:
           "$module_name" == "order-service" ||
           "$module_name" == "cart-service" ||
           "$module_name" == "lims-service" ||
+          "$module_name" == "api" ||
           "$module_name" == "product-service" ]] && module_names+=("$module_name")
           done
           module_names=($(printf '%s\n' "${module_names[@]}" | sort -u))
@@ -71,6 +73,8 @@ jobs:
       S3_SECRET_KEY: ${{secrets.S3_SECRET_KEY}}
       S3_ENDPOINT: ${{secrets.S3_ENDPOINT}}
       S3_BUCKET_NAME: ${{secrets.S3_BUCKET_NAME}}
+      ALIS_PRIVATE_MODULUS: ${{secrets.ALIS_PRIVATE_MODULUS}}
+      ALIS_PRIVATE_EXPONENT: ${{secrets.ALIS_PRIVATE_EXPONENT}}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
