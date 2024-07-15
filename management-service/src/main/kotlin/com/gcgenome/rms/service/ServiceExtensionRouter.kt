@@ -3,10 +3,9 @@ package com.gcgenome.rms.service
 import com.gcgenome.rms.auth.AuthenticationHandler
 import com.gcgenome.rms.auth.ManagerAuthenticationHandler
 import com.gcgenome.rms.data.Query
-import com.gcgenome.rms.exception.AdminAuthenticationException
 import com.gcgenome.rms.exception.AuthenticationNotFoundException
 import com.gcgenome.rms.exception.ServiceNotFoundException
-import com.gcgenome.rms.tables.pojos.Service
+import com.gcgenome.rms.tables.pojos.ServiceExtension
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
@@ -17,72 +16,65 @@ import org.springframework.web.reactive.function.server.router
 import reactor.core.publisher.Mono
 
 @Configuration
-class ServiceRouter (
+class ServiceExtensionRouter (
     private val authenticationHandler: AuthenticationHandler,
     private val managerAuthenticationHandler: ManagerAuthenticationHandler,
-    private val serviceHandler: ServiceHandler
+    private val serviceHandler: ServiceExtensionHandler
 ) {
-    @Bean("ServicesRouter")
+    @Bean("ServiceExtensionRouter")
     fun route() = router {
-        GET("/w-api/management-service/services/users/{user_id}", ::selectUserServices)
-        GET("/w-api/management-service/services/{service_id}", ::selectService)
-        POST("/w-api/management-service/service_category", ::selectServiceCategory)
-        POST("/w-api/management-service/services", ::selectServices)
-        PATCH("/w-api/management-service/services/{service_id}", ::updateServiceByCategoryId)
+        POST("/w-api/management-service/services/{service_id}/extensions", ::selectServiceExtensions)
+        POST("/w-api/management-service/extensions", ::findExtensions)
+        POST("/w-api/management-service/services/{service_id}/extensions/{extension_id}", ::insertExtension)
+        DELETE("/w-api/management-service/services/{service_id}/extensions/{extension_id}", ::deleteExtension)
     }
 
-    private fun updateServiceByCategoryId(request: ServerRequest): Mono<ServerResponse> {
+    private fun selectServiceExtensions(request: ServerRequest): Mono<ServerResponse> {
         val serviceId = request.pathVariable("service_id")
         return authenticationHandler.principal(request)
             .flatMap { managerAuthenticationHandler.chkAdmin(it) }
-            .flatMap { request.bodyToMono(Service::class.java) }
-            .flatMap { serviceHandler.updateServiceById(it.apply { id = serviceId }) }
+            .flatMap { request.bodyToMono(Query.Companion.Filter::class.java) }
+            .flatMap { serviceHandler.selectServiceExtensions(it, serviceId).collectList() }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume(AdminAuthenticationException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(ServiceNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
             .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
             .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
     }
 
-    private fun selectUserServices(request: ServerRequest): Mono<ServerResponse> {
-        val userId = request.pathVariable("user_id")
+    private fun findExtensions(request: ServerRequest): Mono<ServerResponse> {
         return authenticationHandler.principal(request)
-            .flatMap { serviceHandler.selectServiceByUserId(userId).collectList() }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
-            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
-            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
-    }
-
-    private fun selectService(request: ServerRequest): Mono<ServerResponse> {
-        val serviceId = request.pathVariable("service_id")
-        return authenticationHandler.principal(request)
-            .flatMap { serviceHandler.selectService(serviceId) }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
-            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
-            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
-    }
-
-    private fun selectServiceCategory(request: ServerRequest): Mono<ServerResponse> {
-        return Mono.zip(authenticationHandler.principal(request), request.bodyToMono(Query::class.java))
-            .flatMap { p -> serviceHandler.selectServiceCategory(p.t1,p.t2.copy(page=p.t2.page - 1)) }
-            .flatMap { ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("X-Total-Page", it.totalPage.toString())
-                .bodyValue(it) }
-            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
-            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
-    }
-
-    private fun selectServices(request: ServerRequest): Mono<ServerResponse> {
-        return authenticationHandler.principal(request)
+            .flatMap { managerAuthenticationHandler.chkAdmin(it) }
             .flatMap { request.bodyToMono(Query.Companion.Filter::class.java) }
-            .flatMap { serviceHandler.selectServiceByNameOrId(it).collectList() }
+            .flatMap { serviceHandler.selectExtensionAll(it).collectList() }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(ServiceNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
+            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
+    }
+
+    private fun insertExtension(request: ServerRequest): Mono<ServerResponse> {
+        return authenticationHandler.principal(request)
+            .flatMap { managerAuthenticationHandler.chkAdmin(it) }
+            .flatMap { request.bodyToMono(ServiceExtension::class.java) }
+            .flatMap { serviceHandler.insertServiceExtension(it) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(ServiceNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
+            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
+    }
+
+    private fun deleteExtension(request: ServerRequest): Mono<ServerResponse> {
+        val serviceId = request.pathVariable("service_id")
+        val extensionId = request.pathVariable("extension_id")
+        return authenticationHandler.principal(request)
+            .flatMap { managerAuthenticationHandler.chkAdmin(it) }
+            .flatMap { serviceHandler.deleteServiceExtension(serviceId, extensionId) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(ServiceNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
             .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
             .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
     }

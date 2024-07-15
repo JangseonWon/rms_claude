@@ -18,11 +18,11 @@
 .btnSelect {
     display: flex;
     width: 100%;
-    min-width: 5vw;
+    min-width: 10.35vw;
     justify-content: space-between;
     align-items: center;
     border: 0.1vw solid #DAE2ED;
-    border-radius: 20px;
+    border-radius: 5px;
     padding: 1vh 1vw;
     margin-bottom: 0.4vh;
     font-size: 0.6vw;
@@ -44,20 +44,26 @@
     outline: 0.1vw solid #CCE492;
     border: 1px solid #90BA2D;
 }
-
+.searchInput {
+    border: solid #C4C4C4 0.1vw;
+    border-radius: 5px;
+    outline: none;
+}
 .listMember {
     position: absolute;
     overflow: hidden;
     outline: 0.05vw solid #C4C4C4;
-    border-radius: 10px;
+    border-radius: 5px;
     display: none;
+    max-height: 200px;
+    overflow-y: auto;
 }
 
 .listMember.open {
     display: block;
 }
 .listMember li {
-    width: 9vw;
+    width: 9.5vw;
 }
 
 .listMember li button {

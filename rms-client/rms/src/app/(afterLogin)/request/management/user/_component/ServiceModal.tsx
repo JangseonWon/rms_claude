@@ -5,7 +5,7 @@ import style from "@/app/(afterLogin)/request/management/user/_component/service
 import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {getServices} from "@/app/(afterLogin)/request/management/user/_api/getServices";
-import {ServiceExtension} from "@/model/ServiceExtension";
+import {ServiceExtensionAndSampleType} from "@/model/ServiceExtensionAndSampleType";
 import {Service} from "@/model/Service";
 
 type Props = {
@@ -15,13 +15,13 @@ type Props = {
 }
 
 export default function ServiceModal({id, open, closeModal}: Props) {
-    const [serviceData, setServiceData] = useState<ServiceExtension[]>([]);
+    const [serviceData, setServiceData] = useState<ServiceExtensionAndSampleType[]>([]);
     const [selectService, setSelectService] = useState<Service>();
 
     const fetchServiceData = async (userId: string) => {
         const response = await getServices(userId);
         const data = await response.json();
-        setServiceData(data as ServiceExtension[]);
+        setServiceData(data as ServiceExtensionAndSampleType[]);
     }
 
     useEffect(() => {

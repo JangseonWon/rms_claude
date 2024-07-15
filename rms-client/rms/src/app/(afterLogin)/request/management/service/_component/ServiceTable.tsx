@@ -8,6 +8,7 @@ import InputBox from "@/app/_component/InputBox";
 import {Paging} from "@/model/Paging";
 import {getServiceCategory} from "@/app/(afterLogin)/request/management/service/_api/getServiceCategory";
 import {ServiceManage} from "@/model/ServiceManage";
+import ServiceEditModal from "@/app/(afterLogin)/request/management/service/_component/ServiceEditModal";
 
 interface InstitutionWithSelected extends ServiceManage {
     isSelected?: boolean;
@@ -20,6 +21,8 @@ export default function ServiceTable() {
         useState<Paging>({filters: [], sort_by:"name", asc: true, size:10, page:1});
     const [searchKey, setSearchKey] = useState<string>("service_id");
     const [searchValue, setSearchValue] = useState<string>("");
+    const [serviceModalOpen, setServiceModalOpen] = useState<boolean>(false);
+    const [selectedService, setSelectedService] = useState<ServiceManage>();
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage =>({
@@ -65,12 +68,18 @@ export default function ServiceTable() {
         }
     }
 
-    const handleUserAddClick = () => {
+    const handleAlisSyncClick = () => {
         alert('sync complete');
     }
 
-    const handleServiceEditClick = (serviceCode: string) => {
-        alert(`${serviceCode} service edit`);
+    const handleServiceEditClick = (service: ServiceManage) => {
+        setSelectedService(service);
+        setServiceModalOpen(true);
+    }
+
+    const closeModal = () => {
+        setSelectedService(undefined);
+        setServiceModalOpen(false);
     }
 
     useEffect(() => {
@@ -81,7 +90,7 @@ export default function ServiceTable() {
         <>
             <section className={style.filterContainer}>
                 <div className={style.filterContainerLeft}>
-                    <button className={style.alisSync} onClick={handleUserAddClick}>
+                    <button className={style.alisSync} onClick={handleAlisSyncClick}>
                         Alis-Sync
                     </button>
                     <select className={style.selectSearchKey} onChange={handleSearchKeyChange}>
@@ -115,7 +124,10 @@ export default function ServiceTable() {
                             <td>{row.service_name}</td>
                             <td>{row.category_name}</td>
                             <td>
-                                <button onClick={()=> handleServiceEditClick(row.service_id!)}>
+                                <button
+                                    className={style.editButton}
+                                    onClick={()=> handleServiceEditClick(row)}
+                                >
                                     Edit
                                 </button>
                             </td>
@@ -145,6 +157,9 @@ export default function ServiceTable() {
                     </button>
                 </div>
             </section>
+            {serviceModalOpen && (
+                <ServiceEditModal service={selectedService} open={serviceModalOpen} closeModal={closeModal}/>
+            )}
         </>
     );
 }

@@ -5,10 +5,12 @@ import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.dao.SampleTypeDao
 import com.gcgenome.rms.dao.ServiceDao
 import com.gcgenome.rms.dao.ServiceExtensionDao
-import com.gcgenome.rms.data.*
+import com.gcgenome.rms.data.Page
+import com.gcgenome.rms.data.Query
+import com.gcgenome.rms.data.ServiceCategory
+import com.gcgenome.rms.data.Service_
 import com.gcgenome.rms.exception.FilterOperatorNotFoundException
 import com.gcgenome.rms.exception.ServiceNotFoundException
-import com.gcgenome.rms.tables.pojos.SampleType
 import com.gcgenome.rms.tables.pojos.Service
 import com.gcgenome.rms.tables.references.CATEGORY
 import com.gcgenome.rms.tables.references.SERVICE
@@ -62,28 +64,13 @@ class ServiceHandler(
         return Flux.from(dslContext.selectServiceByUserId(userId))
     }
 
-    fun selectServiceExtensions(filter: Query.Companion.Filter, serviceId: String): Flux<Extension> {
-        val whereClause = buildExtensionIdOrNameWhereClause(filter)
-        return Flux.from(dslContext.run {
-            selectServiceById(serviceId).switchIfEmpty(Mono.error(ServiceNotFoundException(serviceId)))
-                .thenMany(selectServiceExtensionByNameOrId(whereClause, serviceId))
-        })
-    }
-
-    fun selectSampleTypes(filter: Query.Companion.Filter, serviceId: String): Flux<SampleType> {
-        return Flux.from(dslContext.run {
-            selectServiceById(serviceId).switchIfEmpty(Mono.error(ServiceNotFoundException(serviceId)))
-                .thenMany(selectSampleTypeByNameOrId(serviceId, filter.value))
-        })
+    fun selectService(serviceId: String): Mono<Service_> {
+        return Mono.from(dslContext.selectServiceByServiceId(serviceId))
     }
 
     fun buildServiceIdOrNameWhereClause(filter: Query.Companion.Filter) : Condition {
         return field("service.id").likeIgnoreCase("%${filter.value}%")
             .or(field("service.name").likeIgnoreCase("%${filter.value}%"))
-    }
-
-    fun buildExtensionIdOrNameWhereClause(filter: Query.Companion.Filter) : Condition {
-        return field("extension.id").like("%${filter.value}%").or(field("extension.name").like("%${filter.value}%"))
     }
 
     fun buildWhereClause(filters:List<Query.Companion.Filter>?) : Condition {

@@ -3,10 +3,9 @@ package com.gcgenome.rms.service
 import com.gcgenome.rms.auth.AuthenticationHandler
 import com.gcgenome.rms.auth.ManagerAuthenticationHandler
 import com.gcgenome.rms.data.Query
-import com.gcgenome.rms.exception.AdminAuthenticationException
 import com.gcgenome.rms.exception.AuthenticationNotFoundException
 import com.gcgenome.rms.exception.ServiceNotFoundException
-import com.gcgenome.rms.tables.pojos.Service
+import com.gcgenome.rms.tables.pojos.ServiceSampleType
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
@@ -17,72 +16,65 @@ import org.springframework.web.reactive.function.server.router
 import reactor.core.publisher.Mono
 
 @Configuration
-class ServiceRouter (
+class ServiceSampleTypeRouter (
     private val authenticationHandler: AuthenticationHandler,
     private val managerAuthenticationHandler: ManagerAuthenticationHandler,
-    private val serviceHandler: ServiceHandler
+    private val serviceHandler: ServiceSampleTypeHandler
 ) {
-    @Bean("ServicesRouter")
+    @Bean("ServiceSampleTypeRouter")
     fun route() = router {
-        GET("/w-api/management-service/services/users/{user_id}", ::selectUserServices)
-        GET("/w-api/management-service/services/{service_id}", ::selectService)
-        POST("/w-api/management-service/service_category", ::selectServiceCategory)
-        POST("/w-api/management-service/services", ::selectServices)
-        PATCH("/w-api/management-service/services/{service_id}", ::updateServiceByCategoryId)
+        POST("/w-api/management-service/services/{service_id}/sample-types", ::selectSampleTypes)
+        POST("/w-api/management-service/sample-types", ::findSampleTypes)
+        POST("/w-api/management-service/services/{service_id}/sample-types/{sample_type_id}", ::insertSampleType)
+        DELETE("/w-api/management-service/services/{service_id}/sample-types/{sample_type_id}", ::deleteSampleType)
     }
 
-    private fun updateServiceByCategoryId(request: ServerRequest): Mono<ServerResponse> {
+    private fun selectSampleTypes(request: ServerRequest): Mono<ServerResponse> {
         val serviceId = request.pathVariable("service_id")
         return authenticationHandler.principal(request)
             .flatMap { managerAuthenticationHandler.chkAdmin(it) }
-            .flatMap { request.bodyToMono(Service::class.java) }
-            .flatMap { serviceHandler.updateServiceById(it.apply { id = serviceId }) }
+            .flatMap { request.bodyToMono(Query.Companion.Filter::class.java) }
+            .flatMap { serviceHandler.selectSampleTypes(it, serviceId).collectList() }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume(AdminAuthenticationException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(ServiceNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
             .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
             .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
     }
 
-    private fun selectUserServices(request: ServerRequest): Mono<ServerResponse> {
-        val userId = request.pathVariable("user_id")
+    private fun findSampleTypes(request: ServerRequest): Mono<ServerResponse> {
         return authenticationHandler.principal(request)
-            .flatMap { serviceHandler.selectServiceByUserId(userId).collectList() }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
-            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
-            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
-    }
-
-    private fun selectService(request: ServerRequest): Mono<ServerResponse> {
-        val serviceId = request.pathVariable("service_id")
-        return authenticationHandler.principal(request)
-            .flatMap { serviceHandler.selectService(serviceId) }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
-            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
-            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
-    }
-
-    private fun selectServiceCategory(request: ServerRequest): Mono<ServerResponse> {
-        return Mono.zip(authenticationHandler.principal(request), request.bodyToMono(Query::class.java))
-            .flatMap { p -> serviceHandler.selectServiceCategory(p.t1,p.t2.copy(page=p.t2.page - 1)) }
-            .flatMap { ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("X-Total-Page", it.totalPage.toString())
-                .bodyValue(it) }
-            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
-            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
-    }
-
-    private fun selectServices(request: ServerRequest): Mono<ServerResponse> {
-        return authenticationHandler.principal(request)
+            .flatMap { managerAuthenticationHandler.chkAdmin(it) }
             .flatMap { request.bodyToMono(Query.Companion.Filter::class.java) }
-            .flatMap { serviceHandler.selectServiceByNameOrId(it).collectList() }
+            .flatMap { serviceHandler.selectSampleTypeAll(it).collectList() }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(ServiceNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
+            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
+    }
+
+    private fun insertSampleType(request: ServerRequest): Mono<ServerResponse> {
+        return authenticationHandler.principal(request)
+            .flatMap { managerAuthenticationHandler.chkAdmin(it) }
+            .flatMap { request.bodyToMono(ServiceSampleType::class.java) }
+            .flatMap { serviceHandler.insertServiceSampleType(it) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(ServiceNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
+            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
+    }
+
+    private fun deleteSampleType(request: ServerRequest): Mono<ServerResponse> {
+        val serviceId = request.pathVariable("service_id")
+        val extensionId = request.pathVariable("sample_type_id")
+        return authenticationHandler.principal(request)
+            .flatMap { managerAuthenticationHandler.chkAdmin(it) }
+            .flatMap { serviceHandler.deleteServiceSampleType(serviceId, extensionId) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(ServiceNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
             .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
             .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
     }

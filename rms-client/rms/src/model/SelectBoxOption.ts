@@ -1,4 +1,4 @@
 export interface SelectBoxOption {
-    value?: string
+    value?: any
     name?: string
 }

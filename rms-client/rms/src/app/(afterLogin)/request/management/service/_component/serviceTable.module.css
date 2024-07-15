@@ -135,3 +135,19 @@
 .select select:hover {
     border-color: #1a1a1a;
 }
+.editButton {
+    font-size: 0.7vw;
+    padding: 0.5vh 0.3vw;
+    min-width: 4vw;
+    border-radius: 5px;
+    border: none;
+    transition: all 150ms ease;
+    cursor: pointer;
+    background: linear-gradient(135deg, #a2a3a9, #7a92af);
+    color: #ffffff;
+    margin: 0.5vh 0.3vw;
+}
+.editButton:hover {
+    background: linear-gradient(135deg, #3c6699, #9ebce6);
+    border: none;
+}

@@ -51,6 +51,42 @@ interface ServiceDao{
         ).map { it.into(Service_::class.java) }
     }
 
+    fun DSLContext.selectServiceByServiceId(serviceId: String): Mono<Service_>{
+        return Mono.from(
+            select(
+                SERVICE.ID,
+                SERVICE.NAME,
+                field(
+                    select(
+                        jsonArrayAgg(
+                            jsonObject(
+                                key("id").value(EXTENSION.ID),
+                                key("name").value(EXTENSION.NAME),
+                                key("regex").value(EXTENSION.REGEX),
+                                key("required").value(SERVICE_EXTENSION.REQUIRED),
+                            )
+                        )
+                    ).from(EXTENSION)
+                        .join(SERVICE_EXTENSION).on(EXTENSION.ID.eq(SERVICE_EXTENSION.EXTENSION_ID))
+                        .where(SERVICE_EXTENSION.SERVICE_ID.eq(SERVICE.ID))
+                ).`as`("extensions"),
+                field(
+                    select(
+                        jsonArrayAgg(
+                            jsonObject(
+                                key("id").value(SAMPLE_TYPE.ID),
+                                key("name").value(SAMPLE_TYPE.NAME)
+                            )
+                        )
+                    ).from(SAMPLE_TYPE)
+                        .join(SERVICE_SAMPLE_TYPE).on(SAMPLE_TYPE.ID.eq(SERVICE_SAMPLE_TYPE.SAMPLE_TYPE_ID))
+                        .where(SERVICE.ID.eq(SERVICE_SAMPLE_TYPE.SERVICE_ID))
+                ).`as`("sample_types")
+            ).from(SERVICE)
+                .where(SERVICE.ID.eq(serviceId))
+        ).map { it.into(Service_::class.java) }
+    }
+
     fun DSLContext.selectServiceById(serviceId: String): Mono<Service_> {
         return Mono.from(
             selectFrom(SERVICE).where(SERVICE.ID.eq(serviceId))
