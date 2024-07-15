@@ -32,7 +32,7 @@ export default function ServiceEditModal({service, open, closeModal}: Props) {
     const [serviceName, setServiceName] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<string>('');
     const [categories, setCategories] = useState<SelectBoxOption[]>([]);
-    const [required, setRequired] = useState<boolean>();
+    const [required, setRequired] = useState<boolean>(false);
     const [serviceData, setServiceData] = useState<ServiceExtensionAndSampleType>();
     const [selectedSampleType, setSelectedSampleType] = useState<SelectBoxOption | null>(null);
     const [selectedExtension, setSelectedExtension] = useState<SelectBoxOption | null>(null);
