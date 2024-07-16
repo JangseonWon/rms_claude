@@ -32,7 +32,10 @@ class CategoriesHandler(
     }
 
     fun deleteCategories(category: Category): Mono<Category> {
-        return dslContext.deleteCategory(category)
+        return dslContext.run {
+            cancelCategoryByService(category.id!!)
+                .then(deleteCategory(category))
+        }
     }
 
     fun updateCategories(category: Category): Mono<Category> {

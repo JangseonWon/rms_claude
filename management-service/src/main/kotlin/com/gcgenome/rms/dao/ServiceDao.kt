@@ -11,6 +11,7 @@ import org.jooq.SortOrder
 import org.jooq.impl.DSL.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import java.util.*
 
 
 interface ServiceDao{
@@ -131,5 +132,14 @@ interface ServiceDao{
                 .where(SERVICE.ID.eq(service.id))
                 .returning()
         ).map { it.into(Service::class.java) }
+    }
+
+    fun DSLContext.cancelCategoryByService(categoryId: UUID): Mono<Service> {
+        return Mono.from(
+            update(SERVICE)
+                .set(SERVICE.CATEGORY_ID, `val`(null, SERVICE.CATEGORY_ID.dataType))
+                .where(SERVICE.CATEGORY_ID.eq(categoryId))
+                .returning()
+        ).map { it.into(Service::class.java)}
     }
 }
