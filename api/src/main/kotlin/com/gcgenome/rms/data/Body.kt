@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlCData
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlText
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -48,6 +49,16 @@ data class Body(
             val instype: String?,    //기관유형
             val sampnm: String?,    //검체명
             val sex: String?,    //성별
+            @JacksonXmlElementWrapper(localName = "etcs")
+            @JacksonXmlProperty(localName = "etc")
+            val etcs: List<Etc>?
         )
+        data class Etc (
+            @JacksonXmlText
+            val value: String,
+            @JacksonXmlProperty(isAttribute = true)
+            val id: String,
+        )
+
     }
 }
