@@ -81,7 +81,7 @@ export default function SelectSearchBox({ type, onSelect }: Props) {
                     <div>{selectedValue}</div>
                     <FontAwesomeIcon icon={faChevronDown}/>
                 </button>
-                <ul className={`${style.listMember} ${isOpen ? style.open : ''}`}>
+                <div className={`${style.searchList} ${isOpen ? style.open : ''}`}>
                     <input
                         type="text"
                         value={selectedValue}
@@ -89,14 +89,16 @@ export default function SelectSearchBox({ type, onSelect }: Props) {
                         className={style.searchInput}
                         placeholder="Search..."
                     />
-                    {options.map((option) => (
-                        <li key={option.name}>
-                            <button onClick={() => handleOptionClick(option)}>
-                                {option.value} / {option.name}
-                            </button>
-                        </li>
-                    ))}
-                </ul>
+                    <ul className={style.listMember}>
+                        {options.map((option) => (
+                            <li key={option.name}>
+                                <button onClick={() => handleOptionClick(option)}>
+                                    {option.value} / {option.name}
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
             </section>
         </div>
     )

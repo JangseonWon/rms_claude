@@ -44,28 +44,33 @@
     outline: 0.1vw solid #CCE492;
     border: 1px solid #90BA2D;
 }
-.searchInput {
-    border: solid #C4C4C4 0.1vw;
-    border-radius: 5px;
-    outline: none;
-}
-.listMember {
+.searchList {
+    display: none;
     position: absolute;
-    overflow: hidden;
     outline: 0.05vw solid #C4C4C4;
     border-radius: 5px;
-    display: none;
     max-height: 200px;
     overflow-y: auto;
+    background-color: #fff;
+    z-index: 1;
 }
-
-.listMember.open {
+.searchList.open {
     display: block;
+}
+.searchInput {
+    border: solid #C4C4C4 0.1vw;
+    width: 90%;
+    border-radius: 5px;
+    margin: 0.5vh 0.2vw;
+    outline: none;
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    z-index: 10;
 }
 .listMember li {
     width: 9.5vw;
 }
-
 .listMember li button {
     width: 100%;
     background-color: #fff;
