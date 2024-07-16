@@ -7,6 +7,7 @@
     left: 0;
     right: 0;
     bottom: 0;
+    z-index: 5;
 }
 .modal {
     background: #ffffff;
@@ -20,6 +21,7 @@
     flex-direction: column;
     overflow: auto;
     padding: 30px;
+    z-index: 10;
 }
 .modalTitle {
     display: flex;
