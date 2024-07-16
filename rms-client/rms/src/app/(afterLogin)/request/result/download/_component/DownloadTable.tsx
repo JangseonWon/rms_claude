@@ -114,6 +114,13 @@ export default function DownloadTable() {
         }
     };
 
+    const handleMultiDownloadOnClick = async () => {
+        const selectedRequests = requestData.filter(row => row.isSelected);
+        for (const request of selectedRequests) {
+            await handleDownloadOnClick(`${request.sample?.barcode}_${request.service?.id}` || '');
+        }
+    }
+
     return (
         <>
             <section className={style.filterContainer}>
@@ -135,7 +142,7 @@ export default function DownloadTable() {
                 </div>
             </section>
             <section>
-                <button className={style.downloadButton}>
+                <button className={style.downloadButton} onClick={handleMultiDownloadOnClick}>
                     Download
                 </button>
             </section>
