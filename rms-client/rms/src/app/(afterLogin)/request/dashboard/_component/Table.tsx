@@ -59,7 +59,8 @@ export default function Table() {
         const newSize = parseInt(event.target.value);
         setSearch(prevSearch => ({
             ...prevSearch,
-            size: newSize
+            size: newSize,
+            page: 1
         }));
     };
     const handleSearchChange = (newFilter: { key: string; value: string }) => {

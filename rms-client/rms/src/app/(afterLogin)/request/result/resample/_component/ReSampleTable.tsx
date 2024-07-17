@@ -33,7 +33,8 @@ export default function ReSampleTable() {
         const newSize = parseInt(event.target.value);
         setSearch(prevSearch => ({
             ...prevSearch,
-            size: newSize
+            size: newSize,
+            page: 1
         }));
     };
 
