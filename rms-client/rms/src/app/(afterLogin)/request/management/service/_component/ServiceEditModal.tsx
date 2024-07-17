@@ -12,25 +12,27 @@ import {getCategories} from "@/app/(afterLogin)/request/management/service/_api/
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import {ServiceExtensionAndSampleType} from "@/model/ServiceExtensionAndSampleType";
 import {getService} from "@/app/(afterLogin)/request/management/service/_api/getService";
-import SelectSearchBox
-    from "@/app/(afterLogin)/request/management/service/_component/SelectSearchBox";
-import {Status} from "@/model/Status";
+import SelectSearchBox from "@/app/(afterLogin)/request/management/service/_component/SelectSearchBox";
 import {postSampleType} from "@/app/(afterLogin)/request/management/service/_api/postSampleType";
 import {postExtension} from "@/app/(afterLogin)/request/management/service/_api/postExtensions";
 import {deleteSampleType} from "@/app/(afterLogin)/request/management/service/_api/deleteSampleType";
 import {deleteExtension} from "@/app/(afterLogin)/request/management/service/_api/deleteExtension";
+import {patchService} from "@/app/(afterLogin)/request/management/service/_api/patchService";
+import {Service} from "@/model/Service";
 
 
 type Props = {
     service?: ServiceManage;
     open: boolean;
     closeModal: () => void;
+    refreshData: () => void;
 }
 
-export default function ServiceEditModal({service, open, closeModal}: Props) {
+export default function ServiceEditModal({service, open, closeModal, refreshData}: Props) {
     const [serviceId, setServiceId] = useState('');
     const [serviceName, setServiceName] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState<string>('');
+    const [selectedCategoryName, setSelectedCategoryName] = useState<string>('');
+    const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
     const [categories, setCategories] = useState<SelectBoxOption[]>([]);
     const [required, setRequired] = useState<boolean>(false);
     const [serviceData, setServiceData] = useState<ServiceExtensionAndSampleType>();
@@ -65,14 +67,23 @@ export default function ServiceEditModal({service, open, closeModal}: Props) {
         if (open && service) {
             setServiceId(service.service_id!);
             setServiceName(service.service_name!);
-            setSelectedCategory(service.category_name!);
+            setSelectedCategoryName(service.category_name!);
             fetchServiceData(service.service_id!);
         } else {
             setServiceId('');
             setServiceName('');
-            setSelectedCategory('');
+            setSelectedCategoryName('');
         }
     }, [open, service]);
+
+    const handleServiceCategoryChangeClick = async () => {
+        if (service && selectedCategoryId) {
+            const serviceData : Service = {id: service.service_id, category_id: selectedCategoryId};
+            await patchService(serviceData);
+            await fetchServiceData(service.service_id!);
+            refreshData();
+        }
+    }
 
     const handleSampleTypeAddClick = async () => {
         if (selectedSampleType && service) {
@@ -141,14 +152,22 @@ export default function ServiceEditModal({service, open, closeModal}: Props) {
                             onChange={setServiceName}
                             type="categoryName"
                         />
-                        <SelectBox
-                            label={"Category Name"}
-                            value={selectedCategory}
-                            options={categories}
-                            onChange={(value) => {
-                                setSelectedCategory(value.name);
-                            }}
-                        />
+                        <div className={style.categoryBox}>
+                            <SelectBox
+                                label={"Category Name"}
+                                value={selectedCategoryName}
+                                options={categories}
+                                onChange={(value) => {
+                                    setSelectedCategoryName(value.name);
+                                    setSelectedCategoryId(value.value);
+                                }}
+                            />
+                        </div>
+                        <button className={style.addButton}
+                                onClick={() => handleServiceCategoryChangeClick()}
+                        >
+                            Category Change
+                        </button>
                     </section>
                     <section className={style.bottomBody}>
                         <div className={style.leftBody}>

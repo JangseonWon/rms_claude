@@ -82,6 +82,10 @@ export default function ServiceTable() {
         setServiceModalOpen(false);
     }
 
+    const refreshData = () => {
+        fetchData(search);
+    }
+
     useEffect(() => {
         fetchData(search)
     }, [search]);
@@ -158,7 +162,12 @@ export default function ServiceTable() {
                 </div>
             </section>
             {serviceModalOpen && (
-                <ServiceEditModal service={selectedService} open={serviceModalOpen} closeModal={closeModal}/>
+                <ServiceEditModal
+                    service={selectedService}
+                    open={serviceModalOpen}
+                    closeModal={closeModal}
+                    refreshData={refreshData}
+                />
             )}
         </>
     );
