@@ -11,6 +11,8 @@ import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.router
 import reactor.core.publisher.Mono
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 @Configuration("com.gcgenome.rms.service.Router")
@@ -23,7 +25,10 @@ class Router (
         GET("/w-api/order-service/orders/{order_id}/services/{service_id}/samples/{sample_id}/form", ::download)
         GET("/w-api/order-service/requests/reports/{report_id}/file", ::downloadRequest)
         GET("/w-api/order-service/requests/services/{service_name}/file", ::downloadServiceFile)
+        POST("/w-api/order-service/requests/reports/multi-download", ::multiDownloadRequest)
     }
+
+    data class IdRequests(val ids: List<String>)
 
     private fun download(request: ServerRequest): Mono<ServerResponse> {
         val serviceId = request.pathVariable("service_id")
@@ -48,6 +53,19 @@ class Router (
             .flatMap { byteArray -> ServerResponse.ok().contentType(MediaType.APPLICATION_PDF)
                     .header("Content-Disposition", "attachment; filename=$requestId.pdf")
                     .bodyValue(byteArray) }
+            .switchIfEmpty(ServerResponse.status(HttpStatus.NO_CONTENT).build())
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}") }
+            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Error code: $e") }
+    }
+
+    private fun multiDownloadRequest(request: ServerRequest): Mono<ServerResponse> {
+        val today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
+        return principal(request)
+            .zipWith(request.bodyToMono(IdRequests::class.java))
+            .flatMap { handler.downloadByMultiRequestIds(it.t1, it.t2.ids) }
+            .flatMap { byteArray -> ServerResponse.ok().contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header("Content-Disposition", "attachment; filename=${today}_file.pdf")
+                .bodyValue(byteArray) }
             .switchIfEmpty(ServerResponse.status(HttpStatus.NO_CONTENT).build())
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}") }
             .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Error code: $e") }

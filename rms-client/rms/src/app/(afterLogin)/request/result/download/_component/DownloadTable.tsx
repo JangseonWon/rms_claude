@@ -13,6 +13,7 @@ import {format} from "date-fns";
 import SelectBox from "@/app/_component/SelectBox";
 import InputBox from "@/app/_component/InputBox";
 import {Paging} from "@/model/Paging";
+import {fetchMultiDownloadFile} from "@/app/(afterLogin)/request/result/download/_api/fetchMultiDownloadFile";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -115,9 +116,35 @@ export default function DownloadTable() {
     };
 
     const handleMultiDownloadOnClick = async () => {
-        const selectedRequests = requestData.filter(row => row.isSelected);
-        for (const request of selectedRequests) {
-            await handleDownloadOnClick(`${request.sample?.barcode}_${request.service?.id}` || '');
+        const selectedIds = requestData.filter(row => row.isSelected).map(row => `${row.sample?.barcode}_${row.service?.id}`);
+        if (selectedIds.length === 0) {
+            setMessage("No items selected for download.");
+            setShowAlertDialog(true);
+            setIcon('warning');
+            return;
+        }
+
+        try {
+            const response = await fetchMultiDownloadFile(selectedIds);
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                const today = new Date().toISOString().split('T')[0];
+                a.href = url;
+                a.download = `reports_${today}.zip`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                fetchData(search);
+            } else {
+                setMessage(response.statusText);
+                setShowAlertDialog(true);
+                setIcon('error');
+            }
+        } catch (error) {
+            console.error("Failed to fetch multi download file:", error);
         }
     }
 

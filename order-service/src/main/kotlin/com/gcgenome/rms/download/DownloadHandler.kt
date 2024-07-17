@@ -10,11 +10,15 @@ import com.gcgenome.rms.tables.pojos.SampleExtension
 import org.jooq.DSLContext
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import software.amazon.awssdk.core.async.AsyncResponseTransformer
 import software.amazon.awssdk.services.s3.S3AsyncClient
 import software.amazon.awssdk.services.s3.model.GetObjectRequest
+import java.io.ByteArrayOutputStream
 import java.util.*
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 
 @Service
@@ -71,6 +75,35 @@ class DownloadHandler(
                 updateStatus.thenReturn(byteArray)
             }
         }
+    }
+
+    fun downloadByMultiRequestIds(authentication: UserAuthentication, requestIds: List<String>): Mono<ByteArray> {
+        val downloadMono = requestIds.map { requestId ->
+            downloadByRequestId(authentication, requestId)
+                .map { byteArray -> Pair(requestId, byteArray) }
+        }
+
+        return Flux.merge(downloadMono)
+            .collectList()
+            .flatMap { byteArrayPairs ->
+                val zipBytes = createZipFile(byteArrayPairs)
+                Mono.just(zipBytes)
+            }
+    }
+
+    fun createZipFile(byteArrayPairs: List<Pair<String, ByteArray>>): ByteArray {
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        val zipOutputStream = ZipOutputStream(byteArrayOutputStream)
+
+        byteArrayPairs.forEach { (fileName, byteArray) ->
+            val zipEntry = ZipEntry("$fileName.pdf")
+            zipOutputStream.putNextEntry(zipEntry)
+            zipOutputStream.write(byteArray)
+            zipOutputStream.closeEntry()
+        }
+
+        zipOutputStream.close()
+        return byteArrayOutputStream.toByteArray()
     }
 
     fun downloadByServiceSampleFile(serviceName: String): Mono<ByteArray> {
