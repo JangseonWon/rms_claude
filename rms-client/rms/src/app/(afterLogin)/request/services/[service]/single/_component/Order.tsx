@@ -165,32 +165,38 @@ export default function Order() {
             </div>
             <p className={style.mainName}>Institution name *</p>
             <div className={style.section}>
-                <SelectBox
-                    label={""}
-                    options={organizationOptions}
-                    value={selectedOrganization}
-                    required={true}
-                    onChange={(value) => {
-                        handleRequestChange('sample.patient.organization.id', value.value)
-                        handleRequestChange('sample.patient.organization.name', value.name)
-                        setSelectedOrganization(value.name);
-                    }}
-                />
+                <div className={style.selectBox}>
+                    <SelectBox
+                        label={""}
+                        options={organizationOptions}
+                        value={selectedOrganization}
+                        required={true}
+                        onChange={(value) => {
+                            handleRequestChange('sample.patient.organization.id', value.value)
+                            handleRequestChange('sample.patient.organization.name', value.name)
+                            setSelectedOrganization(value.name);
+                        }}
+                        width="11vw"
+                    />
+                </div>
             </div>
             <p className={style.mainName}>Service Info.</p>
             <div className={style.section}>
-                <SelectBox
-                    label={"Service*"}
-                    value={selectedService}
-                    options={serviceOptions}
-                    required={true}
-                    onChange={(value) => {
-                        handleServiceChange(value)
-                        setSelectedService(value.name);
-                        handleRequestChange('service.id', value.value)
-                        handleRequestChange('service.name', value.name)
-                    }}
-                />
+                <div className={style.selectBox}>
+                    <SelectBox
+                        label={"Service*"}
+                        value={selectedService}
+                        options={serviceOptions}
+                        required={true}
+                        onChange={(value) => {
+                            handleServiceChange(value)
+                            setSelectedService(value.name);
+                            handleRequestChange('service.id', value.value)
+                            handleRequestChange('service.name', value.name)
+                        }}
+                        width="11vw"
+                    />
+                </div>
             </div>
             <p className={style.mainName}>Patient Info.</p>
             <div className={style.section}>
@@ -204,24 +210,26 @@ export default function Order() {
                     required={true}
                     onChange={(value) => handleRequestChange('sample.patient.serial', value)}
                 />
-                <DatePickerBox
-                    label={"Date of Birth"}
-                    onChange={(date) => {
-                        if (date) {
-                            handleRequestChange('sample.patient.birth_year', date.getFullYear());
-                            handleRequestChange('sample.patient.birth_month', date.getMonth() + 1);
-                            handleRequestChange('sample.patient.birth_day', date.getDate());
-                            if (request.sample?.sampling_on) {
-                                handleRequestChange('sample.age', setAge(date, new Date(request.sample.sampling_on)));
+                <div className={style.dateBox}>
+                    <DatePickerBox
+                        label={"Date of Birth"}
+                        onChange={(date) => {
+                            if (date) {
+                                handleRequestChange('sample.patient.birth_year', date.getFullYear());
+                                handleRequestChange('sample.patient.birth_month', date.getMonth() + 1);
+                                handleRequestChange('sample.patient.birth_day', date.getDate());
+                                if (request.sample?.sampling_on) {
+                                    handleRequestChange('sample.age', setAge(date, new Date(request.sample.sampling_on)));
+                                }
+                            } else {
+                                handleRequestChange('sample.patient.birth_year', null);
+                                handleRequestChange('sample.patient.birth_month', null);
+                                handleRequestChange('sample.patient.birth_day', null);
+                                handleRequestChange('sample.age', null);
                             }
-                        } else {
-                            handleRequestChange('sample.patient.birth_year', null);
-                            handleRequestChange('sample.patient.birth_month', null);
-                            handleRequestChange('sample.patient.birth_day', null);
-                            handleRequestChange('sample.age', null);
-                        }
-                    }}
-                />
+                        }}
+                    />
+                </div>
                 <InputBox
                     label={"Age"}
                     disabled={true}
@@ -230,35 +238,40 @@ export default function Order() {
             </div>
             <p className={style.mainName}>Specimen/ .Sample Info.</p>
             <div className={style.section}>
-                <SelectBox
-                    label={"Type*"}
-                    value={selectedSampleType}
-                    options={sampleTypeOptions}
-                    required={true}
-                    onChange={(value) => {
-                        handleRequestChange('sample.sample_type.id', value.value)
-                        handleRequestChange('sample.sample_type.name', value.name)
-                        setSelectedSampleType(value.name);
-                    }}
-                />
-                <DatePickerBox
-                    label={"Date of Collection*"}
-                    required={true}
-                    onChange={(date) => {
-                        if (date) {
-                            handleRequestChange('sample.sampling_on', format(date, "yyyy-MM-dd"))
-                            if (request.sample?.patient?.birth_year
-                                && request.sample?.patient?.birth_month
-                                && request.sample?.patient?.birth_day) {
-                                handleRequestChange('sample.age', setAge(new Date(`${request.sample.patient.birth_year}-${request.sample.patient.birth_month}-${request.sample.patient.birth_day}`), date));
+                <div className={style.selectBox}>
+                    <SelectBox
+                        label={"Type*"}
+                        value={selectedSampleType}
+                        options={sampleTypeOptions}
+                        required={true}
+                        onChange={(value) => {
+                            handleRequestChange('sample.sample_type.id', value.value)
+                            handleRequestChange('sample.sample_type.name', value.name)
+                            setSelectedSampleType(value.name);
+                        }}
+                        width="11vw"
+                    />
+                </div>
+                <div className={style.dateBox}>
+                    <DatePickerBox
+                        label={"Date of Collection*"}
+                        required={true}
+                        onChange={(date) => {
+                            if (date) {
+                                handleRequestChange('sample.sampling_on', format(date, "yyyy-MM-dd"))
+                                if (request.sample?.patient?.birth_year
+                                    && request.sample?.patient?.birth_month
+                                    && request.sample?.patient?.birth_day) {
+                                    handleRequestChange('sample.age', setAge(new Date(`${request.sample.patient.birth_year}-${request.sample.patient.birth_month}-${request.sample.patient.birth_day}`), date));
+                                }
+                            } else {
+                                handleRequestChange('sample.sampling_on', null)
+                                handleRequestChange('sample.age', null);
                             }
-                        } else {
-                            handleRequestChange('sample.sampling_on', null)
-                            handleRequestChange('sample.age', null);
-                        }
 
-                    }}
-                />
+                        }}
+                    />
+                </div>
                 <InputBox
                     label={"Quantity*"}
                     required={true}

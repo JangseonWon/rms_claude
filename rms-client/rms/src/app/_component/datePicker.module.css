@@ -21,6 +21,7 @@
     border: 1px solid red;
 }
 .testBox input {
-    width: 8vw;
-    height: 1.65vh;
+    font-size: 0.7vw;
+    min-width: 1.65vw;
+    height: 1.8vh;
 }

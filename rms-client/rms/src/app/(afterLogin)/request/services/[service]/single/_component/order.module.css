@@ -14,6 +14,12 @@
 .section > * {
     padding-right: 1vw;
 }
+.selectBox {
+    width: 11vw;
+}
+.dateBox {
+    width: 11vw;
+}
 .mainName {
     color: #002b49;
     font-weight: 800;

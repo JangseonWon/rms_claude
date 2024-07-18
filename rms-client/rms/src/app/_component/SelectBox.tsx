@@ -10,9 +10,10 @@ type Props = {
     value?: any
     onChange?: (selectedValue: any) => void;
     required?: boolean
+    width?: string;
 }
 
-export default function SelectBox({ label, value, options, onChange, required=false }: Props) {
+export default function SelectBox({ label, value, options, onChange, required=false, width }: Props) {
     const [selectedValue, setSelectedValue] = useState<string>('');
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const [hasError, setHasError] = useState(false);
@@ -40,14 +41,14 @@ export default function SelectBox({ label, value, options, onChange, required=fa
     }, [selectedValue, required, value]);
 
     return (
-        <div ref={selectBoxRef}>
+        <div ref={selectBoxRef} style={{ width }}>
             <section className={`${style.selectSection} ${hasError ? style.error : ""}`}>
                 <p className={style.label}>{label}</p>
                 <button className={`${style.btnSelect} ${isOpen ? style.open : ''}`} onClick={toggleList}>
                     <div>{value || '-'}</div>
                     <FontAwesomeIcon style={{paddingLeft: '1vw'}} icon={faChevronDown} />
                 </button>
-                <ul className={`${style.listMember} ${isOpen ? style.open : ''}`}>
+                <ul className={`${style.listMember} ${isOpen ? style.open : ''}`} style={{ width }}>
                     {options.map((option) => (
                         <li key={option.name}>
                             <button onClick={() => handleOptionClick(option)}>

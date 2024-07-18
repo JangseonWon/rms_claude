@@ -57,7 +57,7 @@
     display: block;
 }
 .listMember li {
-    width: 9vw;
+    width: 100%;
 }
 
 .listMember li button {
