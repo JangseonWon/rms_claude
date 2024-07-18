@@ -63,7 +63,7 @@ export default function DownloadTable() {
             const existingFilterIndex = updatedFilters.findIndex((filter) => filter.key === newFilter.key)
             if (existingFilterIndex !== -1) updatedFilters[existingFilterIndex] = newFilter;
             else updatedFilters.push(newFilter);
-            return { ...prevSearch, filters: updatedFilters }
+            return { ...prevSearch, filters: updatedFilters, page:1 }
         });
     };
 

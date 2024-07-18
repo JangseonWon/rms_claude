@@ -43,7 +43,8 @@ export default function ServiceTable() {
         const filterWithOperator = { ...newFilter, operator: "LIKE" };
         setSearch((prevSearch) => ({
             ...prevSearch,
-            filters: [filterWithOperator]
+            filters: [filterWithOperator],
+            page:1
         }));
     };
 

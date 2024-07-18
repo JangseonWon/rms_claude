@@ -7,4 +7,5 @@ export interface Organization {
     registration_number?: string
     nursing_number?: string
     user?: User
+    user_id?: string
 }

@@ -51,7 +51,6 @@ export default function ProfileButton({session}: Props) {
                 <div className={style.profileDropdown} ref={dropdownRef}>
                     <ul>
                         <li onClick={onProfile}>My profile</li>
-                        <li>Manage the institution</li>
                         <li>Setting</li>
                         <li onClick={onLogout}>Logout</li>
                     </ul>

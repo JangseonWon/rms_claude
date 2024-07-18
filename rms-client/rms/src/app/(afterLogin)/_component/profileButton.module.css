@@ -19,8 +19,9 @@
 }
 .profileDropdown {
     position: absolute;
-    top: -2%;
-    right: 0;
+    width: 8vw;
+    top: -0.5%;
+    right: 5%;
     transform: translate(-20%, 40%);
     background-color: #fff;
     padding: 1vh 1vw;

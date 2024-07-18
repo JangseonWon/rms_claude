@@ -1,23 +1,13 @@
-export async function fetchOrganization(userId: string | undefined, pageSize: number, pageNumber: number) {
-    const res = await fetch(`/w-api/organization-service/organizations`, {
+import {Paging} from "@/model/Paging";
+
+export async function fetchOrganization(search: Paging) {
+    return await fetch(`/w-api/organization-service/organizations`, {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-            filter: [{
-                key: "user_id",
-                value: userId
-            }],
-            sort_by: "user_id",
-            asc: false,
-            size: pageSize,
-            page: pageNumber
-        }),
+        body: JSON.stringify(search),
         credentials: 'include',
         cache: 'no-store'
     });
-    if (!res.ok) throw new Error('Failed to fetch data');
-
-    return res;
 }

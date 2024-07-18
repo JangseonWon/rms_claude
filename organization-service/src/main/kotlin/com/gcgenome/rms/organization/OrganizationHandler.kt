@@ -65,9 +65,17 @@ class OrganizationHandler(
                 .map { filter ->
                     val key = filter.key!!
                     val value = filter.value!!
+                    val field = when (key) {
+                        "user_id" -> ORGANIZATION.USER_ID
+                        "name" -> ORGANIZATION.NAME
+                        "type" -> ORGANIZATION.TYPE
+                        "nursing_number" -> ORGANIZATION.NURSING_NUMBER
+                        "registration_number" -> ORGANIZATION.REGISTRATION_NUMBER
+                        else -> throw IllegalArgumentException("Unknown filter key: $key")
+                    }
                     val condition = when (filter.operator) {
                         "=" -> field(key).eq(value)
-                        "LIKE" -> field(key).likeIgnoreCase("%$value%")
+                        "LIKE" -> field.likeIgnoreCase("%$value%")
                         ">" -> field(key).gt(value)
                         "<" -> field(key).lt(value)
                         ">=" -> field(key).ge(value)
