@@ -5,19 +5,23 @@ import style from "@/app/(afterLogin)/user/_component/institutionTable.module.cs
 import type {Organization} from "@/model/Organization";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import EditModal from "@/app/(afterLogin)/user/_component/EditModal";
 import {fetchOrganization} from "@/app/(afterLogin)/user/_api/fetchOrganization";
 import {useSession} from "next-auth/react";
 import InputBox from "@/app/_component/InputBox";
 import {Paging} from "@/model/Paging";
+import InstitutionAddModal from "@/app/(afterLogin)/user/_component/InstitutionAddModal";
+import InstitutionEditModal from "@/app/(afterLogin)/user/_component/InstitutionEditModal";
 
 export default function InstitutionTable() {
     const [organizationData, setOrganizationData] = useState<Organization[]>([])
     const [totalPage, setTotalPage] = useState<number>(0);
     const [search, setSearch] =
-        useState<Paging>({filters: [], sort_by:"name", asc: true, size:5, page:1});
+        useState<Paging>({filters: [], sort_by:"name", asc: true, size:10, page:1});
     const [searchKey, setSearchKey] = useState<string>("user_id");
     const [searchValue, setSearchValue] = useState<string>("");
+    const [selectInstitution, setSelectInstitution] = useState<Organization>();
+    const [institutionEditModalOpen, setInstitutionEditModalOpen] = useState<boolean>(false);
+    const [institutionAddModalOpen, setInstitutionAddModalOpen] = useState<boolean>(false);
     const { data: session, status } = useSession();
 
     const handlePageChange = (newPageNumber: number) => {
@@ -50,6 +54,23 @@ export default function InstitutionTable() {
         handleSearchChange({key: key, value: searchValue});
     };
 
+    const openInstitutionAddModal = () => {
+        setInstitutionAddModalOpen(true);
+    }
+
+    const closeInstitutionAddModal = () => {
+        setInstitutionAddModalOpen(false);
+    }
+
+    const openInstitutionEditModal = (organization: Organization) => {
+        setSelectInstitution(organization);
+        setInstitutionEditModalOpen(true);
+    }
+
+    const closeInstitutionEditModal = () => {
+        setInstitutionEditModalOpen(false);
+    }
+
     const fetchData = useCallback(async (search: Paging) => {
         const response = await fetchOrganization(search);
         const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
@@ -68,6 +89,9 @@ export default function InstitutionTable() {
     return (
         <div className={style.container}>
             <section className={style.searchContainer}>
+                <button className={style.institutionAddButton} onClick={openInstitutionAddModal}>
+                    Institution Add
+                </button>
                 <select className={style.selectSearchKey} onChange={handleSearchKeyChange}>
                     <option value="user_id">User Name</option>
                     <option value="name">Name</option>
@@ -88,7 +112,7 @@ export default function InstitutionTable() {
                     <th>Type</th>
                     <th>Registration Number</th>
                     <th>Nursing Number</th>
-                    <th></th>
+                    <th>Edit</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -100,7 +124,9 @@ export default function InstitutionTable() {
                         <td>{row.registration_number}</td>
                         <td>{row.nursing_number}</td>
                         <td>
-                            <EditModal id={row.id}/>
+                            <button className={style.editButton} onClick={() => openInstitutionEditModal(row)}>
+                                Edit
+                            </button>
                         </td>
                     </tr>
                 ))}
@@ -110,9 +136,9 @@ export default function InstitutionTable() {
                 <span>items per page:</span>
                 <div className={style.select}>
                     <select onChange={handlePageSizeChange}>
-                        <option value="5">5</option>
                         <option value="10">10</option>
                         <option value="20">20</option>
+                        <option value="50">50</option>
                     </select>
                 </div>
                 <span> 1-{totalPage} of {search.page} </span>
@@ -127,6 +153,19 @@ export default function InstitutionTable() {
                 ><FontAwesomeIcon icon={faAngleRight}/>
                 </button>
             </div>
+            {institutionAddModalOpen && (
+                <InstitutionAddModal
+                    open={institutionAddModalOpen}
+                    closeModal={closeInstitutionAddModal}
+                />
+            )}
+            {institutionEditModalOpen && (
+                <InstitutionEditModal
+                    organization={selectInstitution!}
+                    open={institutionEditModalOpen}
+                    closeModal={closeInstitutionEditModal}
+                />
+            )}
         </div>
     );
 }

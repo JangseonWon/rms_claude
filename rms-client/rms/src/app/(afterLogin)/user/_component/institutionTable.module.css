@@ -1,10 +1,25 @@
 .container {
     width: 100%;
-    margin: 0 auto 2vh auto;
+    margin: 0 auto;
 }
 .searchContainer {
     float: right;
     display: flex;
+}
+.institutionAddButton {
+    margin: 1vh 2vw 0 0;
+    width: 5vw;
+    height: 5vh;
+    border-radius: 15px;
+    border: none;
+    background: linear-gradient(135deg, #3c6699, #354e6d);
+    color: #ffffff;
+    font-size: 0.7vw;
+    font-weight: 600;
+    cursor: pointer;
+}
+.institutionAddButton:hover {
+    background: linear-gradient(135deg, #90BA2D, #6a9600);
 }
 .selectSearchKey {
     padding: 0.2vh 0.2vw 0.2vh 0.2vw;
@@ -52,6 +67,18 @@
 .table td {
     padding: 0.8vh;
     text-align: center;
+}
+.editButton {
+    margin: 0.5vh 0;
+    padding: 0.5vh 1vw;
+    background: linear-gradient(to right, #002b49, #3d587e);
+    color: #ffffff;
+    cursor: pointer;
+    border: none;
+    border-radius: 15px;
+}
+.editButton:hover {
+    background: linear-gradient(to right, #bf7171, #cd4d4d);
 }
 .pagination {
     display: flex;

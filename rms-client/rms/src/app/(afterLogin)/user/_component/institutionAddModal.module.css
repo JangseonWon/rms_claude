@@ -1,0 +1,76 @@
+.modalBackground {
+    display: flex;
+    background-color: rgba(128, 128, 128, 0.16);
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+.modal {
+    background: rgb(255, 255, 255);
+    border: solid #f0f0f0 2px;
+    position: relative;
+    top: 10%;
+    height: 70vh;
+    width: 31vw;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+}
+.modalClose {
+    padding-top: 1vh;
+    padding-right: 1vw;
+    float: right;
+}
+.modalClose:hover {
+    cursor: pointer;
+}
+.modalHeader {
+    border-radius: 16px 16px 0 0;
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 10;
+}
+.modalBody {
+    display: grid;
+}
+.bottomBody {
+    display: flex;
+    margin: 1vh 2vw;
+    border: solid #C8C9CB 1px;
+    border-radius: 15px;
+    width: 27vw;
+    height: 60vh;
+}
+.bodyGrid {
+    display: grid;
+    margin: 1vh 3vw;
+    gap: 3%;
+}
+.bodyHeader {
+    display: flex;
+    width: 20vw;
+}
+.addButton {
+    margin: 2vh 0 0 auto;
+    cursor: pointer;
+    padding: 0.5vh 0.5vw;
+    height: 4vh;
+    width: 4vw;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, #182847, #354e6d);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.7vw;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.5);
+}
+.addButton:hover {
+    background: linear-gradient(135deg, #354e6d, #182847);
+}
+.deleteButton {
+    cursor: pointer;
+}

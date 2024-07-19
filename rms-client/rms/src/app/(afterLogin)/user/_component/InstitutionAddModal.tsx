@@ -1,0 +1,98 @@
+'use client';
+
+import React, {useState} from "react";
+import style from "@/app/(afterLogin)/user/_component/institutionAddModal.module.css";
+import {faXmark} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import InputBox from "@/app/_component/InputBox";
+import {useSession} from "next-auth/react";
+import {PutOrganization} from "@/app/(afterLogin)/user/_api/putOrganization";
+import {Organization} from "@/model/Organization";
+
+
+type Props = {
+    open: boolean;
+    closeModal: () => void;
+}
+
+export default function InstitutionAddModal({open, closeModal}: Props) {
+    const [institutionId, setInstitutionId] = useState('');
+    const [institutionName, setInstitutionName] = useState('');
+    const [nursingNumber, setNursingNumber] = useState('');
+    const [registrationNumber, setRegistrationNumber] = useState('');
+    const [type, setType] = useState('');
+    const { data: session } = useSession();
+
+    const handleInstitutionAdd = async () => {
+        const organization: Organization = {
+            id: institutionId,
+            user_id: session?.user?.id,
+            name: institutionName,
+            nursing_number: nursingNumber,
+            registration_number: registrationNumber,
+            type: type,
+        }
+        const response = await PutOrganization(organization);
+        if (response.ok) {
+            alert("Institution added successfully!");
+            closeModal();
+        } else {
+            alert("Failed to add institution");
+        }
+    }
+
+    return (
+        <div className={style.modalBackground}>
+            <div className={style.modal}>
+                <section className={style.modalHeader}>
+                    <div className={style.modalClose} onClick={closeModal}>
+                        <FontAwesomeIcon icon={faXmark}/>
+                    </div>
+                </section>
+                <section className={style.modalBody}>
+                    <section className={style.bottomBody}>
+                            <div className={style.bodyGrid}>
+                                <div className={style.bodyHeader}>
+                                    <h2>New Institution Info</h2>
+                                    <button className={style.addButton} onClick={handleInstitutionAdd}>
+                                        Add
+                                    </button>
+                                </div>
+                                <InputBox
+                                    required={true}
+                                    label={"Institution Id"}
+                                    value={institutionId}
+                                    onChange={setInstitutionId}
+                                    type="institutionId"
+                                />
+                                <InputBox
+                                    label={"Institution Name"}
+                                    value={institutionName}
+                                    onChange={setInstitutionName}
+                                    type="institutionName"
+                                />
+                                <InputBox
+                                    label={"Nursing Number"}
+                                    value={nursingNumber}
+                                    onChange={setNursingNumber}
+                                    type="nursingNumber"
+                                />
+                                <InputBox
+                                    label={"Registration Number"}
+                                    value={registrationNumber}
+                                    onChange={setRegistrationNumber}
+                                    type="registrationNumber"
+                                />
+                                <InputBox
+                                    label={"Type"}
+                                    value={type}
+                                    onChange={setType}
+                                    type="type"
+                                />
+                        </div>
+                    </section>
+                </section>
+            </div>
+        </div>
+    )
+}
