@@ -16,8 +16,8 @@ export default function InstitutionTable() {
     const [organizationData, setOrganizationData] = useState<Organization[]>([])
     const [totalPage, setTotalPage] = useState<number>(0);
     const [search, setSearch] =
-        useState<Paging>({filters: [], sort_by:"name", asc: true, size:10, page:1});
-    const [searchKey, setSearchKey] = useState<string>("user_id");
+        useState<Paging>({filters: [], sort_by:"id", asc: true, size:10, page:1});
+    const [searchKey, setSearchKey] = useState<string>("id");
     const [searchValue, setSearchValue] = useState<string>("");
     const [selectInstitution, setSelectInstitution] = useState<Organization>();
     const [institutionEditModalOpen, setInstitutionEditModalOpen] = useState<boolean>(false);
@@ -60,6 +60,7 @@ export default function InstitutionTable() {
 
     const closeInstitutionAddModal = () => {
         setInstitutionAddModalOpen(false);
+        fetchData(search);
     }
 
     const openInstitutionEditModal = (organization: Organization) => {
@@ -69,6 +70,7 @@ export default function InstitutionTable() {
 
     const closeInstitutionEditModal = () => {
         setInstitutionEditModalOpen(false);
+        fetchData(search);
     }
 
     const fetchData = useCallback(async (search: Paging) => {
@@ -93,7 +95,7 @@ export default function InstitutionTable() {
                     Institution Add
                 </button>
                 <select className={style.selectSearchKey} onChange={handleSearchKeyChange}>
-                    <option value="user_id">User Name</option>
+                    <option value="id">Id</option>
                     <option value="name">Name</option>
                     <option value="type">Type</option>
                     <option value="registration_number">Registration Number</option>
@@ -107,7 +109,7 @@ export default function InstitutionTable() {
             <table className={style.table}>
                 <thead>
                 <tr>
-                    <th>User Name</th>
+                    <th>Institution Id</th>
                     <th>Institute / Practice Name</th>
                     <th>Type</th>
                     <th>Registration Number</th>
@@ -118,7 +120,7 @@ export default function InstitutionTable() {
                 <tbody>
                 {organizationData && organizationData.length > 0 && organizationData.map((row) => (
                     <tr key={row.id + row.name! + row.type + row.user}>
-                        <td>{row.user_id}</td>
+                        <td>{row.id}</td>
                         <td>{row.name}</td>
                         <td>{row.type}</td>
                         <td>{row.registration_number}</td>

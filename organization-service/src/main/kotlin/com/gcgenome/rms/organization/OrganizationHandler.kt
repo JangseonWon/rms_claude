@@ -37,23 +37,16 @@ class OrganizationHandler(
 
     fun selectOrganizations(userId: String, query: Query): Mono<Page<Organization>> {
         val filters = query.filters ?: emptyList()
-        val whereClause = buildWhereClause(filters)
+        val whereClause = buildWhereClause(filters).and(ORGANIZATION.USER_ID.eq(userId))
         return dslContext.dsl().run {
-            selectUserById(userId).flatMap { user ->
-                val adjustedWhereClause = if (user.role == "USER") {
-                    whereClause.and(ORGANIZATION.USER_ID.eq(userId))
-                } else {
-                    whereClause
-                }
-                val organization = dslContext.dsl().selectOrganizations(query, adjustedWhereClause)
-                selectOrganizationsCount(adjustedWhereClause)
-                    .flatMap { totalCount ->
-                        var totalPage = totalCount / query.size
-                        if (totalCount % query.size != 0) totalPage++
-                        organization.collectList().flatMap { list ->
-                            val page = Page(totalCount, totalPage, query.size, query.page + 1, list)
-                            Mono.just(page)
-                        }
+            val organization = dslContext.dsl().selectOrganizations(query, whereClause)
+            selectOrganizationsCount(whereClause)
+                .flatMap { totalCount ->
+                    var totalPage = totalCount / query.size
+                    if (totalCount % query.size != 0) totalPage++
+                    organization.collectList().flatMap { list ->
+                        val page = Page(totalCount, totalPage, query.size, query.page + 1, list)
+                        Mono.just(page)
                     }
             }
         }
@@ -66,7 +59,7 @@ class OrganizationHandler(
                     val key = filter.key!!
                     val value = filter.value!!
                     val field = when (key) {
-                        "user_id" -> ORGANIZATION.USER_ID
+                        "id" -> ORGANIZATION.ID
                         "name" -> ORGANIZATION.NAME
                         "type" -> ORGANIZATION.TYPE
                         "nursing_number" -> ORGANIZATION.NURSING_NUMBER
