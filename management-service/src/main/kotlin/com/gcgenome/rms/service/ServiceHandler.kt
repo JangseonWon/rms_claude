@@ -60,8 +60,9 @@ class ServiceHandler(
             }
     }
 
-    fun selectServiceByUserId(userId: String): Flux<Service_> {
-        return Flux.from(dslContext.selectServiceByUserId(userId))
+    fun selectServiceByUserId(userId: String, filter: Query.Companion.Filter): Flux<Service_> {
+        val whereClause = buildServiceIdOrNameWhereClause(filter)
+        return Flux.from(dslContext.selectServiceByUserId(userId, whereClause))
     }
 
     fun selectService(serviceId: String): Mono<Service_> {

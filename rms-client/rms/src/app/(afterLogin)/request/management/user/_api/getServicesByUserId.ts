@@ -1,7 +1,7 @@
 import {Filter} from "@/model/Filter";
 
-export async function getServices(search: Filter) {
-    return await fetch(`/w-api/management-service/services`, {
+export async function getServicesByUserId(userId: string, search: Filter) {
+    return await fetch(`/w-api/management-service/services/users/${userId}`, {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",

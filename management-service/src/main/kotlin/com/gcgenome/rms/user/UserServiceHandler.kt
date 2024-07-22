@@ -31,7 +31,7 @@ class UserServiceHandler(
                             .flatMap { selectServiceById(it.id).switchIfEmpty(Mono.error(ServiceNotFoundException(it.id))) }
                             .flatMap { insertUserService(userId,it.id) }
                         )
-                        .thenMany(selectServiceByUserId(userId))
+                        .thenMany(selectServiceByUserId(userId, null))
                 }
         })
     }

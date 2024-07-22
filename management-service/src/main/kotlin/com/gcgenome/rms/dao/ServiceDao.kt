@@ -15,7 +15,7 @@ import java.util.*
 
 
 interface ServiceDao{
-    fun DSLContext.selectServiceByUserId(userId: String): Flux<Service_>{
+    fun DSLContext.selectServiceByUserId(userId: String, whereClause: Condition?): Flux<Service_>{
         return Flux.from(
             select(
                 SERVICE.ID,
@@ -48,7 +48,7 @@ interface ServiceDao{
                 ).`as`("sample_types")
             ).from(SERVICE)
                 .join(USER_SERVICE).on(SERVICE.ID.eq(USER_SERVICE.SERVICE_ID))
-                .where(USER_SERVICE.USER_ID.eq(userId))
+                .where(USER_SERVICE.USER_ID.eq(userId).and(whereClause))
         ).map { it.into(Service_::class.java) }
     }
 

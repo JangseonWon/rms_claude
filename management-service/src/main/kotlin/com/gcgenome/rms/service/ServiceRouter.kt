@@ -24,7 +24,7 @@ class ServiceRouter (
 ) {
     @Bean("ServicesRouter")
     fun route() = router {
-        GET("/w-api/management-service/services/users/{user_id}", ::selectUserServices)
+        POST("/w-api/management-service/services/users/{user_id}", ::selectUserServices)
         GET("/w-api/management-service/services/{service_id}", ::selectService)
         POST("/w-api/management-service/service_category", ::selectServiceCategory)
         POST("/w-api/management-service/services", ::selectServices)
@@ -48,7 +48,8 @@ class ServiceRouter (
     private fun selectUserServices(request: ServerRequest): Mono<ServerResponse> {
         val userId = request.pathVariable("user_id")
         return authenticationHandler.principal(request)
-            .flatMap { serviceHandler.selectServiceByUserId(userId).collectList() }
+            .flatMap { request.bodyToMono(Query.Companion.Filter::class.java) }
+            .flatMap { serviceHandler.selectServiceByUserId(userId, it).collectList() }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }

@@ -12,6 +12,7 @@ import SwitchButton from "@/app/_component/SwitchButton";
 import {fetchUserUpdate} from "@/app/(afterLogin)/_api/fetchUserUpdate";
 import ServiceModal from "@/app/(afterLogin)/request/management/user/_component/ServiceModal";
 import InstitutionModal from "@/app/(afterLogin)/request/management/user/_component/InstitutionModal";
+import UserServiceEditModal from "@/app/(afterLogin)/request/management/user/_component/UserServiceEditModal";
 
 interface UserWithSelected extends User {
     isSelected?: boolean;
@@ -25,7 +26,9 @@ export default function UsersTable() {
     const [searchKey, setSearchKey] = useState<string>("id");
     const [searchValue, setSearchValue] = useState<string>("");
     const [serviceModalOpen, setServiceModalOpen] = useState<boolean>(false);
+    const [userServiceModalOpen, setUserServiceModalOpen] = useState<boolean>(false);
     const [selectedServiceUserId, setSelectedServiceUserId] = useState<string | null>(null);
+    const [selectedUser, setSelectedUser] = useState<User>();
     const [institutionModalOpen, setInstitutionModalOpen] = useState<boolean>(false);
     const [selectedInstitutionUser, setSelectedInstitutionUser] = useState<{id: string; name: string} | null>(null);
 
@@ -58,9 +61,6 @@ export default function UsersTable() {
         const key = event.target.value;
         setSearchKey(key);
         handleSearchChange({key: key, value: searchValue});
-        console.log(search);
-        console.log(searchValue);
-        console.log(searchKey);
     };
 
     const fetchData = async (search: Paging) => {
@@ -99,9 +99,15 @@ export default function UsersTable() {
         setServiceModalOpen(true);
     }
 
+    const handleUserServiceEditClick = (user: User) => {
+        setSelectedUser(user);
+        setUserServiceModalOpen(true);
+    }
+
     const closeModal = () => {
         setServiceModalOpen(false);
         setInstitutionModalOpen(false);
+        setUserServiceModalOpen(false);
         setSelectedServiceUserId(null);
         setSelectedInstitutionUser(null);
     }
@@ -144,9 +150,9 @@ export default function UsersTable() {
                         <th>Phone Number</th>
                         <th>Serial</th>
                         <th>Role</th>
-                        <th>Institution</th>
-                        <th>Service</th>
+                        <th>Institution / Service</th>
                         <th>State</th>
+                        <th>Service Edit</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -164,8 +170,7 @@ export default function UsersTable() {
                                     icon={faMagnifyingGlass}
                                     onClick={()=> handleInstitutionIconClick(row.id, row.name)}
                                 />
-                            </td>
-                            <td>
+                                &nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;
                                 <FontAwesomeIcon
                                     className={style.icon}
                                     icon={faMagnifyingGlass}
@@ -178,6 +183,14 @@ export default function UsersTable() {
                                     checked={row.state === 'ACTIVE'}
                                     onToggle={handleToggle}
                                 />
+                            </td>
+                            <td>
+                                <button
+                                    className={style.editButton}
+                                    onClick={() => handleUserServiceEditClick(row)}
+                                >
+                                    Edit
+                                </button>
                             </td>
                         </tr>
                     ))}
@@ -210,6 +223,9 @@ export default function UsersTable() {
             )}
             {selectedInstitutionUser && (
                 <InstitutionModal id={selectedInstitutionUser.id} name={selectedInstitutionUser.name} open={institutionModalOpen} closeModal={closeModal}/>
+            )}
+            {userServiceModalOpen && (
+                <UserServiceEditModal user={selectedUser!} open={serviceModalOpen} closeModal={closeModal}/>
             )}
         </>
     );

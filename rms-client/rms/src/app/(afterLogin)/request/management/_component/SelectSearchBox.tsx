@@ -1,4 +1,4 @@
-import style from "@/app/(afterLogin)/request/management/service/_component/selectSearchBox.module.css";
+import style from "@/app/(afterLogin)/request/management/_component/selectSearchBox.module.css";
 import React, {useEffect, useRef, useState} from "react";
 import {faChevronDown} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -7,13 +7,15 @@ import {getSampleTypes} from "@/app/(afterLogin)/request/management/service/_api
 import {Filter} from "@/model/Filter";
 import {SampleType} from "@/model/SampleType";
 import {getExtensions} from "@/app/(afterLogin)/request/management/service/_api/getExtensions";
+import {getServices} from "@/app/(afterLogin)/request/management/user/_api/getServices";
 
 interface Props {
-    type: 'sampleType' | 'extension';
+    type: 'sampleType' | 'extension' | 'service';
     onSelect: (option: SelectBoxOption) => void;
+    width?: string;
 }
 
-export default function SelectSearchBox({ type, onSelect }: Props) {
+export default function SelectSearchBox({ type, onSelect, width }: Props) {
     const [selectedValue, setSelectedValue] = useState<string>('');
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const [options, setOptions] = useState<SelectBoxOption[]>([]);
@@ -43,15 +45,25 @@ export default function SelectSearchBox({ type, onSelect }: Props) {
         setSelectedValue(event.target.value);
     };
 
-    const fetchSampleTypes = async () => {
+    const fetchOptions = async () => {
         setOptions([]);
         const filter: Filter = { value: selectedValue };
         let response;
-        if (type === 'sampleType') {
-            response = await getSampleTypes(filter);
-        } else {
-            response = await getExtensions(filter);
+
+        switch (type) {
+            case 'sampleType' :
+                response = await getSampleTypes(filter);
+                break;
+            case 'extension' :
+                response = await getExtensions(filter);
+                break;
+            case 'service' :
+                response = await getServices(filter);
+                break;
+            default:
+                return;
         }
+
         const data = await response.json();
         setOptions(transformDataToOptions(data));
     };
@@ -63,7 +75,7 @@ export default function SelectSearchBox({ type, onSelect }: Props) {
     };
 
     useEffect(() => {
-        fetchSampleTypes();
+        fetchOptions();
     }, [selectedValue]);
 
     useEffect(() => {
@@ -74,9 +86,9 @@ export default function SelectSearchBox({ type, onSelect }: Props) {
     }, []);
 
     return (
-        <div ref={selectBoxRef}>
+        <div ref={selectBoxRef} style={{ width }}>
             <section className={style.selectSection}>
-                <p className={style.label}>{type === 'sampleType' ? 'SampleType' : 'Extension'} </p>
+                <p className={style.label}>{type} </p>
                 <button className={`${style.btnSelect} ${isOpen ? style.open : ''}`} onClick={toggleList}>
                     <div>{selectedValue}</div>
                     <FontAwesomeIcon icon={faChevronDown}/>
@@ -89,10 +101,10 @@ export default function SelectSearchBox({ type, onSelect }: Props) {
                         className={style.searchInput}
                         placeholder="Search..."
                     />
-                    <ul className={style.listMember}>
+                    <ul className={style.listMember} style={{ width }}>
                         {options.map((option) => (
                             <li key={option.name}>
-                                <button onClick={() => handleOptionClick(option)}>
+                                <button onClick={() => handleOptionClick(option)} style={{ width }}>
                                     {option.value} / {option.name}
                                 </button>
                             </li>
