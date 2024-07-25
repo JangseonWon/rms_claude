@@ -29,7 +29,7 @@ export default function TestOption() {
             <h1>Your Testing Options</h1>
             <p>Choose one of available segments to start an order using G-Portal</p>
             <div className={style.cardContainer}>
-                {categoryData.map(category => (
+                {categoryData && categoryData.length > 0 && categoryData.map(category => (
                     <Link
                         key={category.id}
                         href={`/request/services/${category.name}/${category.order_type === 'SINGLE' ? 'single' : 'multi'}`}>

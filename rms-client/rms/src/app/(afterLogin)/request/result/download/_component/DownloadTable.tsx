@@ -23,6 +23,7 @@ export default function DownloadTable() {
     const [requestData, setRequestData] = useState<RequestWithSelected[]>([]);
     const isSelectedAll = requestData && requestData.length > 0 ? requestData.every((row) => row.isSelected) : false;
     const [totalPage, setTotalPage] = useState<number>(0);
+    const [status, setStatus] = useState<string>('-');
     const [search, setSearch] =
         useState<Paging>({filters: [], sort_by:"status", asc: true, size:5, page:1});
     const statusList = [
@@ -159,7 +160,8 @@ export default function DownloadTable() {
                             handleSearchChange({key: "date_from", value: format(from, "yyyy-MM-dd")})
                             handleSearchChange({key: "date_to", value: format(to, "yyyy-MM-dd")})
                         }}/>
-                    <SelectBox options={statusList} label={"status"} onChange={(value) => {
+                    <SelectBox options={statusList} label={"status"} value={status} onChange={(value) => {
+                        setStatus(value.value);
                         handleSearchChange({key: "status", value: value.value})
                     }}/>
                 </div>

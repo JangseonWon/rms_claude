@@ -1,0 +1,117 @@
+.container {
+    display: grid;
+    gap: 1vh;
+    margin: 3vh 3vw;
+    padding: 2vh 3vw;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+}
+.userContainer, .titleContainer, .contentContainer, .fileContainer, .commentContainer {
+    display: grid;
+    margin: 1vh 2vw;
+    gap: 1vh;
+}
+.userLabel, .titleLabel, .contentLabel, .fileLabel, .commentLabel {
+    font-weight: 700;
+    font-size: 0.8vw;
+    color: #333;
+}
+.inputUser, .inputTitle, .textareaContent, .fileInput {
+    padding: 1vh 1vw;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 0.7vw;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.fileName {
+    margin-right: 1vw;
+    cursor: pointer;
+}
+.fileName:hover {
+    color: #90BA2D;
+}
+.fileIcon {
+    margin-right: 0.2vw;
+}
+.textareaContent {
+    resize: none;
+}
+.buttonContainer {
+    margin-top: 3vh;
+    display: flex;
+    justify-content: flex-end;
+}
+.editButton, .cancelButton {
+    cursor: pointer;
+    padding: 0.8vh 1vw;
+    border: 1px solid #bbb9b7;
+    background-color: #ffffff;
+    font-size: 0.7vw;
+    color: #88837E;
+}
+.comment {
+    border-radius: 5px;
+    border: none;
+    padding: 1vh 1vw 3vh 1vw;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+}
+.commentUser {
+    border-bottom: solid 1px #bbbbbb;
+}
+.commentUserName, .commentManagerName {
+    margin: 0.5vh 0 !important;
+    font-size: 0.7vw;
+}
+.commentManagerName {
+    color: #cf5757;
+    font-weight: 600;
+}
+.commentContent {
+    margin: 0.5vh 0 !important;
+    font-size: 0.7vw;
+}
+.commentDate {
+    margin: 0.5vh 0 !important;
+    font-size: 0.5vw;
+}
+.firstCommentContainer {
+    display: flex;
+    margin-top: 2vh;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 1vh 0 1vh 1vw;
+}
+.secondCommentContainer {
+    display: grid;
+}
+.inputCommentUser {
+    font-size: 0.7vw;
+    margin: 0.5vh 0 !important;
+}
+.inputComment {
+    border: none;
+    width: 56vw;
+    font-size: 0.7vw;
+    background-color: #fff;
+    margin-bottom: 1vh;
+}
+.inputCommendButton {
+    width: 4vw;
+    margin: 0 0 0 1vw !important;
+    border-left: solid 1px #ccc;
+    border-top: none;
+    border-right: none;
+    border-bottom: none;
+    background-color: #ffffff;
+    cursor: pointer;
+}
+.editButton {
+    border-right: none;
+}
+.cancelButton {
+
+}

@@ -1,0 +1,52 @@
+.container {
+    display: grid;
+    gap: 2vh;
+    margin: 3vh 3vw;
+    padding: 2vh 3vw;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+}
+.userContainer, .titleContainer, .contentContainer, .fileContainer {
+    display: grid;
+    margin: 1vh 2vw;
+    gap: 1vh;
+}
+.userLabel, .titleLabel, .contentLabel, .fileLabel {
+    font-weight: 700;
+    font-size: 0.8vw;
+    color: #333;
+}
+.inputUser, .inputTitle, .textareaContent, .fileInput {
+    padding: 1vh 1vw;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 0.7vw;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.inputTitle, .fileInput {
+}
+.textareaContent {
+    resize: none;
+}
+.buttonContainer {
+    margin-top: 3vh;
+    display: flex;
+    justify-content: flex-end;
+}
+.addButton, .cancelButton {
+    width: 5vw;
+    cursor: pointer;
+    padding: 0.8vh 1vw;
+    border: 1px solid #bbb9b7;
+    background-color: #ffffff;
+    font-size: 0.7vw;
+    color: #88837E;
+}
+.addButton {
+    border-right: none;
+}
+.cancelButton {
+
+}
