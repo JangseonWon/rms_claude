@@ -34,9 +34,13 @@ data class User(
     val createAt: LocalDateTime,
 
     @OneToMany(mappedBy = "userId")
-    val organization: List<Organization>,
+    val organizations: List<Organization>,
     @OneToMany(mappedBy = "userId")
-    val userService: List<UserService>,
+    val userServices: List<UserService>,
     @OneToMany(mappedBy = "userId")
-    val order: List<Order>
-)
+    val orders: List<Order>,
+    @OneToMany(mappedBy = "userId")
+    val posts: List<Post>,
+    @OneToMany(mappedBy = "userId")
+    val comments: List<Comment>
+    )
