@@ -15,7 +15,7 @@ export default function Answer() {
         last_modify_at: '2024-01-03',
         title: '테스트 입니다',
         number: 1,
-        user_id: 'manager',
+        user_id: 'tlsrhkddnd',
         view: 10,
         category_id: 'update',
         content: '알라랄라라라라라\n알라랄라라라라라\n알라랄라라라라라\n알라랄라라라라라\n' +
@@ -165,6 +165,7 @@ export default function Answer() {
                 <ul className={style.fileInput}>
                     {postData.file.map((file, index) => (
                         <span
+                            key={index}
                             className={style.fileName}
                             onClick={() => handleFileNameClick(file.id)}
                         >

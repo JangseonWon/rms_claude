@@ -81,7 +81,7 @@ export default function InstitutionTable() {
 
         setOrganizationData(data as Organization[]);
         setTotalPage(totalPage);
-    }, [session?.user?.id]);
+    }, []);
 
     useEffect(() => {
         setOrganizationData([]);
