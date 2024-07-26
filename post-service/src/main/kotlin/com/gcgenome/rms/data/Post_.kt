@@ -30,7 +30,7 @@ data class Post_(
     @JsonProperty("post_category_id")
     val postCategoryId: UUID,
     @JsonProperty("files")
-    val files: Array<File_>,
+    val files: Array<File_>?,
     @JsonProperty("comments")
-    val comments: Array<Comment>,
+    val comments: Array<Comment>?,
 )

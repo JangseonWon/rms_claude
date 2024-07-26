@@ -18,6 +18,8 @@ dependencies {
     implementation(libs.spring.security)
     implementation(project(":authentication"))
     jooqGenerator("org.postgresql:postgresql:42.6.0")
+    implementation("software.amazon.awssdk:s3:2.20.118")
+    implementation("software.amazon.awssdk:netty-nio-client:2.20.117")
 }
 jib {
     from { image = "eclipse-temurin:17.0.7_7-jre-jammy" }

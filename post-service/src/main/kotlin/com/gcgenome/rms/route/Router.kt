@@ -30,8 +30,11 @@ class Router (
     private fun selectPostSearch(request: ServerRequest): Mono<ServerResponse> {
         return authenticationHandler.principal(request)
             .flatMap { request.bodyToMono(Query::class.java) }
-            .flatMap { serviceHandler.getPostAll(it).collectList() }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
+            .flatMap { serviceHandler.getPostAll(it.copy(page= it.page -1 )) }
+            .flatMap { ServerResponse.ok()
+                .header("X-Total-Page", it.totalPage.toString())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(it) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
             .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }

@@ -14,6 +14,7 @@ on:
       - cart-service/**
       - lims-service/**
       - api/**
+      - post-service/**
 permissions: write-all
 jobs:
   extract:
@@ -40,6 +41,7 @@ jobs:
           "$module_name" == "cart-service" ||
           "$module_name" == "lims-service" ||
           "$module_name" == "api" ||
+          "$module_name" == "post-service" ||
           "$module_name" == "product-service" ]] && module_names+=("$module_name")
           done
           module_names=($(printf '%s\n' "${module_names[@]}" | sort -u))

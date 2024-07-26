@@ -2,6 +2,7 @@ package com.gcgenome.rms.service
 
 import com.gcgenome.rms.auth.ManagerAuthenticationHandler
 import com.gcgenome.rms.dao.PostDao
+import com.gcgenome.rms.data.Page
 import com.gcgenome.rms.data.Post_
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.exceptions.FilterOperatorNotFoundException
@@ -11,7 +12,6 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.jooq.impl.DSL.field
 import org.springframework.stereotype.Component
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.util.*
 
@@ -20,10 +20,22 @@ class ServiceHandler(
     val dslContext: DSLContext,
     private val managerAuthenticationHandler: ManagerAuthenticationHandler
 ): PostDao {
+    fun pageCount(query: Query, totalCount: Int) : Int{
+        var totalPage = totalCount / query.size
+        if (totalCount % query.size != 0) totalPage++
+        return totalPage
+    }
 
-    fun getPostAll(query: Query): Flux<Post_> {
+    fun getPostAll(query: Query):  Mono<Page<Post_>> {
         val whereClause = buildWhereClause(query.filters)
-        return Flux.from(dslContext.selectPostAll(query, whereClause))
+        val postData = dslContext.selectPostAll(query, whereClause)
+        return dslContext.selectPostCount(query, whereClause)
+            .flatMap { totalCount ->
+                postData.collectList().flatMap { list ->
+                    val page = Page(totalCount, pageCount(query, totalCount), query.size, query.page + 1, list)
+                    Mono.just(page)
+                }
+            }
     }
 
     fun getPostByPostId(postId: UUID): Mono<Post_> {

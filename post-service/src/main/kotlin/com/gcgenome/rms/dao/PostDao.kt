@@ -115,4 +115,11 @@ interface PostDao{
                 .where(POST.ID.eq(postId))
         ).map { it.into(Post_::class.java) }
     }
+
+    fun DSLContext.selectPostCount(query: Query, whereClause: Condition?): Mono<Int> {
+        return Mono.from(
+            select(count())
+                .from(POST).where(whereClause)
+        ).map { it.component1() }
+    }
 }
