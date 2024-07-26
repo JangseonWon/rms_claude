@@ -2,7 +2,7 @@ rootProject.name = "rms"
 
 include("entity")
 include("management-service")
-//include("alis-api")
+include("alis-api")
 include("lims-service")
 include("alis-sync")
 include("api")
@@ -13,6 +13,8 @@ include("order-service")
 include("authentication")
 include("dashboard-service")
 include("cart-service")
+include("alis-service")
+include("post-service")
 
 
 dependencyResolutionManagement {

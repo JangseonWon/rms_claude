@@ -88,7 +88,7 @@ export default function PostTable() {
                 <div className={style.filterContainerLeft}>
                     <select className={style.selectSearchKey} onChange={handleSearchKeyChange}>
                         <option value="title">Title</option>
-                        <option value="content">Content</option>
+                        <option value="user_id">User</option>
                     </select>
                 </div>
                 <div className={style.filterContainerRight}>

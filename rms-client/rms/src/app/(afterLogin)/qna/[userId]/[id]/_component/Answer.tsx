@@ -14,7 +14,6 @@ export default function Answer() {
         create_at: '2024-01-01',
         last_modify_at: '2024-01-03',
         title: '테스트 입니다',
-        number: 1,
         user_id: 'tlsrhkddnd',
         view: 10,
         category_id: 'update',
