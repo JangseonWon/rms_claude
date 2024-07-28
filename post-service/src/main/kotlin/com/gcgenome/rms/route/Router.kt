@@ -23,8 +23,8 @@ class Router (
 ) {
     @Bean
     fun route() = router {
-        POST("/w-api/post_service/post/search", ::selectPostSearch)
-        GET("/w-api/post_service/post/{post_id}", ::selectPostByPostId)
+        POST("/w-api/post-service/post/search", ::selectPostSearch)
+        GET("/w-api/post-service/post/{post_id}", ::selectPostByPostId)
     }
 
     private fun selectPostSearch(request: ServerRequest): Mono<ServerResponse> {
