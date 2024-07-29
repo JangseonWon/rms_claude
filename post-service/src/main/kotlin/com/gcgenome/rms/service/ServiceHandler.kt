@@ -1,11 +1,13 @@
 package com.gcgenome.rms.service
 
 import com.gcgenome.rms.auth.ManagerAuthenticationHandler
+import com.gcgenome.rms.dao.CommentDao
 import com.gcgenome.rms.dao.PostDao
 import com.gcgenome.rms.data.Page
 import com.gcgenome.rms.data.Post_
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.exceptions.FilterOperatorNotFoundException
+import com.gcgenome.rms.tables.pojos.Comment
 import com.gcgenome.rms.tables.references.POST
 import org.jooq.Condition
 import org.jooq.DSLContext
@@ -19,7 +21,7 @@ import java.util.*
 class ServiceHandler(
     val dslContext: DSLContext,
     private val managerAuthenticationHandler: ManagerAuthenticationHandler
-): PostDao {
+): PostDao, CommentDao {
     fun pageCount(query: Query, totalCount: Int) : Int{
         var totalPage = totalCount / query.size
         if (totalCount % query.size != 0) totalPage++
@@ -40,6 +42,10 @@ class ServiceHandler(
 
     fun getPostByPostId(postId: UUID): Mono<Post_> {
         return Mono.from(dslContext.selectPostById(postId))
+    }
+
+    fun insertPostComment(comment: Comment): Mono<Comment> {
+        return Mono.from(dslContext.insertComment(comment))
     }
 
     fun buildWhereClause(filters:List<Query.Companion.Filter>?) : Condition {

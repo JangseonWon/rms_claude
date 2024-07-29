@@ -1,6 +1,6 @@
 "use client"
 
-import React, {useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import style from "./postTable.module.css";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -9,38 +9,39 @@ import {Paging} from "@/model/Paging";
 import {Post} from "@/model/Post";
 import {useRouter} from "next/navigation";
 import {faComment} from "@fortawesome/free-regular-svg-icons";
+import {getPostSearch} from "@/app/(afterLogin)/qna/_api/getPostSearch";
+
+const categoryMap: { [key: string]: string } = {
+    "f9476263-f8b2-4ff9-b5f9-ed680715401e": "update",
+    "7cefa58c-d85b-4f9e-82ff-dc46ba953e27": "bug",
+    "f1d0a814-8c90-4103-bbd5-6c0e54d37808": "question",
+};
 
 export default function PostTable() {
-    const postTestData: Post[] = [
-        {id: '6e521e46-0686-40b2-a190-9270e69a059e', create_at: '2024-01-01', last_modify_at: '2024-01-01', content: '', title: 'Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10', user_id: 'John Doe', category_id: 'update', read: false, comment: [{id:'1'},{id:'1'},{id:'1'},{id:'1'}]},
-        {id: '40fa0256-0784-4272-81fe-2cb32a2c6686', create_at: '2024-01-02', last_modify_at: '2024-01-02', content: '', title: 'Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10', user_id: 'Jane Smith', category_id: 'bug', read: false, comment: [{id:'1'}, {id:'1'}, {id:'1'}]},
-        {id: '49adc8e4-0dd2-4ca0-a174-eb8515c6d616', create_at: '2024-01-03', last_modify_at: '2024-01-03', content: '', title: 'Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10', user_id: 'Alice Johnson', category_id: 'question', read: true, comment: [{id:'1'}, {id:'1'}]},
-        {id: '383f3665-7bf0-489e-979f-06911a57656b', create_at: '2024-01-04', last_modify_at: '2024-01-04', content: '', title: 'Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10', user_id: 'Bob Brown', category_id: 'question', read: false, comment: [{id:'1'}, {id:'1'}, {id:'1'}, {id:'1'}]},
-        {id: '2f008a39-e9a8-40d3-81d0-f026bf0c297c', create_at: '2024-01-05', last_modify_at: '2024-01-05', content: '', title: 'Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10', user_id: 'Charlie White', category_id: 'question', read: false, comment: [{id:'1'}, {id:'1'}]},
-        {id: '9b0c50bf-8153-4052-b8c2-1e42f893f8ab', create_at: '2024-01-06', last_modify_at: '2024-01-06', content: '', title: 'Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10', user_id: 'David Green', category_id: 'bug', read: false, comment: []},
-        {id: '2ec25ff8-b7bc-49a2-8382-88c1d482b20e', create_at: '2024-01-07', last_modify_at: '2024-01-07', content: '', title: 'Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10', user_id: 'Eve Black', category_id: 'question', read: false, comment: [{id:'1'}, {id:'1'}]},
-        {id: '4e8f9aaf-1d8f-4b32-a99f-ddaad1d15ade', create_at: '2024-01-08', last_modify_at: '2024-01-08', content: '', title: 'Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10', user_id: 'Frank Blue', category_id: 'question', read: false, comment: [{id:'1'}, {id:'1'}, {id:'1'}, {id:'1'}, {id:'1'}]},
-        {id: '66b52543-0709-459d-b691-5a66a02fbce6', create_at: '2024-01-09', last_modify_at: '2024-01-09', content: '', title: 'Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10', user_id: 'Grace Red', category_id: 'question', read: false, comment: [{id:'1'}, {id:'1'}]},
-        {id: '0acb89e5-7950-4242-8a62-856887d91272', create_at: '2024-01-10', last_modify_at: '2024-01-10', content: '', title: 'Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10', user_id: 'Hank Yellow', category_id: 'question', read: true, comment: [{id:'1'}]},
-        {id: '6e521e46-0686-40b2-a190-9270e69a059e', create_at: '2024-01-01', last_modify_at: '2024-01-01', content: '', title: 'Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10', user_id: 'John Doe', category_id: 'update', read: false, comment: [{id:'1'}]},
-        {id: '40fa0256-0784-4272-81fe-2cb32a2c6686', create_at: '2024-01-02', last_modify_at: '2024-01-02', content: '', title: 'Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10', user_id: 'Jane Smith', category_id: 'bug', read: false, comment: [{id:'1'}, {id:'1'}, {id:'1'}]},
-        {id: '49adc8e4-0dd2-4ca0-a174-eb8515c6d616', create_at: '2024-01-03', last_modify_at: '2024-01-03', content: '', title: 'Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10', user_id: 'Alice Johnson', category_id: 'question', read: false, comment: [{id:'1'}]},
-        {id: '383f3665-7bf0-489e-979f-06911a57656b', create_at: '2024-01-04', last_modify_at: '2024-01-04', content: '', title: 'Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10 Test Post 10', user_id: 'Bob Brown', category_id: 'question', read: false, comment: [{id:'1'}]},
-    ];
 
     const router = useRouter();
     const [postData, setPostData] = useState<Post[]>([]);
     const [totalPage, setTotalPage] = useState<number>(4);
     const [search, setSearch] =
-        useState<Paging>({filters: [], sort_by:"date", asc: true, size:14, page:1});
-    const [searchKey, setSearchKey] = useState<string>("service_id");
+        useState<Paging>({filters: [], sort_by:"create_at", asc: false, size:14, page:1});
+    const [searchKey, setSearchKey] = useState<string>("title");
     const [searchValue, setSearchValue] = useState<string>("");
+    const [pageRange, setPageRange] = useState<{ start: number, end: number }>({ start: 1, end: 10 });
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return new Intl.DateTimeFormat("en-CA").format(date);
+    };
 
     const handlePageChange = (newPageNumber: number) => {
-        setSearch(prevPage =>({
+        setSearch(prevPage => ({
             ...prevPage,
             page: newPageNumber
         }));
+        if (newPageNumber < pageRange.start || newPageNumber > pageRange.end) {
+            const newStart = Math.floor((newPageNumber - 1) / 10) * 10 + 1;
+            setPageRange({ start: newStart, end: newStart + 9 });
+        }
     };
 
     const handleSearchChange = (newFilter: { key: string; value: string }) => {
@@ -50,6 +51,7 @@ export default function PostTable() {
             filters: [filterWithOperator],
             page:1
         }));
+        setPageRange({ start: 1, end: 10 });
     };
 
     const handleSearchKeyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -68,7 +70,7 @@ export default function PostTable() {
 
     const renderPageNumbers = () => {
         const pageNumbers = [];
-        for (let i = 1; i <= totalPage; i++) {
+        for (let i = pageRange.start; i <= pageRange.end && i <= totalPage; i++) {
             pageNumbers.push(
                 <button
                     key={i}
@@ -81,6 +83,21 @@ export default function PostTable() {
         }
         return pageNumbers;
     };
+
+    const fetchData = useCallback(async (search: Paging) => {
+        const response = await getPostSearch(search);
+        const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
+        const responseData = await response.json();
+        const data = responseData.data;
+
+        setPostData(data as Post[]);
+        setTotalPage(totalPage);
+    }, []);
+
+    useEffect(() => {
+        setPostData([]);
+        fetchData(search)
+    }, [search]);
 
     return (
         <>
@@ -110,11 +127,13 @@ export default function PostTable() {
                     </tr>
                     </thead>
                     <tbody>
-                    {postTestData && postTestData.length > 0 && postTestData.map((row, rowIndex) => (
+                    {postData && postData.length > 0 && postData.map((row, rowIndex) => (
                         <tr key={rowIndex} onClick={() => handleRowClick(row, row.user_id)}>
                             <td>
                                 <span
-                                className={`${style.category} ${style[`category-${row.category_id}`]}`}>{row.category_id}
+                                  className={`${style.category} ${style[`category-${categoryMap[row.post_category_id]}`]}`}
+                                >
+                                    {categoryMap[row.post_category_id] || row.post_category_id}
                                 </span>
                             </td>
                             <td className={style.titleTd}>
@@ -122,11 +141,11 @@ export default function PostTable() {
                             </td>
                             <td className={style.newAndComment}>
                                 <FontAwesomeIcon className={style.commentIcon} icon={faComment}/>
-                                {row.comment.length}
+                                {row.comments && row.comments.length > 0 ? row.comments.length : 0}
                                 {row.read && <span className={style.new}>New</span>}
                             </td>
                             <td>{row.user_id}</td>
-                            <td>{row.create_at}</td>
+                            <td>{formatDate(row.create_at)}</td>
                         </tr>
                     ))}
                     </tbody>

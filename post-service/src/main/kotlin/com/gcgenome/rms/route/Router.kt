@@ -5,6 +5,7 @@ import com.gcgenome.rms.auth.ManagerAuthenticationHandler
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.exceptions.AuthenticationNotFoundException
 import com.gcgenome.rms.service.ServiceHandler
+import com.gcgenome.rms.tables.pojos.Comment
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
@@ -25,6 +26,7 @@ class Router (
     fun route() = router {
         POST("/w-api/post-service/post/search", ::selectPostSearch)
         GET("/w-api/post-service/post/{post_id}", ::selectPostByPostId)
+        POST("/w-api/post-service/post/comment", ::insertPostComment)
     }
 
     private fun selectPostSearch(request: ServerRequest): Mono<ServerResponse> {
@@ -44,6 +46,16 @@ class Router (
         val postId = UUID.fromString(request.pathVariable("post_id"))
         return authenticationHandler.principal(request)
             .flatMap { serviceHandler.getPostByPostId(postId) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
+    }
+
+    private fun insertPostComment(request: ServerRequest): Mono<ServerResponse> {
+        return authenticationHandler.principal(request)
+            .flatMap { request.bodyToMono(Comment::class.java) }
+            .flatMap { serviceHandler.insertPostComment(it) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }

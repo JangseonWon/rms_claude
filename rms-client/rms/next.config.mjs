@@ -30,6 +30,10 @@ const nextConfig = {
                 source: '/w-api/cart-service/:path*',
                 destination: `https://rms-test.gcgenome.com/w-api/cart-service/:path*`,
             },
+            {
+                source: '/w-api/post-service/:path*',
+                destination: `https://rms-test.gcgenome.com/w-api/post-service/:path*`,
+            },
         ];
     },
     output: 'standalone',

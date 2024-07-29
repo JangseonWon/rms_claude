@@ -1,73 +1,40 @@
 'use client';
 
 import style from './answer.module.css';
-import {useRouter} from "next/navigation";
+import {usePathname, useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
-import React, {ChangeEvent, useState} from "react";
-import {faComment, faFile, faFilePdf, faImage} from "@fortawesome/free-regular-svg-icons";
+import React, {ChangeEvent, useCallback, useEffect, useState} from "react";
+import {faFile, faFilePdf, faImage} from "@fortawesome/free-regular-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {Post} from "@/model/Post";
+import {getPostId} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/getPostId";
+import {PostComment} from "@/model/PostComment";
+import {fetchComment} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/fetchComment";
 
 export default function Answer() {
-    //api 호출해서 정보 가져올거임
-    const initialPostData = {
-        id: '6e521e46-0686-40b2-a190-9270e69a059e',
-        create_at: '2024-01-01',
-        last_modify_at: '2024-01-03',
-        title: '테스트 입니다',
-        user_id: 'tlsrhkddnd',
-        view: 10,
-        category_id: 'update',
-        content: '알라랄라라라라라\n알라랄라라라라라\n알라랄라라라라라\n알라랄라라라라라\n' +
-            '알라랄라라라라라\n알라랄라라라라라\n알라랄라라라라라\n알라랄라라라라라\n' +
-            '알라랄라라라라라\n알라랄라라라라라\n알라랄라라라라라\n알라랄라라라라라\n' +
-            '알라랄라라라라라\n알라랄라라라라라\n알라랄라라라라라\n알라랄라라라라라\n' +
-            '알라랄라라라라라\n알라랄라라라라라\n알라랄라라라라라\n알라랄라라라라라\n' +
-            '알라랄라라라라라\n알라랄라라라라라\n알라랄라라라라라\n알라랄라라라라라\n',
-        file: [
-            {
-                id: '3',
-                path: '/test/test1/test3',
-                name: 'test1.xls',
-                create_at: '2024.07.11 14:28:16'
-            },
-            {
-                id: '2',
-                path: '/test/test1/test3',
-                name: 'test2.pdf',
-                create_at: '2024.07.11 14:30:21'
-            },
-            {
-                id: '1',
-                path: '/test/test1/test3',
-                name: 'test2.img',
-                create_at: '2024.07.11 14:32:22'
-            },
-        ],
-        comment: [
-            {
-                user_id: 'manager',
-                create_at: '2024.07.11 14:28:16',
-                content: '첫번째'
-            },
-            {
-                user_id: 'tlsrhkddnd',
-                create_at: '2024.07.11 14:30:21',
-                content: '두번째'
-            },
-            {
-                user_id: 'user',
-                create_at: '2024.07.11 14:32:22',
-                content: '세번째'
-            }
-        ]
+    const defaultPostData: Post = {
+        id: '',
+        create_at: '',
+        last_modify_at: '',
+        title: '',
+        user_id: '',
+        post_category_id: '',
+        content: '',
+        files: [],
+        comments: [],
+        read: false
     };
 
-    const [postData, setPostData] = useState(initialPostData);
+    const [postData, setPostData] = useState<Post>(defaultPostData);
     const [commentData, setCommentData] = useState('');
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    const [writerCheck, setWriterCheck] = useState(false);
     const route = useRouter();
     const { data: session } = useSession();
-    const writerCheck = session?.user.id === postData.user_id;
+
+    const pathname = usePathname();
+    const pathSegments = pathname.split('/');
+    const postId = decodeURIComponent(pathSegments.pop() || '');
 
     const renderFileIcon = (fileName: string) => {
         const fileExtension = fileName.split('.').pop()?.toLowerCase();
@@ -85,6 +52,26 @@ export default function Answer() {
                 return <FontAwesomeIcon className={style.fileIcon} icon={faFile}/>;
         }
     }
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+
+        const options: Intl.DateTimeFormatOptions = {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true,
+            weekday: 'long',
+        };
+        return date.toLocaleString('en-US', options);
+    }
+
+    const formatContentForTextarea = (content: string) => {
+        return content.replace(/\\n/g, '\n').replace(/^'|'$/g, '');
+    };
 
     const editButtonClick = () => {
         if (writerCheck) {
@@ -125,18 +112,43 @@ export default function Answer() {
         alert(id + '파일 다운로드');
     }
 
+    const handleCommentClick = async () => {
+        const comment : PostComment = {
+            post_id: postId,
+            content: commentData,
+            user_id: session?.user.id
+        }
+        await fetchComment(comment);
+        fetchData();
+    }
+
+    const fetchData = useCallback(async () => {
+        const response = await getPostId(postId);
+        const data = await response.json();
+        setPostData(data as Post);
+        if (data) {
+            if (session?.user?.id === data.user_id) {
+                setWriterCheck(true);
+            }
+        }
+    }, [postId, session?.user?.id]);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+
     return (
         <div className={style.container}>
             <section className={style.userContainer}>
                 <label className={style.userLabel}>User</label>
-                <label className={style.inputUser}>{postData.user_id}</label>
+                <label className={style.inputUser}>{postData?.user_id}</label>
             </section>
             <section className={style.titleContainer}>
                 <label className={style.titleLabel}>Title</label>
                 <input
                     className={style.inputTitle}
                     name={'title'}
-                    value={postData.title}
+                    value={postData?.title}
                     onChange={handleInputChange}
                     readOnly={!writerCheck}
                 />
@@ -147,7 +159,7 @@ export default function Answer() {
                     rows={30}
                     name={'content'}
                     className={style.textareaContent}
-                    value={postData.content}
+                    value={formatContentForTextarea(postData.content || '')}
                     onChange={handleTextareaChange}
                     readOnly={!writerCheck}
                 ></textarea>
@@ -162,7 +174,7 @@ export default function Answer() {
                     />
                 )}
                 <ul className={style.fileInput}>
-                    {postData.file.map((file, index) => (
+                    {postData?.files?.map((file, index) => (
                         <span
                             key={index}
                             className={style.fileName}
@@ -177,13 +189,13 @@ export default function Answer() {
             <section className={style.commentContainer}>
                 <label className={style.commentLabel}>Comment</label>
                 <div className={style.comment}>
-                    {postData.comment.map((comment, index) => (
+                    {postData?.comments?.map((comment, index) => (
                         <div key={index} className={style.commentUser}>
                             <p className={comment.user_id === 'manager' ? style.commentManagerName : style.commentUserName}>
                                 {comment.user_id}
                             </p>
                             <p className={style.commentContent}>{comment.content}</p>
-                            <p className={style.commentDate}>{comment.create_at}</p>
+                            <p className={style.commentDate}>{formatDate(comment.create_at ?? '')}</p>
                         </div>
                     ))}
                     <div className={style.firstCommentContainer}>
@@ -196,7 +208,7 @@ export default function Answer() {
                                 onChange={handleCommentChange}
                             />
                         </div>
-                        <button className={style.inputCommendButton}>
+                        <button className={style.inputCommendButton} onClick={handleCommentClick}>
                             Comment
                         </button>
                     </div>

@@ -1,3 +1,5 @@
+import {PostComment} from "@/model/PostComment";
+
 export interface Post {
     id: string;
     title: string;
@@ -6,10 +8,14 @@ export interface Post {
     last_modify_at: string;
     read: boolean;
     user_id: string;
-    category_id: string;
-    comment: Comment[];
+    post_category_id: string;
+    files?: Files[];
+    comments?: PostComment[];
 }
 
-interface Comment {
+interface Files {
     id: string;
+    path: string;
+    name: string;
+    create_at: string;
 }

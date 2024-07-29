@@ -106,7 +106,7 @@ interface PostDao{
                                 key("user_id").value(COMMENT.USER_ID),
                                 key("post_id").value(COMMENT.POST_ID),
                             )
-                        )
+                        ).orderBy(COMMENT.CREATE_AT.asc())
                     ).from(COMMENT)
                         .where(COMMENT.POST_ID.eq(POST.ID))
                 ).`as`("comments"),
