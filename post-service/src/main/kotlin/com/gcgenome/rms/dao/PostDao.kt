@@ -5,6 +5,7 @@ import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.tables.references.COMMENT
 import com.gcgenome.rms.tables.references.POST
 import com.gcgenome.rms.tables.references.POST_FILE
+import com.gcgenome.rms.tables.references.USER
 import org.jooq.Condition
 import org.jooq.DSLContext
 import org.jooq.SortOrder
@@ -30,8 +31,16 @@ interface PostDao{
                 POST.CREATE_AT,
                 POST.LAST_MODIFY_AT,
                 POST.READ,
-                POST.USER_ID,
                 POST.POST_CATEGORY_ID,
+                field(
+                    select(
+                        jsonObject(
+                            key("id").value(USER.ID),
+                            key("name").value(USER.NAME)
+                        )
+                    ).from(USER)
+                        .where(USER.ID.eq(POST.USER_ID))
+                ).`as`("user"),
                 field(
                     select(
                         jsonArrayAgg(
@@ -79,8 +88,16 @@ interface PostDao{
                 POST.CREATE_AT,
                 POST.LAST_MODIFY_AT,
                 POST.READ,
-                POST.USER_ID,
                 POST.POST_CATEGORY_ID,
+                field(
+                    select(
+                        jsonObject(
+                            key("id").value(USER.ID),
+                            key("name").value(USER.NAME)
+                        )
+                    ).from(USER)
+                        .where(USER.ID.eq(POST.USER_ID))
+                ).`as`("user"),
                 field(
                     select(
                         jsonArrayAgg(

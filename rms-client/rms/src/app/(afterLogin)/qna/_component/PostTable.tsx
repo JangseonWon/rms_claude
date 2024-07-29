@@ -12,9 +12,10 @@ import {faComment} from "@fortawesome/free-regular-svg-icons";
 import {getPostSearch} from "@/app/(afterLogin)/qna/_api/getPostSearch";
 
 const categoryMap: { [key: string]: string } = {
-    "f9476263-f8b2-4ff9-b5f9-ed680715401e": "update",
-    "7cefa58c-d85b-4f9e-82ff-dc46ba953e27": "bug",
-    "f1d0a814-8c90-4103-bbd5-6c0e54d37808": "question",
+    "f9476263-f8b2-4ff9-b5f9-ed680715401e": "Service",
+    "7cefa58c-d85b-4f9e-82ff-dc46ba953e27": "Bug",
+    "f1d0a814-8c90-4103-bbd5-6c0e54d37808": "Result",
+    "f86a9106-e431-4649-a4f9-c61e73ec7bab": "Others",
 };
 
 export default function PostTable() {
@@ -30,7 +31,11 @@ export default function PostTable() {
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
-        return new Intl.DateTimeFormat("en-CA").format(date);
+        return new Intl.DateTimeFormat("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+        }).format(date);
     };
 
     const handlePageChange = (newPageNumber: number) => {
@@ -119,19 +124,21 @@ export default function PostTable() {
                 <table className={style.table}>
                     <thead>
                     <tr>
+                        <th className={style.state}>State</th>
                         <th className={style.category}>Category</th>
                         <th className={style.title}>Title</th>
                         <th/>
-                        <th className={style.user}>User</th>
+                        <th className={style.user}>User Name</th>
                         <th className={style.date}>Date</th>
                     </tr>
                     </thead>
                     <tbody>
                     {postData && postData.length > 0 && postData.map((row, rowIndex) => (
-                        <tr key={rowIndex} onClick={() => handleRowClick(row, row.user_id)}>
+                        <tr key={rowIndex} onClick={() => handleRowClick(row, row.user?.id!)}>
+                            <td>{row.read ? 'To Be Confirmed' : 'Finished'}</td>
                             <td>
                                 <span
-                                  className={`${style.category} ${style[`category-${categoryMap[row.post_category_id]}`]}`}
+                                    className={`${style.category} ${style[`category-${categoryMap[row.post_category_id]}`]}`}
                                 >
                                     {categoryMap[row.post_category_id] || row.post_category_id}
                                 </span>
@@ -144,7 +151,7 @@ export default function PostTable() {
                                 {row.comments && row.comments.length > 0 ? row.comments.length : 0}
                                 {row.read && <span className={style.new}>New</span>}
                             </td>
-                            <td>{row.user_id}</td>
+                            <td>{row.user?.name}</td>
                             <td>{formatDate(row.create_at)}</td>
                         </tr>
                     ))}

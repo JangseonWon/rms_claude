@@ -83,14 +83,17 @@
     font-weight: 700;
     border: none;
 }
-.category-bug {
+.category-Bug {
     color: #cd4855;
 }
-.category-update {
+.category-Result {
     color: #007bff;
 }
-.category-question {
+.category-Service {
     color: #28a745;
+}
+.category-Service {
+    color: #a75928;
 }
 .newAndComment {
     display: flex;
@@ -113,7 +116,7 @@
     border-radius: 18px;
     background-color: #cd4855;
 }
-.number .view .category {
+.number .view .category .state {
     width: 2vw;
 }
 .user .date {

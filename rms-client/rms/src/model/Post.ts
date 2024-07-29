@@ -1,4 +1,5 @@
 import {PostComment} from "@/model/PostComment";
+import {User} from "@/model/User";
 
 export interface Post {
     id: string;
@@ -7,7 +8,7 @@ export interface Post {
     create_at: string;
     last_modify_at: string;
     read: boolean;
-    user_id: string;
+    user?: User;
     post_category_id: string;
     files?: Files[];
     comments?: PostComment[];

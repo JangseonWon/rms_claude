@@ -17,7 +17,6 @@ export default function Answer() {
         create_at: '',
         last_modify_at: '',
         title: '',
-        user_id: '',
         post_category_id: '',
         content: '',
         files: [],
@@ -120,6 +119,7 @@ export default function Answer() {
         }
         await fetchComment(comment);
         fetchData();
+        setCommentData('');
     }
 
     const fetchData = useCallback(async () => {
@@ -141,7 +141,7 @@ export default function Answer() {
         <div className={style.container}>
             <section className={style.userContainer}>
                 <label className={style.userLabel}>User</label>
-                <label className={style.inputUser}>{postData?.user_id}</label>
+                <label className={style.inputUser}>{postData.user?.name}</label>
             </section>
             <section className={style.titleContainer}>
                 <label className={style.titleLabel}>Title</label>
@@ -202,6 +202,7 @@ export default function Answer() {
                         <div className={style.secondCommentContainer}>
                             <p className={style.inputCommentUser}>{session?.user.id}</p>
                             <textarea
+                                value={commentData}
                                 rows={5}
                                 className={style.inputComment}
                                 name={'comment'}
