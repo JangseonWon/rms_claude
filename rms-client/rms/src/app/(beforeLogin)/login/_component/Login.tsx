@@ -30,13 +30,17 @@ export default function Login() {
                 redirect: false,
             });
             if (response?.error !== null || !response.ok) {
-                throw new Error('아이디나 비밀번호가 일치하지 않습니다.');
+                // throw new Error('G-Portal is available only to those who have a contractual relationship with GC Genome. \n' +
+                //     'If you are a medical professional or distributor, please contact us at the email address below.\n');
             } else {
                 router.replace('/home');
             }
         } catch (err) {
             console.error(err);
-            setMessage('아이디나 비밀번호가 일치하지 않습니다.');
+            setMessage('G-Portal is available only to those who have a contractual relationship with GC Genome. \n' +
+                'If you are a medical professional or distributor, please contact us at the email address below.\n' +
+                '\n'+
+            'info@gcgenome.com\n');
             setShowAlertDialog(true);
             setIcon('error');
         } finally {

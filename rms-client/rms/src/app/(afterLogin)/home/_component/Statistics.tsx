@@ -32,12 +32,7 @@ export default function Statistics() {
     return (
         <div className={style.container}>
             <div className={style.line}></div>
-            <h1>Need more help?
-                <span>
-                    <Link href={"/qna"}>
-                    <button>Go to QnA</button>
-                    </Link>
-                </span>
+            <h1>Dashboard
             </h1>
             <div className={style.cardContainer}>
                 {statisticsCards.map((card) => (

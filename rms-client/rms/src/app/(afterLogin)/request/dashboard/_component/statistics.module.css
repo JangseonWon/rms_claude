@@ -5,14 +5,17 @@
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 .titleContainer{
-    display: flex;
+    display: grid;
     justify-content: space-between;
     align-items: stretch;
+    gap: 10%;
+    padding: 2vh 0 4vh 0;
 }
 .mainTitle{
     color: #002b49;
     font-size: 2.5vw;
     font-weight: 800;
+    text-shadow: 2px 2px 2px #b6b6b6;
 }
 .subTitle {
     align-self: flex-end;

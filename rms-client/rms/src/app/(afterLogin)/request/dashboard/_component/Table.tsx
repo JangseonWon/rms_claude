@@ -122,31 +122,33 @@ export default function Table() {
             <table className={style.table}>
                 <thead>
                 <tr>
+                    <th>Order Date</th>
                     <th>Registration ID</th>
-                    <th>User Name</th>
                     <th>Institution</th>
-                    <th>Service</th>
                     <th>Patient(s) Name</th>
+                    <th>Service</th>
                     <th>MRN</th>
                     <th>Patient BOD</th>
                     <th>Current Status</th>
-                    <th>Order Date</th>
+                    <th>Report Date</th>
+                    <th>User Name</th>
                 </tr>
                 </thead>
                 <tbody>
                 {requestData && requestData.length > 0 && requestData.map((row) => (
                     <tr key={`${row.order_id}${row.sample?.id}${row.service!.id}`}>
+                        <td>{row.create_at ? format(new Date(row.create_at), "yyyy-MMM-dd") : '-'}</td>
                         <td>{row.sample!.barcode}</td>
-                        <td>{row.sample!.patient!.organization!.user!.id}</td>
                         <td>{row.sample!.patient!.organization!.id}</td>
-                        <td>{row.service!.name}</td>
                         <td>{row.sample!.patient!.name}</td>
+                        <td>{row.service!.name}</td>
                         <td>{row.sample!.patient!.serial}</td>
                         <td>{row.sample?.patient ?
                             formatDate(row.sample.patient.birth_year, row.sample.patient.birth_month, row.sample.patient.birth_day) : '-'}
                         </td>
                         <td>{row.status}</td>
-                        <td>{row.create_at ? format(new Date(row.create_at), "yyyy-MMM-dd") : '-'}</td>
+                        <td>report date</td>
+                        <td>{row.sample!.patient!.organization!.user!.name}</td>
                     </tr>
                 ))}
                 </tbody>

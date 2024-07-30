@@ -7,10 +7,10 @@ export default function MainImage() {
         <div className={style.imageContainer}>
             <Image src={homeMainImg} alt={"genome"}/>
             <div className={style.text}>
-                <p className={style.mainText}>The Smart Solution</p>
-                <p className={style.mainText}>For Rare Disease Testing</p>
-                <p className={style.subText}>OUR DIAGNOSTIC SOLUTIONS ARE MORE THAN</p>
-                <p className={style.subText}>LABORATORY AND BIOINFORMATICS</p>
+                <p className={style.mainText}>Care to Cure, We make it happen</p>
+                <p className={style.subText}>We are dedicated to connect the care and cure to the</p>
+                <p className={style.subText}>world by providing genetic diagnosis</p>
+                <p className={style.subText}>and suggesting personalized treatment for longer and healthier lives.</p>
             </div>
         </div>
     )

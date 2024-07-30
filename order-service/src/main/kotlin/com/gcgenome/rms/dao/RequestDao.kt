@@ -92,9 +92,14 @@ interface RequestDao {
                                     key("type").value(ORGANIZATION.TYPE),
                                     key("registration_number").value(ORGANIZATION.REGISTRATION_NUMBER),
                                     key("nursing_number").value(ORGANIZATION.NURSING_NUMBER),
-                                    key("user").value(jsonObject(
-                                        key("id").value(ORGANIZATION.USER_ID)
-                                    ))
+                                    key("user").value(
+                                        select(
+                                            jsonObject(
+                                                key("id").value(USER.ID),
+                                                key("name").value(USER.NAME)
+                                            )
+                                        ).from(USER).where(ORGANIZATION.USER_ID.eq(USER.ID))
+                                    )
                                 )
                             )
                         )

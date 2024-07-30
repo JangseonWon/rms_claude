@@ -71,8 +71,11 @@
     font-weight: 600;
 }
 .commentContent {
+    max-width: 55vw;
     margin: 0.5vh 0 !important;
     font-size: 0.7vw;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 .commentDate {
     margin: 0.5vh 0 !important;

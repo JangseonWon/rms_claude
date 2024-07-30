@@ -1,6 +1,7 @@
 package com.gcgenome.rms.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.gcgenome.rms.tables.pojos.User
 
 data class Organization(
     @JsonProperty("id")
@@ -18,5 +19,5 @@ data class Organization(
     @JsonProperty("branch_name")
     val branchName:String?,
     @JsonProperty("user")
-    val user: UserId?,
+    val user: User?,
 )

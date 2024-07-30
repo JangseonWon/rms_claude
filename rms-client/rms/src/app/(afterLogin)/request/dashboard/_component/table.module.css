@@ -24,16 +24,16 @@
     border-collapse: collapse;
 }
 .table thead {
-    background-color: #838689;
+    background-color: #002b49;
     color: #ffffff;
     font-size: 0.8vw;
     font-weight: 600;
 }
 .table thead tr th:first-child {
-    border-radius: 20px 0 0 0;
+    border-radius: 25px 0 0 25px;
 }
 .table thead tr th:last-child {
-    border-radius: 0 20px 0 0;
+    border-radius: 0 25px 25px 0;
 }
 .table tbody {
     font-weight: 300;

@@ -26,7 +26,7 @@ export default function Answer() {
 
     const [postData, setPostData] = useState<Post>(defaultPostData);
     const [commentData, setCommentData] = useState('');
-    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    // const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [writerCheck, setWriterCheck] = useState(false);
     const route = useRouter();
     const { data: session } = useSession();
@@ -194,7 +194,7 @@ export default function Answer() {
                             <p className={comment.user_id === 'manager' ? style.commentManagerName : style.commentUserName}>
                                 {comment.user_id}
                             </p>
-                            <p className={style.commentContent}>{comment.content}</p>
+                            <pre className={style.commentContent}>{comment.content}</pre>
                             <p className={style.commentDate}>{formatDate(comment.create_at ?? '')}</p>
                         </div>
                     ))}

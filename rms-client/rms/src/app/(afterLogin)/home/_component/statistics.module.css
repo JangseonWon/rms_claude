@@ -1,5 +1,5 @@
 .container {
-    padding: 2vh 10%;
+    padding: 6vh 10%;
 }
 .container h1 {
     color: #002b49;
@@ -30,11 +30,11 @@
     display: flex;
     flex-grow: 1;
     flex-direction: column;
-    border-radius: 1vh;
+    border-radius: 20px;
     justify-content: space-between;
     padding: 1vh 1vw;
     width: 20vw;
-    height: 11vh;
+    height: 15vh;
     background-color: #fff;
     color:#002b49;
     margin: 1vh 1vw
@@ -47,7 +47,7 @@
 }
 .card:hover{
     color:white;
-    background: linear-gradient(to right, #002b49, #3d587e);
+    background: linear-gradient(to right, #023a60, #5676a2);
 }
 .cardLabel{
     font-size: 1vw;
