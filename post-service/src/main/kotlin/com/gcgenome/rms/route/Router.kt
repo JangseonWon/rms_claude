@@ -1,7 +1,6 @@
 package com.gcgenome.rms.route
 
 import com.gcgenome.rms.auth.AuthenticationHandler
-import com.gcgenome.rms.auth.ManagerAuthenticationHandler
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.exceptions.AuthenticationNotFoundException
 import com.gcgenome.rms.service.ServiceHandler
@@ -19,7 +18,6 @@ import java.util.*
 @Configuration
 class Router (
     private val authenticationHandler: AuthenticationHandler,
-    private val managerAuthenticationHandler: ManagerAuthenticationHandler,
     private val serviceHandler: ServiceHandler
 ) {
     @Bean
@@ -30,9 +28,8 @@ class Router (
     }
 
     private fun selectPostSearch(request: ServerRequest): Mono<ServerResponse> {
-        return authenticationHandler.principal(request)
-            .flatMap { request.bodyToMono(Query::class.java) }
-            .flatMap { serviceHandler.getPostAll(it.copy(page= it.page -1 )) }
+        return Mono.zip(authenticationHandler.principal(request), request.bodyToMono(Query::class.java))
+            .flatMap { serviceHandler.getPostAll(it.t1, it.t2.copy(page= it.t2.page -1 )) }
             .flatMap { ServerResponse.ok()
                 .header("X-Total-Page", it.totalPage.toString())
                 .contentType(MediaType.APPLICATION_JSON)

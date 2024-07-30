@@ -1,11 +1,12 @@
 package com.gcgenome.rms.service
 
-import com.gcgenome.rms.auth.ManagerAuthenticationHandler
+import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.dao.CommentDao
 import com.gcgenome.rms.dao.PostDao
 import com.gcgenome.rms.data.Page
 import com.gcgenome.rms.data.Post_
 import com.gcgenome.rms.data.Query
+import com.gcgenome.rms.data.Role
 import com.gcgenome.rms.exceptions.FilterOperatorNotFoundException
 import com.gcgenome.rms.tables.pojos.Comment
 import com.gcgenome.rms.tables.references.POST
@@ -19,8 +20,7 @@ import java.util.*
 
 @Component
 class ServiceHandler(
-    val dslContext: DSLContext,
-    private val managerAuthenticationHandler: ManagerAuthenticationHandler
+    val dslContext: DSLContext
 ): PostDao, CommentDao {
     fun pageCount(query: Query, totalCount: Int) : Int{
         var totalPage = totalCount / query.size
@@ -28,8 +28,11 @@ class ServiceHandler(
         return totalPage
     }
 
-    fun getPostAll(query: Query):  Mono<Page<Post_>> {
-        val whereClause = buildWhereClause(query.filters)
+    fun getPostAll(authentication: UserAuthentication, query: Query):  Mono<Page<Post_>> {
+        var whereClause = buildWhereClause(query.filters)
+        if (authentication.user.role == Role.USER.toString()) {
+            whereClause = whereClause.and(POST.USER_ID.eq(authentication.user.id))
+        }
         val postData = dslContext.selectPostAll(query, whereClause)
         return dslContext.selectPostCount(query, whereClause)
             .flatMap { totalCount ->
