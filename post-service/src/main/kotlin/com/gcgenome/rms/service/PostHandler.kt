@@ -3,12 +3,13 @@ package com.gcgenome.rms.service
 import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.dao.CommentDao
 import com.gcgenome.rms.dao.PostDao
+import com.gcgenome.rms.dao.PostFileDao
 import com.gcgenome.rms.data.Page
 import com.gcgenome.rms.data.Post_
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.Role
 import com.gcgenome.rms.exceptions.FilterOperatorNotFoundException
-import com.gcgenome.rms.tables.pojos.Comment
+import com.gcgenome.rms.tables.pojos.Post
 import com.gcgenome.rms.tables.references.POST
 import org.jooq.Condition
 import org.jooq.DSLContext
@@ -19,9 +20,9 @@ import reactor.core.publisher.Mono
 import java.util.*
 
 @Component
-class ServiceHandler(
+class PostHandler(
     val dslContext: DSLContext
-): PostDao, CommentDao {
+): PostDao, PostFileDao, CommentDao {
     fun pageCount(query: Query, totalCount: Int) : Int{
         var totalPage = totalCount / query.size
         if (totalCount % query.size != 0) totalPage++
@@ -47,8 +48,22 @@ class ServiceHandler(
         return Mono.from(dslContext.selectPostById(postId))
     }
 
-    fun insertPostComment(comment: Comment): Mono<Comment> {
-        return Mono.from(dslContext.insertComment(comment))
+    fun insertPost(authentication: UserAuthentication, post: Post): Mono<Post> {
+        val userId = authentication.user.id
+        return Mono.from(dslContext.insertPost(userId, post))
+    }
+    fun deletePost(postId: UUID): Mono<Post> {
+        return Mono.from(dslContext.transactionPublisher { trx ->
+            trx.dsl().run {
+                deletePostFile(postId)
+                    .then(deleteCommentByPostId(postId))
+                    .then(deletePostByPostId(postId))
+            }
+        })
+    }
+
+    fun postIdCheckSwitch(postId: UUID): Mono<Post> {
+        return Mono.from(dslContext.readChangeByPostId(postId))
     }
 
     fun buildWhereClause(filters:List<Query.Companion.Filter>?) : Condition {

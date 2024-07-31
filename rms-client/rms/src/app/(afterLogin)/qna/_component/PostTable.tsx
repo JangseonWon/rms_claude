@@ -10,6 +10,7 @@ import {Post} from "@/model/Post";
 import {useRouter} from "next/navigation";
 import {faComment} from "@fortawesome/free-regular-svg-icons";
 import {getPostSearch} from "@/app/(afterLogin)/qna/_api/getPostSearch";
+import {useSession} from "next-auth/react";
 
 const categoryMap: { [key: string]: string } = {
     "f9476263-f8b2-4ff9-b5f9-ed680715401e": "Service",
@@ -28,6 +29,7 @@ export default function PostTable() {
     const [searchKey, setSearchKey] = useState<string>("title");
     const [searchValue, setSearchValue] = useState<string>("");
     const [pageRange, setPageRange] = useState<{ start: number, end: number }>({ start: 1, end: 10 });
+    const { data: session } = useSession();
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -138,9 +140,9 @@ export default function PostTable() {
                             <td>{row.read ? 'To Be Confirmed' : 'Finished'}</td>
                             <td>
                                 <span
-                                    className={`${style.category} ${style[`category-${categoryMap[row.post_category_id]}`]}`}
+                                    className={`${style.category} ${style[`category-${categoryMap[row.post_category_id!!]}`]}`}
                                 >
-                                    {categoryMap[row.post_category_id] || row.post_category_id}
+                                    {categoryMap[row.post_category_id!!] || row.post_category_id}
                                 </span>
                             </td>
                             <td className={style.titleTd}>
@@ -149,10 +151,10 @@ export default function PostTable() {
                             <td className={style.newAndComment}>
                                 <FontAwesomeIcon className={style.commentIcon} icon={faComment}/>
                                 {row.comments && row.comments.length > 0 ? row.comments.length : 0}
-                                {row.read && <span className={style.new}>New</span>}
+                                {row.read && session?.user.role === 'USER' && <span className={style.new}>New</span>}
                             </td>
                             <td>{row.user?.name}</td>
-                            <td>{formatDate(row.create_at)}</td>
+                            <td>{formatDate(row.create_at!!)}</td>
                         </tr>
                     ))}
                     </tbody>

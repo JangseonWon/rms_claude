@@ -20,4 +20,22 @@ interface CommentDao {
                 .returning()
         ).map { it.into(Comment::class.java) }
     }
+
+    fun DSLContext.deleteComment(userId: String, postId: UUID, commentId: UUID): Mono<Comment> {
+        return Mono.from(
+            deleteFrom(COMMENT)
+                .where(COMMENT.POST_ID.eq(postId)
+                    .and(COMMENT.ID.eq(commentId))
+                    .and(COMMENT.USER_ID.eq(userId)))
+                .returning()
+        ).map { it.into(Comment::class.java) }
+    }
+
+    fun DSLContext.deleteCommentByPostId(postId: UUID): Mono<Comment> {
+        return Mono.from(
+            deleteFrom(COMMENT)
+                .where(COMMENT.POST_ID.eq(postId))
+                .returning()
+        ).map { it.into(Comment::class.java) }
+    }
 }

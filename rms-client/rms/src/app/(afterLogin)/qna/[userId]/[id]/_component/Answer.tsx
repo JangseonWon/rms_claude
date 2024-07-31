@@ -10,6 +10,9 @@ import {Post} from "@/model/Post";
 import {getPostId} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/getPostId";
 import {PostComment} from "@/model/PostComment";
 import {fetchComment} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/fetchComment";
+import {faXmark} from "@fortawesome/free-solid-svg-icons";
+import {deleteCommentById} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/deleteCommentById";
+import {deletePostById} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/deletePostById";
 
 export default function Answer() {
     const defaultPostData: Post = {
@@ -63,7 +66,6 @@ export default function Answer() {
             minute: '2-digit',
             second: '2-digit',
             hour12: true,
-            weekday: 'long',
         };
         return date.toLocaleString('en-US', options);
     }
@@ -80,9 +82,10 @@ export default function Answer() {
         }
     }
 
-    const deleteButtonClick = () => {
+    const deleteButtonClick = async (postId: string) => {
         const confirmed = window.confirm('정말로 삭제하시겠습니까?');
         if (confirmed) {
+            await deletePostById(postId);
             route.push('/qna');
         }
     }
@@ -111,15 +114,27 @@ export default function Answer() {
         alert(id + '파일 다운로드');
     }
 
-    const handleCommentClick = async () => {
-        const comment : PostComment = {
-            post_id: postId,
-            content: commentData,
-            user_id: session?.user.id
+    const handleCommentDeleteClick = async (postId: string, commentId: string) => {
+        const confirmed = window.confirm('댓글을 삭제하시겠습니까?');
+        if (confirmed) {
+            await deleteCommentById(postId, commentId);
+            fetchData();
         }
-        await fetchComment(comment);
-        fetchData();
-        setCommentData('');
+    }
+
+    const handleCommentClick = async () => {
+        if (commentData.length > 0) {
+            const comment : PostComment = {
+                post_id: postId,
+                content: commentData,
+                user_id: session?.user.id
+            }
+            await fetchComment(comment);
+            fetchData();
+            setCommentData('');
+        } else {
+            alert('코멘트 입력해주세요');
+        }
     }
 
     const fetchData = useCallback(async () => {
@@ -191,9 +206,18 @@ export default function Answer() {
                 <div className={style.comment}>
                     {postData?.comments?.map((comment, index) => (
                         <div key={index} className={style.commentUser}>
-                            <p className={comment.user_id === 'manager' ? style.commentManagerName : style.commentUserName}>
-                                {comment.user_id}
-                            </p>
+                            <div className={style.commentNameAndDelete}>
+                                <p className={comment.user_id === 'manager' ? style.commentManagerName : style.commentUserName}>
+                                    {comment.user_id}
+                                </p>
+                                {comment.user_id === session?.user?.id && (
+                                    <FontAwesomeIcon
+                                        className={style.commentDelete}
+                                        icon={faXmark}
+                                        onClick={()=> handleCommentDeleteClick(comment.post_id!!, comment.id!!)}
+                                    />
+                                )}
+                            </div>
                             <pre className={style.commentContent}>{comment.content}</pre>
                             <p className={style.commentDate}>{formatDate(comment.create_at ?? '')}</p>
                         </div>
@@ -221,7 +245,7 @@ export default function Answer() {
                         Edit Post
                     </button>
                 )}
-                <button className={style.cancelButton} onClick={deleteButtonClick}>Delete</button>
+                <button className={style.cancelButton} onClick={()=> deleteButtonClick(postData.id!)}>Delete</button>
             </section>
         </div>
     )

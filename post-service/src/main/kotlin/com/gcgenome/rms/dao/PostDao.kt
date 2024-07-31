@@ -2,6 +2,7 @@ package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.Post_
 import com.gcgenome.rms.data.Query
+import com.gcgenome.rms.tables.pojos.Post
 import com.gcgenome.rms.tables.references.COMMENT
 import com.gcgenome.rms.tables.references.POST
 import com.gcgenome.rms.tables.references.POST_FILE
@@ -12,6 +13,7 @@ import org.jooq.SortOrder
 import org.jooq.impl.DSL.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import java.time.LocalDateTime
 import java.util.*
 
 
@@ -138,5 +140,36 @@ interface PostDao{
             select(count())
                 .from(POST).where(whereClause)
         ).map { it.component1() }
+    }
+
+    fun DSLContext.insertPost(userId: String?, post: Post): Mono<Post> {
+        return Mono.from(
+            insertInto(POST)
+                .set(POST.ID, UUID.randomUUID())
+                .set(POST.TITLE, post.title)
+                .set(POST.CONTENT, post.content)
+                .set(POST.CREATE_AT, post.createAt ?: LocalDateTime.now())
+                .set(POST.LAST_MODIFY_AT, LocalDateTime.now())
+                .set(POST.POST_CATEGORY_ID, post.postCategoryId)
+                .set(POST.USER_ID, userId ?: post.userId)
+                .set(POST.READ, true)
+                .returning()
+        ).map { it.into(Post::class.java) }
+    }
+
+    fun DSLContext.deletePostByPostId(postId: UUID): Mono<Post> {
+        return Mono.from(
+            deleteFrom(POST).where(POST.ID.eq(postId))
+                .returning()
+        ).map { it.into(Post::class.java) }
+    }
+
+    fun DSLContext.readChangeByPostId(postId: UUID): Mono<Post> {
+        return Mono.from(
+            update(POST)
+                .set(POST.READ, false)
+                .where(POST.ID.eq(postId))
+                .returning()
+        ).map { it.into(Post::class.java) }
     }
 }

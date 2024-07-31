@@ -7,17 +7,22 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     background-color: #f9f9f9;
 }
-.userContainer, .titleContainer, .contentContainer, .fileContainer {
+.userAndCategoryContainer {
+    justify-content: space-between;
+    display: flex;
+    gap: 1vw;
+}
+.userContainer, .titleContainer, .contentContainer, .fileContainer, .select {
     display: grid;
     margin: 1vh 2vw;
     gap: 1vh;
 }
-.userLabel, .titleLabel, .contentLabel, .fileLabel {
+.userLabel, .titleLabel, .contentLabel, .fileLabel, .categoryLabel {
     font-weight: 700;
     font-size: 0.8vw;
     color: #333;
 }
-.inputUser, .inputTitle, .textareaContent, .fileInput {
+.inputUser, .inputTitle, .textareaContent, .fileInput, .selectCategory {
     padding: 1vh 1vw;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -25,7 +30,24 @@
     background-color: #fff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-.inputTitle, .fileInput {
+.inputUser {
+    width: 15vw;
+}
+.select select {
+    display: grid;
+    padding: 1vh 1vw;
+    width: 10vw;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+.select select:focus {
+    outline: none;
+}
+.select option {
+    font-size: 0.8vw;
 }
 .textareaContent {
     resize: none;
