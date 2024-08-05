@@ -7,12 +7,14 @@ import React, {ChangeEvent, useCallback, useEffect, useState} from "react";
 import {faFile, faFilePdf, faImage} from "@fortawesome/free-regular-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Post} from "@/model/Post";
-import {getPostId} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/getPostId";
+import {getPostByPostId} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/getPostByPostId";
 import {PostComment} from "@/model/PostComment";
 import {fetchComment} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/fetchComment";
 import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import {deleteCommentById} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/deleteCommentById";
 import {deletePostById} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/deletePostById";
+import {getFileById} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/getFileById";
+import {deleteFileByPostId} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/deleteFileByPostId";
 
 export default function Answer() {
     const defaultPostData: Post = {
@@ -29,8 +31,8 @@ export default function Answer() {
 
     const [postData, setPostData] = useState<Post>(defaultPostData);
     const [commentData, setCommentData] = useState('');
-    // const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [writerCheck, setWriterCheck] = useState(false);
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const route = useRouter();
     const { data: session } = useSession();
 
@@ -86,6 +88,7 @@ export default function Answer() {
         const confirmed = window.confirm('정말로 삭제하시겠습니까?');
         if (confirmed) {
             await deletePostById(postId);
+            await deleteFileByPostId(postId);
             route.push('/qna');
         }
     }
@@ -110,8 +113,33 @@ export default function Answer() {
         }));
     };
 
-    const handleFileNameClick = (id: string) => {
-        alert(id + '파일 다운로드');
+    const handleFileNameClick = async (postId: string, fileId: string) => {
+        try {
+            const response = await getFileById(postId, fileId);
+            if (response.ok) {
+                const contentDisposition = response.headers.get('Content-Disposition');
+                let filename = fileId;
+
+                if (contentDisposition) {
+                    const filenameMatch = contentDisposition.match(/filename[^;=\n]*[=\s](.*?)(;|$)/);
+                    if (filenameMatch && filenameMatch[1]) {
+                        filename = decodeURIComponent(filenameMatch[1].replace(/"/g, ''));
+                    }
+                }
+
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+        } catch (error) {
+            console.error('Error downloading file:', error);
+        }
     }
 
     const handleCommentDeleteClick = async (postId: string, commentId: string) => {
@@ -137,14 +165,26 @@ export default function Answer() {
         }
     }
 
+    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            setSelectedFiles(Array.from(e.target.files));
+        }
+    };
+
     const fetchData = useCallback(async () => {
-        const response = await getPostId(postId);
-        const data = await response.json();
-        setPostData(data as Post);
-        if (data) {
-            if (session?.user?.id === data.user_id) {
+        const response = await getPostByPostId(postId);
+        const text = await response.text();
+        if (text) {
+            const data = JSON.parse(text);
+            setPostData(data as Post);
+
+            if (session?.user?.id === data.user.id) {
                 setWriterCheck(true);
             }
+        } else {
+            alert('Post not found');
+            route.push('/qna');
+            return;
         }
     }, [postId, session?.user?.id]);
 
@@ -182,18 +222,25 @@ export default function Answer() {
             <section className={style.fileContainer}>
                 <label className={style.fileLabel}>Upload File</label>
                 {writerCheck && (
-                    <input
-                        type="file"
-                        className={style.fileInput}
-                        multiple
-                    />
+                    <div className={style.fileInput}>
+                        <input type="file" multiple onChange={handleFileChange}/>
+                        {selectedFiles.length > 0 && (
+                            <ul className={style.fileList}>
+                                {selectedFiles.map((file, index) => (
+                                    <span key={index} className={style.fileItem}>
+                                    {file.name}
+                                </span>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
                 )}
                 <ul className={style.fileInput}>
                     {postData?.files?.map((file, index) => (
                         <span
                             key={index}
                             className={style.fileName}
-                            onClick={() => handleFileNameClick(file.id)}
+                            onClick={() => handleFileNameClick(file.post_id, file.id)}
                         >
                             {renderFileIcon(file.name)}
                             {file.name}

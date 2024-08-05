@@ -20,4 +20,5 @@ interface Files {
     path: string;
     name: string;
     create_at: string;
+    post_id: string;
 }

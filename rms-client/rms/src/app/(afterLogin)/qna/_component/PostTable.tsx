@@ -11,6 +11,7 @@ import {useRouter} from "next/navigation";
 import {faComment} from "@fortawesome/free-regular-svg-icons";
 import {getPostSearch} from "@/app/(afterLogin)/qna/_api/getPostSearch";
 import {useSession} from "next-auth/react";
+import {fetchPostId} from "@/app/(afterLogin)/qna/_api/fetchPostId";
 
 const categoryMap: { [key: string]: string } = {
     "f9476263-f8b2-4ff9-b5f9-ed680715401e": "Service",
@@ -67,7 +68,8 @@ export default function PostTable() {
         handleSearchChange({key: key, value: searchValue});
     };
 
-    const handleRowClick = (post: Post, userId: string) => {
+    const handleRowClick = async (post: Post, userId: string) => {
+        await fetchPostId(post.id!);
         router.push(`/qna/${userId}/${post.id}`);
     };
 

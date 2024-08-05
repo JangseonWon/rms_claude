@@ -4,10 +4,7 @@ import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.dao.CommentDao
 import com.gcgenome.rms.dao.PostDao
 import com.gcgenome.rms.dao.PostFileDao
-import com.gcgenome.rms.data.Page
-import com.gcgenome.rms.data.Post_
-import com.gcgenome.rms.data.Query
-import com.gcgenome.rms.data.Role
+import com.gcgenome.rms.data.*
 import com.gcgenome.rms.exceptions.FilterOperatorNotFoundException
 import com.gcgenome.rms.tables.pojos.Post
 import com.gcgenome.rms.tables.references.POST
@@ -15,7 +12,10 @@ import org.jooq.Condition
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.jooq.impl.DSL.field
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
+import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
 import java.util.*
 
@@ -23,6 +23,12 @@ import java.util.*
 class PostHandler(
     val dslContext: DSLContext
 ): PostDao, PostFileDao, CommentDao {
+    private val webClient: WebClient = WebClient.builder()
+        .baseUrl("https://wh.jandi.com/connect-api/webhook")
+        .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        .defaultHeader(HttpHeaders.ACCEPT, "application/vnd.tosslab.jandi-v2+json")
+        .build()
+
     fun pageCount(query: Query, totalCount: Int) : Int{
         var totalPage = totalCount / query.size
         if (totalCount % query.size != 0) totalPage++
@@ -64,6 +70,31 @@ class PostHandler(
 
     fun postIdCheckSwitch(postId: UUID): Mono<Post> {
         return Mono.from(dslContext.readChangeByPostId(postId))
+    }
+
+    fun sendToJandi(postId: UUID, category: String, jandiRequest: JandiRequest): Mono<Post> {
+        val connectColor = when (category.lowercase()) {
+            "bug" -> "#cd4855"
+            "result" -> "#007bff"
+            "service" -> "#28a745"
+            "others" -> "#a75928"
+            else -> "#000000"
+        }
+
+        val requestBody = mapOf(
+            "body" to "[새로운질문이 등록 되었습니다.](http://localhost:3000/qna/${jandiRequest.post.userId}/${jandiRequest.post.id})",
+            "connectColor" to connectColor,
+            "connectInfo" to listOf(
+                mapOf("title" to "작성자 이름", "description" to "제목: ${jandiRequest.post.title}" +
+                        "\n카테고리: ${category}\n작성자: ${jandiRequest.userName}"),
+            )
+        )
+
+        return webClient.post()
+            .uri("/17558388/81bc697c503328e485da5e22dddaaa4e")
+            .bodyValue(requestBody)
+            .retrieve()
+            .bodyToMono(Post::class.java)
     }
 
     fun buildWhereClause(filters:List<Query.Companion.Filter>?) : Condition {

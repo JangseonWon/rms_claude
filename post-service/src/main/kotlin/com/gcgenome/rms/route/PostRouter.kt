@@ -1,6 +1,7 @@
 package com.gcgenome.rms.route
 
 import com.gcgenome.rms.auth.AuthenticationHandler
+import com.gcgenome.rms.data.JandiRequest
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.exceptions.AuthenticationNotFoundException
 import com.gcgenome.rms.service.PostHandler
@@ -27,6 +28,7 @@ class PostRouter (
         PATCH("/w-api/post-service/post/{post_id}", ::postIdCheckSwitch)
         POST("/w-api/post-service/post", ::insertPost)
         DELETE("/w-api/post-service/post/{post_id}", ::deletePost)
+        POST("/w-api/post-service/post/{post_id}/message/{category}", ::jandiWebHook)
     }
 
     private fun selectPostSearch(request: ServerRequest): Mono<ServerResponse> {
@@ -78,6 +80,18 @@ class PostRouter (
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
             .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
+    }
+
+    private fun jandiWebHook(request: ServerRequest): Mono<ServerResponse> {
+        val postId = UUID.fromString(request.pathVariable("post_id"))
+        val category = request.pathVariable("category")
+        return authenticationHandler.principal(request)
+            .flatMap { request.bodyToMono(JandiRequest::class.java) }
+            .flatMap { serviceHandler.sendToJandi(postId, category, it) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+//            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+//            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
     }
 }
 

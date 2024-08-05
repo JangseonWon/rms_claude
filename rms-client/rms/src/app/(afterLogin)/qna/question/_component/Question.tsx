@@ -6,14 +6,18 @@ import {useRouter} from "next/navigation";
 import {fetchPost} from "@/app/(afterLogin)/qna/question/_api/fetchPost";
 import {Post} from "@/model/Post";
 import React, {ChangeEvent, useState} from "react";
+import {fetchFile} from "@/app/(afterLogin)/qna/question/_api/fetchFile";
+import {fetchSendToJandi} from "@/app/(afterLogin)/qna/question/_api/fetchSendToJandi";
 
 export default function Question() {
     const route = useRouter();
     const { data: session } = useSession();
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [categoryId, setCategoryId] =
         useState('f9476263-f8b2-4ff9-b5f9-ed680715401e');
+    const [categoryName, setCategoryName] = useState('service');
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -38,16 +42,25 @@ export default function Question() {
                 content: content,
                 user_id: session?.user.id
             };
-            const res = await fetchPost(postData);
 
-            if (res.ok) {
-                alert('정상적으로 등록되었습니다.');
-                route.push('/qna');
-            } else {
-                alert('등록 실패하였습니다. 문의바랍니다.');
+            const postResponse = await fetchPost(postData);
+            if (!postResponse.ok) {
+                console.error('Post creation failed');
             }
+
+            const postId = (await postResponse.json()).id;
+            if (selectedFiles.length > 0) {
+                const fileUploadResponse = await fetchFile(postId, selectedFiles);
+                if (!fileUploadResponse.ok) {
+                    console.error('File upload failed');
+                }
+            }
+            await fetchSendToJandi(session?.user.name!, postId, categoryName, postData);
+
+            alert('정상적으로 등록되었습니다.');
+            route.push('/qna');
         }
-    }
+    };
 
     const cancelButtonClick = () => {
         const confirmed = window.confirm('정말로 취소하시겠습니까?');
@@ -57,8 +70,15 @@ export default function Question() {
     }
 
     const handleCategoryIdChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const categoryId = event.target.value;
-        setCategoryId(categoryId);
+        const selectedValue = JSON.parse(event.target.value);
+        setCategoryId(selectedValue.uuid);
+        setCategoryName(selectedValue.category);
+    };
+
+    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            setSelectedFiles(Array.from(e.target.files));
+        }
     };
 
     return (
@@ -71,10 +91,26 @@ export default function Question() {
                 <div className={style.select}>
                     <label className={style.categoryLabel}>Category</label>
                     <select className={style.selectCategory} onChange={handleCategoryIdChange}>
-                        <option value="f9476263-f8b2-4ff9-b5f9-ed680715401e">Service</option>
-                        <option value="f1d0a814-8c90-4103-bbd5-6c0e54d37808">Result</option>
-                        <option value="7cefa58c-d85b-4f9e-82ff-dc46ba953e27">Bug</option>
-                        <option value="f86a9106-e431-4649-a4f9-c61e73ec7bab">Others</option>
+                        <option value={JSON.stringify({
+                            category: 'service',
+                            uuid: 'f9476263-f8b2-4ff9-b5f9-ed680715401e'
+                        })}>Service
+                        </option>
+                        <option value={JSON.stringify({
+                            category: 'result',
+                            uuid: 'f1d0a814-8c90-4103-bbd5-6c0e54d37808'
+                        })}>Result
+                        </option>
+                        <option value={JSON.stringify({
+                            category: 'bug',
+                            uuid: '7cefa58c-d85b-4f9e-82ff-dc46ba953e27'
+                        })}>Bug
+                        </option>
+                        <option value={JSON.stringify({
+                            category: 'others',
+                            uuid: 'f86a9106-e431-4649-a4f9-c61e73ec7bab'
+                        })}>Others
+                        </option>
                     </select>
                 </div>
             </section>
@@ -99,7 +135,18 @@ export default function Question() {
             </section>
             <section className={style.fileContainer}>
                 <label className={style.fileLabel}>Upload File</label>
-                <input type="file" className={style.fileInput} />
+                <div className={style.fileInput}>
+                    <input type="file" multiple onChange={handleFileChange} />
+                    {selectedFiles.length > 0 && (
+                        <ul className={style.fileList}>
+                            {selectedFiles.map((file, index) => (
+                                <span key={index} className={style.fileItem}>
+                                    {file.name}
+                                </span>
+                            ))}
+                        </ul>
+                    )}
+                </div>
             </section>
             <section className={style.buttonContainer}>
                 <button className={style.addButton} onClick={addButtonClick}>Add</button>
