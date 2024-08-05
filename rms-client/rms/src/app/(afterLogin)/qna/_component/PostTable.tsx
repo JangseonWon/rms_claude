@@ -69,7 +69,7 @@ export default function PostTable() {
     };
 
     const handleRowClick = async (post: Post, userId: string) => {
-        await fetchPostId(post.id!);
+        if (session?.user.role !== 'USER') await fetchPostId(post.id!);
         router.push(`/qna/${userId}/${post.id}`);
     };
 
