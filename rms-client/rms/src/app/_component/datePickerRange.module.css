@@ -24,6 +24,7 @@
     color: grey;
 }
 .icon {
+    font-size: 1vw;
     position: absolute;
     right: 1vw;
     top: 50%;

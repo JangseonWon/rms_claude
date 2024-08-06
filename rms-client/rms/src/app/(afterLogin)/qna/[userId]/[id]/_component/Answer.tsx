@@ -15,6 +15,8 @@ import {deleteCommentById} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/delet
 import {deletePostById} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/deletePostById";
 import {getFileById} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/getFileById";
 import {deleteFileByPostId} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/deleteFileByPostId";
+import {fetchSendToJandi} from "@/app/(afterLogin)/qna/_api/fetchSendToJandi";
+import {fetchPostId} from "@/app/(afterLogin)/qna/_api/fetchPostId";
 
 export default function Answer() {
     const defaultPostData: Post = {
@@ -103,7 +105,7 @@ export default function Answer() {
 
     const handleCommentChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
         setCommentData(e.target.value);
-    }
+    };
 
     const handleTextareaChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -158,6 +160,9 @@ export default function Answer() {
                 user_id: session?.user.id
             }
             await fetchComment(comment);
+            if (session?.user.role === "USER") await fetchPostId(postId, true);
+            await fetchSendToJandi(session?.user.name!, postId, "comment", postData, comment);
+
             fetchData();
             setCommentData('');
         } else {
@@ -223,7 +228,7 @@ export default function Answer() {
                 <label className={style.fileLabel}>Upload File</label>
                 {writerCheck && (
                     <div className={style.fileInput}>
-                        <input type="file" multiple onChange={handleFileChange}/>
+                        <input type="file" className={style.inputButton} multiple onChange={handleFileChange}/>
                         {selectedFiles.length > 0 && (
                             <ul className={style.fileList}>
                                 {selectedFiles.map((file, index) => (

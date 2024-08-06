@@ -10,19 +10,19 @@ import java.util.UUID
 
 data class Comment (
     @JsonProperty("id")
-    val id: UUID,
+    val id: UUID?,
     @JsonProperty("content")
     val content: String,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("create_at")
-    val createAt: LocalDateTime,
+    val createAt: LocalDateTime?,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("last_modify_at")
-    val lastModifyAt: LocalDateTime,
+    val lastModifyAt: LocalDateTime?,
     @JsonProperty("user_id")
-    val userId: String,
+    val userId: String?,
     @JsonProperty("post_id")
     val postId: UUID,
 )

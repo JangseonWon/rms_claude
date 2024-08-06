@@ -68,25 +68,25 @@ class PostHandler(
         })
     }
 
-    fun postIdCheckSwitch(postId: UUID): Mono<Post> {
-        return Mono.from(dslContext.readChangeByPostId(postId))
+    fun postIdCheckSwitch(postId: UUID, new: Boolean): Mono<Post> {
+        return Mono.from(dslContext.readChangeByPostId(postId, new))
     }
 
     fun sendToJandi(postId: UUID, category: String, jandiRequest: JandiRequest): Mono<Post> {
-        val connectColor = when (category.lowercase()) {
-            "bug" -> "#cd4855"
-            "result" -> "#007bff"
-            "service" -> "#28a745"
-            "others" -> "#a75928"
-            else -> "#000000"
+        val (connectColor, postCategory, comment) = when (category.lowercase()) {
+            "bug" -> Triple("#cd4855", "새로운 질문이 등록 되었습니다.", "")
+            "result" -> Triple("#007bff", "새로운 질문이 등록 되었습니다.", "")
+            "service" -> Triple("#28a745", "새로운 질문이 등록 되었습니다.", "")
+            "others" -> Triple("#a75928", "새로운 질문이 등록 되었습니다.", "")
+            "comment" -> Triple("#FFFA99", "새로운 댓글이 등록 되었습니다.", "\n댓글: ${jandiRequest.comment?.content}")
+            else -> Triple("#000000", "새로운 질문이 등록 되었습니다.", "")
         }
 
         val requestBody = mapOf(
-            "body" to "[새로운질문이 등록 되었습니다.](http://localhost:3000/qna/${jandiRequest.post.userId}/${jandiRequest.post.id})",
+            "body" to "[$postCategory](https://rms-test.gcgenome.com/qna/${jandiRequest.post.userId}/${postId})",
             "connectColor" to connectColor,
             "connectInfo" to listOf(
-                mapOf("title" to "작성자 이름", "description" to "제목: ${jandiRequest.post.title}" +
-                        "\n카테고리: ${category}\n작성자: ${jandiRequest.userName}"),
+                mapOf("title" to "세부내용", "description" to "제목: ${jandiRequest.post.title}\n작성자: ${jandiRequest.userName}$comment")
             )
         )
 

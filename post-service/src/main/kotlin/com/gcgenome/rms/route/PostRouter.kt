@@ -75,7 +75,8 @@ class PostRouter (
     private fun postIdCheckSwitch(request: ServerRequest): Mono<ServerResponse> {
         val postId = UUID.fromString(request.pathVariable("post_id"))
         return authenticationHandler.principal(request)
-            .flatMap { serviceHandler.postIdCheckSwitch(postId) }
+            .flatMap { request.bodyToMono(Boolean::class.java) }
+            .flatMap { serviceHandler.postIdCheckSwitch(postId, it) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
@@ -90,8 +91,8 @@ class PostRouter (
             .flatMap { serviceHandler.sendToJandi(postId, category, it) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-//            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
-//            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
+            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
     }
 }
 

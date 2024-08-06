@@ -164,10 +164,10 @@ interface PostDao{
         ).map { it.into(Post::class.java) }
     }
 
-    fun DSLContext.readChangeByPostId(postId: UUID): Mono<Post> {
+    fun DSLContext.readChangeByPostId(postId: UUID, new: Boolean): Mono<Post> {
         return Mono.from(
             update(POST)
-                .set(POST.READ, false)
+                .set(POST.READ, new)
                 .where(POST.ID.eq(postId))
                 .returning()
         ).map { it.into(Post::class.java) }

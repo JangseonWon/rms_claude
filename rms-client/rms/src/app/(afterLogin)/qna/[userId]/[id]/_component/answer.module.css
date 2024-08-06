@@ -25,6 +25,9 @@
     background-color: #fff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+.inputButton {
+    font-size: 0.6vw;
+}
 .fileList {
     display: flex;
     flex-wrap: wrap;
@@ -122,6 +125,7 @@
     margin-bottom: 1vh;
 }
 .inputCommendButton {
+    font-size: 0.6vw;
     width: 4vw;
     margin: 0 0 0 1vw !important;
     border-left: solid 1px #ccc;

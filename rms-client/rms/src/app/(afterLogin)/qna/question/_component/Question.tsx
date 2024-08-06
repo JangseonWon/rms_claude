@@ -7,7 +7,7 @@ import {fetchPost} from "@/app/(afterLogin)/qna/question/_api/fetchPost";
 import {Post} from "@/model/Post";
 import React, {ChangeEvent, useState} from "react";
 import {fetchFile} from "@/app/(afterLogin)/qna/question/_api/fetchFile";
-import {fetchSendToJandi} from "@/app/(afterLogin)/qna/question/_api/fetchSendToJandi";
+import {fetchSendToJandi} from "@/app/(afterLogin)/qna/_api/fetchSendToJandi";
 
 export default function Question() {
     const route = useRouter();
