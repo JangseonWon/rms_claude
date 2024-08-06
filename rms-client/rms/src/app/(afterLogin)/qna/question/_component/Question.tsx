@@ -3,10 +3,10 @@
 import style from './question.module.css';
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
-import {fetchPost} from "@/app/(afterLogin)/qna/question/_api/fetchPost";
+import {fetchPost} from "@/app/(afterLogin)/qna/_api/fetchPost";
 import {Post} from "@/model/Post";
 import React, {ChangeEvent, useState} from "react";
-import {fetchFile} from "@/app/(afterLogin)/qna/question/_api/fetchFile";
+import {fetchFile} from "@/app/(afterLogin)/qna/_api/fetchFile";
 import {fetchSendToJandi} from "@/app/(afterLogin)/qna/_api/fetchSendToJandi";
 
 export default function Question() {

@@ -5,7 +5,7 @@ import {useEffect, useState} from "react";
 import {getStatisticsRequest} from "@/app/(afterLogin)/request/dashboard/_api/getStatisticsRequest";
 import type {Statistics} from "@/model/Statistics";
 import Loading from "@/app/(afterLogin)/_component/Loading";
-import {useSetStatus, useStatus} from "@/app/(afterLogin)/request/dashboard/store/useStatusStore";
+import {useSetStatus} from "@/app/(afterLogin)/request/dashboard/store/useStatusStore";
 import {Status} from "@/model/Status";
 
 export default function Statistics() {
@@ -41,7 +41,7 @@ export default function Statistics() {
         <div className={style.container}>
             <div className={style.titleContainer}>
                 <div className={style.subTitle}>
-                    Dashboard &gt; <span>Dashboard</span>
+                    <span>Dashboard</span>
                 </div>
                 <div className={style.mainTitle}>
                     Dashboard

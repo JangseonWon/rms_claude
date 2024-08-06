@@ -58,6 +58,11 @@ class PostHandler(
         val userId = authentication.user.id
         return Mono.from(dslContext.insertPost(userId, post))
     }
+
+    fun updatePost(postId: UUID, post: Post): Mono<Post> {
+        return Mono.from(dslContext.updatePost(postId, post))
+    }
+
     fun deletePost(postId: UUID): Mono<Post> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
@@ -78,6 +83,7 @@ class PostHandler(
             "result" -> Triple("#007bff", "새로운 질문이 등록 되었습니다.", "")
             "service" -> Triple("#28a745", "새로운 질문이 등록 되었습니다.", "")
             "others" -> Triple("#a75928", "새로운 질문이 등록 되었습니다.", "")
+            "update" -> Triple("#800080", "질문이 수정 되었습니다.", "")
             "comment" -> Triple("#FFFA99", "새로운 댓글이 등록 되었습니다.", "\n댓글: ${jandiRequest.comment?.content}")
             else -> Triple("#000000", "새로운 질문이 등록 되었습니다.", "")
         }

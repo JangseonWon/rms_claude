@@ -38,8 +38,8 @@
 
 }
 .fileName {
-    display: flex;
-    margin-right: 1vw;
+    display: inline-flex;
+    margin: 0.3vh 0.3vw 0.3vh 0;
     cursor: pointer;
 }
 .fileName:hover {
@@ -47,6 +47,11 @@
 }
 .fileIcon {
     margin-right: 0.2vw;
+}
+.fileDelete {
+    margin: 0 0 0.5vh 0.2vw;
+    font-size: 0.6vw;
+    cursor: pointer;
 }
 .textareaContent {
     resize: none;

@@ -157,6 +157,18 @@ interface PostDao{
         ).map { it.into(Post::class.java) }
     }
 
+    fun DSLContext.updatePost(postId: UUID, post: Post): Mono<Post> {
+        return Mono.from(
+            update(POST)
+                .set(POST.TITLE, post.title)
+                .set(POST.CONTENT, post.content)
+                .set(POST.LAST_MODIFY_AT, LocalDateTime.now())
+                .set(POST.READ, true)
+                .where(POST.ID.eq(postId))
+                .returning()
+        ).map { it.into(Post::class.java) }
+    }
+
     fun DSLContext.deletePostByPostId(postId: UUID): Mono<Post> {
         return Mono.from(
             deleteFrom(POST).where(POST.ID.eq(postId))

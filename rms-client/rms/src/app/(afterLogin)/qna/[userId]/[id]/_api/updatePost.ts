@@ -1,10 +1,12 @@
-export async function fetchPostId(postId: String, check: boolean) {
+import {Post} from "@/model/Post";
+
+export async function updatePost(postId: string, post: Post) {
     return await fetch(`/w-api/post-service/post/${postId}`, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify(check),
+        body: JSON.stringify(post),
         credentials: 'include',
         cache: 'no-store'
     });

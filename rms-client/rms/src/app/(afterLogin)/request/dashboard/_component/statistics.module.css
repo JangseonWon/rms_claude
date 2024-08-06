@@ -1,7 +1,8 @@
 .container {
+    margin-top: 3vh;
     padding: 2vh 5vw;
     background-color: white;
-    border-radius: 0 0 20px 20px;
+    border-radius: 20px;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 .titleContainer{
@@ -39,13 +40,19 @@
     border-radius: 10px;
     justify-content: space-between;
     padding: 2vh 1vw;
-    height: 11vh;
+    height: 14vh;
     width: 6vw;
 }
 .card:hover {
+    background: linear-gradient(135deg, #002C4B, #004A88);
     box-shadow: 0 15px 15px rgba(0, 0, 0.2, 0.3);
     cursor: pointer;
 }
+.card:hover .cardLabel,
+.card:hover .cardValue {
+    color: #ffffff;
+}
+
 .card img {
     width: 25%;
     height: auto;
@@ -53,7 +60,7 @@
 .cardLabel{
     font-size: 0.9vw;
     color:#002b49;
-    font-weight: 500;
+    font-weight: 600;
     text-align: left;
 }
 .cardValue{
