@@ -262,7 +262,7 @@ export default function Answer() {
                 )}
                 <ul className={style.fileInput}>
                     {postData?.files?.map((file, index) => (
-                        <div className={style.fileItem}>
+                        <div className={style.fileItem} key={index}>
                             <span
                                 key={index}
                                 className={style.fileName}
