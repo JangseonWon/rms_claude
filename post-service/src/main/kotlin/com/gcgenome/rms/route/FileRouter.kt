@@ -7,11 +7,9 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
-import org.springframework.http.codec.multipart.FilePart
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.router
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.util.*
 
@@ -32,44 +30,25 @@ class FileRouter (
         val fileId = UUID.fromString(request.pathVariable("file_id"))
         return authenticationHandler.principal(request)
             .flatMap { serviceHandler.downloadByFileId(postId, fileId) }
-            .flatMap { fileData ->
-                val filename = fileData.first
-                val mimeType = determineMimeType(filename)
-                ServerResponse.ok().contentType(mimeType)
-                    .header("Content-Disposition", "attachment; filename=\"$filename\"")
-                    .bodyValue(fileData.second)
-            }
+            .flatMap { ServerResponse.ok().contentType(determineMimeType(it.first))
+                    .header("Content-Disposition", "attachment; filename=\"${it.first}\"")
+                    .bodyValue(it.second) }
             .switchIfEmpty(ServerResponse.status(HttpStatus.NO_CONTENT).build())
             .onErrorResume(AuthenticationNotFoundException::class.java) { e ->
-                ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")
-            }
-            .onErrorResume { e ->
-                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Error code: $e")
-            }
+                ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}") }
+            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Error code: $e") }
     }
 
     private fun uploadFile(request: ServerRequest): Mono<ServerResponse> {
         val postId = UUID.fromString(request.pathVariable("post_id"))
-
-        return authenticationHandler.principal(request)
-            .flatMap { authentication ->
-                request.multipartData()
-                    .flatMap { parts ->
-                        val fileParts = parts["file"]?.filterIsInstance<FilePart>() ?: emptyList()
-                        if (fileParts.isNotEmpty()) {
-                            val uploadFlux = Flux.fromIterable(fileParts)
-                                .flatMap { filePart -> serviceHandler.uploadFile(authentication, postId, filePart) }
-                                .collectList()
-                            uploadFlux
-                                .flatMap { ServerResponse.ok().bodyValue("Files uploaded successfully") }
-                                .onErrorResume { e ->
-                                    ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Error code: $e")
-                                }
-                        } else { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("No files uploaded") }
-                    }
+        return request.multipartData()
+            .flatMap { parts ->
+                authenticationHandler.principal(request)
+                    .flatMap { authentication -> serviceHandler.uploadFiles(parts, authentication, postId) }
+                    .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
+                    .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}") }
+                    .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Error code: $e") }
             }
-            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}") }
-            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Error code: $e") }
     }
 
     private fun deleteFile(request: ServerRequest): Mono<ServerResponse> {

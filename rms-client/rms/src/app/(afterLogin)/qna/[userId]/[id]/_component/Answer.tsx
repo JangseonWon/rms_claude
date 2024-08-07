@@ -20,12 +20,14 @@ import {fetchPostId} from "@/app/(afterLogin)/qna/_api/fetchPostId";
 import {fetchFile} from "@/app/(afterLogin)/qna/_api/fetchFile";
 import {updatePost} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/updatePost";
 import {deleteFileById} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/deleteFileById";
+import QnaLoading from "@/app/(afterLogin)/qna/_component/QnaLoading";
 
 export default function Answer() {
     const [postData, setPostData] = useState<Post>();
     const [commentData, setCommentData] = useState('');
     const [writerCheck, setWriterCheck] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
     const route = useRouter();
     const { data: session } = useSession();
 
@@ -73,22 +75,27 @@ export default function Answer() {
         if (writerCheck) {
             const confirmed = window.confirm('정말로 수정하시겠습니까?');
             if (confirmed) {
-                const postId = postData?.id!
-                const postResponse =
-                    await updatePost(postId, {title: postData?.title!, content: postData?.content!});
-                if (!postResponse.ok) {
-                    console.error('Post creation failed');
-                }
-                if (selectedFiles.length > 0) {
-                    const fileUploadResponse = await fetchFile(postId, selectedFiles);
-                    if (!fileUploadResponse.ok) {
-                        console.error('File upload failed');
+                setIsLoading(true);
+                try {
+                    const postId = postData?.id!
+                    const postResponse =
+                        await updatePost(postId, {title: postData?.title!, content: postData?.content!});
+                    if (!postResponse.ok) {
+                        console.error('Post creation failed');
                     }
-                }
-                await fetchSendToJandi(session?.user.name!, postId, "update", postData!);
+                    if (selectedFiles.length > 0) {
+                        const fileUploadResponse = await fetchFile(postId, selectedFiles);
+                        if (!fileUploadResponse.ok) {
+                            console.error('File upload failed');
+                        }
+                    }
+                    await fetchSendToJandi(session?.user.name!, postId, "update", postData!);
 
-                alert('정상적으로 수정되었습니다.');
-                route.push('/qna');
+                    alert('정상적으로 수정되었습니다.');
+                    route.push('/qna');
+                } finally {
+                    setIsLoading(false);
+                }
             }
         } else {
             alert('수정 불가능 합니다.');
@@ -98,9 +105,15 @@ export default function Answer() {
     const deleteButtonClick = async (postId: string) => {
         const confirmed = window.confirm('정말로 삭제하시겠습니까?');
         if (confirmed) {
-            await deletePostById(postId);
-            await deleteFileByPostId(postId);
-            route.push('/qna');
+            setIsLoading(true);
+            try {
+                await deleteFileByPostId(postId);
+                await deletePostById(postId);
+            } finally {
+                alert('삭제 완료 되었습니다.');
+                setIsLoading(false);
+                route.push('/qna');
+            }
         }
     }
 
@@ -170,8 +183,11 @@ export default function Answer() {
                 user_id: session?.user.id
             }
             await fetchComment(comment);
-            if (session?.user.role !== "USER") await fetchPostId(postId, true);
-            await fetchSendToJandi(session?.user.name!, postId, "comment", postData!, comment);
+            if (session?.user.role !== "USER") {
+                await fetchPostId(postId, true);
+            } else {
+                await fetchSendToJandi(session?.user.name!, postId, "comment", postData!, comment);
+            }
 
             fetchData();
             setCommentData('');
@@ -192,11 +208,6 @@ export default function Answer() {
         if (text) {
             const data = JSON.parse(text);
             setPostData(data as Post);
-            // setTitle(data.title);
-            // setContent(data.content);
-            // setCategoryId(data.category_id);
-            // setCategoryName(data.category_name);
-            // setUserName(data.user.name);
 
             if (session?.user?.id === data.user.id) {
                 setWriterCheck(true);
@@ -210,10 +221,11 @@ export default function Answer() {
 
     useEffect(() => {
         fetchData();
-    }, [fetchData]);
+    }, []);
 
     return (
         <div className={style.container}>
+            {isLoading && <QnaLoading/>}
             <section className={style.userContainer}>
                 <label className={style.userLabel}>User</label>
                 <label className={style.inputUser}>{postData?.user?.name}</label>
@@ -271,11 +283,11 @@ export default function Answer() {
                             {renderFileIcon(file.name)}
                                 {file.name}
                             </span>
-                            <FontAwesomeIcon
+                            {session?.user?.role === 'USER' && (<FontAwesomeIcon
                                 className={style.fileDelete}
                                 icon={faXmark}
                                 onClick={()=> handleFileDeleteClick(file.post_id, file.id)}
-                            />
+                            />)}
                         </div>
                     ))}
                 </ul>

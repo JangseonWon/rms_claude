@@ -8,12 +8,14 @@ import {Post} from "@/model/Post";
 import React, {ChangeEvent, useState} from "react";
 import {fetchFile} from "@/app/(afterLogin)/qna/_api/fetchFile";
 import {fetchSendToJandi} from "@/app/(afterLogin)/qna/_api/fetchSendToJandi";
+import QnaLoading from "@/app/(afterLogin)/qna/_component/QnaLoading";
 
 export default function Question() {
     const route = useRouter();
     const { data: session } = useSession();
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [categoryId, setCategoryId] =
         useState('f9476263-f8b2-4ff9-b5f9-ed680715401e');
@@ -36,29 +38,33 @@ export default function Question() {
 
         const confirmed = window.confirm('문의 등록하시겠습니까?');
         if (confirmed) {
-            const postData: Post = {
-                title: title,
-                post_category_id: categoryId,
-                content: content,
-                user_id: session?.user.id
-            };
+            setIsLoading(true);
+            try {
+                const postData: Post = {
+                    title: title,
+                    post_category_id: categoryId,
+                    content: content,
+                    user_id: session?.user.id
+                };
 
-            const postResponse = await fetchPost(postData);
-            if (!postResponse.ok) {
-                console.error('Post creation failed');
-            }
-
-            const postId = (await postResponse.json()).id;
-            if (selectedFiles.length > 0) {
-                const fileUploadResponse = await fetchFile(postId, selectedFiles);
-                if (!fileUploadResponse.ok) {
-                    console.error('File upload failed');
+                const postResponse = await fetchPost(postData);
+                if (!postResponse.ok) {
+                    console.error('Post creation failed');
                 }
-            }
-            await fetchSendToJandi(session?.user.name!, postId, categoryName, postData);
 
-            alert('정상적으로 등록되었습니다.');
-            route.push('/qna');
+                const postId = (await postResponse.json()).id;
+                if (selectedFiles.length > 0) {
+                    const fileUploadResponse = await fetchFile(postId, selectedFiles);
+                    if (!fileUploadResponse.ok) {
+                        console.error('File upload failed');
+                    }
+                }
+                await fetchSendToJandi(session?.user.name!, postId, categoryName, postData);
+            } finally {
+                alert('정상적으로 등록되었습니다.');
+                setIsLoading(false);
+                route.push('/qna');
+            }
         }
     };
 
@@ -83,6 +89,7 @@ export default function Question() {
 
     return (
         <div className={style.container}>
+            {isLoading && <QnaLoading/>}
             <section className={style.userAndCategoryContainer}>
                 <div className={style.userContainer}>
                     <label className={style.userLabel}>User</label>

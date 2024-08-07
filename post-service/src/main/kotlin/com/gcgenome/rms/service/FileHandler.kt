@@ -6,7 +6,10 @@ import com.gcgenome.rms.tables.pojos.PostFile
 import org.jooq.DSLContext
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.codec.multipart.FilePart
+import org.springframework.http.codec.multipart.Part
 import org.springframework.stereotype.Component
+import org.springframework.util.MultiValueMap
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import software.amazon.awssdk.core.async.AsyncRequestBody
 import software.amazon.awssdk.core.async.AsyncResponseTransformer
@@ -35,9 +38,19 @@ class FileHandler(
             }
     }
 
-    fun uploadFile(authentication: UserAuthentication, postId: UUID, filePart: FilePart): Mono<PostFile> {
+    fun uploadFiles(parts: MultiValueMap<String, Part>, authentication: UserAuthentication, postId: UUID): Mono<List<PostFile>> {
+        val fileParts = parts["file"]?.filterIsInstance<FilePart>() ?: emptyList()
+        return if (fileParts.isNotEmpty()) {
+            Flux.fromIterable(fileParts)
+                .flatMap { filePart -> uploadFile(authentication.user.id!!, postId, filePart) }
+                .collectList()
+        } else {
+            Mono.error(IllegalArgumentException("No files uploaded"))
+        }
+    }
+
+    fun uploadFile(userId: String, postId: UUID, filePart: FilePart): Mono<PostFile> {
         val fileName = filePart.filename()
-        val userId = authentication.user.id
         val currentDate = LocalDate.now()
         val dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd")
         val formattedDate = currentDate.format(dateFormatter)
@@ -93,7 +106,6 @@ class FileHandler(
                     .bucket(bucketName)
                     .prefix(directory + "/")
                     .build()
-
                 Mono.fromFuture { s3Client.listObjectsV2(listObjectsRequest) }
                     .flatMap { listObjectsResponse ->
                         val keysToDelete = listObjectsResponse.contents().map { it.key() }
@@ -107,7 +119,6 @@ class FileHandler(
                                     it.objects(keysToDelete.map { key -> ObjectIdentifier.builder().key(key).build() })
                                 }
                                 .build()
-
                             Mono.fromFuture { s3Client.deleteObjects(deleteObjectsRequest) }
                                 .then(Mono.from(dslContext.deleteFileByPostId(postId)))
                                 .thenReturn(file)
