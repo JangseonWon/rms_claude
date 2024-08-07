@@ -69,7 +69,7 @@ export default function PostTable() {
     };
 
     const handleRowClick = async (post: Post, userId: string) => {
-        if (session?.user.role !== 'USER') await fetchPostId(post.id!, false);
+        if (session?.user.role === 'USER') await fetchPostId(post.id!, false);
         router.push(`/qna/${userId}/${post.id}`);
     };
 
@@ -139,7 +139,7 @@ export default function PostTable() {
                     <tbody>
                     {postData && postData.length > 0 && postData.map((row, rowIndex) => (
                         <tr key={rowIndex} onClick={() => handleRowClick(row, row.user?.id!)}>
-                            <td>{row.read ? 'To Be Confirmed' : 'Finished'}</td>
+                            <td>{row.read ? 'Finished' : 'To Be Confirmed'}</td>
                             <td>
                                 <span
                                     className={`${style.category} ${style[`category-${categoryMap[row.post_category_id!!]}`]}`}

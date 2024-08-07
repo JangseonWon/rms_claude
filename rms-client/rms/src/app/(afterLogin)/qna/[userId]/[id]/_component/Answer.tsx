@@ -170,7 +170,7 @@ export default function Answer() {
                 user_id: session?.user.id
             }
             await fetchComment(comment);
-            if (session?.user.role === "USER") await fetchPostId(postId, true);
+            if (session?.user.role !== "USER") await fetchPostId(postId, true);
             await fetchSendToJandi(session?.user.name!, postId, "comment", postData!, comment);
 
             fetchData();

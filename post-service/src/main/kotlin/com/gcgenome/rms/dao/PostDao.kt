@@ -152,7 +152,7 @@ interface PostDao{
                 .set(POST.LAST_MODIFY_AT, LocalDateTime.now())
                 .set(POST.POST_CATEGORY_ID, post.postCategoryId)
                 .set(POST.USER_ID, userId ?: post.userId)
-                .set(POST.READ, true)
+                .set(POST.READ, false)
                 .returning()
         ).map { it.into(Post::class.java) }
     }
@@ -163,7 +163,7 @@ interface PostDao{
                 .set(POST.TITLE, post.title)
                 .set(POST.CONTENT, post.content)
                 .set(POST.LAST_MODIFY_AT, LocalDateTime.now())
-                .set(POST.READ, true)
+                .set(POST.READ, false)
                 .where(POST.ID.eq(postId))
                 .returning()
         ).map { it.into(Post::class.java) }
