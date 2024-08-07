@@ -166,8 +166,13 @@ export default function Answer() {
     const handleFileDeleteClick = async (postId: string, fileId: string) => {
         const confirmed = window.confirm('파일을 삭제하시겠습니까?');
         if (confirmed) {
-            await deleteFileById(postId, fileId);
-            fetchData();
+            setIsLoading(true);
+            try{
+                await deleteFileById(postId, fileId);
+            } finally {
+                fetchData();
+                setIsLoading(false);
+            }
         }
     }
 
