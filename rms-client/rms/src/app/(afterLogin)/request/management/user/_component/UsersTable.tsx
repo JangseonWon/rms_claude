@@ -2,7 +2,7 @@
 
 import React, {useEffect, useState} from "react";
 import style from "@/app/(afterLogin)/request/management/user/_component/usersTable.module.css";
-import {faAngleLeft, faAngleRight, faBuildingColumns, faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons";
+import {faAngleLeft, faAngleRight, faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
 import {Paging} from "@/model/Paging";
@@ -13,6 +13,8 @@ import {fetchUserUpdate} from "@/app/(afterLogin)/_api/fetchUserUpdate";
 import ServiceModal from "@/app/(afterLogin)/request/management/user/_component/ServiceModal";
 import InstitutionModal from "@/app/(afterLogin)/request/management/user/_component/InstitutionModal";
 import UserServiceEditModal from "@/app/(afterLogin)/request/management/user/_component/UserServiceEditModal";
+import SelectBox from "@/app/_component/SelectBox";
+import {SelectBoxOption} from "@/model/SelectBoxOption";
 
 interface UserWithSelected extends User {
     isSelected?: boolean;
@@ -31,7 +33,17 @@ export default function UsersTable() {
     const [selectedUser, setSelectedUser] = useState<User>();
     const [institutionModalOpen, setInstitutionModalOpen] = useState<boolean>(false);
     const [selectedInstitutionUser, setSelectedInstitutionUser] = useState<{id: string; name: string} | null>(null);
+    const [selectOption, setSelectOption] = useState<string>('ID');
 
+    const selectBoxOptions: SelectBoxOption[] = [
+        { value: "id", name: "ID" },
+        { value: "name", name: "Name" },
+        { value: "email", name: "Email" },
+        { value: "phone_number", name: "Phone Number" },
+        { value: "branch_name", name: "Institution" },
+        { value: "branch_serial", name: "Serial" },
+        { value: "role", name: "Role" },
+    ];
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage =>({
@@ -123,15 +135,16 @@ export default function UsersTable() {
                     <button className={style.alisSync} onClick={handleAlisSyncButtonClick}>
                         Alis-Sync
                     </button>
-                    <select className={style.selectSearchKey} onChange={handleSearchKeyChange}>
-                        <option value="id">ID</option>
-                        <option value="name">Name</option>
-                        <option value="email">Email</option>
-                        <option value="phone_number">Phone Number</option>
-                        <option value="branch_name">Institution</option>
-                        <option value="branch_serial">Serial</option>
-                        <option value="role">Role</option>
-                    </select>
+                    <SelectBox
+                        width={"7vw"}
+                        value={selectOption}
+                        options={selectBoxOptions}
+                        label={"status"}
+                        onChange={(selectedOption) =>{
+                            setSelectOption(selectedOption.value);
+                            handleSearchKeyChange({target: {value: selectedOption.value}} as React.ChangeEvent<HTMLSelectElement>);
+                        }}
+                    />
                 </div>
                 <div className={style.filterContainerRight}>
                     <InputBox label={"search"} onChange={(value) => {

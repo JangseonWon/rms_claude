@@ -41,7 +41,7 @@ export default function SelectBox({ label, value, options, onChange, required=fa
     }, [selectedValue, required, value]);
 
     return (
-        <div ref={selectBoxRef} style={{ width }}>
+        <div ref={selectBoxRef} className={style.selectContainer} style={{ width }}>
             <section className={`${style.selectSection} ${hasError ? style.error : ""}`}>
                 <p className={style.label}>{label}</p>
                 <button className={`${style.btnSelect} ${isOpen ? style.open : ''}`} onClick={toggleList}>

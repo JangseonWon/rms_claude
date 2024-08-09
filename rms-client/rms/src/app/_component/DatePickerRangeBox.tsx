@@ -47,6 +47,9 @@ export default function DatePickerRangeBox({label, value, onChange, required = f
                 endDate={endDate}
                 dateFormat={"dd-MM-yyyy"}
                 showPopperArrow={false}
+                showMonthDropdown
+                showYearDropdown
+                dropdownMode="select"
                 onChange={(update) =>{
                     setDateRange(update);
                     if(update[0] && update[1]) onChange(update[0], update[1])

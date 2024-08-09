@@ -1,10 +1,11 @@
-
+.selectContainer {
+    position: relative;
+}
 .label{
     font-size: 0.65vw;
     color: #666666;
     margin-bottom: 5px;
 }
-
 .selectSection ul,
 .selectSection li {
     list-style: none;
@@ -51,6 +52,7 @@
     outline: 0.05vw solid #C4C4C4;
     border-radius: 10px;
     display: none;
+    z-index: 1000;
 }
 
 .listMember.open {

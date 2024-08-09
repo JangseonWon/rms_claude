@@ -9,6 +9,8 @@ import {Paging} from "@/model/Paging";
 import {getServiceCategory} from "@/app/(afterLogin)/request/management/service/_api/getServiceCategory";
 import {ServiceManage} from "@/model/ServiceManage";
 import ServiceEditModal from "@/app/(afterLogin)/request/management/service/_component/ServiceEditModal";
+import SelectBox from "@/app/_component/SelectBox";
+import {SelectBoxOption} from "@/model/SelectBoxOption";
 
 interface InstitutionWithSelected extends ServiceManage {
     isSelected?: boolean;
@@ -23,6 +25,14 @@ export default function ServiceTable() {
     const [searchValue, setSearchValue] = useState<string>("");
     const [serviceModalOpen, setServiceModalOpen] = useState<boolean>(false);
     const [selectedService, setSelectedService] = useState<ServiceManage>();
+    const [selectOption, setSelectOption] = useState<string>('Service Id');
+
+    const selectBoxOptions: SelectBoxOption[] = [
+        { value: "service_id", name: "Service Id" },
+        { value: "service_name", name: "Service Name" },
+        { value: "category_id", name: "Category Id" },
+        { value: "category_name", name: "Category Name" },
+    ];
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage =>({
@@ -98,12 +108,16 @@ export default function ServiceTable() {
                     <button className={style.alisSync} onClick={handleAlisSyncClick}>
                         Alis-Sync
                     </button>
-                    <select className={style.selectSearchKey} onChange={handleSearchKeyChange}>
-                        <option value="service_id">Service Id</option>
-                        <option value="service_name">Service Name</option>
-                        <option value="category_id">Category Id</option>
-                        <option value="category_name">Category Name</option>
-                    </select>
+                    <SelectBox
+                        width={"7vw"}
+                        value={selectOption}
+                        options={selectBoxOptions}
+                        label={"status"}
+                        onChange={(selectedOption) =>{
+                            setSelectOption(selectedOption.value);
+                            handleSearchKeyChange({target: {value: selectedOption.value}} as React.ChangeEvent<HTMLSelectElement>);
+                        }}
+                    />
                 </div>
                 <div className={style.filterContainerRight}>
                     <InputBox label={"search"} onChange={(value) => {
