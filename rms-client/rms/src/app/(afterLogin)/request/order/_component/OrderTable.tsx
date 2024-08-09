@@ -10,8 +10,9 @@ import {format} from "date-fns";
 import {useRouter} from "next/navigation";
 import {faFileLines} from "@fortawesome/free-regular-svg-icons/faFileLines";
 import {getRequestOrders} from "@/app/(afterLogin)/request/order/_api/getRequestOrders";
+import BarcodeButton from "@/app/(afterLogin)/request/order/_component/BarcodeButton";
 
-interface RequestWithSelected extends Request {
+export interface RequestWithSelected extends Request {
     isSelected?: boolean;
 }
 
@@ -19,10 +20,21 @@ export default function OrderTable() {
     const [requestData, setRequestData] = useState<RequestWithSelected[]>([]);
     const [page, setPage] = useState<Page>({size:5, number:1});
     const router = useRouter();
+    const isSelectedAll = requestData.every((row) => row.isSelected);
 
-    useEffect(() => {
-        fetchData(page.size, page.number)
-    }, [page.size, page.number]);
+    const handleSelectChange = (rowIndex: number, isSelected: boolean) => {
+        setRequestData((prevData) => {
+            const updatedData = [...prevData];
+            updatedData[rowIndex].isSelected = isSelected;
+            return updatedData;
+        });
+    };
+
+    const handleSelectAll = (isSelected: boolean) => {
+        setRequestData((prevData) =>
+            prevData.map((row) => ({ ...row, isSelected }))
+        );
+    };
 
     const handlePageChange = (newPageNumber: number) => {
         setPage(prevPage =>({...prevPage, number: newPageNumber}));
@@ -47,11 +59,26 @@ export default function OrderTable() {
         router.push(`/request/order/info?order=${row.order_id}&service=${row.service!.id}&sample=${row.sample!.id}&user_id=${row.sample!.patient!.organization!.user!.id}`);
     };
 
+    const selectedRequest = requestData.filter((row) => row.isSelected);
+
+    useEffect(() => {
+        fetchData(page.size, page.number)
+    }, [page.size, page.number]);
+
     return (
         <div className={style.container}>
+            <BarcodeButton selectRequest={selectedRequest}/>
             <table className={style.table}>
                 <thead>
                 <tr>
+                    <th>
+                        <input
+                            type="checkbox"
+                            checked={isSelectedAll}
+                            onChange={() => handleSelectAll(!isSelectedAll)}
+                            className={style.checkbox}
+                        />
+                    </th>
                     <th>Service Name</th>
                     <th>Patient(s) Name</th>
                     <th>Patient BOD<br/>(DD/MM/YYYY)</th>
@@ -64,8 +91,16 @@ export default function OrderTable() {
                 </tr>
                 </thead>
                 <tbody>
-                {requestData && requestData.length > 0 && requestData.map((row) => (
+                {requestData && requestData.length > 0 && requestData.map((row, rowIndex) => (
                     <tr key={row.order_id! + row.service!.id + row.sample!.id}>
+                        <td onClick={(e) => e.stopPropagation()}>
+                            <input
+                                type="checkbox"
+                                checked={row.isSelected || false}
+                                onChange={() => handleSelectChange(rowIndex, !row.isSelected)}
+                                className={style.checkbox}
+                            />
+                        </td>
                         <td>{row.service?.name}</td>
                         <td>{row.sample?.patient?.name}</td>
                         <td>{row.sample?.patient?.birth_day}-{row.sample?.patient?.birth_month}-{row.sample?.patient?.birth_year}</td>
@@ -81,7 +116,7 @@ export default function OrderTable() {
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     handleInfoClick(row);
-                            }}/>
+                                }}/>
                         </td>
                     </tr>
                 ))}

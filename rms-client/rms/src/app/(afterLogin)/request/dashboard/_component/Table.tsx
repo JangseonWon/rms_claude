@@ -106,9 +106,17 @@ export default function Table() {
                             handleSearchChange({ key: "date_from", value: format(from, "yyyy-MM-dd")})
                             handleSearchChange({ key: "date_to", value: format(to, "yyyy-MM-dd")})
                         }}/>
-                    <SelectBox value={status} options={statusList} label={"status"} onChange={(selectedOption) =>{
-                        handleSelectStatusChange(selectedOption.value);
-                    }}/>
+                    <div>
+                        <SelectBox
+                            width={"7vw"}
+                            value={status}
+                            options={statusList}
+                            label={"status"}
+                            onChange={(selectedOption) =>{
+                                handleSelectStatusChange(selectedOption.value);
+                            }}
+                        />
+                    </div>
                 </div>
                 <div className={style.filterContainerLeft}>
                     <DownloadExcelButton requestData={requestData} status={status} />

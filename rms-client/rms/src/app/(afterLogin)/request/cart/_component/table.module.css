@@ -25,16 +25,13 @@
 }
 .table tbody tr {
     border-bottom: 1px solid #838689;
-    cursor: pointer;
+    /*cursor: pointer;*/
 }
 .table tbody tr:nth-child(even) {
-    background-color: #EBECEE;
+    background-color: #ffffff;
 }
 .table tbody tr:nth-child(odd) {
     background-color: #ffffff;
-}
-.table tbody tr:hover {
-    background-color: #D5D5D5;
 }
 .table tbody tr td {
     color: #666666;
@@ -89,7 +86,13 @@
     border-color: #1a1a1a;
 }
 .checkbox {
-    width: 20px;
-    height: 20px;
+    width: 2vw;
+    height: 2vh;
     cursor: pointer;
+}
+.info {
+    cursor: pointer;
+}
+.info:hover {
+    color: #002b49;
 }

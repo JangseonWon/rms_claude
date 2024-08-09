@@ -139,10 +139,10 @@ class RequestHandler(
         filters.let {
             for (filter in it) {
                 conditions = when (filter.key) {
-                    "date_from" -> conditions.and(REQUEST.CREATE_AT.ge(LocalDate.parse(filter.value).atStartOfDay()))
-                    "date_to" -> conditions.and(REQUEST.CREATE_AT.le(LocalDate.parse(filter.value).plusDays(1).atStartOfDay()))
+                    "date_from" -> conditions.and(REQUEST.CREATE_AT.ge(LocalDate.parse(filter.value!!).atStartOfDay()))
+                    "date_to" -> conditions.and(REQUEST.CREATE_AT.le(LocalDate.parse(filter.value!!).plusDays(1).atStartOfDay()))
                     "status" -> {
-                        if (filter.value != "all") {
+                        if (filter.value != "ALL") {
                             conditions.and(REQUEST.STATUS.eq(filter.value))
                         } else {
                             conditions
@@ -167,42 +167,42 @@ class RequestHandler(
             }
             status == "inprogress" -> {
                 val progress = Status.entries.filter { it != Status.CART && it != Status.FINISHED }
-                progress.forEach { status ->
-                    (progressCondition as MutableList).add(field("status").like("%$status%"))
+                progress.forEach { statusValue ->
+                    (progressCondition as MutableList).add(field("status").like("%$statusValue%"))
                 }
             }
             status == "result" -> {
                 val progress = Status.entries.filter { it == Status.DELIVERED }
-                progress.forEach { status ->
-                    (progressCondition as MutableList).add(field("status").like("%$status%"))
+                progress.forEach { statusValue ->
+                    (progressCondition as MutableList).add(field("status").like("%$statusValue%"))
                 }
             }
             status == "confirm" -> {
                 val progress = Status.entries.filter { it == Status.ORDERED }
-                progress.forEach { status ->
-                    (progressCondition as MutableList).add(field("status").like("%$status%"))
+                progress.forEach { statusValue ->
+                    (progressCondition as MutableList).add(field("status").like("%$statusValue%"))
                 }
             }
             status == "order" -> {
                 val progress = Status.entries.filter { it == Status.ORDERED || it == Status.INPROGRESS }
-                progress.forEach { status ->
-                    (progressCondition as MutableList).add(field("status").like("%$status%"))
+                progress.forEach { statusValue ->
+                    (progressCondition as MutableList).add(field("status").like("%$statusValue%"))
                 }
             }
             status == "deliver" -> {
                 val progress = Status.entries.filter { it == Status.DELIVERED }
-                progress.forEach { status ->
-                    (progressCondition as MutableList).add(field("status").like("%$status%"))
+                progress.forEach { statusValue ->
+                    (progressCondition as MutableList).add(field("status").like("%$statusValue%"))
                 }
             }
             status == "download" -> {
                 val progress = Status.entries.filter { it == Status.DELIVERED || it == Status.FINISHED}
-                progress.forEach { status ->
-                    (progressCondition as MutableList).add(field("status").like("%$status%"))
+                progress.forEach { statusValue ->
+                    (progressCondition as MutableList).add(field("status").like("%$statusValue%"))
                 }
             }
             else -> {
-                if (status != "all")
+                if (status != "ALL")
                     throw WebInputException()
             }
         }

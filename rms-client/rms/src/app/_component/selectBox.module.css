@@ -47,7 +47,7 @@
 
 .listMember {
     position: absolute;
-    overflow: hidden;
+    overflow: auto;
     outline: 0.05vw solid #C4C4C4;
     border-radius: 10px;
     display: none;

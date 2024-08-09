@@ -27,7 +27,7 @@
     border-bottom: 1px solid #838689;
 }
 .table tbody tr:nth-child(even) {
-    background-color: #EBECEE;
+    background-color: #ffffff;
 }
 .table tbody tr:nth-child(odd) {
     background-color: #ffffff;
@@ -85,36 +85,10 @@
     border-color: #1a1a1a;
 }
 .checkbox {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
+    width: 2vw;
+    height: 2vh;
     cursor: pointer;
 }
-
-.checkbox input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-}
-
-.checkmark {
-    width: 20px;
-    height: 20px;
-    background-color: #faf7f7;
-    border: 1px solid #DAE2ED;
-    border-radius: 3px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.checkbox input:checked + .checkmark {
-    background-color: #90BA2D;
-}
-
 .checkmark:after {
     content: "";
     display: none;

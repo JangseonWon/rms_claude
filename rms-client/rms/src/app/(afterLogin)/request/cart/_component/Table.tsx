@@ -13,6 +13,7 @@ import GreenButton from "@/app/_component/GreenButton";
 import BlueButton from "@/app/_component/BlueButton";
 import {deleteRequest} from "@/app/(afterLogin)/request/cart/_api/deleteRequest";
 import {putRequest} from "@/app/(afterLogin)/request/cart/_api/putRequest";
+import {faFileLines} from "@fortawesome/free-regular-svg-icons/faFileLines";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean; // Add an optional property for selection state
@@ -22,7 +23,7 @@ export default function Table() {
     const [requestData, setRequestData] = useState<RequestWithSelected[]>([])
     const [page, setPage] = useState<Page>({size:10, number:1})
     const router = useRouter();
-    const isSelectedAll = requestData.every((row) => row.isSelected); // Check if all or none are selected
+    const isSelectedAll = requestData.every((row) => row.isSelected);
 
     useEffect(() => {
         fetchData(page.size, page.number)
@@ -54,11 +55,15 @@ export default function Table() {
             prevData.map((row) => ({ ...row, isSelected }))
         );
     };
-    const handleRowClick = (row: RequestWithSelected) => {
+    const handleInfoClick = (row: RequestWithSelected) => {
         router.push(`/request/cart/info?order=${row.order_id}&service=${row.service!.id}&sample=${row.sample!.id}&user_id=${row.sample!.patient!.organization!.user!.id}`);
     };
     const handleDeleteCart = async () => {
         const selectedRequests = requestData.filter(request => request.isSelected);
+        if( selectedRequests.length === 0) {
+            alert("No selected.");
+            return;
+        }
         const response = await deleteRequest(selectedRequests)
         if(response.ok) alert("deleted!")
         else alert("fail")
@@ -75,7 +80,7 @@ export default function Table() {
     return (
         <div className={style.container}>
             <div className={style.buttonSection}>
-                <GreenButton name={"Back"} onClick={handleDeleteCart}/>
+                <GreenButton name={"Delete"} onClick={handleDeleteCart}/>
                 <BlueButton name={"Save & Order"} onClick={handleCartToOrder}/>
             </div>
             <div>
@@ -98,13 +103,13 @@ export default function Table() {
                         <th>Collection Date<br/>(DD/MM/YYYY)</th>
                         <th>MRN</th>
                         <th>Service Code</th>
+                        <th>Info</th>
                     </tr>
                     </thead>
                     <tbody>
                     {requestData.map((row, rowIndex) => (
                         <tr
                             key={row.order_id! + row.service!.id + row.sample!.id}
-                            onClick={()=>handleRowClick(row)}
                         >
                             <td onClick={(e) => e.stopPropagation()}>
                                 <input
@@ -122,6 +127,15 @@ export default function Table() {
                             <td>{row.sample?.sampling_on ? format(new Date(row.sample.sampling_on), "dd-MM-yyyy") : '-'}</td>
                             <td>{row.sample?.patient?.serial}</td>
                             <td>{row.service?.id}</td>
+                            <td>
+                                <FontAwesomeIcon
+                                    icon={faFileLines}
+                                    className={style.info}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleInfoClick(row)
+                                    }}/>
+                            </td>
                         </tr>
                     ))}
                     </tbody>

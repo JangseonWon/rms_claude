@@ -1,5 +1,5 @@
 export enum Status {
-    TOTAL = "all",
+    TOTAL = "ALL",
     ORDERED = "ORDERED",
     INPROGRESS = "INPROGRESS",
     TESTFAILED = "TESTFAILED",

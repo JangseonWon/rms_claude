@@ -1,0 +1,21 @@
+.container {
+    float: right;
+    margin: 1vh 1vw 1vh auto;
+}
+
+.barcodeButton {
+    width: 7vw;
+    height: 3.5vh;
+    border-radius: 20px;
+    border: solid #5676a2 thin;
+    background: linear-gradient(to right, #023a60, #5676a2);
+    color: #ffffff;
+    font-size: 0.7vw;
+    font-weight: 700;
+    cursor: pointer;
+}
+.barcodeButton:hover {
+    background: linear-gradient(to right, #90BA2D, #6a9600);
+    border: solid #90BA2D thin;
+    color: #ffffff;
+}

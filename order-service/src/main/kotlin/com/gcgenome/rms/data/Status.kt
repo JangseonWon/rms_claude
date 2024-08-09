@@ -7,6 +7,6 @@ enum class Status {
     TESTFAILED,
     DELIVERED,
     FINISHED,
-    CART
-
+    CART,
+    TOTAL
 }
