@@ -82,21 +82,23 @@ export default function OrderInfo() {
                 </div>
                 {request ? (
                     <div className={style.modalContent}>
-                        <div className={style.content}>
-                            <p className={style.title}>Institution name*</p>
-                            <InputBox
-                                label={"Institution"}
-                                value={request.sample?.patient?.organization?.name}
-                                disabled={true}
-                            />
-                        </div>
-                        <div className={style.content}>
-                            <p className={style.title}>Service Info.</p>
-                            <InputBox
-                                label={"Service"}
-                                value={request.service?.name}
-                                disabled={true}
-                            />
+                        <div className={style.headerContent}>
+                            <div className={style.firstContent}>
+                                <p className={style.firstTitle}>Institution name</p>
+                                <InputBox
+                                    label={"Institution"}
+                                    value={request.sample?.patient?.organization?.name}
+                                    disabled={true}
+                                />
+                            </div>
+                            <div className={style.firstContent}>
+                                <p className={style.firstTitle}>Service Info.</p>
+                                <InputBox
+                                    label={"Service"}
+                                    value={request.service?.name}
+                                    disabled={true}
+                                />
+                            </div>
                         </div>
                         <div className={style.content}>
                             <p className={style.title}>Patient Info.</p>
@@ -124,6 +126,24 @@ export default function OrderInfo() {
                             />
                         </div>
                         <div className={style.content}>
+                            <p className={style.title}>Additional Info.</p>
+                            <InputBox
+                                label={"Medical Department"}
+                                value={request.department}
+                                disabled={true}
+                            />
+                            <InputBox
+                                label={"Ward"}
+                                value={request.ward}
+                                disabled={true}
+                            />
+                            <InputBox
+                                label={"Physician Name"}
+                                value={request.physician}
+                                disabled={true}
+                            />
+                        </div>
+                        <div className={style.content}>
                             <p className={style.title}>Specimen/.Sample Info.</p>
                             <InputBox
                                 label={"Type*"}
@@ -140,28 +160,14 @@ export default function OrderInfo() {
                                 value={request.sample?.quantity?.toString()}
                                 disabled={true}
                             />
-                            <InputBox
-                                label={"Memo"}
-                                value={request.memo}
-                                disabled={true}
-                            />
                         </div>
                         <div className={style.content}>
-                            <p className={style.title}>Additional Info.</p>
-                            <InputBox
-                                label={"Medical Department"}
-                                value={request.department}
-                                disabled={true}
-                            />
-                            <InputBox
-                                label={"Ward"}
-                                value={request.ward}
-                                disabled={true}
-                            />
-                            <InputBox
-                                label={"Physician Name"}
-                                value={request.physician}
-                                disabled={true}
+                            <p className={style.title}>Memo</p>
+                            <textarea
+                                className={style.memo}
+                                rows={8}
+                                value={request.memo}
+                                readOnly={true}
                             />
                         </div>
                     </div>

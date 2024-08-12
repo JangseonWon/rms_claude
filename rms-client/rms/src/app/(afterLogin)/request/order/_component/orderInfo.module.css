@@ -60,3 +60,25 @@
     display: flex;
     justify-content: flex-end;
 }
+.headerContent {
+    display: flex;
+}
+.firstContent {
+    margin: 2vh 1vw 0.5vh 0;
+}
+.firstTitle {
+    color: #002b49;
+    font-size: 18px;
+    font-weight: 700;
+}
+.memo {
+    border: solid 1px #EBEDF4;
+    background: #FAFAFA;
+    width: 100%;
+    border-radius: 15px;
+    padding: 1vh 1vw;
+    box-shadow: 0 2px 2px #F3F6F9;
+}
+.memo:focus {
+    outline: none;
+}
