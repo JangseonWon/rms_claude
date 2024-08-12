@@ -96,7 +96,7 @@ export default function UserServiceEditModal({user, open, closeModal}: Props) {
                         </div>
                         <div className={style.secondTop}>
                             <div className={style.serviceAddContainer}>
-                                <SelectSearchBox type={'service'} onSelect={setSelectedAddService} width={'20vw'}/>
+                                <SelectSearchBox type={'service'} onSelect={setSelectedAddService} width={'15vw'}/>
                             </div>
                             <button className={style.addButton}
                                 onClick={handleUserServiceInsertClick}

@@ -86,25 +86,22 @@ export default function SelectSearchBox({ type, onSelect, width }: Props) {
     }, []);
 
     return (
-        <div ref={selectBoxRef} style={{ width }}>
-            <section className={style.selectSection}>
-                <p className={style.label}>{type} </p>
-                <button className={`${style.btnSelect} ${isOpen ? style.open : ''}`} onClick={toggleList}>
-                    <div>{selectedValue}</div>
-                    <FontAwesomeIcon icon={faChevronDown}/>
-                </button>
-                <div className={`${style.searchList} ${isOpen ? style.open : ''}`}>
+        <div ref={selectBoxRef} className={style.container} style={{ width: width }} onClick={toggleList}>
+            <section className={style.selectSection} >
+                <div className={`${style.btnSelect} ${isOpen ? style.open : ''}`}>
                     <input
+                        className={style.selectInput}
                         type="text"
                         value={selectedValue}
                         onChange={handleSearchChange}
-                        className={style.searchInput}
-                        placeholder="Search..."
                     />
-                    <ul className={style.listMember} style={{ width }}>
+                    <FontAwesomeIcon icon={faChevronDown} className={style.icon}/>
+                </div>
+                <div className={`${style.searchList} ${isOpen ? style.open : ''}`} style={{width: `calc(${width} + 2vw)`}}>
+                    <ul className={style.listMember}>
                         {options.map((option) => (
                             <li key={option.name}>
-                                <button onClick={() => handleOptionClick(option)} style={{ width }}>
+                                <button onClick={() => handleOptionClick(option)} style={{width}}>
                                     {option.value} / {option.name}
                                 </button>
                             </li>

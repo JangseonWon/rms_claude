@@ -1,10 +1,6 @@
-
-.label{
-    font-size: 0.65vw;
-    color: #666666;
-    margin-bottom: 5px;
+.container {
+    margin: 2vh 2vw 1vh 0;
 }
-
 .selectSection ul,
 .selectSection li {
     list-style: none;
@@ -14,6 +10,11 @@
 }
 .selectSection p {
     margin-top: 0;
+}
+.label{
+    font-size: 0.65vw;
+    color: #666666;
+    margin-bottom: 5px;
 }
 .btnSelect {
     display: flex;
@@ -44,6 +45,11 @@
     outline: 0.1vw solid #CCE492;
     border: 1px solid #90BA2D;
 }
+.selectInput, .selectInput:focus {
+    width: 100%;
+    border: none;
+    outline: none;
+}
 .searchList {
     display: none;
     position: absolute;
@@ -69,7 +75,7 @@
     z-index: 10;
 }
 .listMember li {
-    width: 9.5vw;
+
 }
 .listMember li button {
     width: 100%;

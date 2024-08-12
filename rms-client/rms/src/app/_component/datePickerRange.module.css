@@ -34,3 +34,20 @@
 .dateBox.error input{
     border: 1px solid red;
 }
+.leftButton, .rightButton {
+    padding: 0.2vh 0.2vw;
+    margin: 0.2vh 0.4vw;
+    background: #ffffff;
+    border: none;
+    cursor: pointer;
+}
+.leftButton:hover, .rightButton:hover {
+    color: #90BA2D;
+}
+.selectBox {
+    margin: 1vh 0.2vw;
+    padding: 0.2vh 0.2vw;
+}
+.selectBox:focus {
+    outline: none;
+}

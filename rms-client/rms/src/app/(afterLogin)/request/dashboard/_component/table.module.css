@@ -22,8 +22,7 @@
 .table {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 0;
-    overflow: hidden;
+    border-spacing: 0 0.2vh;
     border-radius: 15px;
 }
 .table thead {
@@ -36,12 +35,12 @@
     font-weight: 300;
 }
 .table tbody tr {
-    border-bottom: 0.1vh solid #838689;
+    border-bottom: 0.2vh solid #e80c0c;
 }
 .table tbody tr td {
     color: #666666;
     font-size: 0.8vw;
-    padding: 1vh 1vw;
+    padding: 0.8vh 1vw;
 }
 .table tbody tr:nth-child(even) {
     background-color: #ffffff;

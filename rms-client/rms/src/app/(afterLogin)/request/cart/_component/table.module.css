@@ -25,7 +25,6 @@
 }
 .table tbody tr {
     border-bottom: 1px solid #838689;
-    /*cursor: pointer;*/
 }
 .table tbody tr:nth-child(even) {
     background-color: #ffffff;

@@ -174,7 +174,7 @@ export default function ServiceEditModal({service, open, closeModal, refreshData
                             <div className={style.innerBody}>
                                 <div className={style.typeAndExtension}>
                                     <div className={style.AddContainer}>
-                                        <SelectSearchBox type={'sampleType'} onSelect={setSelectedSampleType}/>
+                                        <SelectSearchBox type={'sampleType'} onSelect={setSelectedSampleType} width={'11vw'}/>
                                         <button className={style.addButton}
                                                 onClick={()=> handleSampleTypeAddClick()}
                                         >
@@ -213,7 +213,7 @@ export default function ServiceEditModal({service, open, closeModal, refreshData
                             <div className={style.innerBody}>
                                 <div className={style.typeAndExtension}>
                                     <div className={style.AddContainer}>
-                                        <SelectSearchBox type={'extension'} onSelect={setSelectedExtension}/>
+                                        <SelectSearchBox type={'extension'} onSelect={setSelectedExtension} width={'11vw'}/>
                                         <div className={style.required}>
                                             <SelectBox value={required ? "True" : "False"} options={requiredOption} label={"required"} onChange={(selectedOption) => {
                                                 handleSelectRequiredChange(selectedOption.value);

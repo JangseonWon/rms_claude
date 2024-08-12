@@ -47,6 +47,7 @@
 }
 
 .listMember {
+    max-height: 20vh;
     position: absolute;
     overflow: auto;
     outline: 0.05vw solid #C4C4C4;

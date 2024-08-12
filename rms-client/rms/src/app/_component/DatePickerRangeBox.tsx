@@ -1,12 +1,14 @@
 "use client"
 
 import DatePicker, {ReactDatePickerProps} from "react-datepicker";
-import {forwardRef, useState} from "react";
+import React, {forwardRef, useState} from "react";
 import style from "@/app/_component/datePickerRange.module.css"
 import "react-datepicker/dist/react-datepicker.css";
 import '@/app/globals.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCalendarDays} from "@fortawesome/free-regular-svg-icons";
+import {getMonth, getYear} from "date-fns";
+import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 
 type Props = {
     label?: string
@@ -34,28 +36,104 @@ const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(
     )
 );
 CustomInput.displayName = "CustomInput";
+
+const range = (start: number, end: number, step: number) => {
+    let output = [];
+    for (let i = start; i <= end; i += step) {
+        output.push(i);
+    }
+    return output;
+};
+
 export default function DatePickerRangeBox({label, value, onChange, required = false}: Props) {
+    const years = range(1900, getYear(new Date()) + 1, 1);
     const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
     const [startDate, endDate] = dateRange;
-
+    const months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+    ];
     return (
         <div className={style.dateBox}>
             <p>{label}</p>
             <DatePicker
+                renderCustomHeader={({
+                         date,
+                         changeYear,
+                         changeMonth,
+                         decreaseMonth,
+                         increaseMonth,
+                         prevMonthButtonDisabled,
+                         nextMonthButtonDisabled,
+                     }) => (
+                    <div
+                        style={{
+                            margin: 10,
+                            display: "flex",
+                            justifyContent: "center",
+                        }}
+                    >
+                        <button onClick={decreaseMonth} className={style.leftButton} disabled={prevMonthButtonDisabled}>
+                            <FontAwesomeIcon icon={faAngleLeft}/>
+                        </button>
+                        <select
+                            className={style.selectBox}
+                            value={months[getMonth(date)]}
+                            onChange={({target: {value}}) =>
+                                changeMonth(months.indexOf(value))
+                            }
+                        >
+                            {months.map((option) => (
+                                <option key={option} value={option}>
+                                    {option}
+                                </option>
+                            ))}
+                        </select>
+                        <select
+                            className={style.selectBox}
+                            value={getYear(date)}
+                            onChange={({target: {value}}) =>
+                                changeYear(Number(value))
+                            }
+                        >
+                            {years.map((option) => (
+                                <option key={option} value={option}>
+                                    {option}
+                                </option>
+                            ))}
+                        </select>
+                        <button onClick={increaseMonth} className={style.rightButton}
+                                disabled={nextMonthButtonDisabled}>
+                            <FontAwesomeIcon icon={faAngleRight}/>
+                        </button>
+                    </div>
+                )}
                 selectsRange={true}
                 startDate={startDate}
                 endDate={endDate}
                 dateFormat={"dd-MM-yyyy"}
                 showPopperArrow={false}
-                showMonthDropdown
-                showYearDropdown
-                dropdownMode="select"
-                onChange={(update) =>{
-                    setDateRange(update);
-                    if(update[0] && update[1]) onChange(update[0], update[1])
+                onChange={(update) => {
+                    const selectedDates = update as unknown as [Date | null, Date | null];
+
+                    setDateRange(selectedDates);
+
+                    if (selectedDates[0] && selectedDates[1]) {
+                        onChange(selectedDates[0], selectedDates[1]);
+                    }
                 }}
                 customInput={<CustomInput/>}
             />
         </div>
-    )
+    );
 }
