@@ -5,7 +5,7 @@ export interface ServiceExtensionAndSampleType {
     sample_types?: SampleTypes[]
 }
 
-interface Extensions {
+export interface Extensions {
     id: string,
     name: string,
     required: boolean,

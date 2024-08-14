@@ -277,10 +277,6 @@ export default function Order() {
                     required={true}
                     onChange={(value) => handleRequestChange('sample.quantity', value)}
                 />
-                <InputBox
-                    label={"Memo"}
-                    onChange={(value) => handleRequestChange('memo', value)}
-                />
             </div>
             <p className={style.mainName}>Additional Info.</p>
             <div className={style.section}>
@@ -295,6 +291,14 @@ export default function Order() {
                 <InputBox
                     label={"Physician Name"}
                     onChange={(value) => handleRequestChange('physician', value)}
+                />
+            </div>
+            <div className={style.content}>
+                <p className={style.title}>Memo</p>
+                <textarea
+                    className={style.memo}
+                    rows={8}
+                    value={request.memo}
                 />
             </div>
         </div>

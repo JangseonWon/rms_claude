@@ -3,6 +3,7 @@ package com.gcgenome.rms.service
 import com.gcgenome.rms.auth.AuthenticationHandler
 import com.gcgenome.rms.auth.ManagerAuthenticationHandler
 import com.gcgenome.rms.data.Query
+import com.gcgenome.rms.exception.AdminAuthenticationException
 import com.gcgenome.rms.exception.AuthenticationNotFoundException
 import com.gcgenome.rms.exception.ServiceNotFoundException
 import com.gcgenome.rms.tables.pojos.ServiceExtension
@@ -27,6 +28,7 @@ class ServiceExtensionRouter (
         POST("/w-api/management-service/extensions", ::findExtensions)
         POST("/w-api/management-service/services/{service_id}/extensions/{extension_id}", ::insertExtension)
         DELETE("/w-api/management-service/services/{service_id}/extensions/{extension_id}", ::deleteExtension)
+        GET("/w-api/management-service/extensions", ::getExtensions)
     }
 
     private fun selectServiceExtensions(request: ServerRequest): Mono<ServerResponse> {
@@ -50,6 +52,17 @@ class ServiceExtensionRouter (
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(ServiceNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
+            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
+    }
+
+    private fun getExtensions(request: ServerRequest): Mono<ServerResponse> {
+        return authenticationHandler.principal(request)
+            .flatMap { managerAuthenticationHandler.chkAdmin(it) }
+            .flatMap { serviceHandler.getExtensionAll().collectList() }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(AdminAuthenticationException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
             .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
     }

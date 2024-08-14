@@ -1,12 +1,14 @@
 "use client"
 
 import DatePicker, {ReactDatePickerProps} from "react-datepicker";
-import {forwardRef, useEffect, useState} from "react";
+import React, {forwardRef, useEffect, useState} from "react";
 import style from "@/app/_component/datePicker.module.css"
 import "react-datepicker/dist/react-datepicker.css";
 import '@/app/globals.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCalendarDays} from "@fortawesome/free-regular-svg-icons";
+import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
+import {getMonth, getYear} from "date-fns";
 
 type Props = {
     label?: string
@@ -34,13 +36,38 @@ const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(
     )
 );
 CustomInput.displayName = "CustomInput";
+
+const range = (start: number, end: number, step: number) => {
+    let output = [];
+    for (let i = start; i <= end; i += step) {
+        output.push(i);
+    }
+    return output;
+};
+
 export default function DatePickerBox({label, value, onChange, required=false}: Props) {
+    const years = range(1900, getYear(new Date()) + 1, 1);
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(value);
     const [hasError, setHasError] = useState(false);
 
+    const months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+    ];
+
     const handleDateChange = (date: Date) => {
         setSelectedDate(date);
-        if(onChange) onChange(date)
+        if(onChange) onChange(date);
     };
     useEffect(() => {
         setHasError(!selectedDate && required)
@@ -51,10 +78,62 @@ export default function DatePickerBox({label, value, onChange, required=false}: 
             <p>{label}</p>
             <DatePicker
                 selected={selectedDate}
+                onChange={handleDateChange}
                 dateFormat={"dd-MM-yyyy"}
                 showPopperArrow={false}
-                onChange={handleDateChange}
-                customInput={<CustomInput/>}
+                customInput={<CustomInput />}
+                renderCustomHeader={({
+                                         date,
+                                         changeYear,
+                                         changeMonth,
+                                         decreaseMonth,
+                                         increaseMonth,
+                                         prevMonthButtonDisabled,
+                                         nextMonthButtonDisabled,
+                                     }) => (
+                    <div>
+                        <button
+                            onClick={decreaseMonth}
+                            className={style.leftButton}
+                            disabled={prevMonthButtonDisabled}
+                        >
+                            <FontAwesomeIcon icon={faAngleLeft} />
+                        </button>
+                        <select
+                            className={style.selectBox}
+                            value={months[getMonth(date)]}
+                            onChange={({ target: { value } }) =>
+                                changeMonth(months.indexOf(value))
+                            }
+                        >
+                            {months.map((option) => (
+                                <option key={option} value={option}>
+                                    {option}
+                                </option>
+                            ))}
+                        </select>
+                        <select
+                            className={style.selectBox}
+                            value={getYear(date)}
+                            onChange={({ target: { value } }) =>
+                                changeYear(Number(value))
+                            }
+                        >
+                            {years.map((option) => (
+                                <option key={option} value={option}>
+                                    {option}
+                                </option>
+                            ))}
+                        </select>
+                        <button
+                            onClick={increaseMonth}
+                            className={style.rightButton}
+                            disabled={nextMonthButtonDisabled}
+                        >
+                            <FontAwesomeIcon icon={faAngleRight} />
+                        </button>
+                    </div>
+                )}
             />
         </div>
     )

@@ -1,5 +1,6 @@
 package com.gcgenome.rms.service
 
+import com.gcgenome.rms.dao.ExtensionDao
 import com.gcgenome.rms.dao.SampleTypeDao
 import com.gcgenome.rms.dao.ServiceDao
 import com.gcgenome.rms.dao.ServiceExtensionDao
@@ -17,7 +18,7 @@ import reactor.core.publisher.Mono
 @Component
 class ServiceExtensionHandler(
     val dslContext: DSLContext
-): ServiceDao, ServiceExtensionDao, SampleTypeDao {
+): ServiceDao, ServiceExtensionDao, SampleTypeDao, ExtensionDao {
 
     fun selectServiceExtensions(filter: Query.Companion.Filter, serviceId: String): Flux<Extension> {
         val whereClause = buildExtensionIdOrNameWhereClause(filter)
@@ -30,6 +31,10 @@ class ServiceExtensionHandler(
     fun selectExtensionAll(filter: Query.Companion.Filter): Flux<Extension> {
         val whereClause = buildExtensionIdOrNameWhereClause(filter)
         return Flux.from(dslContext.selectExtensionByNameOrdId(whereClause))
+    }
+
+    fun getExtensionAll(): Flux<com.gcgenome.rms.tables.pojos.Extension> {
+        return Flux.from(dslContext.getExtensions())
     }
 
     fun insertServiceExtension(serviceExtension: ServiceExtension): Mono<ServiceExtension> {

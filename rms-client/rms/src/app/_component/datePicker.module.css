@@ -4,7 +4,7 @@
 .dateBox p {
     font-size: 0.65vw;
     color: #666666;
-    margin: 0 0 0.27vw 0;
+    margin: 0 0 0.615vh 0;
 }
 .dateBox.error p{
     color: red;
@@ -21,7 +21,25 @@
     border: 1px solid red;
 }
 .testBox input {
+    width: 9.3vw;
     font-size: 0.7vw;
     min-width: 1.65vw;
     height: 1.8vh;
+}
+.leftButton, .rightButton {
+    padding: 0.2vh 0.2vw;
+    margin: 0.2vh 0.4vw;
+    background: #ffffff;
+    border: none;
+    cursor: pointer;
+}
+.leftButton:hover, .rightButton:hover {
+    color: #90BA2D;
+}
+.selectBox {
+    margin: 1vh 0.2vw;
+    padding: 0.2vh 0.2vw;
+}
+.selectBox:focus {
+    outline: none;
 }

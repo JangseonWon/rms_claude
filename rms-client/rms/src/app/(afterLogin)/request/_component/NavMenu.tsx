@@ -172,6 +172,11 @@ export default function NavMenu() {
                                 Category Management
                             </Link>
                         </ol>
+                        <ol>
+                            <Link href={"/request/management/extension"}>
+                                Extension Management
+                            </Link>
+                        </ol>
                     </>
                 )}
             </ul>
