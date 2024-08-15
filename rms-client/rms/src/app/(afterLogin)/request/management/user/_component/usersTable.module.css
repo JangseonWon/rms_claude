@@ -66,6 +66,7 @@
     border-bottom: 1px solid #838689;
 }
 .table tbody tr td {
+    height: 4vh;
     color: #666666;
     font-size: 0.7vw;
     padding: 10px;
@@ -139,7 +140,7 @@
 .icon:hover {
     cursor: pointer;
 }
-.editButton {
+/*.editButton {
     cursor: pointer;
     padding: 0.5vh 0.5vw;
     border-radius: 10px;
@@ -152,4 +153,20 @@
 }
 .editButton:hover {
     background: linear-gradient(135deg, #dfd6a4, #b7c86c);
+}*/
+.editButton {
+    font-size: 0.7vw;
+    padding: 0.5vh 0.3vw;
+    min-width: 4vw;
+    border-radius: 5px;
+    border: none;
+    transition: all 150ms ease;
+    cursor: pointer;
+    background: linear-gradient(135deg, #a2a3a9, #7a92af);
+    color: #ffffff;
+    margin: 0.5vh 0.3vw;
+}
+.editButton:hover {
+    background: linear-gradient(135deg, #3c6699, #9ebce6);
+    border: none;
 }

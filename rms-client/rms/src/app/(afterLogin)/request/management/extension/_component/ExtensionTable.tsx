@@ -74,7 +74,6 @@ export default function ExtensionTable() {
                 <table className={style.table}>
                     <thead>
                     <tr>
-                        <th className={style.head}>Id</th>
                         <th className={style.headName}>Name</th>
                         <th className={style.head}>Type</th>
                         <th className={style.head}>List Value</th>
@@ -85,7 +84,6 @@ export default function ExtensionTable() {
                     <tbody>
                     {extensionData && extensionData.length > 0 && extensionData.map((row, rowIndex) => (
                         <tr key={rowIndex}>
-                            <td>{row.id}</td>
                             <td>{row.name}</td>
                             <td>{mapRegexToType(row.regex)}</td>
                             <td>{mapRegexToValue(row.regex)}</td>

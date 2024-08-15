@@ -26,6 +26,7 @@
     border-bottom: 1px solid #838689;
 }
 .table tbody tr td {
+    height: 4vh;
     color: #666666;
     font-size: 0.7vw;
     padding: 10px;

@@ -165,7 +165,7 @@ export default function UsersTable() {
                         <th>Role</th>
                         <th>Institution / Service</th>
                         <th>State</th>
-                        <th>Service Edit</th>
+                        <th>Edit</th>
                     </tr>
                     </thead>
                     <tbody>
