@@ -134,7 +134,7 @@ export default function ExtensionModal({getExtension, type, open, closeModal, re
                         {extensionRegex === 'List' && (
                             <>
                             {listInputs.map((input, index) => (
-                                    <div style={{display: 'flex', marginBottom: '2vh'}}>
+                                    <div key={index} style={{display: 'flex', marginBottom: '2vh'}}>
                                         <InputBox
                                             key={index}
                                             label={`List Value ${index + 1}`}
