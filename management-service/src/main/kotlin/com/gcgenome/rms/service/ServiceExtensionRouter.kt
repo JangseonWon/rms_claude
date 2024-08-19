@@ -5,7 +5,9 @@ import com.gcgenome.rms.auth.ManagerAuthenticationHandler
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.exception.AdminAuthenticationException
 import com.gcgenome.rms.exception.AuthenticationNotFoundException
+import com.gcgenome.rms.exception.ExtensionNotFoundException
 import com.gcgenome.rms.exception.ServiceNotFoundException
+import com.gcgenome.rms.tables.pojos.Extension
 import com.gcgenome.rms.tables.pojos.ServiceExtension
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -29,6 +31,7 @@ class ServiceExtensionRouter (
         POST("/w-api/management-service/services/{service_id}/extensions/{extension_id}", ::insertExtension)
         DELETE("/w-api/management-service/services/{service_id}/extensions/{extension_id}", ::deleteExtension)
         GET("/w-api/management-service/extensions", ::getExtensions)
+        PATCH("/w-api/management-service/extension/{extension_id}", ::updateExtensionRegex)
     }
 
     private fun selectServiceExtensions(request: ServerRequest): Mono<ServerResponse> {
@@ -63,6 +66,20 @@ class ServiceExtensionRouter (
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(AdminAuthenticationException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
+    }
+
+    private fun updateExtensionRegex(request: ServerRequest): Mono<ServerResponse> {
+        val extensionId = request.pathVariable("extension_id")
+        return authenticationHandler.principal(request)
+            .flatMap { managerAuthenticationHandler.chkAdmin(it) }
+            .flatMap { request.bodyToMono(Extension::class.java) }
+            .flatMap { serviceHandler.updateExtensionRegex(extensionId, it.regex!!) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(AdminAuthenticationException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(ExtensionNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
             .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
             .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
     }

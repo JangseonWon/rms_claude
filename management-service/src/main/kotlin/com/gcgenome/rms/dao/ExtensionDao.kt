@@ -7,9 +7,15 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 interface ExtensionDao{
+    fun DSLContext.selectExtensionById(extensionId: String): Mono<Extension> {
+        return Mono.from(
+            selectFrom(EXTENSION).where(EXTENSION.ID.eq(extensionId))
+        ).map { it.into(Extension::class.java) }
+    }
+
     fun DSLContext.getExtensions(): Flux<Extension> {
         return Flux.from(
-            selectFrom(EXTENSION)
+            selectFrom(EXTENSION).orderBy(EXTENSION.ID.asc())
         ).map { it.into(Extension::class.java) }
     }
 

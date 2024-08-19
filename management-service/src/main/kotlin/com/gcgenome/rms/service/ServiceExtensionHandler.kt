@@ -6,6 +6,8 @@ import com.gcgenome.rms.dao.ServiceDao
 import com.gcgenome.rms.dao.ServiceExtensionDao
 import com.gcgenome.rms.data.Extension
 import com.gcgenome.rms.data.Query
+import com.gcgenome.rms.data.Service_
+import com.gcgenome.rms.exception.ExtensionNotFoundException
 import com.gcgenome.rms.exception.ServiceNotFoundException
 import com.gcgenome.rms.tables.pojos.ServiceExtension
 import org.jooq.Condition
@@ -35,6 +37,16 @@ class ServiceExtensionHandler(
 
     fun getExtensionAll(): Flux<com.gcgenome.rms.tables.pojos.Extension> {
         return Flux.from(dslContext.getExtensions())
+    }
+
+    fun checkExtensionById(extensionId: String): Mono<com.gcgenome.rms.tables.pojos.Extension> {
+        return dslContext.selectExtensionById(extensionId)
+            .switchIfEmpty(Mono.error(ExtensionNotFoundException(extensionId)))
+    }
+
+    fun updateExtensionRegex(extensionId: String, regex: String): Mono<com.gcgenome.rms.tables.pojos.Extension> {
+        return Mono.from(checkExtensionById(extensionId)
+            .flatMap { dslContext.updateExtension(extensionId, regex) })
     }
 
     fun insertServiceExtension(serviceExtension: ServiceExtension): Mono<ServiceExtension> {
