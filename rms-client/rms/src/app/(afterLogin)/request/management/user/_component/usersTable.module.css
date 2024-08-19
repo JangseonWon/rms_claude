@@ -140,20 +140,6 @@
 .icon:hover {
     cursor: pointer;
 }
-/*.editButton {
-    cursor: pointer;
-    padding: 0.5vh 0.5vw;
-    border-radius: 10px;
-    border: none;
-    background: linear-gradient(135deg, #182847, #354e6d);
-    color: #ffffff;
-    font-weight: 700;
-    font-size: 0.7vw;
-    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.5);
-}
-.editButton:hover {
-    background: linear-gradient(135deg, #dfd6a4, #b7c86c);
-}*/
 .editButton {
     font-size: 0.7vw;
     padding: 0.5vh 0.3vw;

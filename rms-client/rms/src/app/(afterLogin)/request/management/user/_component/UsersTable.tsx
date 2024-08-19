@@ -163,7 +163,8 @@ export default function UsersTable() {
                         <th>Phone Number</th>
                         <th>Serial</th>
                         <th>Role</th>
-                        <th>Institution / Service</th>
+                        <th>Institution</th>
+                        <th>Service</th>
                         <th>State</th>
                         <th>Edit</th>
                     </tr>
@@ -183,7 +184,8 @@ export default function UsersTable() {
                                     icon={faMagnifyingGlass}
                                     onClick={()=> handleInstitutionIconClick(row.id, row.name)}
                                 />
-                                &nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;
+                            </td>
+                            <td>
                                 <FontAwesomeIcon
                                     className={style.icon}
                                     icon={faMagnifyingGlass}

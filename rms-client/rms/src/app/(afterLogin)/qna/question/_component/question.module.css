@@ -66,7 +66,7 @@
     display: flex;
     justify-content: flex-end;
 }
-.addButton, .cancelButton {
+.editButton, .cancelButton {
     width: 5vw;
     cursor: pointer;
     padding: 0.8vh 1vw;
@@ -75,7 +75,7 @@
     font-size: 0.7vw;
     color: #88837E;
 }
-.addButton {
+.editButton {
     border-right: none;
 }
 .cancelButton {

@@ -130,7 +130,7 @@
     padding: 0.6vh 0.6vw;
     text-align: center;
 }
-.addButton {
+.editButton {
     margin: 2vh 0 0 2vw;
     cursor: pointer;
     padding: 0.5vh 0.5vw;
@@ -144,7 +144,7 @@
     font-size: 0.7vw;
     box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.5);
 }
-.addButton:hover {
+.editButton:hover {
     background: linear-gradient(135deg, #354e6d, #182847);
 }
 .deleteButton:hover {

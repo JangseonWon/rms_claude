@@ -22,6 +22,9 @@ export default function Title() {
         case 'user':
             correctedValue = 'User'
             break;
+        case 'extension':
+            correctedValue = 'Extension'
+            break;
         default:
             correctedValue = lastValue;
             break;

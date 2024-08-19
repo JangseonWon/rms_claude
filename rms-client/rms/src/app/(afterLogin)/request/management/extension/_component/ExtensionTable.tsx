@@ -1,23 +1,16 @@
 'use client';
 
 import style from "./extensionTable.module.css";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React, {useEffect, useState} from "react";
 import {Extensions} from "@/model/ServiceExtensionAndSampleType";
-import {faFloppyDisk} from "@fortawesome/free-regular-svg-icons";
 import {getExtensions} from "@/app/(afterLogin)/request/management/extension/_api/getExtensions";
-import SelectBox from "@/app/_component/SelectBox";
-import {SelectBoxOption} from "@/model/SelectBoxOption";
+import ExtensionModal from "@/app/(afterLogin)/request/management/extension/_component/ExtensionModal";
 
 export default function ExtensionTable() {
     const [extensionData, setExtensionData] = useState<Extensions[]>([]);
-
-    const extensionOptions: SelectBoxOption[] = [
-        {value: 'Boolean', name: 'Boolean'},
-        {value: 'String', name: 'String'},
-        {value: 'Number', name: 'Number'},
-        {value: 'List', name: 'List'}
-    ];
+    const [selectExtensionData, setSelectExtensionData] = useState<Extensions | undefined>();
+    const [extensionEditModalOpen, setExtensionEditModalOpen] = useState<boolean>(false);
+    const [extensionType, setExtensionType] = useState<string>('');
 
     const fetchData = async () => {
         try {
@@ -30,12 +23,15 @@ export default function ExtensionTable() {
         }
     }
 
-    const handleSaveExtensionClick = (id: string) => {
-        alert(`${id} save`);
+    const handleEditExtensionClick = (extension: Extensions) => {
+        setExtensionEditModalOpen(true);
+        setSelectExtensionData(extension);
+        const type = mapRegexToType(extension.regex);
+        setExtensionType(type);
     }
 
-    const extensionChange = () => {
-        alert('siuuuuuu');
+    const closeModal = () => {
+        setExtensionEditModalOpen(false);
     }
 
     const mapRegexToType = (regex: string): string => {
@@ -74,11 +70,10 @@ export default function ExtensionTable() {
                 <table className={style.table}>
                     <thead>
                     <tr>
-                        <th className={style.headName}>Name</th>
-                        <th className={style.head}>Type</th>
-                        <th className={style.head}>List Value</th>
-                        <th className={style.headSelect}>Select</th>
-                        <th className={style.head}>Save</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>List Value</th>
+                        <th>Edit</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -88,25 +83,27 @@ export default function ExtensionTable() {
                             <td>{mapRegexToType(row.regex)}</td>
                             <td>{mapRegexToValue(row.regex)}</td>
                             <td>
-                                <SelectBox
-                                    label={''}
-                                    options={extensionOptions}
-                                    onChange={extensionChange}
-                                    width={'5vw'}
-                                />
-                            </td>
-                            <td>
-                                <FontAwesomeIcon
-                                    className={style.change}
-                                    icon={faFloppyDisk}
-                                    onClick={() => handleSaveExtensionClick(row.id)}
-                                />
+                                <button
+                                    className={style.editButton}
+                                    onClick={() => handleEditExtensionClick(row)}
+                                >
+                                    Edit
+                                </button>
                             </td>
                         </tr>
                     ))}
                     </tbody>
                 </table>
             </section>
+            {extensionEditModalOpen && selectExtensionData && (
+                <ExtensionModal
+                    getExtension={selectExtensionData}
+                    type={extensionType}
+                    open={extensionEditModalOpen}
+                    closeModal={closeModal}
+                    refreshTable={fetchData}
+                />
+            )}
         </>
     );
 }

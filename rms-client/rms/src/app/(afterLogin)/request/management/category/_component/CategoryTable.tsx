@@ -4,7 +4,7 @@ import React, {useEffect, useState} from "react";
 import style from "@/app/(afterLogin)/request/management/category/_component/categoryTable.module.css";
 import {Categories} from "@/model/Categories";
 import {getCategories} from "@/app/(afterLogin)/request/management/category/_api/getCategories";
-import {faPen, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {faTrash} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import CategoryModal from "@/app/(afterLogin)/request/management/category/_component/CategoryModal";
 import {deleteCategories} from "@/app/(afterLogin)/request/management/category/_api/deleteCategories";
@@ -83,17 +83,18 @@ export default function CategoryTable() {
                             <td>{row.name}</td>
                             <td>{row.order_type}</td>
                             <td>
-                                <FontAwesomeIcon
-                                    className={style.edit}
-                                    icon={faPen}
-                                    onClick={()=> handleEditCategoryClick(row)}
-                                />
+                                <button
+                                    className={style.editButton}
+                                    onClick={() => handleEditCategoryClick(row)}
+                                >
+                                    Edit
+                                </button>
                             </td>
                             <td>
                                 <FontAwesomeIcon
                                     className={style.delete}
                                     icon={faTrash}
-                                    onClick={()=> handleDeleteClick(row)}
+                                    onClick={() => handleDeleteClick(row)}
                                 />
                             </td>
                         </tr>
