@@ -8,6 +8,9 @@ import React, {useEffect} from "react";
 import {getCategories} from "@/app/(afterLogin)/_api/getCategories";
 import {Categories} from "@/model/Categories";
 import {useCategory, useSetCategory} from "@/store/useCategoryStore";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 export default function TestOption() {
     const categoryData = useCategory();
@@ -23,12 +26,21 @@ export default function TestOption() {
         fetchData()
     }, []);
 
+    const settings = {
+        infinite: true,
+        speed: 500,
+        slidesToShow: 4,
+        slidesToScroll: 1,
+        autoplay: true,
+        autoplaySpeed: 5000,
+    };
+
     return (
         <div className={style.container}>
             <div className={style.line}></div>
             <h1>Your Testing Options</h1>
             <p>Choose one of available segments to start an order using G-Portal</p>
-            <div className={style.cardContainer}>
+            <Slider className={style.slider} {...settings}>
                 {categoryData && categoryData.length > 0 && categoryData.map(category => (
                     <Link
                         key={category.id}
@@ -39,7 +51,7 @@ export default function TestOption() {
                         </div>
                     </Link>
                 ))}
-            </div>
+            </Slider>
         </div>
     )
 }

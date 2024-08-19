@@ -24,6 +24,8 @@
     border-collapse: separate;
     border-spacing: 0 0.2vh;
     border-radius: 15px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
+    z-index: 10;
 }
 .table thead {
     background-color: #002b49;
@@ -31,11 +33,25 @@
     font-size: 0.8vw;
     font-weight: 600;
 }
+.table thead tr th:first-child {
+    border-radius: 20px 0 0 0;
+}
+.table thead tr th:last-child {
+    border-radius: 0 20px 0 0;
+}
+.table tbody tr:last-child td:first-child {
+    border-radius: 0 0 0 18px;
+}
+
+.table tbody tr:last-child td:last-child {
+    border-radius: 0 0 18px 0;
+}
 .table tbody {
     font-weight: 300;
+    z-index: 1;
 }
 .table tbody tr {
-    border-bottom: 0.2vh solid #e80c0c;
+    border-bottom: 0.2vh solid grey;
 }
 .table tbody tr td {
     color: #666666;
@@ -71,7 +87,8 @@
     border: none;
     border-radius: 18px;
     font-size: 1vw;
-    padding: 1.5vh 0.8vw;
+    padding: 1vh 0.5vw;
+    margin: 1vh 0.5vw;
 }
 .pagination button:hover:not([disabled]) {
     background-color: #d3d3d3;

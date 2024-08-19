@@ -84,8 +84,9 @@
 .pagination button {
     border: none;
     border-radius: 18px;
-    font-size: 18px;
-    padding: 15px;
+    font-size: 1vw;
+    padding: 1vh 0.5vw;
+    margin: 1vh 0.5vw;
 }
 .pagination button:hover:not([disabled]) {
     background-color: #d3d3d3;

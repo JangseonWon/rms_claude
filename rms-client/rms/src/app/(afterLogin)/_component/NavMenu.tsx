@@ -1,6 +1,6 @@
 "use client"
 
-import style from "@/app/(afterLogin)/request/_component/navMenu.module.css"
+import style from "@/app/(afterLogin)/_component/navMenu.module.css"
 import Link from "next/link";
 import {
     faBorderAll,

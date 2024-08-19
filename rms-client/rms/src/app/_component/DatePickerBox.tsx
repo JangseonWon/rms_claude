@@ -27,6 +27,7 @@ const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(
                 type="text"
                 value={value}
                 onClick={onClick}
+                readOnly={true}
                 onChange={onChange}
                 ref={ref}
                 placeholder="DD-MM-YYYY"

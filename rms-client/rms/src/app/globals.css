@@ -2,6 +2,22 @@ body{
     margin: 0;
     background-color: #EBECEE;
 }
+/*scroll*/
+::-webkit-scrollbar {
+    width: 0.8vw !important;
+    height: 1vh !important;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 0.5rem;
+    border: 0.25rem solid #f1f1f1;
+}
+
 /*react-datepicker*/
 .react-datepicker{
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);

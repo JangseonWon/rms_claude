@@ -1,7 +1,7 @@
 'use client';
 
 import {ReactNode} from "react";
-import NavMenu from "@/app/(afterLogin)/request/_component/NavMenu";
+import NavMenu from "@/app/(afterLogin)/_component/NavMenu";
 import style from "@/app/(afterLogin)/request/layout.module.css"
 import AlertDialog from "@/app/_component/AlertDialog";
 import {useAlertDialog, useMessageAlertDialog} from "@/store/useAlertDialogStore";

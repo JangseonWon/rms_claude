@@ -31,9 +31,6 @@ export default function Statistics() {
 
     return (
         <div className={style.container}>
-            <div className={style.line}></div>
-            <h1>Dashboard
-            </h1>
             <div className={style.cardContainer}>
                 {statisticsCards.map((card) => (
                     <Link href={"/request/order"} className={style.card} key={card.label}>

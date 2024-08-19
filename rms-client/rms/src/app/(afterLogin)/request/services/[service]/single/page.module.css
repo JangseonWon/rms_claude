@@ -15,15 +15,3 @@
     overflow-y: scroll;
     position: relative;
 }
-.orderContainer::-webkit-scrollbar {
-    width: 5px;
-}
-.orderContainer::-webkit-scrollbar-thumb {
-    background-color: #859fbf;
-    border-radius: 15px;
-}
-.orderContainer::-webkit-scrollbar-track {
-    background-color: #ffffff;
-    border: solid grey thin;
-    border-radius: 15px;
-}

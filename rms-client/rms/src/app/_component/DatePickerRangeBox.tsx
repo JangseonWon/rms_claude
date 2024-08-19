@@ -26,6 +26,7 @@ const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(
             <input
                 type="text"
                 value={value}
+                readOnly={true}
                 onClick={onClick}
                 onChange={onChange}
                 ref={ref}

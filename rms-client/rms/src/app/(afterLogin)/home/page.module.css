@@ -1,0 +1,10 @@
+.bodyContainer {
+    display: flex;
+    margin-bottom: 2vh;
+}
+.leftSection {
+    width: 18%;
+}
+.rightSection {
+    width: 82%;
+}

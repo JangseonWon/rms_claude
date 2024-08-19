@@ -98,8 +98,8 @@
     border: none;
     border-radius: 18px;
     font-size: 1vw;
-    margin-top: 1vh;
-    padding: 1.5vh;
+    padding: 1vh 0.5vw;
+    margin: 1vh 0.5vw;
 }
 .pagination button:hover:not([disabled]) {
     background-color: #d3d3d3;
