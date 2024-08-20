@@ -12,5 +12,5 @@ data:
             header: Authorization
             jwt:
               signature-algorithm: RS256
-              duration: 36000
+              duration: 604800
               secret: ${jwt.private}

@@ -40,6 +40,9 @@ export const{handlers: {GET, POST}, auth} = NextAuth({
     pages:{
         signIn: '/login'
     },
+    session:{
+        maxAge: 60 * 60 * 12
+    },
     callbacks: {
         jwt({token, user}){
             return {...token, ...user}
@@ -75,14 +78,16 @@ export const{handlers: {GET, POST}, auth} = NextAuth({
                 }
                 const setCookie = authResponse.headers.get('set-cookie')!
 
-                const [authorizationHeader, ...remainingHeaders] = setCookie?.split(';')
-                const authorization = authorizationHeader.split('=')[1];
                 if (setCookie) {
                     const parsed = cookie.parse(setCookie);
-                    cookies().set('Authorization', parsed['Authorization'], parsed); // 브라우저에 쿠키를 심어주는 것
-                }
+                    const authorization = parsed['Authorization']
+                    const expires = parsed['Expires'];
+                    const expiresDate = new Date(expires);
+                    const maxAge = Math.floor((expiresDate.getTime() - Date.now()) / 1000);
 
-                return JWTParser.decode(authorization, {complete:true})?.payload
+                    cookies().set('Authorization', authorization, {maxAge});
+                    return JWTParser.decode(authorization, {complete:true})?.payload
+                }
             }
         })
     ]
