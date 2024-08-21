@@ -24,6 +24,7 @@ class CategoriesRouter (
     @Bean("CategoriesRouter")
     fun route() = router {
         GET("/w-api/management-service/categories", ::searchCategories)
+        GET("/w-api/management-service/categories/{category_id}", ::getCategories)
         POST("/w-api/management-service/categories/{category_id}/services", ::selectCategories)
         PUT("/w-api/management-service/categories", ::insertCategories)
         DELETE("/w-api/management-service/categories", ::deleteCategories)
@@ -33,6 +34,18 @@ class CategoriesRouter (
     private fun searchCategories(request: ServerRequest): Mono<ServerResponse> {
         return authenticationHandler.principal(request)
             .flatMap { categoriesHandler.searchCategories().collectList() }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(CategoryNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
+            .onErrorResume {
+                it.printStackTrace()
+                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
+    }
+
+    private fun getCategories(request: ServerRequest): Mono<ServerResponse> {
+        val categoryId = UUID.fromString(request.pathVariable("category_id"))
+        return authenticationHandler.principal(request)
+            .flatMap { categoriesHandler.getCategories(categoryId) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(CategoryNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }

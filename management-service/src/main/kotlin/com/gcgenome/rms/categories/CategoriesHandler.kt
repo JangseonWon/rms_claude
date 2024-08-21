@@ -26,6 +26,11 @@ class CategoriesHandler(
             .switchIfEmpty(Mono.error(CategoryNotFoundException()))
     }
 
+    fun getCategories(categoryId: UUID): Mono<Category> {
+        return dslContext.selectCategoryById(categoryId)
+            .switchIfEmpty(Mono.error(CategoryNotFoundException()))
+    }
+
     fun insertCategories(category: Category): Mono<Category> {
         return checkCategoryOrderType(category)
             .then(dslContext.insertCategory(category))
