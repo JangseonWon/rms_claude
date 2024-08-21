@@ -54,7 +54,7 @@ export default function MainPage() {
                                 dangerouslySetInnerHTML={{__html: description(category.name)}}
                             />
                             <Link
-                                href={`/request/service-catalog/${category.name}`}
+                                href={`/request/service-catalog/${category.id}`}
                                 className={style.serviceLink}
                                 onClick={() => linkClick(category)}
                             >

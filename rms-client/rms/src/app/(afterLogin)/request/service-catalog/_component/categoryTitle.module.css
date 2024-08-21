@@ -1,0 +1,10 @@
+.title{
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+}
+.mainTitle{
+    color: #002b49;
+    font-size: 3vw;
+    font-weight: 800;
+}

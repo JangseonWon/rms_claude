@@ -2,11 +2,15 @@
 
 import style from "./catalogTitle.module.css";
 import {usePathname} from "next/navigation";
+import {useEffect, useState} from "react";
+import {getCategoryById} from "@/app/(afterLogin)/request/service-catalog/[category]/_api/getCategoryById";
+import {Categories} from "@/model/Categories";
 
 export default function CatalogTitle() {
     const pathname = usePathname();
     const pathSegments = pathname.split('/');
     const lastValue = decodeURIComponent(pathSegments.pop() || '');
+    const [categoryData, setCategoryData] = useState<Categories>();
 
     const description = (name: string) => {
         switch(name) {
@@ -38,16 +42,27 @@ export default function CatalogTitle() {
         }
     }
 
-    const { first, second } = description(lastValue);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const response = await getCategoryById(lastValue);
+            const data = await response.json();
+            setCategoryData(data);
+        };
+        fetchData()
+    }, []);
+
+    const { first, second } = description(categoryData?.name || '');
+    const title = categoryData?.name || 'not found';
 
     return (
         <div className={style.title}>
             <div className={style.first}>
                 <div className={style.subTitle}>
-                    Service Catalog &gt; <span>{lastValue}</span>
+                    Service Catalog &gt; <span>{title}</span>
                 </div>
                 <div className={style.mainTitle}>
-                    {lastValue}
+                    {title}
                 </div>
             </div>
             <div className={style.second}>

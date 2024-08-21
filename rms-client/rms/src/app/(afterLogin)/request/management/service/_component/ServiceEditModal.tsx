@@ -11,7 +11,7 @@ import {Categories} from "@/model/Categories";
 import {getCategories} from "@/app/(afterLogin)/request/management/service/_api/getCategories";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import {ServiceExtensionAndSampleType} from "@/model/ServiceExtensionAndSampleType";
-import {getService} from "@/app/(afterLogin)/request/management/service/_api/getService";
+import {getService} from "@/app/(afterLogin)/_api/getService";
 import SelectSearchBox from "@/app/(afterLogin)/request/management/_component/SelectSearchBox";
 import {postSampleType} from "@/app/(afterLogin)/request/management/service/_api/postSampleType";
 import {postExtension} from "@/app/(afterLogin)/request/management/service/_api/postExtensions";

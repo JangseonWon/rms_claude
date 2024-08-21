@@ -2,7 +2,6 @@
 
 import style from './serviceCard.module.css';
 import React, {useEffect, useState} from "react";
-import Link from "next/link";
 import {useSelectCategory} from "@/store/useCategoryStore";
 import {
     getServicesByCategoryId
@@ -54,7 +53,7 @@ export default function ServiceCard() {
     return (
         <div className={style.container}>
             <section className={style.bodySection}>
-                {serviceData.map((service) => (
+                {serviceData && serviceData.length > 0 && serviceData.map((service) => (
                     <div key={service.id} className={style.categoryItem}>
                         <span className={style.categoryTitle}>{service.name}</span>
                         <div className={style.cardDescription}>
@@ -62,7 +61,7 @@ export default function ServiceCard() {
                                 className={style.categoryDescription}
                                 dangerouslySetInnerHTML={{__html: description(service.id!)}}
                             />
-                            <button className={style.orderButton} onClick={()=> OrderButtonClick(service.name!)}>
+                            <button className={style.orderButton} onClick={()=> OrderButtonClick(service.id!)}>
                                 Order now
                             </button>
                         </div>

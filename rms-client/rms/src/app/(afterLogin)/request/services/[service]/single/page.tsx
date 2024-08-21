@@ -1,6 +1,6 @@
-import ServiceTitle from "@/app/_component/ServiceTitle";
 import Order from "@/app/(afterLogin)/request/services/[service]/single/_component/Order";
 import style from "@/app/(afterLogin)/request/services/[service]/single/page.module.css"
+import ServiceTitle from "@/app/(afterLogin)/request/services/[service]/single/_component/ServiceTitle";
 
 export default async function Page() {
     return(

@@ -1,4 +1,4 @@
-import ServiceTitle from "@/app/_component/ServiceTitle";
+import Title from "@/app/_component/Title";
 import style from "@/app/(afterLogin)/request/result/download/page.module.css";
 import DownloadTable from "@/app/(afterLogin)/request/result/download/_component/DownloadTable";
 
@@ -8,7 +8,7 @@ export default async function Page() {
     return(
         <div className={style.container}>
             <section className={style.titleContainer}>
-                <ServiceTitle/>
+                <Title/>
             </section>
             <section className={style.mainContainer}>
                 <DownloadTable/>
