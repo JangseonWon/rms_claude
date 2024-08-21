@@ -7,7 +7,7 @@ import React, {useCallback, useEffect, useState} from "react";
 import {Organization} from "@/model/Organization";
 import {getOrganization} from "@/app/(afterLogin)/request/services/[service]/single/_api/getOrganization";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
-import {getServices} from "@/app/(afterLogin)/request/services/[service]/single/_api/getServices";
+import {getServicesByCategoryId} from "@/app/(afterLogin)/request/services/[service]/single/_api/getServicesByCategoryId";
 import {Service} from "@/model/Service";
 import {Request} from "@/model/Request";
 import DatePickerBox from "@/app/_component/DatePickerBox";
@@ -52,7 +52,7 @@ export default function Order() {
     },[]);
 
     const fetchServices = useCallback(async (categoryId: string) => {
-        const response = await getServices(categoryId);
+        const response = await getServicesByCategoryId(categoryId);
         const data = await response.json();
         setServiceOptions(transformServiceToOptions(data as Service[]));
     }, []);
@@ -85,16 +85,19 @@ export default function Order() {
                 }
                 else alert("fail")
             })
-    }
+    };
+
     const handleServiceChange = (value: SelectBoxOption):void => {
         fetchSampleType(value.value!)
-    }
+    };
+
     const handleRequestChange = (path: string, value: any):void => {
         setRequest(prevState => ({
             ...prevState,
             ...setNestedValue({...prevState}, path, value)
         }));
     };
+
     const setNestedValue = (object: any, nestedPath: string, newValue: any): any => {
         const [firstKey, ...remainingPathSegments] = nestedPath.split('.');
         if (remainingPathSegments.length === 0) {
@@ -119,18 +122,21 @@ export default function Order() {
             name: value.name
         }));
     };
+
     const transformServiceToOptions = (data: Service[]): SelectBoxOption[] => {
         return data.map(value => ({
             value: value.id,
             name: value.name
         }));
     };
+
     const transformSampleTypeToOptions = (data: SampleType[]): SelectBoxOption[] => {
         return data.map(value => ({
             value: value.id,
             name: value.name
         }));
     };
+
     const setAge = (birthDate: Date, samplingDate: Date): number => {
         let age = samplingDate.getFullYear() - birthDate.getFullYear();
         const monthDifference = samplingDate.getMonth() - birthDate.getMonth()
@@ -138,7 +144,7 @@ export default function Order() {
             age--;
         }
         return age;
-    }
+    };
 
     const isAllRequiredFilled = () => {
         if (!request?.sample?.patient?.name) return false;
@@ -151,6 +157,9 @@ export default function Order() {
 
     return (
         <div className={style.container}>
+            <button className={style.excelButton}>
+                Excel Request
+            </button>
             <div className={style.buttonSection}>
                 <GreenButton
                     name={"Add to Cart"}

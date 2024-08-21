@@ -1,6 +1,23 @@
 .container {
     padding: 0 2vw;
 }
+.excelButton {
+    display: flex;
+    margin: 2vh 0 2vh auto;
+    width: 13.5vw;
+    padding: 1vh;
+    font-size: 0.8vw;
+    background-color: #002b49;
+    color: #fff;
+    border-radius: 15px;
+    border: none;
+    justify-content: center;
+    font-weight: 700;
+    cursor: pointer;
+}
+.excelButton:hover {
+    background-color: #90BA2D;
+}
 .buttonSection {
     position: sticky;
     text-align: right;

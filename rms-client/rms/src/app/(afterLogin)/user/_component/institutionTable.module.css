@@ -68,7 +68,7 @@
     padding: 0.8vh;
     text-align: center;
 }
-.editButton {
+.addButton {
     margin: 0.5vh 0;
     padding: 0.5vh 1vw;
     background: linear-gradient(to right, #002b49, #3d587e);
@@ -77,7 +77,7 @@
     border: none;
     border-radius: 15px;
 }
-.editButton:hover {
+.addButton:hover {
     background: linear-gradient(to right, #bf7171, #cd4d4d);
 }
 .pagination {

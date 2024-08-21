@@ -1,0 +1,55 @@
+.title{
+    display: grid;
+    align-items: stretch;
+}
+.mainTitle{
+    margin-left: 2vw;
+    color: #002b49;
+    font-size: 2vw;
+    font-weight: 800;
+}
+.subTitle {
+    align-self: flex-end;
+    color: #808080;
+    font-size: 0.7vw;
+    font-weight: 600;
+}
+.subTitle span {
+    color: #002b49;
+}
+.first {
+
+}
+.second {
+    margin: 3vh 0;
+    border-top: solid 1px #c8c8c8;
+    border-bottom: solid 1px #c8c8c8;
+    display: flex;
+    justify-content: center;
+}
+.sentence {
+    align-items: center;
+    display: grid;
+    width: 40%;
+}
+.firstSentence {
+    color: black;
+    font-size: 0.9vw;
+    font-weight: 700;
+}
+.secondSentence {
+    margin-top: 2vh;
+    color: #808080;
+    font-size: 0.7vw;
+    font-weight: 600;
+}
+.picture {
+    width: 30%;
+    height: 25vh;
+    background: linear-gradient(to right,
+    rgba(128, 128, 128, 0) 0%,
+    #c8c8c8 10%,
+    #c8c8c8 90%,
+    rgba(128, 128, 128, 0) 100%
+    );
+}

@@ -5,15 +5,6 @@
 }
 .mainTitle{
     color: #002b49;
-    font-size: 50px;
+    font-size: 3vw;
     font-weight: 800;
-}
-.subTitle {
-    align-self: flex-end;
-    color: #808080;
-    font-size: 15px;
-    font-weight: 600;
-}
-.subTitle span {
-    color: #002b49;
 }

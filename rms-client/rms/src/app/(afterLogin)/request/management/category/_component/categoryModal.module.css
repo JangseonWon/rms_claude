@@ -64,7 +64,7 @@
     display: grid;
     gap: 10%;
 }
-.editButton {
+.addButton {
     cursor: pointer;
     padding: 0.5vh 0.5vw;
     height: 10vh;
@@ -76,6 +76,6 @@
     font-size: 0.7vw;
     box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
-.editButton:hover {
+.addButton:hover {
     background: linear-gradient(135deg, #354e6d, #182847);
 }

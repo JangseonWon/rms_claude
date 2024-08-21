@@ -84,7 +84,7 @@ export default function NavMenu() {
                         </div>
                     </Link>
                 </li>
-                <li onClick={toggleServicesDropdown}>
+                {/*<li onClick={toggleServicesDropdown}>
                     <div className={style.navItem}>
                         <FontAwesomeIcon
                             className={segment === 'services' ? style.clickIcon : style.icon}
@@ -102,7 +102,7 @@ export default function NavMenu() {
                             </ol>
                         ))}
                     </>
-                )}
+                )}*/}
                 <li>
                     <Link href={"/request/cart"}>
                         <div className={style.navItem}>
@@ -165,11 +165,6 @@ export default function NavMenu() {
                         <ol>
                             <Link href={"/request/management/service"}>
                                 Service Management
-                            </Link>
-                        </ol>
-                        <ol>
-                            <Link href={"/request/management/category"}>
-                                Category Management
                             </Link>
                         </ol>
                         <ol>

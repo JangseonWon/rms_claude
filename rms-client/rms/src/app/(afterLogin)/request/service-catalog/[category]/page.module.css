@@ -1,0 +1,17 @@
+.container{
+    margin: 3vh auto auto;
+    width: 95%;
+    height: 100%;
+}
+.titleContainer{
+    padding: 20px;
+}
+.orderContainerWrapper {
+    margin-bottom: 3vh;
+    padding: 20px 10px;
+    border-radius: 15px;
+    background-color: #ffffff;
+}
+.cardContainer{
+    margin-bottom: 2vh;
+}

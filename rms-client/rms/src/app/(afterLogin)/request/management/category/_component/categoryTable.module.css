@@ -81,7 +81,7 @@
     padding: 0.6vh 0.6vw;
     text-align: center;
 }
-.editButton {
+.addButton {
     font-size: 0.7vw;
     padding: 0.5vh 0.3vw;
     min-width: 4vw;
@@ -93,7 +93,7 @@
     color: #ffffff;
     margin: 0.5vh 0.3vw;
 }
-.editButton:hover {
+.addButton:hover {
     background: linear-gradient(135deg, #3c6699, #9ebce6);
     border: none;
 }

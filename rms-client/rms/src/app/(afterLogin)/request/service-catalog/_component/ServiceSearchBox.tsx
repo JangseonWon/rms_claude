@@ -1,27 +1,23 @@
-import style from "@/app/(afterLogin)/request/management/_component/selectSearchBox.module.css";
+import style from "./serviceSearchBox.module.css";
 import React, {useEffect, useRef, useState} from "react";
 import {faChevronDown} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
-import {getSampleTypes} from "@/app/(afterLogin)/request/management/service/_api/getSampleTypes";
 import {Filter} from "@/model/Filter";
-import {SampleType} from "@/model/SampleType";
-import {getExtensions} from "@/app/(afterLogin)/request/management/service/_api/getExtensions";
-import {getServices} from "@/app/(afterLogin)/request/management/_api/getServices";
+import {Service} from "@/model/Service";
+import {getServicesByUserId} from "@/app/(afterLogin)/request/management/user/_api/getServicesByUserId";
+import {useSession} from "next-auth/react";
+import {useRouter} from "next/navigation";
 
-interface Props {
-    type: 'sampleType' | 'extension' | 'service';
-    onSelect: (option: SelectBoxOption) => void;
-    width?: string;
-}
-
-export default function SelectSearchBox({ type, onSelect, width }: Props) {
+export default function ServiceSearchBox() {
+    const router = useRouter();
     const [selectedValue, setSelectedValue] = useState<string>('');
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const [options, setOptions] = useState<SelectBoxOption[]>([]);
     const selectBoxRef = useRef<HTMLDivElement>(null);
+    const { data: session } = useSession();
 
-    const transformDataToOptions = (data: SampleType[]): SelectBoxOption[] => {
+    const transformDataToOptions = (data: Service[]): SelectBoxOption[] => {
         if (!data) {
             return [];
         }
@@ -37,8 +33,8 @@ export default function SelectSearchBox({ type, onSelect, width }: Props) {
 
     const handleOptionClick = (option: SelectBoxOption) => {
         setSelectedValue(option.name!);
+        router.push(`/request/services/${option.name}/single`);
         setIsOpen(!isOpen);
-        onSelect(option);
     };
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,21 +44,7 @@ export default function SelectSearchBox({ type, onSelect, width }: Props) {
     const fetchOptions = async () => {
         setOptions([]);
         const filter: Filter = { value: selectedValue };
-        let response;
-
-        switch (type) {
-            case 'sampleType' :
-                response = await getSampleTypes(filter);
-                break;
-            case 'extension' :
-                response = await getExtensions(filter);
-                break;
-            case 'service' :
-                response = await getServices(filter);
-                break;
-            default:
-                return;
-        }
+        const response = await getServicesByUserId(session?.user?.id!, filter);
 
         const data = await response.json();
         setOptions(transformDataToOptions(data));
@@ -86,8 +68,9 @@ export default function SelectSearchBox({ type, onSelect, width }: Props) {
     }, []);
 
     return (
-        <div ref={selectBoxRef} className={style.container} style={{ width: width }} onClick={toggleList}>
-            <section className={style.selectSection} >
+        <div ref={selectBoxRef} className={style.container} onClick={toggleList}>
+            <section className={style.selectSection}>
+                <p className={style.label}>Search the service</p>
                 <div className={`${style.btnSelect} ${isOpen ? style.open : ''}`}>
                     <input
                         className={style.selectInput}
@@ -97,12 +80,12 @@ export default function SelectSearchBox({ type, onSelect, width }: Props) {
                     />
                     <FontAwesomeIcon icon={faChevronDown} className={style.icon}/>
                 </div>
-                <div className={`${style.searchList} ${isOpen ? style.open : ''}`} style={{width: `calc(${width} + 2vw)`}}>
+                <div className={`${style.searchList} ${isOpen ? style.open : ''}`}>
                     <ul className={style.listMember}>
                         {options.map((option) => (
                             <li key={option.name}>
-                                <button onClick={() => handleOptionClick(option)} style={{width}}>
-                                    {option.value} / {option.name}
+                                <button onClick={() => handleOptionClick(option)}>
+                                    {option.name}
                                 </button>
                             </li>
                         ))}
