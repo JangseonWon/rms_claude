@@ -30,19 +30,18 @@ export default function Login() {
                 redirect: false,
             });
             if (response?.error !== null || !response.ok) {
-                // throw new Error('G-Portal is available only to those who have a contractual relationship with GC Genome. \n' +
-                //     'If you are a medical professional or distributor, please contact us at the email address below.\n');
+                setMessage(
+                    'This portal is accessible only to those who have an established contractual relationship with GC Genome.\n'+
+                    ' If you are a healthcare professional or distributor, please contact us at the email address below.\n'+
+                    '\n'+
+                    'info@gcgenome.com\n');
+                setShowAlertDialog(true);
+                setIcon('error');
             } else {
                 router.replace('/home');
             }
         } catch (err) {
             console.error(err);
-            setMessage('G-Portal is available only to those who have a contractual relationship with GC Genome. \n' +
-                'If you are a medical professional or distributor, please contact us at the email address below.\n' +
-                '\n'+
-            'info@gcgenome.com\n');
-            setShowAlertDialog(true);
-            setIcon('error');
         } finally {
             setLoading(false);
         }
