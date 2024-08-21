@@ -11,9 +11,13 @@ import reactor.core.publisher.Mono
 @Component
 @Order(-2)
 class AuthenticationExceptionHandler : WebExceptionHandler {
-    override fun handle(exchange: ServerWebExchange, ex: Throwable): Mono<Void> =
-        if (ex is AuthenticationException) exchange.response.run {
-            statusCode = HttpStatus.UNAUTHORIZED
-            setComplete()
-        } else Mono.error(ex)
+    override fun handle(exchange: ServerWebExchange, ex: Throwable): Mono<Void> {
+        return if(ex is io.jsonwebtoken.ExpiredJwtException || ex is AuthenticationException){
+            exchange.response.apply {
+                statusCode = HttpStatus.UNAUTHORIZED
+            }.setComplete()
+        }else{
+            Mono.error(ex)
+        }
+    }
 }
