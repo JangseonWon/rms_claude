@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    reactStrictMode: false,
     async rewrites() {
         return [
             {
@@ -24,7 +25,7 @@ const nextConfig = {
             },
             {
                 source: '/w-api/dashboard-service/:path*',
-                destination: `https://rms-test.gcgenome.com/w-api/dashboard-service/:path*`,
+                destination: `http://localhost:4444/w-api/dashboard-service/:path*`,
             },
             {
                 source: '/w-api/cart-service/:path*',

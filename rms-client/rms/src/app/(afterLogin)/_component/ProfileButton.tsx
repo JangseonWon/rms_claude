@@ -20,12 +20,8 @@ export default function ProfileButton({session}: Props) {
 
     const onLogout = () =>{
         signOut({redirect: false})
-            .then(() =>{
-                document.cookie = "Authorization=;path=/;";
-            })
-            .then(() =>{
-                router.replace('/login')
-            })
+            .then(() =>{document.cookie = "Authorization=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";})
+            .then(() =>{router.replace('/login')})
     }
 
     const onProfile = () =>{
