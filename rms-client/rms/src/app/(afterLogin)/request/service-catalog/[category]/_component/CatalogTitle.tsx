@@ -2,9 +2,10 @@
 
 import style from "./catalogTitle.module.css";
 import {usePathname} from "next/navigation";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {getCategoryById} from "@/app/(afterLogin)/request/service-catalog/[category]/_api/getCategoryById";
 import {Categories} from "@/model/Categories";
+import Image from "next/image";
 
 export default function CatalogTitle() {
     const pathname = usePathname();
@@ -52,6 +53,10 @@ export default function CatalogTitle() {
         fetchData()
     }, []);
 
+    if (!categoryData) {
+        return <div>Loading...</div>;
+    }
+
     const { first, second } = description(categoryData?.name || '');
     const title = categoryData?.name || 'not found';
 
@@ -71,7 +76,11 @@ export default function CatalogTitle() {
                     <span className={style.secondSentence}>{second}</span>
                 </div>
                 <div className={style.picture}>
-
+                    <Image src={'/category/' + categoryData.name + '.jpg'}
+                           alt={categoryData.name}
+                           fill
+                    />
+                    <div className={style.gradientOverlay}></div>
                 </div>
             </div>
         </div>
