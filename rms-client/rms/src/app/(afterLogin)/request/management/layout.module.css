@@ -1,11 +1,11 @@
 .layout {
     display: flex;
     flex-direction: column;
-    padding-bottom: 10vh;
+    padding-bottom: 2vh;
 }
 .title {
     background-color: #fff;
-    margin: 3vh 2vw 0 2vw;
+    margin: 5vh 2vw 0 2vw;
     padding: 2vh 4vw;
     border-radius: 15px 15px 0 0;
     flex: 0;

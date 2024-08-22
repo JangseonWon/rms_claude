@@ -37,13 +37,13 @@
     z-index: 2;
 }
 .cardPicture {
-    width: 20vw;
+    width: 18vw;
     height: 25vh;
     background-color: #e0e0e0;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     position: absolute;
     top: 0;
-    left: 50%;
+    left: 60%;
     z-index: 1;
     border-radius: 8px;
 }

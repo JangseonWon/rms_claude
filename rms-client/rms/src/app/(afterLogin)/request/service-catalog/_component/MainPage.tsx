@@ -6,6 +6,7 @@ import ServiceSearchBox from "@/app/(afterLogin)/request/service-catalog/_compon
 import React from "react";
 import Link from "next/link";
 import {Categories} from "@/model/Categories";
+import Image from "next/image";
 
 export default function MainPage() {
     const categoryData = useCategory();
@@ -62,7 +63,11 @@ export default function MainPage() {
                             </Link>
                         </div>
                         <div className={style.cardPicture}>
-
+                            <Image src={'/category/' + category.name+ '.jpg'}
+                                   alt={category.name}
+                                   fill
+                                   style={{ objectFit: 'cover'}}
+                            />
                         </div>
                     </div>
                 ))}

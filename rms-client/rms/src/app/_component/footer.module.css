@@ -47,3 +47,8 @@
     width: 40vh;
     height: 5vh;
 }
+.grayAvatar {
+    filter: grayscale(70%);
+    width: 2vw;
+    height: 4vh;
+}
