@@ -2,10 +2,13 @@
     padding: 20px;
 }
 .title {
-    padding: 0 20px 20px 20px;
+    background-color: #fff;
+    margin: 3vh 0 0;
+    padding: 2vh 4vw;
+    border-radius: 15px 15px 0 0;
 }
 .contents{
     background-color: white;
-    border-radius: 20px;
-    padding: 20px;
+    border-radius: 0 0 15px 15px;
+    padding: 2vh 2vw;
 }

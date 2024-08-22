@@ -3,6 +3,7 @@
     align-items: stretch;
 }
 .leftSection {
+    margin-top: 2vh;
     display: flex;
     flex-direction: column;
     flex-grow: 0;

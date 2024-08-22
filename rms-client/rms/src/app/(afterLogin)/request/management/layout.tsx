@@ -2,7 +2,7 @@ import React, {ReactNode} from "react";
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import {config} from '@fortawesome/fontawesome-svg-core';
 import style from "@/app/(afterLogin)/request/management/layout.module.css";
-import Title from "@/app/(afterLogin)/request/management/_component/Title";
+import Title from "@/app/_component/Title";
 
 
 config.autoAddCss = false;
