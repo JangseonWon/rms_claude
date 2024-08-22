@@ -22,8 +22,31 @@
     background-color: #002b49;
 }
 .slider {
-    /*height: 50vh;*/
+    position: relative;
 }
+/*새로 테스트 이거 왜 안되냐 짜증*/
+.slick-prev::before, .slick-next::before {
+    color: red;
+}
+
+.slick-prev:hover, .slick-next:hover {
+    color: red;
+}
+
+.slick-prev::before, .slick-next::before {
+    color: red;
+    font-size: 2rem;
+}
+
+.slick-prev {
+    left: -25px;
+}
+
+.slick-next {
+    right: -25px;
+}
+/**/
+
 .cardContainer {
     display: flex;
     flex-direction: row;

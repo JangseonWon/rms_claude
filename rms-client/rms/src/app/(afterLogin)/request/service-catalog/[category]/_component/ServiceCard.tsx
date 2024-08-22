@@ -53,20 +53,32 @@ export default function ServiceCard() {
     return (
         <div className={style.container}>
             <section className={style.bodySection}>
-                {serviceData && serviceData.length > 0 && serviceData.map((service) => (
-                    <div key={service.id} className={style.categoryItem}>
-                        <span className={style.categoryTitle}>{service.name}</span>
-                        <div className={style.cardDescription}>
-                            <span
-                                className={style.categoryDescription}
-                                dangerouslySetInnerHTML={{__html: description(service.id!)}}
-                            />
-                            <button className={style.orderButton} onClick={()=> OrderButtonClick(service.id!)}>
-                                Order now
-                            </button>
+                {serviceData && serviceData.length > 0 ? (
+                    serviceData.map((service) => (
+                        <div key={service.id} className={style.categoryItem}>
+                            <span className={style.categoryTitle}>{service.name}</span>
+                            <div className={style.cardDescription}>
+                                <span
+                                    className={style.categoryDescription}
+                                    dangerouslySetInnerHTML={{__html: description(service.id!)}}
+                                />
+                                <button className={style.orderButton} onClick={() => OrderButtonClick(service.id!)}>
+                                    Order now
+                                </button>
+                            </div>
                         </div>
+                    ))
+                ) : (
+                    <div className={style.noServiceMessage}>
+                        <h2>Service Not Available!</h2>
+                        <p>
+                            It looks like these services are not included in your current contract.<br/>
+                            If you have contracted this service, please contact us via the email below<br/>
+                            or through our Q&A section.<br/><br/>
+                            info@gcgenome.com
+                        </p>
                     </div>
-                ))}
+                )}
             </section>
         </div>
     );

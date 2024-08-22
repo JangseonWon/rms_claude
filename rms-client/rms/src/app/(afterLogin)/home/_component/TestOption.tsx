@@ -33,6 +33,9 @@ export default function TestOption() {
         slidesToScroll: 1,
         autoplay: true,
         autoplaySpeed: 5000,
+        arrows: true,
+        nextArrow: <div className={style.nextArrow}>&gt;</div>,
+        prevArrow: <div className={style.prevArrow}>&lt;</div>,
     };
 
     return (
@@ -44,7 +47,7 @@ export default function TestOption() {
                 {categoryData && categoryData.length > 0 && categoryData.map(category => (
                     <Link
                         key={category.id}
-                        href={`/request/services/${category.name}/${category.order_type === 'SINGLE' ? 'single' : 'multi'}`}>
+                        href={`/request/services/${category.id}/single`}>
                         <div className={style.card}>
                             <Image src={homeMainImg} alt={`${category.name}`}/>
                             <div className={style.cardLabel}>{category.name}</div>

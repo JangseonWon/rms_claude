@@ -1,5 +1,5 @@
 .container {
-
+    position: relative;
 }
 .bodySection {
     display: flex;
@@ -47,4 +47,18 @@
 .orderButton:hover {
     color: #90BA2D;
     border: solid 2px #90BA2D;
+}
+.noServiceMessage {
+    transform: translate(+65%, 0%);
+    text-align: center;
+    font-size: 1vw;
+}
+.noServiceMessage h2 {
+    color: #002b49;
+    font-size: 1.5vw;
+    margin-bottom: 1vh;
+}
+.noServiceMessage p {
+    font-size: 1vw;
+    margin-bottom: 5vh;
 }
