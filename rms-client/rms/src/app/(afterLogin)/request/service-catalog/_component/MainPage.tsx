@@ -15,8 +15,9 @@ export default function MainPage() {
     const description = (name: string) => {
         switch(name) {
             case 'Precision Oncology':
-                return `A healthy life is within reach with GC Genome.<br>
-                    Analyze your health and design a roadmap for a better future.`;
+                return 'Making the Impossible Possible at GC Genome.<br>' +
+                    'Empower patients by providing accurate and timely<br>' +
+                    'information for the diagnosis and prognosis of specific cancers.';
             case 'Pre & Neonatal':
                 return 'Safe and Accurate Solution by GC Genome.<br>' +
                     'Provide a reliable and precise approach<br>' +
@@ -26,9 +27,8 @@ export default function MainPage() {
                     'Enable a more complete story for rare disease patients<br>' +
                     'with cutting edge genomic technologies.';
             case 'Health Checkup':
-                return 'Making the Impossible Possible at GC Genome.<br>' +
-                    'Empower patients by providing accurate and timely<br>' +
-                    'information for the diagnosis and prognosis of specific cancers.';
+                return `A healthy life is within reach with GC Genome.<br>
+                    Analyze your health and design a roadmap for a better future.`;
             default:
                 return '';
         }

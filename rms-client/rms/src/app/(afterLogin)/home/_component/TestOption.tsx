@@ -31,11 +31,9 @@ export default function TestOption() {
         speed: 500,
         slidesToShow: 4,
         slidesToScroll: 1,
-        autoplay: true,
+        autoplay: categoryData.length > 4,
         autoplaySpeed: 5000,
-        arrows: true,
-        nextArrow: <div className={style.nextArrow}>&gt;</div>,
-        prevArrow: <div className={style.prevArrow}>&lt;</div>,
+        arrows: false,
     };
 
     return (
