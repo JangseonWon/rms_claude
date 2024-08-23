@@ -32,11 +32,11 @@ export default function Question() {
 
     const addButtonClick = async () => {
         if (!title.trim() || !content.trim()) {
-            alert('제목과 내용을 입력해 주세요.');
+            alert('Please enter the title and content.');
             return;
         }
 
-        const confirmed = window.confirm('문의 등록하시겠습니까?');
+        const confirmed = window.confirm('Would you like to register your inquiry?');
         if (confirmed) {
             setIsLoading(true);
             try {
@@ -61,7 +61,7 @@ export default function Question() {
                 }
                 await fetchSendToJandi(session?.user.name!, postId, categoryName, postData);
             } finally {
-                alert('정상적으로 등록되었습니다.');
+                alert('Registered successfully.');
                 setIsLoading(false);
                 route.push('/qna');
             }
@@ -69,7 +69,7 @@ export default function Question() {
     };
 
     const cancelButtonClick = () => {
-        const confirmed = window.confirm('정말로 취소하시겠습니까?');
+        const confirmed = window.confirm('Are you sure you want to cancel?');
         if (confirmed) {
             route.push('/qna');
         }

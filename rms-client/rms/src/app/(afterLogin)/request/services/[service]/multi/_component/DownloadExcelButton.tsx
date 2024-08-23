@@ -26,7 +26,7 @@ export default function DownloadExcelButton() {
             window.URL.revokeObjectURL(url);
         } else {
             setShowAlertDialog(true);
-            setMessage('다운로드 에러 발생 했습니다.');
+            setMessage('A download error occurred.');
         }
     }
 

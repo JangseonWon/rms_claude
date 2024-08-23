@@ -179,7 +179,7 @@ export default function Order() {
 
         if (invalidData) {
             setShowAlertDialog(true);
-            setAlertMessage('잘못된 값이 존재합니다.');
+            setAlertMessage('An invalid value exists.');
             setIcon('error');
         }
 

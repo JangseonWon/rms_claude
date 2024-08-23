@@ -73,7 +73,7 @@ export default function Answer() {
 
     const editButtonClick = async () => {
         if (writerCheck) {
-            const confirmed = window.confirm('정말로 수정하시겠습니까?');
+            const confirmed = window.confirm('Are you sure you want to edit this?');
             if (confirmed) {
                 setIsLoading(true);
                 try {
@@ -91,26 +91,26 @@ export default function Answer() {
                     }
                     await fetchSendToJandi(session?.user.name!, postId, "update", postData!);
 
-                    alert('정상적으로 수정되었습니다.');
+                    alert('It has been corrected properly.');
                     route.push('/qna');
                 } finally {
                     setIsLoading(false);
                 }
             }
         } else {
-            alert('수정 불가능 합니다.');
+            alert('Modification is not possible.');
         }
     }
 
     const deleteButtonClick = async (postId: string) => {
-        const confirmed = window.confirm('정말로 삭제하시겠습니까?');
+        const confirmed = window.confirm('Are you sure you want to delete it?');
         if (confirmed) {
             setIsLoading(true);
             try {
                 await deleteFileByPostId(postId);
                 await deletePostById(postId);
             } finally {
-                alert('삭제 완료 되었습니다.');
+                alert('Deletion has been completed.');
                 setIsLoading(false);
                 route.push('/qna');
             }
@@ -156,7 +156,7 @@ export default function Answer() {
     }
 
     const handleCommentDeleteClick = async (postId: string, commentId: string) => {
-        const confirmed = window.confirm('댓글을 삭제하시겠습니까?');
+        const confirmed = window.confirm('Are you sure you want to delete your comment?');
         if (confirmed) {
             await deleteCommentById(postId, commentId);
             fetchData();
@@ -164,7 +164,7 @@ export default function Answer() {
     }
 
     const handleFileDeleteClick = async (postId: string, fileId: string) => {
-        const confirmed = window.confirm('파일을 삭제하시겠습니까?');
+        const confirmed = window.confirm('Are you sure you want to delete the file?');
         if (confirmed) {
             setIsLoading(true);
             try{
@@ -197,7 +197,7 @@ export default function Answer() {
             fetchData();
             setCommentData('');
         } else {
-            alert('코멘트 입력해주세요');
+            alert('Please enter a comment');
         }
     }
 

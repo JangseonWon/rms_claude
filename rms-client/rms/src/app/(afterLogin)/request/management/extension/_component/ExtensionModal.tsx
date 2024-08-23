@@ -68,12 +68,12 @@ export default function ExtensionModal({getExtension, type, open, closeModal, re
 
     const handleUpdateButtonClick = async () => {
         if (!extension) {
-            alert('확장 정보가 없습니다.');
+            alert('There is no extended information.');
             return;
         }
 
         if (!extensionType) {
-            alert('Extension Type이 선택되지 않았습니다.');
+            alert('Extension Type is not selected.');
             return;
         }
 
@@ -81,12 +81,12 @@ export default function ExtensionModal({getExtension, type, open, closeModal, re
 
         try {
             await patchExtension(extension.id, updatedRegex);
-            alert('Update 완료');
+            alert('Update Complete');
             closeModal();
             refreshTable();
         } catch (error) {
             console.error("Error updating extension:", error);
-            alert('업데이트 중 오류가 발생했습니다.');
+            alert('An error occurred during update.');
         }
     };
 
