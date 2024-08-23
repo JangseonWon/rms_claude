@@ -14,6 +14,7 @@ import SelectBox from "@/app/_component/SelectBox";
 import InputBox from "@/app/_component/InputBox";
 import {Paging} from "@/model/Paging";
 import {fetchMultiDownloadFile} from "@/app/(afterLogin)/request/result/download/_api/fetchMultiDownloadFile";
+import BlueButton from "@/app/_component/BlueButton";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -172,13 +173,13 @@ export default function DownloadTable() {
                 </div>
             </section>
             <section>
-                <button className={style.downloadButton} onClick={handleMultiDownloadOnClick}>
-                    Download
-                </button>
+                <div className={style.downloadButton}>
+                    <BlueButton name={"Report Download"} onClick={handleMultiDownloadOnClick}/>
+                </div>
             </section>
             <section className={style.tableContainer}>
                 <table className={style.table}>
-                <thead>
+                    <thead>
                     <tr>
                         <th>
                             <label form="agree" className={style.checkbox}>

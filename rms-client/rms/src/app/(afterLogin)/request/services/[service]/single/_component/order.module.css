@@ -3,20 +3,23 @@
 }
 .excelButton {
     display: flex;
-    margin: 2vh 0 2vh auto;
-    width: 13.5vw;
-    padding: 1vh;
-    font-size: 0.8vw;
-    background-color: #002b49;
-    color: #fff;
-    border-radius: 15px;
-    border: none;
+    width: 13.2vw;
     justify-content: center;
-    font-weight: 700;
+    font-weight: bold;
+    font-size: 0.8vw;
+    padding: 0.6vh 1vw;
+    min-width: 6vw;
+    border-radius: 15px;
+    border: 1px solid #182847;
+    transition: all 150ms ease;
     cursor: pointer;
+    background: linear-gradient(135deg, #182847, #354e6d);
+    color: #ffffff;
+    margin: 0.5vh 0.3vw 2vh auto;
 }
 .excelButton:hover {
-    background-color: #90BA2D;
+    background: linear-gradient(135deg, #3c6699, #9ebce6);
+    border: 1px solid #9ebce6;
 }
 .buttonSection {
     position: sticky;

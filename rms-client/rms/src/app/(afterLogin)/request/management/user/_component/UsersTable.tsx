@@ -15,6 +15,8 @@ import InstitutionModal from "@/app/(afterLogin)/request/management/user/_compon
 import UserServiceEditModal from "@/app/(afterLogin)/request/management/user/_component/UserServiceEditModal";
 import SelectBox from "@/app/_component/SelectBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
+import RectangleButton from "@/app/_component/RectangleButton";
+import BlueButton from "@/app/_component/BlueButton";
 
 interface UserWithSelected extends User {
     isSelected?: boolean;
@@ -132,15 +134,15 @@ export default function UsersTable() {
         <>
             <section className={style.filterContainer}>
                 <div className={style.filterContainerLeft}>
-                    <button className={style.alisSync} onClick={handleAlisSyncButtonClick}>
-                        Alis-Sync
-                    </button>
+                    <div className={style.alisSyncButton}>
+                        <BlueButton name={"Alis-Sync"} onClick={handleAlisSyncButtonClick}/>
+                    </div>
                     <SelectBox
                         width={"7vw"}
                         value={selectOption}
                         options={selectBoxOptions}
                         label={"status"}
-                        onChange={(selectedOption) =>{
+                        onChange={(selectedOption) => {
                             setSelectOption(selectedOption.value);
                             handleSearchKeyChange({target: {value: selectedOption.value}} as React.ChangeEvent<HTMLSelectElement>);
                         }}
@@ -200,12 +202,7 @@ export default function UsersTable() {
                                 />
                             </td>
                             <td>
-                                <button
-                                    className={style.editButton}
-                                    onClick={() => handleUserServiceEditClick(row)}
-                                >
-                                    Edit
-                                </button>
+                                <RectangleButton name={'Edit'} onClick={() => handleUserServiceEditClick(row)}/>
                             </td>
                         </tr>
                     ))}

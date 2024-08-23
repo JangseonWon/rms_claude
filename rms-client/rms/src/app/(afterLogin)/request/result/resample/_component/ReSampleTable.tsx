@@ -4,13 +4,13 @@ import React, {useEffect, useState} from "react";
 import style from "@/app/(afterLogin)/request/result/resample/_component/reSampleTable.module.css";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {useSession} from "next-auth/react";
 import type {Request} from "@/model/Request";
 import {fetchFinishedOrder} from "@/app/(afterLogin)/request/result/download/_api/fetchFinishedOrder";
 import {Paging} from "@/model/Paging";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import {format} from "date-fns";
 import InputBox from "@/app/_component/InputBox";
+import GreenButton from "@/app/_component/GreenButton";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -84,6 +84,10 @@ export default function ReSampleTable() {
         }
     }
 
+    const handleResampleOnClick = () => {
+        alert('Resample Click');
+    }
+
     useEffect(() => {
         fetchData(search)
     }, [search]);
@@ -106,15 +110,15 @@ export default function ReSampleTable() {
                 </div>
             </section>
             <section>
-                <button className={style.reSampleButton}>
-                    Re-Sample
-                </button>
+                <div className={style.reSampleButton}>
+                    <GreenButton name={"Re-Sample"} onClick={handleResampleOnClick}/>
+                </div>
             </section>
             <section className={style.tableContainer}>
                 <table className={style.table}>
                     <thead>
                     <tr>
-                        <th>
+                    <th>
                             <label form="agree" className={style.checkbox}>
                                 <input
                                     type="checkbox"

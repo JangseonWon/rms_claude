@@ -1,5 +1,7 @@
 import style from './barcodeButton.module.css';
-import type { RequestWithSelected } from "@/app/(afterLogin)/request/order/_component/OrderTable";
+import type {RequestWithSelected} from "@/app/(afterLogin)/request/order/_component/OrderTable";
+import React from "react";
+import BlueButton from "@/app/_component/BlueButton";
 
 interface Props {
     selectRequest: RequestWithSelected[];
@@ -16,9 +18,7 @@ export default function BarcodeButton({selectRequest}: Props) {
 
     return (
         <div className={style.container}>
-            <button className={style.barcodeButton} onClick={handlePrintClick}>
-                Print Barcode
-            </button>
+            <BlueButton name={'Print Barcode'} onClick={handlePrintClick}/>
         </div>
     )
 }

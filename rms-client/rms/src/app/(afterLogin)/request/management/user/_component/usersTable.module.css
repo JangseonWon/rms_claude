@@ -10,24 +10,6 @@
     margin-left: 1vw;
     width: 350px;
 }
-.alisSync {
-    display: flex;
-    margin: 2.5vh 2vw 0 0;
-    border-radius: 15px;
-    background: linear-gradient(135deg, #182847, #354e6d);
-    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    color: #ffffff;
-    width: 7vw;
-    height: 3.5vh;
-    padding: 0.8vh 1.6vw;
-    border: none;
-    font-weight: 700;
-    font-size: 0.8vw;
-    cursor: pointer;
-}
-.alisSync:active {
-    background: linear-gradient(135deg, #546b98, #4f6e92);
-}
 .selectSearchKey {
     padding: 0.2vh 0.2vw 0.2vh 0.2vw;
     margin: 2.5vh 1vw 0 auto;
@@ -39,6 +21,9 @@
     box-shadow: 0 2px 2px #F3F6F9;
     color: #666666;
     outline: none;
+}
+.alisSyncButton {
+    margin: 1.9vh 1vw 0 0;
 }
 .tableContainer {
     margin: 2vh 2vw;
@@ -140,20 +125,4 @@
 }
 .icon:hover {
     cursor: pointer;
-}
-.addButton {
-    font-size: 0.7vw;
-    padding: 0.5vh 0.3vw;
-    min-width: 4vw;
-    border-radius: 5px;
-    border: none;
-    transition: all 150ms ease;
-    cursor: pointer;
-    background: linear-gradient(135deg, #a2a3a9, #7a92af);
-    color: #ffffff;
-    margin: 0.5vh 0.3vw;
-}
-.addButton:hover {
-    background: linear-gradient(135deg, #3c6699, #9ebce6);
-    border: none;
 }

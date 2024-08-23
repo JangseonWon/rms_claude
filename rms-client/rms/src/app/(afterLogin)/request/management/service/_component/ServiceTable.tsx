@@ -11,6 +11,8 @@ import {ServiceManage} from "@/model/ServiceManage";
 import ServiceEditModal from "@/app/(afterLogin)/request/management/service/_component/ServiceEditModal";
 import SelectBox from "@/app/_component/SelectBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
+import RectangleButton from "@/app/_component/RectangleButton";
+import BlueButton from "@/app/_component/BlueButton";
 
 interface InstitutionWithSelected extends ServiceManage {
     isSelected?: boolean;
@@ -105,9 +107,9 @@ export default function ServiceTable() {
         <>
             <section className={style.filterContainer}>
                 <div className={style.filterContainerLeft}>
-                    <button className={style.alisSync} onClick={handleAlisSyncClick}>
-                        Alis-Sync
-                    </button>
+                    <div className={style.alisSyncButton}>
+                        <BlueButton name={"Alis-Sync"} onClick={handleAlisSyncClick}/>
+                    </div>
                     <SelectBox
                         width={"7vw"}
                         value={selectOption}
@@ -143,12 +145,7 @@ export default function ServiceTable() {
                             <td>{row.service_name}</td>
                             <td>{row.category_name}</td>
                             <td>
-                                <button
-                                    className={style.editButton}
-                                    onClick={()=> handleServiceEditClick(row)}
-                                >
-                                    Edit
-                                </button>
+                                <RectangleButton name={'Edit'} onClick={()=> handleServiceEditClick(row)}/>
                             </td>
                         </tr>
                     ))}

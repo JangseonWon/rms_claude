@@ -5,6 +5,7 @@ import React, {useEffect, useState} from "react";
 import {Extensions} from "@/model/ServiceExtensionAndSampleType";
 import {getExtensions} from "@/app/(afterLogin)/request/management/extension/_api/getExtensions";
 import ExtensionModal from "@/app/(afterLogin)/request/management/extension/_component/ExtensionModal";
+import RectangleButton from "@/app/_component/RectangleButton";
 
 export default function ExtensionTable() {
     const [extensionData, setExtensionData] = useState<Extensions[]>([]);
@@ -85,12 +86,7 @@ export default function ExtensionTable() {
                             <td>{mapRegexToType(row.regex)}</td>
                             <td>{mapRegexToValue(row.regex)}</td>
                             <td>
-                                <button
-                                    className={style.editButton}
-                                    onClick={() => handleEditExtensionClick(row)}
-                                >
-                                    Edit
-                                </button>
+                                <RectangleButton name={'Edit'} onClick={()=> handleEditExtensionClick(row)}/>
                             </td>
                         </tr>
                     ))}

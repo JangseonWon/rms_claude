@@ -9,6 +9,7 @@ import SelectBox from "@/app/_component/SelectBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import {Extensions} from "@/model/ServiceExtensionAndSampleType";
 import {patchExtension} from "@/app/(afterLogin)/request/management/extension/_api/patchExtension";
+import BlueButton from "@/app/_component/BlueButton";
 
 type Props = {
     getExtension?: Extensions;
@@ -122,12 +123,10 @@ export default function ExtensionModal({getExtension, type, open, closeModal, re
                                     setExtensionType(value.value);
                                 }}
                             />
-                            <button
-                                className={style.editButton}
+                            <BlueButton
+                                name={"Save"}
                                 onClick={handleUpdateButtonClick}
-                            >
-                                Save
-                            </button>
+                            />
                         </div>
                     </div>
                     <div className={style.rightBody}>

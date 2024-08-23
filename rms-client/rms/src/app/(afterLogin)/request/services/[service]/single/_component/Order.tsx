@@ -146,6 +146,10 @@ export default function Order() {
         return age;
     };
 
+    const excelRequest = () => {
+        alert('excel');
+    }
+
     const isAllRequiredFilled = () => {
         if (!request?.sample?.patient?.name) return false;
         if (!request?.sample?.patient?.serial) return false;
@@ -157,7 +161,7 @@ export default function Order() {
 
     return (
         <div className={style.container}>
-            <button className={style.excelButton}>
+            <button className={style.excelButton} onClick={excelRequest}>
                 Excel Request
             </button>
             <div className={style.buttonSection}>
