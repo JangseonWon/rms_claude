@@ -1,6 +1,6 @@
-import Title from "@/app/(afterLogin)/request/cart/_component/Title";
 import style from "@/app/(afterLogin)/request/cart/page.module.css";
 import Table from "@/app/(afterLogin)/request/cart/_component/Table";
+import Title from "@/app/_component/Title";
 
 export default async function Page() {
     return(

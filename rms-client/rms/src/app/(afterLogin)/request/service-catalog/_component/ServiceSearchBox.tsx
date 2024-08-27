@@ -33,7 +33,7 @@ export default function ServiceSearchBox() {
 
     const handleOptionClick = (option: SelectBoxOption) => {
         setSelectedValue(option.name!);
-        router.push(`/request/services/${option.name}/single`);
+        router.push(`/request/services/${option.value}/single`);
         setIsOpen(!isOpen);
     };
 

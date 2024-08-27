@@ -1,6 +1,8 @@
 .footer {
     border-top: solid #999999;
     border-width: thin;
+    margin-top: 3vh;
+    padding: 3vh 0 5vh 0;
 }
 .menu {
     flex-direction: column;
@@ -47,8 +49,7 @@
     width: 40vh;
     height: 5vh;
 }
-.grayAvatar {
-    filter: grayscale(70%);
+.avatarIcon {
     width: 2vw;
     height: 4vh;
 }

@@ -1,6 +1,8 @@
 .container{
+    /*margin: 5vh auto 20vh auto;*/
     margin: 5vh auto;
     width: 90%;
+    height: 100%;
 }
 .titleContainer{
     padding: 2vh 2vw;
@@ -11,5 +13,5 @@
     background-color: #ffffff;
 }
 .orderContainer{
-    min-height: 60vh;
+    /*min-height: 60vh;*/
 }

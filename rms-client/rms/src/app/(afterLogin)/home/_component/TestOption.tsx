@@ -3,7 +3,6 @@
 import style from "@/app/(afterLogin)/home/_component/testOption.module.css"
 import Link from "next/link";
 import Image from "next/image";
-import homeMainImg from "@/../public/home_main.jpg"
 import React, {useEffect} from "react";
 import {getCategories} from "@/app/(afterLogin)/_api/getCategories";
 import {Categories} from "@/model/Categories";
@@ -47,9 +46,12 @@ export default function TestOption() {
                         key={category.id}
                         href={`/request/services/${category.id}/single`}>
                         <div className={style.card}>
-                            <Image src={homeMainImg} alt={`${category.name}`}/>
-                            <div className={style.cardLabel}>{category.name}</div>
+                            <Image src={'/category/' + category.name + '.jpg'}
+                                   alt={`${category.name}`}
+                                   fill
+                            />
                         </div>
+                        <div className={style.cardLabel}>{category.name}</div>
                     </Link>
                 ))}
             </Slider>

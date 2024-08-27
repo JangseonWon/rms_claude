@@ -1,6 +1,6 @@
 import style from "@/app/(afterLogin)/request/services/[service]/single/page.module.css";
-import MainPage from "@/app/(afterLogin)/request/service-catalog/_component/MainPage";
 import CategoryTitle from "@/app/(afterLogin)/request/service-catalog/_component/CategoryTitle";
+import ListServicePage from "@/app/(afterLogin)/request/service-catalog/_component/ListServicePage";
 
 export default async function Page() {
     return(
@@ -10,7 +10,8 @@ export default async function Page() {
                     <CategoryTitle/>
                 </div>
                 <div className={style.orderContainer}>
-                    <MainPage/>
+                    {/*<MainPage/>*/}
+                    <ListServicePage/>
                 </div>
             </div>
         </div>
