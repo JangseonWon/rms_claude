@@ -132,7 +132,7 @@ export default function ListServicePage() {
                 <section className={style.serviceSection}>
                     <div className={style.serviceContainer}>
                         {serviceData && serviceData.length > 0 ? (serviceData?.map((service) => (
-                            <div className={style.serviceLink} onClick={()=> serviceOnClick(service)}>
+                            <div key={service.id} className={style.serviceLink} onClick={()=> serviceOnClick(service)}>
                                 {service.name}
                             </div>
                             ))
