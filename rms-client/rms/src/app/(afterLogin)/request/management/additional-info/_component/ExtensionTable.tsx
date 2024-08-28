@@ -10,15 +10,26 @@ import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {Paging} from "@/model/Paging";
 import InputBox from "@/app/_component/InputBox";
 import {getExtensionsPage} from "@/app/(afterLogin)/request/management/additional-info/_api/getExtensionsPage";
+import BlueButton from "@/app/_component/BlueButton";
+import SelectBox from "@/app/_component/SelectBox";
+import {SelectBoxOption} from "@/model/SelectBoxOption";
 
 export default function ExtensionTable() {
     const [extensionData, setExtensionData] = useState<Extensions[]>([]);
     const [selectExtensionData, setSelectExtensionData] = useState<Extensions | undefined>();
     const [extensionEditModalOpen, setExtensionEditModalOpen] = useState<boolean>(false);
     const [extensionType, setExtensionType] = useState<string>('');
+    const [searchKey, setSearchKey] = useState<string>("id");
+    const [searchValue, setSearchValue] = useState<string>("");
     const [search, setSearch] =
         useState<Paging>({filters: [], sort_by:"name", asc: true, size:10, page:1});
     const [totalPage, setTotalPage] = useState<number>();
+    const [selectOption, setSelectOption] = useState<string>('Code');
+
+    const selectBoxOptions: SelectBoxOption[] = [
+        { value: "id", name: "Code" },
+        { value: "name", name: "Name" }
+    ];
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage =>({
@@ -46,6 +57,12 @@ export default function ExtensionTable() {
             }
             return { ...prevSearch, filters: updatedFilters, page:1 }
         });
+    };
+
+    const handleSearchKeyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const key = event.target.value;
+        setSearchKey(key);
+        handleSearchChange({key: key, value: searchValue});
     };
 
     const fetchData = async (search: Paging) => {
@@ -100,6 +117,10 @@ export default function ExtensionTable() {
         return "";
     };
 
+    const handleAlisSyncClick = () => {
+        alert('sync complete');
+    }
+
     useEffect(() => {
         fetchData(search);
     }, []);
@@ -111,9 +132,25 @@ export default function ExtensionTable() {
     return (
         <>
             <section className={style.searchContainer}>
-                <div className={style.search}>
+                <div className={style.filterContainerLeft}>
+                    <div className={style.alisSyncButton}>
+                        <BlueButton name={"Alis-Sync"} onClick={handleAlisSyncClick}/>
+                    </div>
+                    <SelectBox
+                        width={"7vw"}
+                        value={selectOption}
+                        options={selectBoxOptions}
+                        label={"status"}
+                        onChange={(selectedOption) => {
+                            setSelectOption(selectedOption.value);
+                            handleSearchKeyChange({target: {value: selectedOption.value}} as React.ChangeEvent<HTMLSelectElement>);
+                        }}
+                    />
+                </div>
+                <div className={style.filterContainerRight}>
                     <InputBox label={"search"} onChange={(value) => {
-                        handleSearchChange({key: "search", value: value})
+                        setSearchValue(value);
+                        handleSearchChange({key: searchKey, value: value})
                     }}></InputBox>
                 </div>
             </section>
