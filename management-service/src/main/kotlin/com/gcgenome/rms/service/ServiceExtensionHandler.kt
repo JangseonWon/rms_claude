@@ -10,8 +10,10 @@ import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.exception.ExtensionNotFoundException
 import com.gcgenome.rms.exception.ServiceNotFoundException
 import com.gcgenome.rms.tables.pojos.ServiceExtension
+import com.gcgenome.rms.tables.references.EXTENSION
 import org.jooq.Condition
 import org.jooq.DSLContext
+import org.jooq.LikeEscapeStep
 import org.jooq.impl.DSL
 import org.jooq.impl.DSL.field
 import org.springframework.stereotype.Component
@@ -80,11 +82,17 @@ class ServiceExtensionHandler(
         return filters?.let {
             it.filter { filter -> filter.key != null && filter.value?.isNotBlank() == true }
                 .map { filter ->
-                    val condition = field("extension.id").likeIgnoreCase("%${filter.value}%")
-                        .or(field("extension.name").likeIgnoreCase("%${filter.value}%"))
+                    val key = filter.key!!
+                    val value = filter.value!!
+                    val field = when (key) {
+                        "id" -> EXTENSION.ID
+                        "name" -> EXTENSION.NAME
+                        else -> throw IllegalArgumentException("Unknown filter key: $key")
+                    }
+                    val condition = field.likeIgnoreCase("%$value%")
                     condition
                 }
-                .reduceOrNull { acc, condition -> acc.and(condition) } ?: DSL.trueCondition()
+                .reduceOrNull { acc, condition -> acc.and(condition) as LikeEscapeStep } ?: DSL.trueCondition()
         } ?: DSL.trueCondition()
     }
 }

@@ -1,9 +1,17 @@
 .searchContainer {
+    margin: 2vh 1.5vw;
     display: flex;
-    justify-content: center;
 }
-.search {
+.filterContainerLeft {
+    display: flex;
+    margin-left: auto;
+}
+.filterContainerRight {
+    margin-left: 1vw;
     width: 20vw;
+}
+.alisSyncButton {
+    margin: 1.9vh 1vw 0 0;
 }
 .tableContainer {
     margin: 2vh 2vw;
