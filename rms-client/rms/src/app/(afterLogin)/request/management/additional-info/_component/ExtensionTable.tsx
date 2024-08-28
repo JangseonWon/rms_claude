@@ -142,7 +142,7 @@ export default function ExtensionTable() {
                         options={selectBoxOptions}
                         label={"status"}
                         onChange={(selectedOption) => {
-                            setSelectOption(selectedOption.value);
+                            setSelectOption(selectedOption.name);
                             handleSearchKeyChange({target: {value: selectedOption.value}} as React.ChangeEvent<HTMLSelectElement>);
                         }}
                     />
