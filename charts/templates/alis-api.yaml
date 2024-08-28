@@ -11,8 +11,6 @@ data:
       config:
         import:
           - classpath:alis-database.yaml
-      main:
-        web-application-type: reactive
     server:
       port: 8080
 ---
