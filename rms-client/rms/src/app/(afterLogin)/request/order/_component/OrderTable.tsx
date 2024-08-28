@@ -18,7 +18,7 @@ export interface RequestWithSelected extends Request {
 
 export default function OrderTable() {
     const [requestData, setRequestData] = useState<RequestWithSelected[]>([]);
-    const [page, setPage] = useState<Page>({size:5, number:1});
+    const [page, setPage] = useState<Page>({size:10, number:1});
     const router = useRouter();
     const isSelectedAll = requestData.every((row) => row.isSelected);
 
@@ -72,12 +72,15 @@ export default function OrderTable() {
                 <thead>
                 <tr>
                     <th>
-                        <input
-                            type="checkbox"
-                            checked={isSelectedAll}
-                            onChange={() => handleSelectAll(!isSelectedAll)}
-                            className={style.checkbox}
-                        />
+                        <label form="agree" className={style.checkbox}>
+                            <input
+                                type="checkbox"
+                                checked={isSelectedAll}
+                                onChange={() => handleSelectAll(!isSelectedAll)}
+                                className={style.checkbox}
+                            />
+                            <span className={style.checkmark}></span>
+                        </label>
                     </th>
                     <th>Service Name</th>
                     <th>Patient(s) Name</th>
@@ -94,12 +97,15 @@ export default function OrderTable() {
                 {requestData && requestData.length > 0 && requestData.map((row, rowIndex) => (
                     <tr key={row.order_id! + row.service!.id + row.sample!.id}>
                         <td onClick={(e) => e.stopPropagation()}>
-                            <input
-                                type="checkbox"
-                                checked={row.isSelected || false}
-                                onChange={() => handleSelectChange(rowIndex, !row.isSelected)}
-                                className={style.checkbox}
-                            />
+                            <label form="agree" className={style.checkbox}>
+                                <input
+                                    type="checkbox"
+                                    checked={row.isSelected || false}
+                                    onChange={() => handleSelectChange(rowIndex, !row.isSelected)}
+                                    className={style.checkbox}
+                                />
+                                <span className={style.checkmark}></span>
+                            </label>
                         </td>
                         <td>{row.service?.name}</td>
                         <td>{row.sample?.patient?.name}</td>
@@ -126,9 +132,9 @@ export default function OrderTable() {
                 <span>items per page:</span>
                 <div className={style.select}>
                     <select onChange={handlePageSizeChange} defaultValue={page.size}>
-                        <option value="5">5</option>
                         <option value="10">10</option>
                         <option value="20">20</option>
+                        <option value="50">50</option>
                     </select>
                 </div>
                 <span> 1-{page.totalPage} of {page.number} </span>

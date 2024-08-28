@@ -26,7 +26,7 @@ export default function DownloadTable() {
     const [totalPage, setTotalPage] = useState<number>(0);
     const [status, setStatus] = useState<string>('-');
     const [search, setSearch] =
-        useState<Paging>({filters: [], sort_by:"status", asc: true, size:5, page:1});
+        useState<Paging>({filters: [], sort_by:"status", asc: true, size:10, page:1});
     const statusList = [
         {name:"DELIVERED", value:"DELIVERED"},
         {name:"COMPLETE", value:"FINISHED"}
@@ -237,9 +237,9 @@ export default function DownloadTable() {
                     <span>items per page:</span>
                     <div className={style.select}>
                         <select onChange={handlePageSizeChange}>
-                            <option value="5">5</option>
                             <option value="10">10</option>
                             <option value="20">20</option>
+                            <option value="50">50</option>
                         </select>
                     </div>
                     <span> 1-{totalPage} of {search.page} </span>

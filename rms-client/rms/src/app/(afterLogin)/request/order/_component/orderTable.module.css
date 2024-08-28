@@ -1,5 +1,5 @@
 .container {
-    padding: 20px;
+    padding: 2vh 2vw;
 }
 .buttonSection {
     text-align: right;
@@ -11,7 +11,7 @@
 .table thead {
     background-color: #002b49;
     color: #ffffff;
-    font-size: 16px;
+    font-size: 0.8vw;
     font-weight: 600;
 }
 .table thead tr th:first-child {
@@ -34,12 +34,12 @@
 }
 .table tbody tr td {
     color: #666666;
-    font-size: 16px;
-    padding: 10px;
+    font-size: 0.8vw;
+    padding: 1vh 1vw;
 }
 .table th,
 .table td {
-    padding: 8px;
+    padding: 0.8vh 0.8vw;
     text-align: center;
 }
 .pagination {
@@ -48,13 +48,13 @@
     justify-content: flex-end;
 }
 .pagination span {
-    padding: 10px 20px;
-    font-size: 16px;
+    padding: 1vh 1vw;
+    font-size: 0.8vw;
     color: #1a1a1a;
     align-items: center;
 }
 .pagination span:first-child {
-    padding: 10px 5px 10px 0;
+    padding: 1vh 0.3vw 1vh 0;
 }
 .pagination button {
     border: none;
@@ -68,15 +68,17 @@
     cursor: pointer;
 }
 .select {
-    width: 50px;
+    width: 2.5vw;
+    margin-right: 1vw;
 }
 
 .select select {
-    padding: 10px;
+    padding: 1vh 0.5vw;
     border: 1px solid #ccc;
     border-radius: 15px;
     background-color: #f8f8f8;
     cursor: pointer;
+    font-size: 0.7vw;
 }
 
 .select select:focus {
@@ -86,20 +88,43 @@
     border-color: #1a1a1a;
 }
 .checkbox {
-    width: 2vw;
-    height: 2vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
     cursor: pointer;
+}
+
+.checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+.checkmark {
+    width: 1vw;
+    height: 2vh;
+    background-color: #faf7f7;
+    border: 1px solid #DAE2ED;
+    border-radius: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.checkbox input:checked + .checkmark {
+    background-color: #90BA2D;
 }
 .checkmark:after {
     content: "";
     display: none;
-    width: 6px;
-    height: 10px;
+    width: 0.3vw;
+    height: 1vh;
     border: solid white;
     border-width: 0 2px 2px 0;
     transform: rotate(45deg);
+    margin-bottom: 0.3vh;
 }
-
 .checkbox input:checked + .checkmark:after {
     display: block;
 }

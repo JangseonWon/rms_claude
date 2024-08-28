@@ -1,5 +1,5 @@
 .filterContainer {
-    margin: 20px 30px;
+    margin: 2vh 1.5vw;
     display: flex;
     justify-content: space-between;
 }
@@ -7,7 +7,7 @@
     display: flex;
 }
 .filterContainerRight {
-    width: 350px;
+    width: 20vw;
 }
 .downloadButton {
     display: flex;
@@ -15,7 +15,7 @@
     margin: 1vh 1vw;
 }
 .tableContainer {
-    margin: 20px;
+    margin: 2vh 1vw;
 }
 .table {
     width: 100%;
@@ -24,7 +24,7 @@
 .table thead {
     background-color: #002b49;
     color: #ffffff;
-    font-size: 16px;
+    font-size: 0.8vw;
     font-weight: 600;
 }
 .table thead tr th:first-child {
@@ -41,15 +41,15 @@
 }
 .table tbody tr td {
     color: #666666;
-    font-size: 16px;
-    padding: 10px;
+    font-size: 0.8vw;
+    padding: 1vh 1vw;
 }
 .table tbody tr:nth-child(even) {
     background-color: #ffffff;
 }
 .table th,
 .table td {
-    padding: 8px;
+    padding: 0.8vh 0.8vw;
     text-align: center;
 }
 .pagination {
@@ -58,13 +58,13 @@
     justify-content: flex-end;
 }
 .pagination span {
-    padding: 10px 20px;
-    font-size: 16px;
+    padding: 1vh 1vw;
+    font-size: 0.8vw;
     color: #1a1a1a;
     align-items: center;
 }
 .pagination span:first-child {
-    padding: 10px 5px 10px 0;
+    padding: 1vh 0.3vw 1vh 0;
 }
 .pagination button {
     border: none;
@@ -78,31 +78,16 @@
     cursor: pointer;
 }
 .select {
-    position: relative;
-    width: 50px;
+    width: 2.5vw;
+    margin-right: 1vw;
 }
-
 .select select {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    width: 100%;
-    padding: 10px;
+    padding: 1vh 0.5vw;
     border: 1px solid #ccc;
     border-radius: 15px;
     background-color: #f8f8f8;
     cursor: pointer;
-}
-
-.select::after {
-    content: '\25BC';
-    font-size: 12px;
-    color: #555;
-    position: absolute;
-    top: 50%;
-    right: 10px;
-    transform: translateY(-50%);
-    pointer-events: none;
+    font-size: 0.7vw;
 }
 .select select:focus {
     outline: none;
@@ -117,7 +102,6 @@
     position: relative;
     cursor: pointer;
 }
-
 .checkbox input {
     position: absolute;
     opacity: 0;
@@ -125,10 +109,9 @@
     height: 0;
     width: 0;
 }
-
 .checkmark {
-    width: 20px;
-    height: 20px;
+    width: 1vw;
+    height: 2vh;
     background-color: #faf7f7;
     border: 1px solid #DAE2ED;
     border-radius: 3px;
@@ -136,21 +119,19 @@
     justify-content: center;
     align-items: center;
 }
-
 .checkbox input:checked + .checkmark {
     background-color: #90BA2D;
 }
-
 .checkmark:after {
     content: "";
     display: none;
-    width: 6px;
-    height: 10px;
+    width: 0.3vw;
+    height: 1vh;
     border: solid white;
     border-width: 0 2px 2px 0;
     transform: rotate(45deg);
+    margin-bottom: 0.3vh;
 }
-
 .checkbox input:checked + .checkmark:after {
     display: block;
 }
