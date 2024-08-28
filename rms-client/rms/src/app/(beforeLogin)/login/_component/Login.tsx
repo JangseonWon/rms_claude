@@ -58,7 +58,7 @@ export default function Login() {
     return (
         <div className={style.container}>
             <div className={style.left}>
-                <Image src={loginImg} alt="img" />
+                <Image src={loginImg} fill alt="img" style={{objectFit: 'cover'}}/>
             </div>
             <div className={style.right}>
                 <div className={style.horizontalLogo}>

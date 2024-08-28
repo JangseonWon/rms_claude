@@ -1,31 +1,10 @@
 .container {
-    display: flex;
-    align-items: stretch;
-    height: 100vh;
-    min-height: 100vh;
-    flex-direction: column;
+    display: grid;
 }
 .topSection {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 8vh;
-    z-index: 1;
 }
 .bodySection {
-    position: fixed;
-    top: 8vh;
-    height: calc(100vh - 8vh - 14vh);
-    width: 100%;
 }
 .bottomSection {
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    /*height: 150px;*/
-    height: 14vh;
     background-color: #f0f0f0;
-    z-index: 1;
 }
