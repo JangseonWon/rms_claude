@@ -29,6 +29,7 @@ export default function ReSampleTable() {
             page: newPageNumber
         }));
     };
+
     const handlePageSizeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const newSize = parseInt(event.target.value);
         setSearch(prevSearch => ({

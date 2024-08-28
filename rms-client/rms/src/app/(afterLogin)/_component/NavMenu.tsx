@@ -3,7 +3,6 @@
 import style from "@/app/(afterLogin)/_component/navMenu.module.css"
 import Link from "next/link";
 import {
-    faBorderAll,
     faCircleCheck,
     faGripLines,
     faHouse,
@@ -18,14 +17,13 @@ import {useSelectedLayoutSegment} from "next/navigation";
 import {useSession} from "next-auth/react";
 import {Categories} from "@/model/Categories";
 import {getCategories} from "@/app/(afterLogin)/_api/getCategories";
-import {useCategory, useSetCategory} from "@/store/useCategoryStore";
+import {useSetCategory} from "@/store/useCategoryStore";
 
 export default function NavMenu() {
     const segment = useSelectedLayoutSegment();
     const [showServicesDropdown, setShowServicesDropdown] = useState(false);
     const [showResultDropdown, setShowResultDropdown] = useState(false);
     const [showManagementDropdown, setShowManagementDropdown] = useState(false);
-    const categoryData = useCategory();
     const setCategoryData = useSetCategory();
     const { data: session } = useSession();
 
@@ -168,8 +166,8 @@ export default function NavMenu() {
                             </Link>
                         </ol>
                         <ol>
-                            <Link href={"/request/management/extension"}>
-                                Extension Management
+                            <Link href={"/request/management/additional-info"}>
+                                Additional info Management
                             </Link>
                         </ol>
                     </>

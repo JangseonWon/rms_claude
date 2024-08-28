@@ -3,13 +3,13 @@
 import style from "./extensionTable.module.css";
 import React, {useEffect, useState} from "react";
 import {Extensions} from "@/model/ServiceExtensionAndSampleType";
-import ExtensionModal from "@/app/(afterLogin)/request/management/extension/_component/ExtensionModal";
+import ExtensionModal from "@/app/(afterLogin)/request/management/additional-info/_component/ExtensionModal";
 import RectangleButton from "@/app/_component/RectangleButton";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {Paging} from "@/model/Paging";
 import InputBox from "@/app/_component/InputBox";
-import {getExtensionsPage} from "@/app/(afterLogin)/request/management/extension/_api/getExtensionsPage";
+import {getExtensionsPage} from "@/app/(afterLogin)/request/management/additional-info/_api/getExtensionsPage";
 
 export default function ExtensionTable() {
     const [extensionData, setExtensionData] = useState<Extensions[]>([]);

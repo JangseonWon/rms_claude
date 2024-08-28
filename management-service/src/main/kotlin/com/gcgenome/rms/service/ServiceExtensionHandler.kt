@@ -5,13 +5,14 @@ import com.gcgenome.rms.dao.SampleTypeDao
 import com.gcgenome.rms.dao.ServiceDao
 import com.gcgenome.rms.dao.ServiceExtensionDao
 import com.gcgenome.rms.data.Extension
+import com.gcgenome.rms.data.Page
 import com.gcgenome.rms.data.Query
-import com.gcgenome.rms.data.Service_
 import com.gcgenome.rms.exception.ExtensionNotFoundException
 import com.gcgenome.rms.exception.ServiceNotFoundException
 import com.gcgenome.rms.tables.pojos.ServiceExtension
 import org.jooq.Condition
 import org.jooq.DSLContext
+import org.jooq.impl.DSL
 import org.jooq.impl.DSL.field
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
@@ -33,6 +34,19 @@ class ServiceExtensionHandler(
     fun selectExtensionAll(filter: Query.Companion.Filter): Flux<Extension> {
         val whereClause = buildExtensionIdOrNameWhereClause(filter)
         return Flux.from(dslContext.selectExtensionByNameOrdId(whereClause))
+    }
+
+    fun selectExtensionPage(query: Query): Mono<Page<Extension>> {
+        val whereClause = buildWhereClause(query.filters)
+        val extensions = dslContext.selectExtensionsByWhereCondition(query, whereClause)
+        return dslContext.selectExtensionByWhereCount(whereClause)
+            .flatMap { totalCount ->
+                val totalPage = (totalCount + query.size -1) / query.size
+                extensions.collectList().flatMap {
+                    val page = Page(totalCount,totalPage,query.size,query.page+1,it)
+                    Mono.just(page)
+                }
+            }
     }
 
     fun getExtensionAll(): Flux<com.gcgenome.rms.tables.pojos.Extension> {
@@ -60,5 +74,17 @@ class ServiceExtensionHandler(
     fun buildExtensionIdOrNameWhereClause(filter: Query.Companion.Filter) : Condition {
         return field("extension.id").likeIgnoreCase("%${filter.value}%")
             .or(field("extension.name").likeIgnoreCase("%${filter.value}%"))
+    }
+
+    fun buildWhereClause(filters:List<Query.Companion.Filter>?) : Condition {
+        return filters?.let {
+            it.filter { filter -> filter.key != null && filter.value?.isNotBlank() == true }
+                .map { filter ->
+                    val condition = field("extension.id").likeIgnoreCase("%${filter.value}%")
+                        .or(field("extension.name").likeIgnoreCase("%${filter.value}%"))
+                    condition
+                }
+                .reduceOrNull { acc, condition -> acc.and(condition) } ?: DSL.trueCondition()
+        } ?: DSL.trueCondition()
     }
 }
