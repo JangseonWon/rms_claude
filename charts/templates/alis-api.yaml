@@ -1,0 +1,123 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: alis-api
+  namespace: {{ .Release.Namespace }}
+data:
+  application.yaml: |
+    spring:
+      application:
+        name: rms-alis-api
+      config:
+        import:
+          - classpath:alis-database.yaml
+      main:
+        web-application-type: reactive
+    server:
+      port: 8080
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  annotations:
+    alpha.image.policy.openshift.io/resolve-names: '*'
+    app.openshift.io/route-disabled: 'false'
+    app.openshift.io/vcs-uri: 'https://github.com/GC-Genome/rms.git'
+    reloader.stakater.com/auto: 'true'
+  name: alis-api
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: alis-api
+    app.openshift.io/runtime: spring-boot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alis-api
+  template:
+    metadata:
+      labels:
+        app: alis-api
+      annotations:
+        sidecar.istio.io/inject: 'true'
+    spec:
+      volumes:
+        - name: config
+          configMap:
+            name: alis-api
+            defaultMode: 420
+        - name: alis-database-config
+          configMap:
+            name: alis-database
+            defaultMode: 420
+      containers:
+        - resources: {}
+          terminationMessagePath: /dev/termination-log
+          name: alis-api
+          env:
+            - name: alis-database.url
+              valueFrom:
+                secretKeyRef:
+                  name: alis-database
+                  key: url
+            - name: alis-database.username
+              valueFrom:
+                secretKeyRef:
+                  name: alis-database
+                  key: username
+            - name: alis-database.password
+              valueFrom:
+                secretKeyRef:
+                  name: alis-database
+                  key: password
+            - name: TZ
+              value: Asia/Seoul
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: config
+              mountPath: /app/resources/application.yaml
+              subPath: application.yaml
+            - name: alis-database-config
+              mountPath: /app/resources/alis-database.yaml
+              subPath: alis-database.yaml
+          terminationMessagePolicy: File
+          image: 'image-registry.openshift-image-registry.svc:5000/{{ .Release.Namespace }}/alis-api:latest'
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 2
+  progressDeadlineSeconds: 600
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: rms-alis-api
+  namespace: {{ .Release.Namespace }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: 80-tcp
+      protocol: TCP
+      port: 80
+      targetPort: 8080
+  selector:
+    app: alis-api
+---
+kind: ImageStream
+apiVersion: image.openshift.io/v1
+metadata:
+  name: alis-api
+  namespace: {{ .Release.Namespace }}
+spec:
+  lookupPolicy:
+    local: false

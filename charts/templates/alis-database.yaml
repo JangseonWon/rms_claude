@@ -1,0 +1,21 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: alis-database
+  namespace: {{ .Release.Namespace }}
+data:
+  alis-database.yaml: |
+    spring:
+      datasource:
+        url: ${alis-database.url}
+        username: ${alis-database.username}
+        password: ${alis-database.password}
+      jpa:
+        hibernate:
+          ddl-auto: none
+        show-sql: false
+        properties:
+          hibernate:
+            dialect: org.hibernate.dialect.SQLServerDialect
+            format_sql: false
+            physical_naming_strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
