@@ -1,0 +1,28 @@
+.content {
+    display: flex;
+    flex-wrap: wrap;
+}
+.content p {
+    flex-basis: 100%;
+    margin: 2vh 0 0.5vh 0;
+    color: #002b49;
+    font-size: 0.8vw;
+    font-weight: 700;
+}
+.content > * {
+    padding-right: 1vw;
+}
+.memo {
+    border: 1px solid #DAE2ED;
+    background: #ffffff;
+    width: 100%;
+    border-radius: 15px;
+    padding: 1vh 1vw;
+    box-shadow: 0 2px 2px #F3F6F9;
+}
+.memo:focus {
+    outline: none;
+}
+.content.error textarea{
+    border: 1px solid red;
+}

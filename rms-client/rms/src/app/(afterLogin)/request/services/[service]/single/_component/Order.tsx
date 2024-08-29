@@ -18,8 +18,11 @@ import BlueButton from "@/app/_component/BlueButton";
 import {putRequest} from "@/app/(afterLogin)/request/services/[service]/single/_api/putRequest";
 import {format} from "date-fns";
 import {getCategories} from "@/app/(afterLogin)/_api/getCategories";
-import {usePathname} from "next/navigation";
+import {usePathname, useRouter} from "next/navigation";
 import {Categories} from "@/model/Categories";
+import ExtensionInputComponent
+    from "@/app/(afterLogin)/request/services/[service]/single/_component/ExtensionInputComponent";
+import TextBox from "@/app/_component/TextBox";
 
 export default function Order() {
     const [organizationOptions, setOrganizationOptions] = useState<SelectBoxOption[]>([])
@@ -30,7 +33,7 @@ export default function Order() {
     const [selectedService, setSelectedService] = useState<SelectBoxOption | null>(null);
     const [selectedSampleType, setSelectedSampleType] = useState<SelectBoxOption | null>(null);
     const [category, setCategory] = useState<Categories>();
-
+    const router = useRouter();
     const pathname = usePathname();
     const pathSegments = pathname.split('/');
     const secondLastValue = decodeURIComponent(pathSegments[pathSegments.length - 2]);
@@ -147,7 +150,7 @@ export default function Order() {
     };
 
     const excelRequest = () => {
-        alert('excel');
+        router.push(`/request/services/${secondLastValue}/multi`);
     }
 
     const isAllRequiredFilled = () => {
@@ -306,14 +309,13 @@ export default function Order() {
                     onChange={(value) => handleRequestChange('physician', value)}
                 />
             </div>
-            <div className={style.content}>
-                <p className={style.title}>Memo</p>
-                <textarea
-                    className={style.memo}
-                    rows={8}
-                    value={request.memo}
-                />
-            </div>
+            <ExtensionInputComponent/>
+            <TextBox
+                label={'Memo'}
+                value={request.memo}
+                required={true}
+                onChange={(value) => handleRequestChange('memo', value)}
+            />
         </div>
     )
 }

@@ -9,7 +9,8 @@ export interface Extensions {
     id: string,
     name: string,
     required: boolean,
-    regex: string
+    regex: string,
+    type: string
 }
 
 interface SampleTypes {
