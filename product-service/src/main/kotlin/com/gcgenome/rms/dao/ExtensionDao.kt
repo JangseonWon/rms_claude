@@ -17,6 +17,7 @@ interface ExtensionDao{
                     DSL.key("id").value(EXTENSION.ID),
                     DSL.key("name").value(EXTENSION.NAME),
                     DSL.key("regex").value(EXTENSION.REGEX),
+                    DSL.key("type").value(EXTENSION.TYPE),
                     DSL.key("required").value(SERVICE_EXTENSION.REQUIRED)
         )).from(EXTENSION)
                 .join(SERVICE_EXTENSION).on(EXTENSION.ID.eq(SERVICE_EXTENSION.EXTENSION_ID))
@@ -32,9 +33,10 @@ interface ExtensionDao{
                     DSL.key("id").value(DSL.field(DSL.name("ext", "id"))),
                     DSL.key("name").value(DSL.field(DSL.name("ext", "name"))),
                     DSL.key("regex").value(DSL.field(DSL.name("ext", "regex"))),
+                    DSL.key("type").value(DSL.field(DSL.name("ext", "type"))),
                     DSL.key("required").value(DSL.field(DSL.name("ext", "required")))
                 )).from(
-                    select(EXTENSION.ID, EXTENSION.NAME, EXTENSION.REGEX, SERVICE_EXTENSION.REQUIRED)
+                    select(EXTENSION.ID, EXTENSION.NAME, EXTENSION.REGEX, EXTENSION.TYPE, SERVICE_EXTENSION.REQUIRED)
                         .distinctOn(EXTENSION.ID)
                         .from(EXTENSION)
                         .join(SERVICE_EXTENSION).on(EXTENSION.ID.eq(SERVICE_EXTENSION.EXTENSION_ID))

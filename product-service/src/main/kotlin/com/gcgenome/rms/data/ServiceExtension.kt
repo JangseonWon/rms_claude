@@ -4,5 +4,6 @@ data class ServiceExtension(
     val id: String,
     val name: String,
     val regex: String,
-    val required: Boolean
+    val required: Boolean,
+    val type: String?
 )
