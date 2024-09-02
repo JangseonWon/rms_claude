@@ -1,8 +1,6 @@
 'use client';
 
 import style from "@/app/_component/footer.module.css";
-import Avatar from '@mui/material/Avatar';
-import Stack from '@mui/material/Stack';
 import Link from "next/link";
 import React, {useState} from "react";
 import Image from "next/image";
@@ -36,7 +34,7 @@ export default function Footer() {
                 </div>
                 <div className={style.flex}>
                     <div>
-                        <Stack className={style.div3Menu} direction="row" spacing={2}>
+                        {/*<Stack className={style.div3Menu} direction="row" spacing={2}>
                             <Link href={"https://oversea.gcgenome.com/"} target={"_blank"}>
                                 <Avatar
                                     alt="gc"
@@ -73,7 +71,7 @@ export default function Footer() {
                                     onMouseLeave={handleMouseLeave}
                                 />
                             </Link>
-                        </Stack>
+                        </Stack>*/}
                     </div>
                     <div className={style.div4Menu}>
                         <Image src={footerImg} alt="img"/>
