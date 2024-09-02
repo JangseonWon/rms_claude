@@ -3,7 +3,7 @@
 import {usePathname} from "next/navigation";
 import {useEffect, useState} from "react";
 import style from './extensionInputComponent.module.css';
-import {fetchServiceExtensions} from "@/app/(afterLogin)/request/services/[service]/single/_api/fetchServiceExtensions";
+import {fetchServiceExtensions} from "@/app/(afterLogin)/request/services/_api/fetchServiceExtensions";
 import {Extensions} from "@/model/ServiceExtensionAndSampleType";
 import InputBox from "@/app/_component/InputBox";
 import SelectBox from "@/app/_component/SelectBox";

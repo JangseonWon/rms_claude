@@ -7,7 +7,6 @@ import com.gcgenome.rms.tables.references.USER
 import org.jooq.Condition
 import org.jooq.DSLContext
 import org.jooq.SortOrder
-import org.jooq.impl.*
 import org.jooq.impl.DSL.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -67,6 +66,12 @@ interface UserDao{
             selectCount().from(USER)
                 .where(whereClause)
         ).map { it.component1() }
+    }
+
+    fun DSLContext.getUserInfo(): Flux<User> {
+        return Flux.from(
+            selectFrom(USER)
+        ).map { it.into(User::class.java) }
     }
 
     fun DSLContext.selectUserOrganizationById(userDto: User): Mono<User> {

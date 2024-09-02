@@ -1,7 +1,6 @@
 'use client';
 
 import style from "@/app/_component/footer.module.css";
-import Link from "next/link";
 import React, {useState} from "react";
 import Image from "next/image";
 import footerImg from "@/../public/footer-img.png"
@@ -33,45 +32,51 @@ export default function Footer() {
                     </div>
                 </div>
                 <div className={style.flex}>
-                    <div>
-                        {/*<Stack className={style.div3Menu} direction="row" spacing={2}>
-                            <Link href={"https://oversea.gcgenome.com/"} target={"_blank"}>
-                                <Avatar
-                                    alt="gc"
-                                    src={getIconSrc("icon images-04")}
-                                    className={style.avatarIcon}
-                                    onMouseEnter={() => handleMouseEnter("icon images-04")}
-                                    onMouseLeave={handleMouseLeave}
-                                />
-                            </Link>
-                            <Link href={"https://www.instagram.com/gcgenome/"} target={"_blank"}>
-                                <Avatar
-                                    alt="insta"
-                                    src={getIconSrc("icon images-03")}
-                                    className={style.avatarIcon}
-                                    onMouseEnter={() => handleMouseEnter("icon images-03")}
-                                    onMouseLeave={handleMouseLeave}
-                                />
-                            </Link>
-                            <Link href={"https://www.youtube.com/@gcgenome2121"} target={"_blank"}>
-                                <Avatar
-                                    alt="youtube"
-                                    src={getIconSrc("icon images-02")}
-                                    className={style.avatarIcon}
-                                    onMouseEnter={() => handleMouseEnter("icon images-02")}
-                                    onMouseLeave={handleMouseLeave}
-                                />
-                            </Link>
-                            <Link href={"https://www.linkedin.com/company/73449146/admin/feed/posts/"} target={"_blank"}>
-                                <Avatar
-                                    alt="linkedin"
-                                    src={getIconSrc("icon images-01")}
-                                    className={style.avatarIcon}
-                                    onMouseEnter={() => handleMouseEnter("icon images-01")}
-                                    onMouseLeave={handleMouseLeave}
-                                />
-                            </Link>
-                        </Stack>*/}
+                    <div className={style.div3Menu}>
+                        <a href="https://oversea.gcgenome.com/" target="_blank" rel="noopener noreferrer">
+                            <Image
+                                className={style.avatarIcon}
+                                src={getIconSrc("icon images-04")}
+                                width={50}
+                                height={50}
+                                onMouseEnter={() => handleMouseEnter("icon images-04")}
+                                onMouseLeave={handleMouseLeave}
+                                alt="Social Icon 1"
+                            />
+                        </a>
+                        <a href="https://www.instagram.com/gcgenome/" target="_blank" rel="noopener noreferrer">
+                            <Image
+                                className={style.avatarIcon}
+                                src={getIconSrc("icon images-03")}
+                                width={50}
+                                height={50}
+                                onMouseEnter={() => handleMouseEnter("icon images-03")}
+                                onMouseLeave={handleMouseLeave}
+                                alt="Social Icon 2"
+                            />
+                        </a>
+                        <a href="https://www.youtube.com/@gcgenome2121" target="_blank" rel="noopener noreferrer">
+                            <Image
+                                className={style.avatarIcon}
+                                src={getIconSrc("icon images-02")}
+                                width={50}
+                                height={50}
+                                onMouseEnter={() => handleMouseEnter("icon images-02")}
+                                onMouseLeave={handleMouseLeave}
+                                alt="Social Icon 3"
+                            />
+                        </a>
+                        <a href="https://www.linkedin.com/company/73449146/admin/feed/posts/" target="_blank" rel="noopener noreferrer">
+                            <Image
+                                className={style.avatarIcon}
+                                src={getIconSrc("icon images-01")}
+                                width={50}
+                                height={50}
+                                onMouseEnter={() => handleMouseEnter("icon images-01")}
+                                onMouseLeave={handleMouseLeave}
+                                alt="Social Icon 4"
+                            />
+                        </a>
                     </div>
                     <div className={style.div4Menu}>
                         <Image src={footerImg} alt="img"/>

@@ -57,6 +57,24 @@ class UserServiceHandler(
         })
     }
 
+    fun insertServiceAllUsers(serviceId: String): Mono<Void> {
+        return Mono.from(dslContext.transactionPublisher { trx ->
+            trx.dsl().run {
+                getUserInfo()
+                    .flatMap { user ->
+                        insertServiceByServiceId(listOf(user), serviceId)
+                    }
+                    .then()
+            }
+        })
+    }
+
+    fun deleteServiceAllUsers(serviceId: String): Mono<UserService> {
+        return Mono.from(dslContext.transactionPublisher { trx ->
+            trx.dsl().deleteServiceByServiceId(serviceId)
+        })
+    }
+
     fun buildUserServiceIdOrNameWhereClause(filter: Query.Companion.Filter) : Condition {
         return field("user_service.service_id").like("%${filter.value}%").or(field("service.name").like("%${filter.value}%"))
     }

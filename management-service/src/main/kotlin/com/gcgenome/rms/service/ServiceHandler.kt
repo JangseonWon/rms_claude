@@ -5,6 +5,7 @@ import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.dao.SampleTypeDao
 import com.gcgenome.rms.dao.ServiceDao
 import com.gcgenome.rms.dao.ServiceExtensionDao
+import com.gcgenome.rms.dao.UserServiceDao
 import com.gcgenome.rms.data.Page
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.ServiceCategory
@@ -26,7 +27,7 @@ import reactor.core.publisher.Mono
 class ServiceHandler(
     val dslContext: DSLContext,
     private val managerAuthenticationHandler: ManagerAuthenticationHandler
-): ServiceDao, ServiceExtensionDao, SampleTypeDao {
+): ServiceDao, ServiceExtensionDao, SampleTypeDao, UserServiceDao {
 
     fun checkServiceById(serviceId: String): Mono<Service_> {
         return dslContext.selectServiceById(serviceId)
@@ -52,9 +53,15 @@ class ServiceHandler(
                 dslContext.selectServicesAndCategoryCount(whereClause)
                     .flatMap { totalCount ->
                         val totalPage = (totalCount + query.size -1) / query.size
-                        services.collectList().flatMap {
-                            val page = Page(totalCount,totalPage,query.size,query.page+1,it)
-                            Mono.just(page)
+                        services.collectList().flatMap { serviceList ->
+                            dslContext.getUserService().collectList().flatMap { userServices ->
+                                val serviceCategoryList = serviceList.map { serviceCategory ->
+                                    val state = userServices.any { it.serviceId == serviceCategory.serviceId }
+                                    serviceCategory.copy(state = state)
+                                }
+                                val page = Page(totalCount, totalPage, query.size, query.page + 1, serviceCategoryList)
+                                Mono.just(page)
+                            }
                         }
                     }
             }

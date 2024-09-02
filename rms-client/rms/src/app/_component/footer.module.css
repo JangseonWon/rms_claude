@@ -38,7 +38,9 @@
     padding: 2.5vh 6vw 0 0;
 }
 .div3Menu {
+    display: flex;
     padding: 1vh 0 0 10vw;
+    gap: 10%;
 }
 .div4Menu {
     z-index: 0;
@@ -49,6 +51,8 @@
     height: 5vh;
 }
 .avatarIcon {
+    cursor: pointer;
+    border-radius: 20px;
     width: 2vw;
     height: 4vh;
 }

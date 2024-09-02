@@ -1,13 +1,18 @@
 .container{
-    margin: 20px auto auto;
-    width: 95%;
+    margin: 5vh auto;
+    width: 90%;
 }
 .titleContainer{
     margin: 20px auto auto;
     width: 95%;
 }
+.orderContainerWrapper {
+    padding: 2vh 2vw;
+    border-radius: 15px;
+    background-color: #ffffff;
+}
 .orderContainer{
-    margin: 20px auto 20px auto;
+    margin: 2vh auto;
     width: 100%;
     max-width: 1500px;
     background-color: #ffffff;

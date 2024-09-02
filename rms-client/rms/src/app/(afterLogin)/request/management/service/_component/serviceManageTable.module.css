@@ -1,33 +1,36 @@
-.top {
-    display: flex;
-    margin: 30px 30px 10px 30px;
-}
-.downloadButton {
-    margin-right: auto;
+.filterContainer {
+    margin: 2vh 1.5vw;
     display: flex;
 }
-.orderAndCartButton {
+.filterContainerLeft {
+    display: flex;
     margin-left: auto;
 }
-
-.container {
-    margin: 5vh 2vw;
-    overflow-x: scroll;
+.filterContainerRight {
+    margin-left: 1vw;
+    width: 20vw;
+}
+.alisSyncButton {
+    margin: 1.9vh 1vw 0 0;
+}
+.tableContainer {
+    margin: 2vh 2vw;
 }
 .table {
+    width: 100%;
     border-collapse: collapse;
 }
 .table thead {
-    background-color: #838689;
+    background-color: #002b49;
     color: #ffffff;
-    font-size: 12px;
+    font-size: 0.8vw;
     font-weight: 600;
 }
 .table thead tr th:first-child {
-    border-radius: 20px 0 0 0;
+    border-radius: 20px 0 0 20px;
 }
 .table thead tr th:last-child {
-    border-radius: 0 20px 0 0;
+    border-radius: 0 20px 20px 0;
 }
 .table tbody {
     font-weight: 300;
@@ -36,18 +39,17 @@
     border-bottom: 1px solid #838689;
 }
 .table tbody tr td {
+    height: 4vh;
     color: #666666;
-    font-size: 14px;
+    font-size: 0.7vw;
     padding: 10px;
-    /*max-width: 250px;*/
-    word-wrap: break-word;
 }
 .table tbody tr:nth-child(even) {
     background-color: #ffffff;
 }
 .table th,
 .table td {
-    padding: 8px;
+    padding: 0.6vh 0.6vw;
     text-align: center;
 }
 .pagination {
@@ -56,13 +58,13 @@
     justify-content: flex-end;
 }
 .pagination span {
-    padding: 10px 20px;
-    font-size: 16px;
+    padding: 1vh 1vw;
+    font-size: 0.8vw;
     color: #1a1a1a;
     align-items: center;
 }
 .pagination span:first-child {
-    padding: 10px 5px 10px 0;
+    padding: 1vh 0.5vw 1vh 0;
 }
 .pagination button {
     border: none;
@@ -75,20 +77,18 @@
     background-color: #d3d3d3;
     cursor: pointer;
 }
-.extensionHeader {
-    min-width: 6vw;
-}
 .select {
     position: relative;
-    width: 50px;
+    width: 3vw;
 }
 
 .select select {
+    font-size: 0.6vw;
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
     width: 100%;
-    padding: 10px;
+    padding: 1vh 0.5vw;
     border: 1px solid #ccc;
     border-radius: 15px;
     background-color: #f8f8f8;
@@ -97,11 +97,11 @@
 
 .select::after {
     content: '\25BC';
-    font-size: 12px;
+    font-size: 0.6vw;
     color: #555;
     position: absolute;
     top: 50%;
-    right: 10px;
+    right: 0.5vw;
     transform: translateY(-50%);
     pointer-events: none;
 }
@@ -110,7 +110,4 @@
 }
 .select select:hover {
     border-color: #1a1a1a;
-}
-.invalid {
-    background-color: #bcf3b2;
 }

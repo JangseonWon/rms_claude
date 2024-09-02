@@ -7,7 +7,9 @@ import React, {useCallback, useEffect, useState} from "react";
 import {Organization} from "@/model/Organization";
 import {getOrganization} from "@/app/(afterLogin)/request/services/[service]/single/_api/getOrganization";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
-import {getServicesByCategoryId} from "@/app/(afterLogin)/request/services/[service]/single/_api/getServicesByCategoryId";
+import {
+    getServicesByCategoryId
+} from "@/app/(afterLogin)/request/services/[service]/single/_api/getServicesByCategoryId";
 import {Service} from "@/model/Service";
 import {Request} from "@/model/Request";
 import DatePickerBox from "@/app/_component/DatePickerBox";
@@ -18,7 +20,7 @@ import BlueButton from "@/app/_component/BlueButton";
 import {putRequest} from "@/app/(afterLogin)/request/services/[service]/single/_api/putRequest";
 import {format} from "date-fns";
 import {getCategories} from "@/app/(afterLogin)/_api/getCategories";
-import {usePathname, useRouter} from "next/navigation";
+import {usePathname} from "next/navigation";
 import {Categories} from "@/model/Categories";
 import ExtensionInputComponent
     from "@/app/(afterLogin)/request/services/[service]/single/_component/ExtensionInputComponent";
@@ -33,7 +35,6 @@ export default function Order() {
     const [selectedService, setSelectedService] = useState<SelectBoxOption | null>(null);
     const [selectedSampleType, setSelectedSampleType] = useState<SelectBoxOption | null>(null);
     const [category, setCategory] = useState<Categories>();
-    const router = useRouter();
     const pathname = usePathname();
     const pathSegments = pathname.split('/');
     const secondLastValue = decodeURIComponent(pathSegments[pathSegments.length - 2]);
@@ -149,10 +150,6 @@ export default function Order() {
         return age;
     };
 
-    const excelRequest = () => {
-        router.push(`/request/services/${secondLastValue}/multi`);
-    }
-
     const isAllRequiredFilled = () => {
         if (!request?.sample?.patient?.name) return false;
         if (!request?.sample?.patient?.serial) return false;
@@ -164,21 +161,6 @@ export default function Order() {
 
     return (
         <div className={style.container}>
-            <button className={style.excelButton} onClick={excelRequest}>
-                Excel Request
-            </button>
-            <div className={style.buttonSection}>
-                <GreenButton
-                    name={"Add to Cart"}
-                    disabled={!isAllRequiredFilled()}
-                    onClick={() => publishRequest("CART")}
-                />
-                <BlueButton
-                    name={"Order Now"}
-                    disabled={!isAllRequiredFilled()}
-                    onClick={() => publishRequest("ORDERED")}
-                />
-            </div>
             <p className={style.mainName}>Institution name *</p>
             <div className={style.section}>
                 <div className={style.selectBox}>
@@ -316,6 +298,18 @@ export default function Order() {
                 required={true}
                 onChange={(value) => handleRequestChange('memo', value)}
             />
+            <div className={style.buttonSection}>
+                <GreenButton
+                    name={"Add to Cart"}
+                    disabled={!isAllRequiredFilled()}
+                    onClick={() => publishRequest("CART")}
+                />
+                <BlueButton
+                    name={"Order Now"}
+                    disabled={!isAllRequiredFilled()}
+                    onClick={() => publishRequest("ORDERED")}
+                />
+            </div>
         </div>
     )
 }
