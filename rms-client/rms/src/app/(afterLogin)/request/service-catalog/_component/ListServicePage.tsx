@@ -120,7 +120,7 @@ export default function ListServicePage() {
                                 />
                             </div>
                             <div className={style.cardPicture}>
-                                <Image src={'/' + category.name + '.jpg'}
+                                <Image src={'/category/' + category.name + '.jpg'}
                                        alt={category.name}
                                        fill
                                        style={{objectFit: 'cover'}}
