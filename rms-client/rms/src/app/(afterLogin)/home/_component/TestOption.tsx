@@ -46,7 +46,7 @@ export default function TestOption() {
                         key={category.id}
                         href={`/request/services/${category.id}/single`}>
                         <div className={style.card}>
-                            <Image src={'/category/' + category.name + '.jpg'}
+                            <Image src={'/' + category.name + '.jpg'}
                                    alt={`${category.name}`}
                                    fill
                             />

@@ -18,9 +18,9 @@ export default function Footer() {
 
     const getIconSrc = (iconName: string) => {
         if (hoveredIcon === iconName) {
-            return `/avatar/${iconName}.png`;
+            return `/${iconName}.png`;
         }
-        return `/avatar/${iconName}-1.png`;
+        return `/${iconName}-1.png`;
     };
 
     return (
