@@ -1,5 +1,5 @@
 import React, {ChangeEvent, useEffect, useState} from 'react';
-import style from './TextBox.module.css';
+import style from '@/app/_component/textBox.module.css';
 
 type Props = {
     label: string
