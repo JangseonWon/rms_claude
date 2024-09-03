@@ -10,7 +10,7 @@ data class Extension(
     val id: String,
     @Column(name = "name", length = 64, nullable = false)
     val name: String,
-    @Column(name = "regex", length = 64, nullable = false)
+    @Column(name = "regex", length = 64, nullable = true)
     val regex: String,
     @Column(name = "type", length = 64, nullable = true)
     val type: String,
