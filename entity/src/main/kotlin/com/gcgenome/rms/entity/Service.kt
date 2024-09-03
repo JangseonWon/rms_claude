@@ -8,7 +8,7 @@ data class Service(
     @Id
     @Column(name = "id", length = 8)
     val id: String,
-    @Column(name = "name", length = 64, nullable = false)
+    @Column(name = "name", length = 128, nullable = false)
     val name: String,
 
     @ManyToOne
