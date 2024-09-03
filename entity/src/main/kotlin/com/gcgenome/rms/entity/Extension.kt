@@ -12,6 +12,8 @@ data class Extension(
     val name: String,
     @Column(name = "regex", length = 64, nullable = false)
     val regex: String,
+    @Column(name = "type", length = 64, nullable = true)
+    val type: String,
 
     @OneToMany(mappedBy = "extensionId")
     val serviceExtension: List<ServiceExtension>,
