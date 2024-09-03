@@ -7,8 +7,6 @@ import React, {useCallback, useEffect, useState} from "react";
 import {Organization} from "@/model/Organization";
 import {getOrganization} from "@/app/(afterLogin)/request/services/[service]/single/_api/getOrganization";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
-import {getServicesByCategoryId} from "@/app/(afterLogin)/request/services/[service]/single/_api/getServicesByCategoryId";
-import {Service} from "@/model/Service";
 import {Request} from "@/model/Request";
 import DatePickerBox from "@/app/_component/DatePickerBox";
 import {SampleType} from "@/model/SampleType";
@@ -17,36 +15,20 @@ import GreenButton from "@/app/_component/GreenButton";
 import BlueButton from "@/app/_component/BlueButton";
 import {putRequest} from "@/app/(afterLogin)/request/services/[service]/single/_api/putRequest";
 import {format} from "date-fns";
-import {getCategories} from "@/app/(afterLogin)/_api/getCategories";
-import {usePathname, useRouter} from "next/navigation";
-import {Categories} from "@/model/Categories";
+import {usePathname} from "next/navigation";
 import ExtensionInputComponent
     from "@/app/(afterLogin)/request/services/[service]/single/_component/ExtensionInputComponent";
 import TextBox from "@/app/_component/TextBox";
 
 export default function Order() {
     const [organizationOptions, setOrganizationOptions] = useState<SelectBoxOption[]>([])
-    const [serviceOptions, setServiceOptions] = useState<SelectBoxOption[]>([])
     const [sampleTypeOptions, setSampleTypeOptions] = useState<SelectBoxOption[]>([])
     const [request, setRequest] = useState<Request>({})
     const [selectedOrganization, setSelectedOrganization] = useState<SelectBoxOption | null>(null);
-    const [selectedService, setSelectedService] = useState<SelectBoxOption | null>(null);
     const [selectedSampleType, setSelectedSampleType] = useState<SelectBoxOption | null>(null);
-    const [category, setCategory] = useState<Categories>();
-    const router = useRouter();
     const pathname = usePathname();
     const pathSegments = pathname.split('/');
-    const secondLastValue = decodeURIComponent(pathSegments[pathSegments.length - 2]);
-
-    const fetchCategory = useCallback( async () => {
-        const response = await getCategories();
-        const data = await response.json();
-
-        const matchingCategory = data.find((category: { name: string; }) => category.name === secondLastValue);
-        if (matchingCategory) {
-            setCategory(matchingCategory);
-        }
-    }, [secondLastValue]);
+    const serviceId = decodeURIComponent(pathSegments[pathSegments.length - 2]);
 
     const fetchOrganizations = useCallback(async () => {
         const response = await getOrganization()
@@ -54,11 +36,6 @@ export default function Order() {
         setOrganizationOptions(transformOrganizationToOptions(data as Organization[]))
     },[]);
 
-    const fetchServices = useCallback(async (categoryId: string) => {
-        const response = await getServicesByCategoryId(categoryId);
-        const data = await response.json();
-        setServiceOptions(transformServiceToOptions(data as Service[]));
-    }, []);
 
     const fetchSampleType = async (serviceId: string) => {
         const response = await getSampleType(serviceId)
@@ -68,14 +45,8 @@ export default function Order() {
 
     useEffect(() => {
         fetchOrganizations();
-        fetchCategory();
-    }, [fetchCategory, fetchOrganizations]);
-
-    useEffect(() => {
-        if (category) {
-            fetchServices(category.id!);
-        }
-    }, [category, fetchServices]);
+        fetchSampleType(serviceId);
+    }, [fetchOrganizations]);
 
     const publishRequest = (status:string) => {
         const updateRequest = [{
@@ -88,10 +59,6 @@ export default function Order() {
                 }
                 else alert("fail")
             })
-    };
-
-    const handleServiceChange = (value: SelectBoxOption):void => {
-        fetchSampleType(value.value!)
     };
 
     const handleRequestChange = (path: string, value: any):void => {
@@ -126,13 +93,6 @@ export default function Order() {
         }));
     };
 
-    const transformServiceToOptions = (data: Service[]): SelectBoxOption[] => {
-        return data.map(value => ({
-            value: value.id,
-            name: value.name
-        }));
-    };
-
     const transformSampleTypeToOptions = (data: SampleType[]): SelectBoxOption[] => {
         return data.map(value => ({
             value: value.id,
@@ -149,36 +109,17 @@ export default function Order() {
         return age;
     };
 
-    const excelRequest = () => {
-        router.push(`/request/services/${secondLastValue}/multi`);
-    }
-
     const isAllRequiredFilled = () => {
         if (!request?.sample?.patient?.name) return false;
         if (!request?.sample?.patient?.serial) return false;
         if (!request?.sample?.sample_type?.id) return false;
         if (!request?.sample?.sampling_on) return false;
-        if (!request?.sample?.quantity) return false;
-        return true;
+        return request?.sample?.quantity;
+
     };
 
     return (
         <div className={style.container}>
-            <button className={style.excelButton} onClick={excelRequest}>
-                Excel Request
-            </button>
-            <div className={style.buttonSection}>
-                <GreenButton
-                    name={"Add to Cart"}
-                    disabled={!isAllRequiredFilled()}
-                    onClick={() => publishRequest("CART")}
-                />
-                <BlueButton
-                    name={"Order Now"}
-                    disabled={!isAllRequiredFilled()}
-                    onClick={() => publishRequest("ORDERED")}
-                />
-            </div>
             <p className={style.mainName}>Institution name *</p>
             <div className={style.section}>
                 <div className={style.selectBox}>
@@ -191,24 +132,6 @@ export default function Order() {
                             handleRequestChange('sample.patient.organization.id', value.value)
                             handleRequestChange('sample.patient.organization.name', value.name)
                             setSelectedOrganization(value.name);
-                        }}
-                        width="11vw"
-                    />
-                </div>
-            </div>
-            <p className={style.mainName}>Service Info.</p>
-            <div className={style.section}>
-                <div className={style.selectBox}>
-                    <SelectBox
-                        label={"Service*"}
-                        value={selectedService}
-                        options={serviceOptions}
-                        required={true}
-                        onChange={(value) => {
-                            handleServiceChange(value)
-                            setSelectedService(value.name);
-                            handleRequestChange('service.id', value.value)
-                            handleRequestChange('service.name', value.name)
                         }}
                         width="11vw"
                     />
@@ -316,6 +239,18 @@ export default function Order() {
                 required={true}
                 onChange={(value) => handleRequestChange('memo', value)}
             />
+            <div className={style.buttonSection}>
+                <GreenButton
+                    name={"Add to Cart"}
+                    disabled={!isAllRequiredFilled()}
+                    onClick={() => publishRequest("CART")}
+                />
+                <BlueButton
+                    name={"Order Now"}
+                    disabled={!isAllRequiredFilled()}
+                    onClick={() => publishRequest("ORDERED")}
+                />
+            </div>
         </div>
     )
 }

@@ -11,5 +11,7 @@ data class ServiceCategory(
     @JsonProperty("category_id")
     val categoryId: UUID?,
     @JsonProperty("category_name")
-    val categoryName: String?
+    val categoryName: String?,
+    @JsonProperty("state")
+    val state: Boolean?
 )

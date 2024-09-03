@@ -1,48 +1,37 @@
 "use client"
 
 import React, {useEffect, useState} from "react";
-import style from "@/app/(afterLogin)/request/management/user/_component/usersTable.module.css";
-import {faAngleLeft, faAngleRight, faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons";
+import style from "@/app/(afterLogin)/request/management/service/_component/serviceManageTable.module.css";
+import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
 import {Paging} from "@/model/Paging";
-import {User} from "@/model/User";
-import {getUsers} from "@/app/(afterLogin)/request/management/user/_api/getUsers";
-import SwitchButton from "@/app/_component/SwitchButton";
-import {fetchUserUpdate} from "@/app/(afterLogin)/_api/fetchUserUpdate";
-import InstitutionModal from "@/app/(afterLogin)/request/management/user/_component/InstitutionModal";
-import UserServiceEditModal from "@/app/(afterLogin)/request/management/user/_component/UserServiceEditModal";
+import {getServiceCategory} from "@/app/(afterLogin)/request/management/service/_api/getServiceCategory";
 import SelectBox from "@/app/_component/SelectBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
-import RectangleButton from "@/app/_component/RectangleButton";
 import BlueButton from "@/app/_component/BlueButton";
+import SwitchButton from "@/app/_component/SwitchButton";
+import {UserServiceManage} from "@/model/UserServiceManage";
+import {fetchUserServiceChange} from "@/app/(afterLogin)/request/management/service/_api/fetchUserServiceChange";
 
-interface UserWithSelected extends User {
+interface InstitutionWithSelected extends UserServiceManage {
     isSelected?: boolean;
 }
 
-export default function UsersTable() {
-    const [userData, setUserData] = useState<UserWithSelected[]>([]);
+export default function ServiceManageTable() {
+    const [serviceManageData, setServiceManageData] = useState<InstitutionWithSelected[]>([]);
     const [totalPage, setTotalPage] = useState<number>(0);
     const [search, setSearch] =
         useState<Paging>({filters: [], sort_by:"name", asc: true, size:10, page:1});
-    const [searchKey, setSearchKey] = useState<string>("id");
+    const [searchKey, setSearchKey] = useState<string>("service_id");
     const [searchValue, setSearchValue] = useState<string>("");
-    const [serviceModalOpen, setServiceModalOpen] = useState<boolean>(false);
-    const [userServiceModalOpen, setUserServiceModalOpen] = useState<boolean>(false);
-    const [selectedUser, setSelectedUser] = useState<User>();
-    const [institutionModalOpen, setInstitutionModalOpen] = useState<boolean>(false);
-    const [selectedInstitutionUser, setSelectedInstitutionUser] = useState<{id: string; name: string} | null>(null);
-    const [selectOption, setSelectOption] = useState<string>('ID');
+    const [selectOption, setSelectOption] = useState<string>('Service Id');
 
     const selectBoxOptions: SelectBoxOption[] = [
-        { value: "id", name: "ID" },
-        { value: "name", name: "Name" },
-        { value: "email", name: "Email" },
-        { value: "phone_number", name: "Phone Number" },
-        { value: "branch_name", name: "Institution" },
-        { value: "branch_serial", name: "Serial" },
-        { value: "role", name: "Role" },
+        { value: "service_id", name: "Service Id" },
+        { value: "service_name", name: "Service Name" },
+        { value: "category_id", name: "Category Id" },
+        { value: "category_name", name: "Category Name" },
     ];
 
     const handlePageChange = (newPageNumber: number) => {
@@ -65,7 +54,7 @@ export default function UsersTable() {
         setSearch((prevSearch) => ({
             ...prevSearch,
             filters: [filterWithOperator],
-            page: 1
+            page:1
         }));
     };
 
@@ -77,46 +66,27 @@ export default function UsersTable() {
 
     const fetchData = async (search: Paging) => {
         try {
-            const response = await getUsers(search)
+            const response = await getServiceCategory(search)
             const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
             const responseData = await response.json();
             const data = responseData.data;
-            setUserData(data as User[]);
+            setServiceManageData(data as UserServiceManage[]);
             setTotalPage(totalPage)
         } catch(error) {
             console.error("Failed to fetch data:", error);
-            setUserData([]);
+            setServiceManageData([]);
             setTotalPage(0);
         }
     }
 
+    const handleAlisSyncClick = () => {
+        alert('sync complete');
+    }
+
     const handleToggle = async (id: string, checked: boolean) => {
-        const state = checked ? 'ACTIVE' : 'INACTIVE';
-        const userUpdate = { id, state };
-        await fetchUserUpdate(userUpdate);
+        await fetchUserServiceChange(id, checked);
         await fetchData(search);
     };
-
-    const handleAlisSyncButtonClick = () => {
-        alert('add click');
-    }
-
-    const handleInstitutionIconClick = (id: string, name: string | undefined) => {
-        setSelectedInstitutionUser({ id, name: name ?? '' });
-        setInstitutionModalOpen(true);
-    }
-
-    const handleUserServiceEditClick = (user: User) => {
-        setSelectedUser(user);
-        setUserServiceModalOpen(true);
-    }
-
-    const closeModal = () => {
-        setServiceModalOpen(false);
-        setInstitutionModalOpen(false);
-        setUserServiceModalOpen(false);
-        setSelectedInstitutionUser(null);
-    }
 
     useEffect(() => {
         fetchData(search)
@@ -127,14 +97,14 @@ export default function UsersTable() {
             <section className={style.filterContainer}>
                 <div className={style.filterContainerLeft}>
                     <div className={style.alisSyncButton}>
-                        <BlueButton name={"Alis-Sync"} onClick={handleAlisSyncButtonClick}/>
+                        <BlueButton name={"Alis-Sync"} onClick={handleAlisSyncClick}/>
                     </div>
                     <SelectBox
                         width={"7vw"}
                         value={selectOption}
                         options={selectBoxOptions}
                         label={"status"}
-                        onChange={(selectedOption) => {
+                        onChange={(selectedOption) =>{
                             setSelectOption(selectedOption.value);
                             handleSearchKeyChange({target: {value: selectedOption.value}} as React.ChangeEvent<HTMLSelectElement>);
                         }}
@@ -153,40 +123,22 @@ export default function UsersTable() {
                     <tr>
                         <th>Id</th>
                         <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone Number</th>
-                        <th>Serial</th>
-                        <th>Role</th>
-                        <th>Institution</th>
+                        <th>Category Name</th>
                         <th>State</th>
-                        <th>Edit</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {userData && userData.length > 0 && userData.map((row, rowIndex) => (
+                    {serviceManageData && serviceManageData.length > 0 && serviceManageData.map((row, rowIndex) => (
                         <tr key={rowIndex}>
-                            <td>{row.id}</td>
-                            <td>{row.name}</td>
-                            <td>{row.email}</td>
-                            <td>{row.phone_number}</td>
-                            <td>{row.branch_serial}</td>
-                            <td>{row.role}</td>
-                            <td>
-                                <FontAwesomeIcon
-                                    className={style.icon}
-                                    icon={faMagnifyingGlass}
-                                    onClick={()=> handleInstitutionIconClick(row.id, row.name)}
-                                />
-                            </td>
+                            <td>{row.service_id}</td>
+                            <td>{row.service_name}</td>
+                            <td>{row.category_name}</td>
                             <td>
                                 <SwitchButton
-                                    id={row.id}
-                                    checked={row.state === 'ACTIVE'}
+                                    id={row.service_id}
+                                    checked={row.state}
                                     onToggle={handleToggle}
                                 />
-                            </td>
-                            <td>
-                                <RectangleButton name={'Edit'} onClick={() => handleUserServiceEditClick(row)}/>
                             </td>
                         </tr>
                     ))}
@@ -214,12 +166,6 @@ export default function UsersTable() {
                     </button>
                 </div>
             </section>
-            {selectedInstitutionUser && (
-                <InstitutionModal id={selectedInstitutionUser.id} name={selectedInstitutionUser.name} open={institutionModalOpen} closeModal={closeModal}/>
-            )}
-            {userServiceModalOpen && (
-                <UserServiceEditModal user={selectedUser!} open={serviceModalOpen} closeModal={closeModal}/>
-            )}
         </>
     );
 }

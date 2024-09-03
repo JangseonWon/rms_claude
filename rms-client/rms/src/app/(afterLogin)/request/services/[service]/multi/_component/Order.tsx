@@ -3,7 +3,6 @@
 import style from "@/app/(afterLogin)/request/services/[service]/multi/_component/order.module.css";
 import GreenButton from "@/app/_component/GreenButton";
 import BlueButton from "@/app/_component/BlueButton";
-import DownloadExcelButton from "@/app/(afterLogin)/request/services/[service]/multi/_component/DownloadExcelButton";
 import UploadExcelButton from "@/app/(afterLogin)/request/services/[service]/multi/_component/UploadExcelButton";
 import React, {useCallback, useEffect, useState} from "react";
 import {format} from "date-fns";
@@ -15,6 +14,10 @@ import {
     useSetMessageNoticeDialog,
     useSetOkNotice
 } from "@/store/useNoticeDialogStore";
+import {Extensions} from "@/model/ServiceExtensionAndSampleType";
+import {fetchServiceExtensions} from "@/app/(afterLogin)/request/services/_api/fetchServiceExtensions";
+import {usePathname} from "next/navigation";
+import DownloadExcelButton from "@/app/(afterLogin)/request/services/[service]/multi/_component/DownloadExcelButton";
 
 type RequestData = {
     registrationDate: string; // 등록일자
@@ -42,6 +45,15 @@ export default function Order() {
     const setNoticeMessage = useSetMessageNoticeDialog();
     const okNotice = useOkNotice();
     const setOkNotice = useSetOkNotice();
+    const pathname = usePathname();
+    const pathSegments = pathname.split('/');
+    const serviceId = decodeURIComponent(pathSegments[pathSegments.length - 2]);
+    const [extensions, setExtensions] = useState<Extensions[]>([]);
+
+    const fetchExtensions = async () => {
+        const response = await fetchServiceExtensions(serviceId);
+        setExtensions(response as Extensions[]);
+    };
 
     const transformDataToFormat = (data: RequestData[], status: string): any => {
         return data.map((item) => {
@@ -160,8 +172,7 @@ export default function Order() {
                 const value = row[index];
                 if (header === 'registrationDate' || header === 'personalID' || header === 'collectionDate') {
                     if (typeof value === 'number') {
-                        const date = convertExcelSerialToDate(value);
-                        (rowData as any)[header] = date;
+                        (rowData as any)[header] = convertExcelSerialToDate(value);
                     } else {
                         (rowData as any)[header] = value;
                     }
@@ -199,11 +210,15 @@ export default function Order() {
         }
     };
 
+    useEffect(()=> {
+        fetchExtensions();
+    }, []);
+
     return (
         <>
             <div className={style.top}>
                 <div className={style.downloadButton}>
-                    <DownloadExcelButton/>
+                    <DownloadExcelButton extensions={extensions}/>
                     <UploadExcelButton onFileUpload={handleFileUpload} />
                 </div>
                 <div className={style.orderAndCartButton}>
@@ -211,51 +226,55 @@ export default function Order() {
                     <BlueButton name={"Order Now"} onClick={handleOrderNowClick}/>
                 </div>
             </div>
-            <div>
-                <div className={style.container}>
-                    <table className={style.table}>
-                        <thead>
-                        <tr>
-                            <th>Registration Date<br/>(YYYY/MM/DD)</th>
-                            <th>Ward</th>
-                            <th>Patient Name</th>
-                            <th>Personal ID Number<br/>(YYYY/MM/DD)</th>
-                            <th>Gender<br/>(Male, Female)</th>
-                            <th>Physician</th>
-                            <th>Collection Date<br/>(YYYY/MM/DD)</th>
-                            <th>Chart Number</th>
-                            <th>Code</th>
-                            <th>Gestational Age</th>
-                            <th>Weight</th>
-                            <th>Fetuses<br/>(1 or 2)</th>
-                            <th>Quantity</th>
-                            <th>Notes</th>
-                            <th>Race<br/>(Genome Health Premium)</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {requestData.map((row, rowIndex) => (
-                            <tr key={rowIndex}>
-                                <td className={!isValid(row.registrationDate, 'date') ? style.invalid : ''}>{row.registrationDate ? format(new Date(row.registrationDate), "yyyy/MM/dd") : '-'}</td>
-                                <td>{row.ward}</td>
-                                <td>{row.patientName}</td>
-                                <td className={!isValid(row.personalID, 'date') ? style.invalid : ''}>{row.personalID ? format(new Date(row.personalID), "yyyy/MM/dd") : '-'}</td>
-                                <td className={!isValid(row.gender, 'gender') ? style.invalid : ''}>{row.gender}</td>
-                                <td>{row.physician}</td>
-                                <td className={!isValid(row.collectionDate, 'date') ? style.invalid : ''}>{row.collectionDate ? format(new Date(row.collectionDate), "yyyy/MM/dd") : '-'}</td>
-                                <td>{row.chartNumber}</td>
-                                <td>{row.code}</td>
-                                <td>{row.gestationalAge}</td>
-                                <td>{row.weight}</td>
-                                <td className={!isValid(row.fetuses, 'fetuses') ? style.invalid : ''}>{row.fetuses}</td>
-                                <td className={!isValid(row.quantity.toString(), 'quantity') ? style.invalid : ''}>{row.quantity}</td>
-                                <td>{row.notes}</td>
-                                <td>{row.race}</td>
-                            </tr>
+            <div className={style.container}>
+                <table className={style.table}>
+                    <thead>
+                    <tr>
+                        <th>Registration Date<br/>(YYYY/MM/DD)</th>
+                        <th>Ward</th>
+                        <th>Patient Name</th>
+                        <th>Personal ID Number<br/>(YYYY/MM/DD)</th>
+                        <th className={style.extensionHeader}>Gender<br/>(Male, Female)</th>
+                        <th className={style.extensionHeader}>Physician</th>
+                        <th className={style.extensionHeader}>Collection Date<br/>(YYYY/MM/DD)</th>
+                        <th className={style.extensionHeader}>Chart Number</th>
+                        <th className={style.extensionHeader}>Code</th>
+                        <th className={style.extensionHeader}>Gestational Age</th>
+                        <th className={style.extensionHeader}>Weight</th>
+                        <th className={style.extensionHeader}>Fetuses<br/>(1 or 2)</th>
+                        <th className={style.extensionHeader}>Quantity</th>
+                        <th className={style.extensionHeader}>Notes</th>
+                        <th className={style.extensionHeader}>Race<br/>(Genome Health Premium)</th>
+                        {extensions.map((extension, index) => (
+                            <th className={style.extensionHeader} key={index}>{extension.name}</th>
                         ))}
-                        </tbody>
-                    </table>
-                </div>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {requestData.map((row, rowIndex) => (
+                        <tr key={rowIndex}>
+                            <td className={!isValid(row.registrationDate, 'date') ? style.invalid : ''}>{row.registrationDate ? format(new Date(row.registrationDate), "yyyy/MM/dd") : '-'}</td>
+                            <td>{row.ward}</td>
+                            <td>{row.patientName}</td>
+                            <td className={!isValid(row.personalID, 'date') ? style.invalid : ''}>{row.personalID ? format(new Date(row.personalID), "yyyy/MM/dd") : '-'}</td>
+                            <td className={!isValid(row.gender, 'gender') ? style.invalid : ''}>{row.gender}</td>
+                            <td>{row.physician}</td>
+                            <td className={!isValid(row.collectionDate, 'date') ? style.invalid : ''}>{row.collectionDate ? format(new Date(row.collectionDate), "yyyy/MM/dd") : '-'}</td>
+                            <td>{row.chartNumber}</td>
+                            <td>{row.code}</td>
+                            <td>{row.gestationalAge}</td>
+                            <td>{row.weight}</td>
+                            <td className={!isValid(row.fetuses, 'fetuses') ? style.invalid : ''}>{row.fetuses}</td>
+                            <td className={!isValid(row.quantity.toString(), 'quantity') ? style.invalid : ''}>{row.quantity}</td>
+                            <td>{row.notes}</td>
+                            <td>{row.race}</td>
+                            {extensions.map((extension, extIndex) => (
+                                <td key={extIndex}>{}</td>
+                            ))}
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
             </div>
         </>
     )

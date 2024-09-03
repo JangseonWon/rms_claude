@@ -24,6 +24,8 @@ class UserServiceRouter (
         PUT("/w-api/management-service/users/{userId}/services", ::saveUserServices)
         POST("/w-api/management-service/users/{userId}/services", ::selectUserServices)
         DELETE("/w-api/management-service/users/{user_id}/services", ::deleteUserServices)
+        PATCH("/w-api/management-service/users/services/{service_id}", ::insertServiceAllUsers)
+        DELETE("/w-api/management-service/users/services/{service_id}", ::deleteServiceAllUsers)
     }
 
     private fun saveUserServices(request: ServerRequest): Mono<ServerResponse> {
@@ -57,6 +59,30 @@ class UserServiceRouter (
             .flatMap { request.bodyToMono(Array<Service_>::class.java) }
             .flatMap { services -> userServiceHandler.deleteUserServices(userId, services) }
             .flatMap { ServerResponse.status(HttpStatus.OK).bodyValue("${userId}의 서비스 삭제 완료") }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(ManagerAuthenticationException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(ServiceNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
+    }
+
+    private fun insertServiceAllUsers(request: ServerRequest): Mono<ServerResponse> {
+        val serviceId = request.pathVariable("service_id")
+        return authenticationHandler.principal(request)
+            .flatMap { userServiceHandler.insertServiceAllUsers(serviceId) }
+            .then(Mono.defer { ServerResponse.status(HttpStatus.OK).bodyValue("$serviceId 상태 전환 완료") })
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(ManagerAuthenticationException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(ServiceNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
+    }
+
+    private fun deleteServiceAllUsers(request: ServerRequest): Mono<ServerResponse> {
+        val serviceId = request.pathVariable("service_id")
+        return authenticationHandler.principal(request)
+            .flatMap { userServiceHandler.deleteServiceAllUsers(serviceId) }
+            .flatMap { ServerResponse.status(HttpStatus.OK).bodyValue("$serviceId 상태 전환 완료") }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(ManagerAuthenticationException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(ServiceNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
