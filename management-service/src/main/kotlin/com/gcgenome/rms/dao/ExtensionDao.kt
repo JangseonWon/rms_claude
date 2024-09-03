@@ -54,9 +54,9 @@ interface ExtensionDao{
             insertInto(EXTENSION)
                 .set(EXTENSION.ID, alisExtension.customCode)
                 .set(EXTENSION.NAME, alisExtension.customDisplayName)
-                .onConflict(SERVICE.ID)
+                .onConflict(EXTENSION.ID)
                 .doUpdate()
-                .set(SERVICE.NAME, alisExtension.customDisplayName)
+                .set(EXTENSION.NAME, alisExtension.customDisplayName)
         )
     }
 }
