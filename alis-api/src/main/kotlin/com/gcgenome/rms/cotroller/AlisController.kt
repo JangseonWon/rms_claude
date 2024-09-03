@@ -1,5 +1,6 @@
 package com.gcgenome.rms.cotroller
 
+import com.gcgenome.rms.model.ExtensionDTO
 import com.gcgenome.rms.model.LabSampleCodeDTO
 import com.gcgenome.rms.model.LabTestCodeDTO
 import com.gcgenome.rms.model.OrganizationDTO
@@ -25,5 +26,9 @@ class AlisController(
     @GetMapping("/organizations")
     fun organizations(): ResponseEntity<List<OrganizationDTO>> {
         return ResponseEntity.ok(alisService.getOrganizations())
+    }
+    @GetMapping("/extensions")
+    fun extensions(): ResponseEntity<List<ExtensionDTO>> {
+        return ResponseEntity.ok(alisService.getExtensions())
     }
 }

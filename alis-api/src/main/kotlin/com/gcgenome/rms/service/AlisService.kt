@@ -1,5 +1,6 @@
 package com.gcgenome.rms.service
 
+import com.gcgenome.rms.model.ExtensionDTO
 import com.gcgenome.rms.model.LabSampleCodeDTO
 import com.gcgenome.rms.model.LabTestCodeDTO
 import com.gcgenome.rms.model.OrganizationDTO
@@ -13,4 +14,5 @@ class AlisService(
     fun getServices(): List<LabTestCodeDTO> = alisRepo.findService()
     fun getSampleTypes(): List<LabSampleCodeDTO> = alisRepo.findSampleType()
     fun getOrganizations(): List<OrganizationDTO> = alisRepo.findOrganizations()
+    fun getExtensions(): List<ExtensionDTO> = alisRepo.findExtensions()
 }

@@ -1,12 +1,14 @@
 package com.gcgenome.rms.repository
 
 import com.gcgenome.rms.entity.*
+import com.gcgenome.rms.model.ExtensionDTO
 import com.gcgenome.rms.model.LabSampleCodeDTO
 import com.gcgenome.rms.model.LabTestCodeDTO
 import com.gcgenome.rms.model.OrganizationDTO
 import com.querydsl.core.types.Projections
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.stereotype.Repository
+import java.security.cert.Extension
 
 @Repository
 class AlisRepo(
@@ -49,6 +51,19 @@ class AlisRepo(
             ))
             .from(progCompCode)
             .join(progCompMngCode).on(progCompCode.compMngCode.eq(progCompMngCode.compMngCode))
+            .fetch()
+    }
+
+    fun findExtensions(): List<ExtensionDTO> {
+        val labCustomCode = QLabCustomCode.labCustomCode
+
+        return jpaQueryFactory
+            .select(Projections.constructor(
+                ExtensionDTO::class.java,
+                labCustomCode.customCode,
+                labCustomCode.customDisplayName
+            ))
+            .from(labCustomCode)
             .fetch()
     }
 }
