@@ -1,8 +1,11 @@
 package com.gcgenome.rms.dao
 
+import com.gcgenome.rms.data.AlisSampleType
+import com.gcgenome.rms.data.AlisService
 import com.gcgenome.rms.tables.pojos.SampleType
 import com.gcgenome.rms.tables.pojos.ServiceSampleType
 import com.gcgenome.rms.tables.references.SAMPLE_TYPE
+import com.gcgenome.rms.tables.references.SERVICE
 import com.gcgenome.rms.tables.references.SERVICE_SAMPLE_TYPE
 import org.jooq.Condition
 import org.jooq.DSLContext
@@ -29,7 +32,7 @@ interface SampleTypeDao {
         ).map { it.into(SampleType::class.java) }
     }
 
-    fun DSLContext.insertSampleTypeByService(serviceSampleType: ServiceSampleType): Mono<ServiceSampleType> {
+    fun DSLContext.insertServiceSampleTypeByService(serviceSampleType: ServiceSampleType): Mono<ServiceSampleType> {
         return Mono.from(
             insertInto(SERVICE_SAMPLE_TYPE)
                 .set(SERVICE_SAMPLE_TYPE.SERVICE_ID, serviceSampleType.serviceId)
@@ -39,12 +42,23 @@ interface SampleTypeDao {
         ).map { it.into(ServiceSampleType::class.java) }
     }
 
-    fun DSLContext.deleteSampleTypeByService(serviceId: String, sampleTypeId: String): Mono<ServiceSampleType> {
+    fun DSLContext.deleteServiceSampleTypeById(serviceSampleType: ServiceSampleType): Mono<ServiceSampleType> {
         return Mono.from(
             deleteFrom(SERVICE_SAMPLE_TYPE)
-                .where(SERVICE_SAMPLE_TYPE.SERVICE_ID.eq(serviceId)
-                    .and(SERVICE_SAMPLE_TYPE.SAMPLE_TYPE_ID.eq(sampleTypeId)))
+                .where(SERVICE_SAMPLE_TYPE.SERVICE_ID.eq(serviceSampleType.serviceId)
+                    .and(SERVICE_SAMPLE_TYPE.SAMPLE_TYPE_ID.eq(serviceSampleType.sampleTypeId)))
                 .returning()
         ).map { it.into(ServiceSampleType::class.java) }
+    }
+
+    fun DSLContext.upsertSampleType(alisSampleType: AlisSampleType): Mono<Int> {
+        return Mono.from(
+            insertInto(SAMPLE_TYPE)
+                .set(SAMPLE_TYPE.ID, alisSampleType.sampleCode)
+                .set(SAMPLE_TYPE.NAME, alisSampleType.sampleFullName)
+                .onConflict(SERVICE.ID)
+                .doUpdate()
+                .set(SERVICE.NAME, alisSampleType.sampleFullName)
+        )
     }
 }

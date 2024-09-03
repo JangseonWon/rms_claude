@@ -1,7 +1,5 @@
 package com.gcgenome.rms.user
 
-import com.gcgenome.rms.auth.ManagerAuthenticationHandler
-import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.dao.*
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.Service_
@@ -19,14 +17,12 @@ import reactor.core.publisher.Mono
 @Component
 class UserServiceHandler(
     val dslContext: DSLContext,
-    private val managerAuthenticationHandler: ManagerAuthenticationHandler
-): UserServiceDao, ServiceDao, UserDao, OrganizationDao, SampleDao {
-    fun insertUserService(authentication: UserAuthentication, userId: String, services: Array<Service_>): Flux<Service_> {
-
+): UserServiceDao, ServiceDao, UserDao, OrganizationDao {
+    fun insertUserService(userId: String, services: Array<Service_>): Flux<Service_> {
         return Flux.from(dslContext.transactionPublisher{ trx ->
                 trx.dsl().run {
-                    managerAuthenticationHandler.chkManager(authentication)
-                        .flatMap { selectUserById(userId).switchIfEmpty(Mono.error(UserNotFoundException(userId))) }
+                    selectUserById(userId)
+                        .switchIfEmpty(Mono.error(UserNotFoundException(userId)))
                         .thenMany(Flux.fromArray(services)
                             .flatMap { selectServiceById(it.id).switchIfEmpty(Mono.error(ServiceNotFoundException(it.id))) }
                             .flatMap { insertUserService(userId,it.id) }
@@ -44,15 +40,14 @@ class UserServiceHandler(
         })
     }
 
-    fun deleteUserServices(authentication: UserAuthentication, userId: String, services: Array<Service_>): Mono<UserService> {
+    fun deleteUserServices(userId: String, services: Array<Service_>): Mono<UserService> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
-                managerAuthenticationHandler.chkManager(authentication)
-                    .thenMany(Flux.fromArray(services)
-                        .flatMap { service -> selectUserByServiceId(userId, service.id)
-                            .switchIfEmpty(Mono.error(ServiceNotFoundException(service.id)))
-                            .then(deleteUserService(userId, service.id))
-                        })
+                Flux.fromArray(services)
+                    .flatMap { service -> selectUserByServiceId(userId, service.id)
+                        .switchIfEmpty(Mono.error(ServiceNotFoundException(service.id)))
+                        .then(deleteUserService(userId, service.id))
+                    }
             }
         })
     }

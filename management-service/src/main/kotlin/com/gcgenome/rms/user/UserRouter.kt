@@ -3,7 +3,6 @@ package com.gcgenome.rms.user
 import com.gcgenome.rms.auth.AuthenticationHandler
 import com.gcgenome.rms.data.Organization_
 import com.gcgenome.rms.data.Query
-import com.gcgenome.rms.data.UpdateUser
 import com.gcgenome.rms.data.User
 import com.gcgenome.rms.exception.*
 import com.gcgenome.rms.tables.pojos.Organization
@@ -29,9 +28,8 @@ class UserRouter(
         GET("/w-api/management-service/users/{user_id}/organizations", :: findUserOrganizations)
         GET("/w-api/management-service/users/{user_id}", :: findUser)
         POST("/w-api/management-service/users", :: findUsers)
-        PUT("/w-api/management-service/users", ::saveUser)
         PUT("/w-api/management-service/users/{user_id}/organizations", ::saveUserOrganization)
-        DELETE("/w-api/management-service/users/{user_id}/organizations/{organization_id}", ::deleteUserOrganization)
+        DELETE("/w-api/management-service/users/{user_id}/organizations/{organization_id}", ::deleteOrganization)
         PATCH("/w-api/management-service/users/{user_id}/organizations/{organization_id}", ::updateUserOrganization)
         PATCH("/w-api/management-service/users/{userId}", ::updateUser)
     }
@@ -46,8 +44,9 @@ class UserRouter(
     }
 
     private fun findUsers(request: ServerRequest): Mono<ServerResponse> {
-        return Mono.zip(authenticationHandler.principal(request),request.bodyToMono(Query::class.java))
-            .flatMap { p -> userHandler.selectUsers(p.t1,p.t2.copy(page=p.t2.page - 1)) }
+        return authenticationHandler.chkManager(request)
+            .flatMap { request.bodyToMono(Query::class.java) }
+            .flatMap { query -> userHandler.selectUsers(query.copy(page=query.page - 1)) }
             .flatMap { ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-Total-Page", it.totalPage.toString())
@@ -72,20 +71,11 @@ class UserRouter(
             .onErrorResume { e ->  ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e") }
     }
 
-    private fun saveUser(request: ServerRequest): Mono<ServerResponse> {
-        return Mono.zip(authenticationHandler.principal(request), request.bodyToMono(User::class.java))
-            .flatMap { p -> userHandler.insertUser(p.t1, p.t2) }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), User::class.java) }
-            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume (IntegrityConstraintViolationException::class.java) { ServerResponse.status(HttpStatus.NOT_ACCEPTABLE).bodyValue(DatabaseConstraintViolationException().message.toString()) }
-            .onErrorResume (ServerWebInputException::class.java) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue(WebInputException().message.toString()) }
-            .onErrorResume { e ->  ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: ${e}") }
-    }
-
     private fun saveUserOrganization(request: ServerRequest): Mono<ServerResponse> {
         val userId = request.pathVariable("user_id")
-        return Mono.zip(authenticationHandler.principal(request), request.bodyToMono(Organization::class.java))
-            .flatMap { userHandler.insertUserOrganization(userId, it.t1, it.t2) }
+        return authenticationHandler.chkUser(request, userId)
+            .flatMap { request.bodyToMono(Organization::class.java) }
+            .flatMap { organization -> userHandler.insertUserOrganization(organization.apply { this.userId = userId}) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), Organization_::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(ManagerAuthenticationException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
@@ -106,11 +96,12 @@ class UserRouter(
             .onErrorResume { e ->  ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: ${e}") }
     }
 
-    private fun deleteUserOrganization(request: ServerRequest): Mono<ServerResponse> {
+    private fun deleteOrganization(request: ServerRequest): Mono<ServerResponse> {
         val userId = request.pathVariable("user_id")
         val organizationId = request.pathVariable("organization_id")
-        return authenticationHandler.principal(request)
-            .flatMap { userHandler.deleteUserOrganization(it, userId, organizationId) }
+        val organization = Organization(id = organizationId, userId = userId)
+        return authenticationHandler.chkUser(request, userId)
+            .flatMap { userHandler.deleteUserOrganization(organization) }
             .flatMap { ServerResponse.status(HttpStatus.OK).bodyValue("${userId}의 $organizationId 삭제 완료") }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(ManagerAuthenticationException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
@@ -123,8 +114,9 @@ class UserRouter(
     private fun updateUserOrganization(request: ServerRequest): Mono<ServerResponse> {
         val userId = request.pathVariable("user_id")
         val organizationId = request.pathVariable("organization_id")
-        return authenticationHandler.principal(request).zipWith(request.bodyToMono(Organization::class.java))
-            .flatMap { userHandler.updateUserOrganization(it.t1, userId, organizationId, it.t2) }
+        return authenticationHandler.chkUser(request, userId)
+            .flatMap { request.bodyToMono(Organization::class.java) }
+            .flatMap { organization -> userHandler.updateUserOrganization(organization.apply { id = organizationId; this.userId = userId }) }
             .flatMap { ServerResponse.status(HttpStatus.OK).bodyValue(it) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(ManagerAuthenticationException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}

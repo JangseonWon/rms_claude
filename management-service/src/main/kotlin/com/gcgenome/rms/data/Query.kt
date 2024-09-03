@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 data class Query(
     @JsonProperty("sort_by")
-    val sortBy: String?,
-    val asc: Boolean?,
-    val page: Int=1,
-    val size: Int=10,
-    val filters: MutableList<Filter>?
+    var sortBy: String? = null,
+    var asc: Boolean? = null,
+    var page: Int,
+    var size: Int,
+    var filters: MutableList<Filter>? = null
     ){
     companion object{
         data class Filter(

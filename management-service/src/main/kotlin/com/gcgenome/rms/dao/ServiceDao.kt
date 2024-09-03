@@ -1,5 +1,6 @@
 package com.gcgenome.rms.dao
 
+import com.gcgenome.rms.data.AlisService
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.ServiceCategory
 import com.gcgenome.rms.data.Service_
@@ -141,5 +142,15 @@ interface ServiceDao{
                 .where(SERVICE.CATEGORY_ID.eq(categoryId))
                 .returning()
         ).map { it.into(Service::class.java)}
+    }
+    fun DSLContext.upsertService(alisService: AlisService): Mono<Int> {
+        return Mono.from(
+            insertInto(SERVICE)
+                .set(SERVICE.ID, alisService.testCode)
+                .set(SERVICE.NAME, alisService.testDisplayName)
+                .onConflict(SERVICE.ID)
+                .doUpdate()
+                .set(SERVICE.NAME, alisService.testDisplayName)
+        )
     }
 }

@@ -1,7 +1,5 @@
 package com.gcgenome.rms.service
 
-import com.gcgenome.rms.auth.ManagerAuthenticationHandler
-import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.dao.SampleTypeDao
 import com.gcgenome.rms.dao.ServiceDao
 import com.gcgenome.rms.dao.ServiceExtensionDao
@@ -25,7 +23,6 @@ import reactor.core.publisher.Mono
 @Component
 class ServiceHandler(
     val dslContext: DSLContext,
-    private val managerAuthenticationHandler: ManagerAuthenticationHandler
 ): ServiceDao, ServiceExtensionDao, SampleTypeDao {
 
     fun checkServiceById(serviceId: String): Mono<Service_> {
@@ -44,19 +41,16 @@ class ServiceHandler(
         return Flux.from(dslContext.selectServiceByNameOrId(whereClause))
     }
 
-    fun selectServiceCategory(authentication: UserAuthentication, query: Query): Mono<Page<ServiceCategory>> {
+    fun selectServiceCategory(query: Query): Mono<Page<ServiceCategory>> {
         val whereClause = buildWhereClause(query.filters)
-        return managerAuthenticationHandler.chkManager(authentication)
-            .flatMap {
-                val services = dslContext.dsl().selectServiceAndCategory(query, whereClause)
-                dslContext.selectServicesAndCategoryCount(whereClause)
-                    .flatMap { totalCount ->
-                        val totalPage = (totalCount + query.size -1) / query.size
-                        services.collectList().flatMap {
-                            val page = Page(totalCount,totalPage,query.size,query.page+1,it)
-                            Mono.just(page)
-                        }
-                    }
+        val services = dslContext.dsl().selectServiceAndCategory(query, whereClause)
+        return dslContext.selectServicesAndCategoryCount(whereClause)
+            .flatMap { totalCount ->
+                val totalPage = (totalCount + query.size -1) / query.size
+                services.collectList().flatMap {
+                    val page = Page(totalCount,totalPage,query.size,query.page+1,it)
+                    Mono.just(page)
+                }
             }
     }
 

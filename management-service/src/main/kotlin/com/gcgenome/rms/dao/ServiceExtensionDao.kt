@@ -57,7 +57,7 @@ interface ServiceExtensionDao{
         ).map { it.into(Extension::class.java) }
     }
 
-    fun DSLContext.insertExtensionByService(serviceExtension: ServiceExtension): Mono<ServiceExtension> {
+    fun DSLContext.insertServiceExtensionByService(serviceExtension: ServiceExtension): Mono<ServiceExtension> {
         return Mono.from(
             insertInto(SERVICE_EXTENSION)
                 .set(SERVICE_EXTENSION.SERVICE_ID, serviceExtension.serviceId)
@@ -68,11 +68,11 @@ interface ServiceExtensionDao{
         ).map { it.into(ServiceExtension::class.java) }
     }
 
-    fun DSLContext.deleteExtensionByService(serviceId: String, extensionId: String): Mono<ServiceExtension> {
+    fun DSLContext.deleteServiceExtensionById(serviceExtension: ServiceExtension): Mono<ServiceExtension> {
         return Mono.from(
             deleteFrom(SERVICE_EXTENSION)
-                .where(SERVICE_EXTENSION.SERVICE_ID.eq(serviceId)
-                    .and(SERVICE_EXTENSION.EXTENSION_ID.eq(extensionId)))
+                .where(SERVICE_EXTENSION.SERVICE_ID.eq(serviceExtension.serviceId)
+                    .and(SERVICE_EXTENSION.EXTENSION_ID.eq(serviceExtension.extensionId)))
                 .returning()
         ).map { it.into(ServiceExtension::class.java) }
     }

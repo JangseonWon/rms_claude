@@ -1,6 +1,5 @@
 package com.gcgenome.rms.user
 
-import com.gcgenome.rms.auth.ManagerAuthenticationHandler
 import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.dao.OrganizationDao
 import com.gcgenome.rms.dao.UserDao
@@ -20,27 +19,24 @@ import reactor.core.publisher.Mono
 class UserHandler(
     val dslContext: DSLContext,
     val encoder: BCryptPasswordEncoder,
-    private val managerAuthenticationHandler: ManagerAuthenticationHandler
 ): UserDao, OrganizationDao {
 
     fun selectUserById(userId: String): Mono<User> {
         return Mono.from(dslContext.selectUserById(userId))
     }
 
-    fun selectUsers(authentication: UserAuthentication, query: Query): Mono<Page<User>> {
+    fun selectUsers(query: Query): Mono<Page<User>> {
         val whereClause = buildWhereClause(query.filters)
-        return managerAuthenticationHandler.chkManager(authentication)
-            .flatMap {
-                val users = dslContext.dsl().selectUsers(query,whereClause)
-                dslContext.selectUsersCount(query,whereClause)
-                    .flatMap { totalCount ->
-                        val totalPage = (totalCount + query.size -1) / query.size
-                        users.collectList().flatMap {
-                            val page = Page(totalCount,totalPage,query.size,query.page+1,it)
-                            Mono.just(page)
-                        }
-                    }
+        val users = dslContext.dsl().selectUsers(query,whereClause)
+        return dslContext.selectUsersCount(query,whereClause)
+            .flatMap { totalCount ->
+                val totalPage = (totalCount + query.size -1) / query.size
+                users.collectList().flatMap {
+                    val page = Page(totalCount,totalPage,query.size,query.page+1,it)
+                    Mono.just(page)
+                }
             }
+
     }
 
     fun selectUserOrganizations(userId: String): Flux<Organization> {
@@ -71,18 +67,6 @@ class UserHandler(
         } ?: DSL.trueCondition()
     }
 
-    fun insertUser(authentication: UserAuthentication, userDto: User): Mono<User> {
-        val password = encoder.encode(userDto.password!!)
-        userDto.organization = Organization_(userDto.id,userDto.id, userDto.name,null,null,null)
-        return Mono.from(dslContext.transactionPublisher { trx ->
-            trx.dsl().run {
-                managerAuthenticationHandler.chkManager(authentication)
-                    .flatMap { insertUser(userDto, password) }
-                    .flatMap { insertOrganization(userDto.organization!!) }
-                    .flatMap { selectUserOrganizationById(userDto) }
-            }.map { it }
-        })
-    }
     fun updateUserById(authentication: UserAuthentication, user: User): Mono<User> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
@@ -99,44 +83,24 @@ class UserHandler(
         return authentication.user.role in listOf(Role.ADMIN.toString(), Role.MANAGER.toString()) ||
                 authentication.user.id == user.id
     }
-    fun insertUserOrganization(userId: String, authentication: UserAuthentication, organization: Organization): Mono<Organization_> {
-        val organizationDto = Organization_(
-            id = organization.id!!,
-            userId = userId,
-            name = organization.name,
-            type = organization.type,
-            registrationNumber = organization.registrationNumber,
-            nursingNumber = organization.nursingNumber
-        )
+    fun insertUserOrganization(organization: Organization): Mono<Organization_> {
         return Mono.from(dslContext.transactionPublisher { trx ->
-            trx.dsl().run {
-                managerAuthenticationHandler.chkUserAndManager(authentication, userId)
-                    .flatMap { selectUserById(userId).switchIfEmpty(Mono.error(UserNotFoundException(userId))) }
-                    .flatMap { insertOrganization(organizationDto) }
-            }
+            trx.dsl().run { insertOrganization(organization) }
         })
     }
 
-    fun deleteUserOrganization(authentication: UserAuthentication, userId: String, organizationId: String): Mono<Organization> {
+    fun deleteUserOrganization(organization: Organization): Mono<Organization> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
-                managerAuthenticationHandler.chkUserAndManager(authentication, userId)
-                    .then(selectUserByOrganizationId(userId, organizationId)
-                        .switchIfEmpty(Mono.error(OrganizationNotFoundException())))
-                    .then(deleteUserByOrganizationId(userId, organizationId))
+                deleteOrganizationById(organization)
                     .switchIfEmpty(Mono.error(OrganizationNotDeleteException()))
             }
         })
     }
 
-    fun updateUserOrganization(authentication: UserAuthentication, userId: String, organizationId: String, organization: Organization): Mono<Organization> {
+    fun updateUserOrganization(organization: Organization): Mono<Organization> {
         return Mono.from(dslContext.transactionPublisher { trx ->
-            trx.dsl().run {
-                managerAuthenticationHandler.chkUserAndManager(authentication, userId)
-                    .then(selectUserByOrganizationId(userId, organizationId)
-                        .switchIfEmpty(Mono.error(OrganizationNotFoundException())))
-                    .then(updateOrganizationByUserId(userId, organizationId, organization))
-            }
+            trx.dsl().run { updateOrganizationByUserId(organization) }
         })
     }
 }

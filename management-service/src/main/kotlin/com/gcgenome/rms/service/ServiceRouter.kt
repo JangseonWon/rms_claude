@@ -1,7 +1,6 @@
 package com.gcgenome.rms.service
 
 import com.gcgenome.rms.auth.AuthenticationHandler
-import com.gcgenome.rms.auth.ManagerAuthenticationHandler
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.exception.AdminAuthenticationException
 import com.gcgenome.rms.exception.AuthenticationNotFoundException
@@ -19,7 +18,6 @@ import reactor.core.publisher.Mono
 @Configuration
 class ServiceRouter (
     private val authenticationHandler: AuthenticationHandler,
-    private val managerAuthenticationHandler: ManagerAuthenticationHandler,
     private val serviceHandler: ServiceHandler
 ) {
     @Bean("ServicesRouter")
@@ -33,8 +31,7 @@ class ServiceRouter (
 
     private fun updateServiceByCategoryId(request: ServerRequest): Mono<ServerResponse> {
         val serviceId = request.pathVariable("service_id")
-        return authenticationHandler.principal(request)
-            .flatMap { managerAuthenticationHandler.chkAdmin(it) }
+        return authenticationHandler.chkManager(request)
             .flatMap { request.bodyToMono(Service::class.java) }
             .flatMap { serviceHandler.updateServiceById(it.apply { id = serviceId }) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
@@ -67,8 +64,9 @@ class ServiceRouter (
     }
 
     private fun selectServiceCategory(request: ServerRequest): Mono<ServerResponse> {
-        return Mono.zip(authenticationHandler.principal(request), request.bodyToMono(Query::class.java))
-            .flatMap { p -> serviceHandler.selectServiceCategory(p.t1,p.t2.copy(page=p.t2.page - 1)) }
+        return authenticationHandler.chkManager(request)
+            .then(request.bodyToMono(Query::class.java))
+            .flatMap { query -> serviceHandler.selectServiceCategory(query.copy(page=query.page - 1)) }
             .flatMap { ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-Total-Page", it.totalPage.toString())

@@ -1,7 +1,6 @@
 package com.gcgenome.rms.categories
 
 import com.gcgenome.rms.auth.AuthenticationHandler
-import com.gcgenome.rms.auth.ManagerAuthenticationHandler
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.exception.*
 import com.gcgenome.rms.tables.pojos.Category
@@ -18,7 +17,6 @@ import java.util.*
 @Configuration
 class CategoriesRouter (
     private val authenticationHandler: AuthenticationHandler,
-    private val managerAuthenticationHandler: ManagerAuthenticationHandler,
     private val categoriesHandler: CategoriesHandler
 ) {
     @Bean("CategoriesRouter")
@@ -55,8 +53,7 @@ class CategoriesRouter (
     }
 
     private fun insertCategories(request: ServerRequest): Mono<ServerResponse> {
-        return authenticationHandler.principal(request)
-            .flatMap { managerAuthenticationHandler.chkManager(it) }
+        return authenticationHandler.chkManager(request)
             .flatMap { request.bodyToMono(Category::class.java) }
             .flatMap { categoriesHandler.insertCategories(it) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
@@ -68,8 +65,7 @@ class CategoriesRouter (
     }
 
     private fun deleteCategories(request: ServerRequest): Mono<ServerResponse> {
-        return authenticationHandler.principal(request)
-            .flatMap { managerAuthenticationHandler.chkManager(it) }
+        return authenticationHandler.chkManager(request)
             .flatMap { request.bodyToMono(Category::class.java) }
             .flatMap { categoriesHandler.deleteCategories(it) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
@@ -81,8 +77,7 @@ class CategoriesRouter (
     }
 
     private fun updateCategories(request: ServerRequest): Mono<ServerResponse> {
-        return authenticationHandler.principal(request)
-            .flatMap { managerAuthenticationHandler.chkManager(it) }
+        return authenticationHandler.chkManager(request)
             .flatMap { request.bodyToMono(Category::class.java) }
             .flatMap { categoriesHandler.updateCategories(it) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }

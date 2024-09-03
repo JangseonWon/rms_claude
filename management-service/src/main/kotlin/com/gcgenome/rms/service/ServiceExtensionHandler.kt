@@ -66,11 +66,11 @@ class ServiceExtensionHandler(
     }
 
     fun insertServiceExtension(serviceExtension: ServiceExtension): Mono<ServiceExtension> {
-        return Mono.from(dslContext.insertExtensionByService(serviceExtension))
+        return Mono.from(dslContext.insertServiceExtensionByService(serviceExtension))
     }
 
-    fun deleteServiceExtension(serviceId: String, extensionId: String): Mono<ServiceExtension> {
-        return Mono.from(dslContext.deleteExtensionByService(serviceId, extensionId))
+    fun deleteServiceExtension(serviceExtension: ServiceExtension): Mono<ServiceExtension> {
+        return Mono.from(dslContext.deleteServiceExtensionById(serviceExtension))
     }
 
     fun buildExtensionIdOrNameWhereClause(filter: Query.Companion.Filter) : Condition {

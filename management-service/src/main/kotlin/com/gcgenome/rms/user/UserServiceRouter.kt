@@ -28,8 +28,9 @@ class UserServiceRouter (
 
     private fun saveUserServices(request: ServerRequest): Mono<ServerResponse> {
         val userId = request.pathVariable("userId")
-        return Mono.zip(authenticationHandler.principal(request),request.bodyToMono(Array<Service_>::class.java))
-            .flatMap { userServiceHandler.insertUserService(it.t1,userId, it.t2).collectList() }
+        return authenticationHandler.chkManager(request)
+            .flatMap { request.bodyToMono(Array<Service_>::class.java) }
+            .flatMap { services -> userServiceHandler.insertUserService(userId, services).collectList() }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it),Service_::class.java ) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume (IntegrityConstraintViolationException::class.java) { ServerResponse.status(HttpStatus.NOT_ACCEPTABLE).bodyValue(DatabaseConstraintViolationException().message.toString()) }
@@ -52,8 +53,9 @@ class UserServiceRouter (
 
     private fun deleteUserServices(request: ServerRequest): Mono<ServerResponse> {
         val userId = request.pathVariable("user_id")
-        return authenticationHandler.principal(request).zipWith(request.bodyToMono(Array<Service_>::class.java))
-            .flatMap { userServiceHandler.deleteUserServices(it.t1, userId, it.t2) }
+        return authenticationHandler.chkManager(request)
+            .flatMap { request.bodyToMono(Array<Service_>::class.java) }
+            .flatMap { services -> userServiceHandler.deleteUserServices(userId, services) }
             .flatMap { ServerResponse.status(HttpStatus.OK).bodyValue("${userId}의 서비스 삭제 완료") }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(ManagerAuthenticationException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}

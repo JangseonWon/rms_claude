@@ -32,11 +32,11 @@ class ServiceSampleTypeHandler(
     }
 
     fun insertServiceSampleType(serviceSampleType: ServiceSampleType): Mono<ServiceSampleType> {
-        return Mono.from(dslContext.insertSampleTypeByService(serviceSampleType))
+        return Mono.from(dslContext.insertServiceSampleTypeByService(serviceSampleType))
     }
 
-    fun deleteServiceSampleType(serviceId: String, sampleTypeId: String): Mono<ServiceSampleType> {
-        return Mono.from(dslContext.deleteSampleTypeByService(serviceId, sampleTypeId))
+    fun deleteServiceSampleType(serviceSampleType: ServiceSampleType): Mono<ServiceSampleType> {
+        return Mono.from(dslContext.deleteServiceSampleTypeById(serviceSampleType))
     }
 
     fun buildSampleTypeIdOrNameWhereClause(filter: Query.Companion.Filter) : Condition {
