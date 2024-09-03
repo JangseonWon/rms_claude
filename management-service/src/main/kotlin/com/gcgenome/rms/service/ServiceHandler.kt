@@ -42,26 +42,24 @@ class ServiceHandler(
         return Flux.from(dslContext.selectServiceByNameOrId(whereClause))
     }
 
-    fun selectServiceCategory(authentication: UserAuthentication, query: Query): Mono<Page<ServiceCategory>> {
+    fun selectServiceCategory(query: Query): Mono<Page<ServiceCategory>> {
         val whereClause = buildWhereClause(query.filters)
-        return managerAuthenticationHandler.chkManager(authentication)
-            .flatMap {
-                val services = dslContext.dsl().selectServiceAndCategory(query, whereClause)
-                dslContext.selectServicesAndCategoryCount(whereClause)
-                    .flatMap { totalCount ->
-                        val totalPage = (totalCount + query.size -1) / query.size
-                        services.collectList().flatMap { serviceList ->
-                            dslContext.getUserService().collectList().flatMap { userServices ->
-                                val serviceCategoryList = serviceList.map { serviceCategory ->
-                                    val state = userServices.any { it.serviceId == serviceCategory.serviceId }
-                                    serviceCategory.copy(state = state)
-                                }
-                                val page = Page(totalCount, totalPage, query.size, query.page + 1, serviceCategoryList)
-                                Mono.just(page)
-                            }
+        val services = dslContext.dsl().selectServiceAndCategory(query, whereClause)
+        return dslContext.selectServicesAndCategoryCount(whereClause)
+            .flatMap { totalCount ->
+                val totalPage = (totalCount + query.size -1) / query.size
+                services.collectList().flatMap { serviceList ->
+                    dslContext.getUserService().collectList().flatMap { userServices ->
+                        val serviceCategoryList = serviceList.map { serviceCategory ->
+                            val state = userServices.any { it.serviceId == serviceCategory.serviceId }
+                            serviceCategory.copy(state = state)
                         }
+                        val page = Page(totalCount, totalPage, query.size, query.page + 1, serviceCategoryList)
+                        Mono.just(page)
                     }
+                }
             }
+
     }
 
     fun selectServiceByUserId(userId: String, filter: Query.Companion.Filter): Flux<Service_> {
