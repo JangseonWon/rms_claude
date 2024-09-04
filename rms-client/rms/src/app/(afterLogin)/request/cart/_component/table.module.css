@@ -88,9 +88,45 @@
     border-color: #1a1a1a;
 }
 .checkbox {
-    width: 2vw;
-    height: 2vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
     cursor: pointer;
+}
+
+.checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+.checkmark {
+    width: 1vw;
+    height: 2vh;
+    background-color: #faf7f7;
+    border: 1px solid #DAE2ED;
+    border-radius: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.checkbox input:checked + .checkmark {
+    background-color: #90BA2D;
+}
+.checkmark:after {
+    content: "";
+    display: none;
+    width: 0.3vw;
+    height: 1vh;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    margin-bottom: 0.3vh;
+}
+.checkbox input:checked + .checkmark:after {
+    display: block;
 }
 .info {
     cursor: pointer;

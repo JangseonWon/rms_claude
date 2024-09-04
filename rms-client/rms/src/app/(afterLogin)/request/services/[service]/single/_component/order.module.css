@@ -13,6 +13,9 @@
 .section > * {
     padding-right: 1vw;
 }
+.memoSection {
+    width: 98.5%;
+}
 .selectBox {
     width: 11vw;
 }

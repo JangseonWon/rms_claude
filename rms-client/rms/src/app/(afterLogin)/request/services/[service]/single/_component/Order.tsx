@@ -233,12 +233,14 @@ export default function Order() {
                 />
             </div>
             <ExtensionInputComponent/>
-            <TextBox
-                label={'Memo'}
-                value={request.memo}
-                required={true}
-                onChange={(value) => handleRequestChange('memo', value)}
-            />
+            <div className={style.memoSection}>
+                <TextBox
+                    label={'Memo'}
+                    value={request.memo}
+                    required={true}
+                    onChange={(value) => handleRequestChange('memo', value)}
+                />
+            </div>
             <div className={style.buttonSection}>
                 <GreenButton
                     name={"Add to Cart"}

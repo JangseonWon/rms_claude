@@ -88,12 +88,15 @@ export default function Table() {
                     <thead>
                     <tr>
                         <th>
-                            <input
-                                type="checkbox"
-                                checked={isSelectedAll}
-                                onChange={() => handleSelectAll(!isSelectedAll)}
-                                className={style.checkbox}
-                            />
+                            <label form="agree" className={style.checkbox}>
+                                <input
+                                    type="checkbox"
+                                    checked={isSelectedAll}
+                                    onChange={() => handleSelectAll(!isSelectedAll)}
+                                    className={style.checkbox}
+                                />
+                                <span className={style.checkmark}></span>
+                            </label>
                         </th>
                         <th>Service Name</th>
                         <th>Patient(s) Name</th>
@@ -108,16 +111,17 @@ export default function Table() {
                     </thead>
                     <tbody>
                     {requestData.map((row, rowIndex) => (
-                        <tr
-                            key={row.order_id! + row.service!.id + row.sample!.id}
-                        >
+                        <tr key={row.order_id! + row.service!.id + row.sample!.id}>
                             <td onClick={(e) => e.stopPropagation()}>
-                                <input
-                                    type="checkbox"
-                                    checked={row.isSelected || false}
-                                    onChange={() => handleSelectChange(rowIndex, !row.isSelected)}
-                                    className={style.checkbox}
-                                />
+                                <label form="agree" className={style.checkbox}>
+                                    <input
+                                        type="checkbox"
+                                        checked={row.isSelected || false}
+                                        onChange={() => handleSelectChange(rowIndex, !row.isSelected)}
+                                        className={style.checkbox}
+                                    />
+                                    <span className={style.checkmark}></span>
+                                </label>
                             </td>
                             <td>{row.service?.name}</td>
                             <td>{row.sample?.patient?.name}</td>
