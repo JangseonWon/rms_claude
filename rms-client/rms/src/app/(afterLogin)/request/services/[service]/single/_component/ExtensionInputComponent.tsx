@@ -18,6 +18,7 @@ export default function ExtensionInputComponent({ onChange }: ExtensionInputComp
     const pathSegments = pathname.split('/');
     const serviceId = decodeURIComponent(pathSegments[pathSegments.length - 2]);
     const [extensions, setExtensions] = useState<Extensions[]>([]);
+    const [values, setValues] = useState<{ [key: string]: any }>({});
 
     const generateSelectList = (regex: string): { name: string, value: string }[] => {
         if (regex.includes("|")) {
@@ -39,21 +40,29 @@ export default function ExtensionInputComponent({ onChange }: ExtensionInputComp
         setExtensions(response as Extensions[]);
     };
 
-    const handleChange = (id: string, value: any) => {
+    const handleInputChange = (id: string, value: any) => {
+        setValues(prevValues => ({ ...prevValues, [id]: value }));
         onChange(id, value);
     };
 
+    const handleSelectChange = (id: string, option: { name: string, value: any }) => {
+        setValues(prevValues => ({ ...prevValues, [id]: option.name }));
+        onChange(id, option.value);
+    };
+
     const renderExtensionComponent = (extension: Extensions) => {
+        let value = values[extension.id] || '';
+
         switch (extension.type) {
             case 'List':
                 const selectList = generateSelectList(extension.regex);
                 return <SelectBox
                     key={extension.id}
                     label={extension.name}
-                    // value={}
+                    value={value}
                     options={selectList}
                     required={extension.required}
-                    onChange={(value) => handleChange(extension.id, value)}
+                    onChange={(selectedOption) => handleSelectChange(extension.id, selectedOption)}
                     width="11vw"
                 />;
             case 'Boolean':
@@ -64,10 +73,10 @@ export default function ExtensionInputComponent({ onChange }: ExtensionInputComp
                 return <SelectBox
                     key={extension.id}
                     label={extension.name}
-                    // value={}
+                    value={value}
                     options={booleanList}
                     required={extension.required}
-                    onChange={(value) => handleChange(extension.id, value)}
+                    onChange={(selectedOption) => handleSelectChange(extension.id, selectedOption)}
                     width="11vw"
                 />;
             case 'Int':
@@ -76,16 +85,14 @@ export default function ExtensionInputComponent({ onChange }: ExtensionInputComp
                 return <InputBox
                     key={extension.id}
                     label={extension.name}
-                    // value={}
                     required={extension.required}
-                    onChange={(value) => handleChange(extension.id, value)}
+                    onChange={(inputValue) => handleInputChange(extension.id, inputValue)}
                 />;
             case 'Text':
                 return <TextBox
                     key={extension.id}
-                    // value={}
                     label={extension.name}
-                    onChange={(value) => handleChange(extension.id, value)}
+                    onChange={(inputValue) => handleInputChange(extension.id, inputValue)}
                 />;
             default:
                 return null;
