@@ -13,7 +13,7 @@ import java.util.*
 
 @Component
 class Handler(val dslContext: DSLContext):
-    OrganizationDao, ServiceDao, SampleTypeDao, OrderDao, RequestDao, PatientDao, SampleDao
+    OrganizationDao, ServiceDao, SampleTypeDao, OrderDao, RequestDao, PatientDao, SampleDao, SampleExtensionDao
 {
     fun getOrganizations(userId: String): Flux<Organization> {
         return dslContext.selectOrganizationsByUserId(userId)
@@ -32,11 +32,16 @@ class Handler(val dslContext: DSLContext):
                         .flatMap { order ->
                             insertPatient(user.id!!, request.sample!!.patient!!)
                                 .then(insertSample(user, request.sample, request.status))
-                                .flatMap {
-                                    insertRequest(request.apply {
-                                        this.orderId = order.id
-                                        this.sample!!.id = it.id
-                                    })
+                                .flatMap { sampleRecord ->
+                                    val extensions = request.sample.extensions ?: emptyList()
+                                    Flux.fromIterable(extensions)
+                                        .flatMap { extension ->
+                                            insertSampleExtension(extension, sampleRecord.id!!)
+                                        }
+                                        .then(insertRequest(request.apply {
+                                            this.orderId = order.id
+                                            this.sample!!.id = sampleRecord.id
+                                        }))
                                 }
                         }
                 }

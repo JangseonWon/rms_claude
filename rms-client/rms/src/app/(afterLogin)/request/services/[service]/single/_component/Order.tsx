@@ -46,6 +46,7 @@ export default function Order() {
     useEffect(() => {
         fetchOrganizations();
         fetchSampleType(serviceId);
+        handleRequestChange('service.id', serviceId);
     }, [fetchOrganizations]);
 
     const publishRequest = (status:string) => {
@@ -66,6 +67,43 @@ export default function Order() {
             ...prevState,
             ...setNestedValue({...prevState}, path, value)
         }));
+    };
+
+    const handleExtensionChange = (id: string, value: any): void => {
+        setRequest(prevState => {
+            const existingExtensions = prevState.sample?.extensions || [];
+
+            const existingExtensionIndex = existingExtensions.findIndex(ext => ext.id === id);
+
+            let updatedExtensions;
+
+            if (existingExtensionIndex > -1) {
+                updatedExtensions = [...existingExtensions];
+                updatedExtensions[existingExtensionIndex] = { id, value: formatExtensionValue(value) };
+            } else {
+                updatedExtensions = [...existingExtensions, { id, value: formatExtensionValue(value) }];
+            }
+
+            return {
+                ...prevState,
+                sample: {
+                    ...prevState.sample,
+                    extensions: updatedExtensions
+                }
+            };
+        });
+    };
+
+    const formatExtensionValue = (value: any) => {
+        if (typeof value === 'object' && value !== null && 'name' in value && 'value' in value) {
+            return value.value;
+        }
+
+        if (typeof value === 'boolean') {
+            return value;
+        }
+
+        return value;
     };
 
     const setNestedValue = (object: any, nestedPath: string, newValue: any): any => {
@@ -232,7 +270,7 @@ export default function Order() {
                     onChange={(value) => handleRequestChange('physician', value)}
                 />
             </div>
-            <ExtensionInputComponent/>
+            <ExtensionInputComponent onChange={handleExtensionChange} />
             <div className={style.memoSection}>
                 <TextBox
                     label={'Memo'}
