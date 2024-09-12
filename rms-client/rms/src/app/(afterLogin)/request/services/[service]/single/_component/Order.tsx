@@ -10,7 +10,7 @@ import {SelectBoxOption} from "@/model/SelectBoxOption";
 import {Request} from "@/model/Request";
 import DatePickerBox from "@/app/_component/DatePickerBox";
 import {SampleType} from "@/model/SampleType";
-import {getSampleType} from "@/app/(afterLogin)/request/services/[service]/single/_api/getSampleType"
+import {getSampleType} from "@/app/(afterLogin)/request/services/_api/getSampleType"
 import GreenButton from "@/app/_component/GreenButton";
 import BlueButton from "@/app/_component/BlueButton";
 import {putRequest} from "@/app/(afterLogin)/request/services/[service]/single/_api/putRequest";

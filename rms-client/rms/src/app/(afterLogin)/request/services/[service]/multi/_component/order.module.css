@@ -75,8 +75,14 @@
     background-color: #d3d3d3;
     cursor: pointer;
 }
+.topHeader {
+    min-width: 10vw;
+}
 .extensionHeader {
     min-width: 6vw;
+}
+.notesHeader {
+    min-width: 15vw;
 }
 .select {
     position: relative;

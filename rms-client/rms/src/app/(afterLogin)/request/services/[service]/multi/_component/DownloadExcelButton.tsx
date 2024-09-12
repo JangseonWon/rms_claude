@@ -1,34 +1,45 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import ExcelJS from 'exceljs';
 import {Extensions} from "@/model/ServiceExtensionAndSampleType";
 import style from './downloadExcelButton.module.css'
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faDownload} from "@fortawesome/free-solid-svg-icons";
 import {usePathname} from "next/navigation";
+import {getSampleType} from "@/app/(afterLogin)/request/services/_api/getSampleType";
+import {getOrganization} from "@/app/(afterLogin)/request/services/[service]/multi/_api/getOrganization";
+import {useSession} from "next-auth/react";
+import {SampleType} from "@/model/SampleType";
+import {Organization} from "@/model/Organization";
 
 interface DownloadExcelButtonProps {
     extensions: Extensions[];
 }
 
 export default function DownloadExcelButton({ extensions }: DownloadExcelButtonProps) {
+    const { data: session } = useSession();
+    const userId = session?.user?.id ?? '';
     const pathname = usePathname();
     const pathSegments = pathname.split('/');
     const serviceId = decodeURIComponent(pathSegments[pathSegments.length - 2]);
+    const [sampleTypeList, setSampleTypeList] = useState<SampleType[]>();
+    const [institutionList, setInstitutionList] = useState<Organization[]>();
 
     const handleDownload = async () => {
         const headers = [
-            "Registration Date (YYYY/MM/DD)", // Date
+            "Sample Type", //List
+            "Institution", //List
+            "Registration Date", // Date
             "Ward",
             "Patient Name",
-            "Personal ID Number (YYYY/MM/DD)", // Date
-            "Gender (Male, Female)", // List
+            "Personal ID Number", // Date
+            "Gender", // List
             "Physician",
-            "Collection Date (YYYY/MM/DD)", // Date
+            "Medical Department",
+            "Collection Date", // Date
             "Chart Number",
-            "Code",
             "Gestational Age", // Integer
             "Weight", // Decimal
-            "Fetuses (1 or 2)", // Integer
+            "Fetuses", // Integer
             "Quantity", // Decimal
             "Notes",
             "Race (Genome Health Premium)",
@@ -45,9 +56,33 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
 
         worksheet.addRow(headers);
 
+        worksheet.columns = headers.map(header => {
+            return { width: Math.max(header.length, 20) };
+        });
+
+        const sampleTypeFormulae = sampleTypeList?.map(sample => `${sample.id}/${sample.name}`).join(',') || '';
+        const institutionFormulae = institutionList?.map(institution => `${institution.id}/${institution.name}`).join(',') || '';
 
         for (let i = 2; i <= 101; i++) {
-            worksheet.getCell(i, 1).dataValidation = worksheet.getCell(i, 4).dataValidation = worksheet.getCell(i, 7).dataValidation = {
+            worksheet.getCell(i, 1).dataValidation = {
+                type: 'list',
+                allowBlank: true,
+                formulae: [`"${sampleTypeFormulae}"`],
+                showErrorMessage: true,
+                errorTitle: 'Invalid Gender',
+                error: 'Please check List.',
+            };
+
+            worksheet.getCell(i, 2).dataValidation = {
+                type: 'list',
+                allowBlank: true,
+                formulae: [`"${institutionFormulae}"`],
+                showErrorMessage: true,
+                errorTitle: 'Invalid Gender',
+                error: 'Please check List.',
+            };
+
+            worksheet.getCell(i, 3).dataValidation = worksheet.getCell(i, 6).dataValidation = worksheet.getCell(i, 9).dataValidation = {
                 type: 'date',
                 allowBlank: true,
                 showErrorMessage: true,
@@ -56,7 +91,7 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
                 formulae: [new Date(1900, 0, 1), new Date(2100, 11, 31)]
             };
 
-            worksheet.getCell(i, 5).dataValidation = {
+            worksheet.getCell(i, 7).dataValidation = {
                 type: 'list',
                 allowBlank: true,
                 formulae: ['"Male,Female"'],
@@ -65,7 +100,7 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
                 error: 'Please select "Male" or "Female".',
             };
 
-            worksheet.getCell(i, 10).dataValidation = worksheet.getCell(i, 12).dataValidation = {
+            worksheet.getCell(i, 12).dataValidation = worksheet.getCell(i, 14).dataValidation = {
                 type: 'whole',
                 allowBlank: true,
                 operator: 'between',
@@ -75,7 +110,7 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
                 error: 'Please enter a valid integer.',
             };
 
-            worksheet.getCell(i, 11).dataValidation = worksheet.getCell(i, 13).dataValidation = {
+            worksheet.getCell(i, 13).dataValidation = worksheet.getCell(i, 13).dataValidation = {
                 type: 'decimal',
                 allowBlank: true,
                 operator: 'between',
@@ -148,6 +183,19 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
         a.click();
         window.URL.revokeObjectURL(url);
     };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const sampleTypeResponse = await getSampleType(serviceId);
+            const sampleType = await sampleTypeResponse.json();
+            setSampleTypeList(sampleType);
+
+            const institutionResponse = await getOrganization(userId);
+            const institution = await institutionResponse.json();
+            setInstitutionList(institution);
+        };
+        fetchData();
+    }, []);
 
     return (
         <button className={style.download} onClick={handleDownload}>
