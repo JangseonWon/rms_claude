@@ -14,11 +14,13 @@ export default function Header({session}: Props) {
     const segment = useSelectedLayoutSegment();
     return (
         <header className={style.header}>
-            <div>
+            <div className={style.leftContainer}>
                 <Link href={"/home"} className={style.gPortalLogo}>G-Portal</Link>
-                <Link href={"/qna"} className={segment?.includes('qna') ? style.headerMenuActive : style.headerMenu }>QnA</Link>
             </div>
-            <ProfileButton session={session}/>
+            <div className={style.rightContainer}>
+                <Link href={"/qna"} className={segment?.includes('qna') ? style.headerMenuActive : style.headerMenu }>QnA</Link>
+                <ProfileButton session={session}/>
+            </div>
         </header>
     )
 }

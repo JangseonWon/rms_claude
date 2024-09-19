@@ -8,6 +8,7 @@
     box-sizing: border-box;
 }
 .section {
+    margin-top: 1vh;
     display: flex;
 }
 .section > * {

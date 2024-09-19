@@ -26,9 +26,14 @@ export default function Order() {
     const [request, setRequest] = useState<Request>({})
     const [selectedOrganization, setSelectedOrganization] = useState<SelectBoxOption | null>(null);
     const [selectedSampleType, setSelectedSampleType] = useState<SelectBoxOption | null>(null);
+    const [selectedSex, setSelectedSex] = useState<SelectBoxOption | null>(null);
     const pathname = usePathname();
     const pathSegments = pathname.split('/');
     const serviceId = decodeURIComponent(pathSegments[pathSegments.length - 2]);
+    const sexOption: SelectBoxOption[] = [
+        { value: "M", name: "Male" },
+        { value: "F", name: "Female" }
+    ];
 
     const fetchOrganizations = useCallback(async () => {
         const response = await getOrganization()
@@ -213,6 +218,21 @@ export default function Order() {
                     value={request.sample?.age}
                 />
             </div>
+            <div className={style.section}>
+                <div className={style.selectBox}>
+                    <SelectBox
+                        label={"Sex*"}
+                        value={selectedSex}
+                        options={sexOption}
+                        required={true}
+                        onChange={(value) => {
+                            handleRequestChange('sample.patient.sex', value.value)
+                            setSelectedSex(value.name);
+                        }}
+                        width="11vw"
+                    />
+                </div>
+            </div>
             <p className={style.mainName}>Specimen/ .Sample Info.</p>
             <div className={style.section}>
                 <div className={style.selectBox}>
@@ -270,7 +290,7 @@ export default function Order() {
                     onChange={(value) => handleRequestChange('physician', value)}
                 />
             </div>
-            <ExtensionInputComponent onChange={handleExtensionChange} />
+            <ExtensionInputComponent onChange={handleExtensionChange}/>
             <div className={style.memoSection}>
                 <TextBox
                     label={'Memo'}
