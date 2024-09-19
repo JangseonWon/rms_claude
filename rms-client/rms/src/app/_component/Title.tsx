@@ -13,13 +13,17 @@ export default function Title() {
     const lastValue = capitalize(decodeURIComponent(pathSegments.pop() || ''));
     const secondLastValue = capitalize(decodeURIComponent(pathSegments.pop() || ''));
 
+    const displayLastValue = secondLastValue.toLowerCase() === 'management'
+        ? `${lastValue} Management`
+        : lastValue;
+
     return (
         <div className={style.title}>
             <div className={style.subTitle}>
-                {secondLastValue} &gt; <span>{lastValue}</span>
+                {secondLastValue} &gt; <span>{displayLastValue}</span>
             </div>
             <div className={style.mainTitle}>
-                {lastValue}
+                {displayLastValue}
             </div>
         </div>
     )

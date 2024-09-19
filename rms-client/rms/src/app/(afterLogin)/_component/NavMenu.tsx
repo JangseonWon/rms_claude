@@ -149,7 +149,7 @@ export default function NavMenu() {
                             <FontAwesomeIcon
                                 className={segment === 'management' ? style.clickIcon : style.icon}
                                 icon={faUsers}/>
-                            <span className={segment === 'management' ? style.clickSpan : ''}>User Management</span>
+                            <span className={segment === 'management' ? style.clickSpan : ''}>Management</span>
                         </div>
                     </li>
                     )}
