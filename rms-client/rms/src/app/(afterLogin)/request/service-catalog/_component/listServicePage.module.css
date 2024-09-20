@@ -97,8 +97,23 @@
     font-weight: 700;
 }
 .serviceContainer {
-    margin: 2vw 2vh;
-    border: 1px solid #002b49;
-    transition: all 0.3s ease;
+    margin: 2vh 2vw;
+    border: 2px solid #002b49;
+    border-radius: 8px;
+    padding: 2vh 1vw;
     overflow-y: scroll;
+    transition: all 0.3s ease;
+    box-shadow: 0.1vh 0.4vh 1vh rgba(152, 152, 152, 0.5);
+}
+.serviceContainer::-webkit-scrollbar-track {
+    background: none;
+}
+.serviceContainer::-webkit-scrollbar-thumb {
+    background-color: #90BA2D;
+    border-radius: 15px;
+    border: none;
+}
+.serviceContainer::-webkit-scrollbar {
+    width: 0.3vw !important;
+    height: 1vh !important;
 }
