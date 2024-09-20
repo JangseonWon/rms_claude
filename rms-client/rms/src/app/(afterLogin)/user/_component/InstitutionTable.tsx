@@ -6,11 +6,12 @@ import type {Organization} from "@/model/Organization";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {fetchOrganization} from "@/app/(afterLogin)/user/_api/fetchOrganization";
-import {useSession} from "next-auth/react";
 import InputBox from "@/app/_component/InputBox";
 import {Paging} from "@/model/Paging";
 import InstitutionAddModal from "@/app/(afterLogin)/user/_component/InstitutionAddModal";
 import InstitutionEditModal from "@/app/(afterLogin)/user/_component/InstitutionEditModal";
+import BlueButton from "@/app/_component/BlueButton";
+import RectangleButton from "@/app/_component/RectangleButton";
 
 export default function InstitutionTable() {
     const [organizationData, setOrganizationData] = useState<Organization[]>([])
@@ -22,7 +23,6 @@ export default function InstitutionTable() {
     const [selectInstitution, setSelectInstitution] = useState<Organization>();
     const [institutionEditModalOpen, setInstitutionEditModalOpen] = useState<boolean>(false);
     const [institutionAddModalOpen, setInstitutionAddModalOpen] = useState<boolean>(false);
-    const { data: session, status } = useSession();
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage =>({
@@ -91,9 +91,9 @@ export default function InstitutionTable() {
     return (
         <div className={style.container}>
             <section className={style.searchContainer}>
-                <button className={style.institutionAddButton} onClick={openInstitutionAddModal}>
-                    Institution Add
-                </button>
+                <div className={style.institutionAddButton}>
+                    <BlueButton name={"Institution Add"} onClick={openInstitutionAddModal}/>
+                </div>
                 <select className={style.selectSearchKey} onChange={handleSearchKeyChange}>
                     <option value="id">Id</option>
                     <option value="name">Name</option>
@@ -126,9 +126,7 @@ export default function InstitutionTable() {
                         <td>{row.registration_number}</td>
                         <td>{row.nursing_number}</td>
                         <td>
-                            <button className={style.editButton} onClick={() => openInstitutionEditModal(row)}>
-                                Edit
-                            </button>
+                            <RectangleButton name={'Edit'} onClick={() => openInstitutionEditModal(row)}/>
                         </td>
                     </tr>
                 ))}

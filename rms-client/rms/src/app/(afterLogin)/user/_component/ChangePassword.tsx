@@ -62,9 +62,9 @@ export default function ChangePassword() {
                 </div>
                 <section className={style.subSection}>
                     <div className={style.explanation}>
-                        <p>password rules...</p>
-                        <p>password rules...</p>
-                        <p>password rules...</p>
+                        {/*<p>password rules...</p>*/}
+                        {/*<p>password rules...</p>*/}
+                        {/*<p>password rules...</p>*/}
                     </div>
                 </section>
             </div>
