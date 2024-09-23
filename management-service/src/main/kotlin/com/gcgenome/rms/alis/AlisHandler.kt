@@ -1,10 +1,10 @@
-package com.gcgenome.rms.service
+package com.gcgenome.rms.alis
 
 import com.gcgenome.rms.dao.ExtensionDao
 import com.gcgenome.rms.dao.SampleTypeDao
 import com.gcgenome.rms.dao.ServiceDao
 import com.gcgenome.rms.data.*
-import com.gcgenome.rms.tables.pojos.Extension
+import com.gcgenome.rms.tables.pojos.SampleType
 import org.jooq.DSLContext
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
@@ -13,33 +13,32 @@ import reactor.core.publisher.Mono
 @Component
 class AlisHandler(
     val dslContext: DSLContext,
-    private val serviceHandler: ServiceHandler
 ):ServiceDao, SampleTypeDao,ExtensionDao {
     private val webClient = WebClient.builder().baseUrl("https://rms-test.gcgenome.com").build()
-    fun updateServices(): Mono<Page<ServiceCategory>> {
+    fun updateServices(query: Query): Mono<Page<ServiceDTO>> {
         return webClient.get()
             .uri("/w-api/alis-api/services")
             .retrieve()
             .bodyToFlux(AlisService::class.java)
             .flatMap { alisService -> dslContext.run { upsertService(alisService) } }
-            .then(serviceHandler.selectServiceCategory(Query(page = 1,size = 10)))
+            .then(dslContext.selectServicesWithPage(query))
     }
 
-    fun updateSampleTypes(): Mono<Page<ServiceCategory>> {
+    fun updateSampleTypes(query: Query): Mono<Page<SampleType>> {
         return webClient.get()
             .uri("/w-api/alis-api/sample-types")
             .retrieve()
             .bodyToFlux(AlisSampleType::class.java)
             .flatMap { alisService -> dslContext.run { upsertSampleType(alisService) } }
-            .then(serviceHandler.selectServiceCategory(Query(page = 1,size = 10)))
+            .then(dslContext.selectSampleTypesWithPage(query))
     }
 
-    fun updateExtensions(): Mono<Pair<Int, List<Extension>>> {
+    fun updateExtensions(query: Query): Mono<Page<ExtensionDTO>> {
         return webClient.get()
             .uri("/w-api/alis-api/extensions")
             .retrieve()
             .bodyToFlux(AlisExtension::class.java)
             .flatMap { alisExtension -> dslContext.run { upsertExtension(alisExtension)}}
-            .then(dslContext.selectExtensionsWithTotalPage(Query(page = 1, size = 10)))
+            .then(dslContext.selectExtensionsWithPage(query))
     }
 }

@@ -1,80 +1,48 @@
 package com.gcgenome.rms.dao
 
-import com.gcgenome.rms.data.Query
-import com.gcgenome.rms.data.User
-import com.gcgenome.rms.tables.references.ORGANIZATION
+import com.gcgenome.rms.data.*
+import com.gcgenome.rms.tables.references.SERVICE
 import com.gcgenome.rms.tables.references.USER
-import org.jooq.Condition
+import com.gcgenome.rms.tables.references.USER_SERVICE
 import org.jooq.DSLContext
-import org.jooq.SortOrder
 import org.jooq.impl.DSL.*
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import java.time.LocalDateTime
-import java.util.*
 
-interface UserDao{
-    fun DSLContext.selectUserById(userId: String): Mono<User> {
+interface UserDao : QueryDao{
+    fun DSLContext.selectUserWithServicesQuery(userId: String, query: Query): Mono<UserDTO> {
+        val joins = listOf(
+            QueryDao.JoinInfo(USER_SERVICE, USER.ID.eq(USER_SERVICE.USER_ID), QueryDao.JoinType.LEFT),
+            QueryDao.JoinInfo(SERVICE, USER_SERVICE.SERVICE_ID.eq(SERVICE.ID), QueryDao.JoinType.LEFT)
+        )
+        val fields = listOf(
+            USER.ID.`as`("id"),
+            USER.NAME.`as`("name"),
+            jsonArrayAgg(
+                jsonObject(
+                    key("id").value(SERVICE.ID),
+                    key("name").value(SERVICE.NAME)
+                )
+            ).`as`("services")
+        )
+        val where = USER.ID.eq(userId)
+        val groupByFields = listOf(USER.ID)
+
+        return selectQuery(mainTable = USER, query = query, selectFields = fields, where = where, joinTables = joins, groupByFields = groupByFields) { record ->
+            record.into(UserDTO::class.java)
+        }
+    }
+    fun DSLContext.selectUsersWithPage(query: Query): Mono<Page<UserDTO>> {
+        return selectPage(mainTable = USER, query = query) { record ->
+            record.into(UserDTO::class.java)
+        }
+    }
+    fun DSLContext.selectUserById(userId: String): Mono<UserDTO> {
         return Mono.from(select(USER.ID, USER.NAME, USER.ROLE,  USER.TYPE, USER.EMAIL, USER.PHONE_NUMBER, USER.KEY, USER.STATE, USER.BRANCH_SERIAL, USER.BRANCH_NAME, USER.CREATE_AT)
             .from(USER).where(USER.ID.eq(userId)))
-            .map { it.into(User::class.java) }
+            .map { it.into(UserDTO::class.java) }
     }
 
-    fun DSLContext.selectUsers(query:Query, whereClause:Condition): Flux<User> {
-        val order: String = query.sortBy?.let { query.sortBy } ?: "CREATE_AT"
-
-        val asc: SortOrder = when(query.asc) {
-            true -> SortOrder.ASC
-            false -> SortOrder.DESC
-            else -> SortOrder.DEFAULT
-        }
-
-        return Flux.from(
-            select(
-                USER.ID,
-                USER.NAME,
-                USER.ROLE,
-                USER.TYPE,
-                USER.EMAIL,
-                USER.PHONE_NUMBER,
-                USER.KEY, USER.STATE,
-                USER.BRANCH_SERIAL,
-                USER.BRANCH_NAME,
-                USER.CREATE_AT,
-                field(
-                    select(
-                        jsonObject(
-                            key("id").value(ORGANIZATION.ID),
-                            key("name").value(ORGANIZATION.NAME),
-                            key("type").value(ORGANIZATION.TYPE),
-                            key("registration_number").value(ORGANIZATION.REGISTRATION_NUMBER),
-                            key("nursing_number").value(ORGANIZATION.NURSING_NUMBER)
-                        )
-                    ).from(ORGANIZATION)
-                        .where(USER.ID.eq(ORGANIZATION.USER_ID).and(USER.ID.eq(ORGANIZATION.ID)))
-                ).`as`("organization"))
-            .from(USER)
-                .where(whereClause)
-                .orderBy(field(order).sort(asc))
-                .limit(query.size)
-                .offset(query.page*query.size)
-        ).map { it.into(User::class.java) }
-    }
-
-    fun DSLContext.selectUsersCount(query: Query, whereClause:Condition): Mono<Int> {
-        return Mono.from(
-            selectCount().from(USER)
-                .where(whereClause)
-        ).map { it.component1() }
-    }
-
-    fun DSLContext.getUserInfo(): Flux<User> {
-        return Flux.from(
-            selectFrom(USER)
-        ).map { it.into(User::class.java) }
-    }
-
-    fun DSLContext.updateUserById(user: User): Mono<User> {
+    fun DSLContext.updateUserById(user: UserDTO): Mono<UserDTO> {
         return Mono.from(
             update(USER)
                 .set(USER.NAME, coalesce(`val`(user.name), USER.NAME))
@@ -86,6 +54,6 @@ interface UserDao{
                 .set(USER.STATE, coalesce(`val`(user.state), USER.STATE))
                 .where(USER.ID.eq(user.id))
                 .returningResult(USER.ID,USER.NAME,USER.ROLE,USER.TYPE,USER.EMAIL,USER.PHONE_NUMBER,USER.STATE,USER.BRANCH_SERIAL,USER.BRANCH_NAME,USER.CREATE_AT)
-        ).map{it.into(User::class.java)}
+        ).map{it.into(UserDTO::class.java)}
     }
 }

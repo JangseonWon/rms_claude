@@ -6,15 +6,21 @@ data class Query(
     @JsonProperty("sort_by")
     var sortBy: String? = null,
     var asc: Boolean? = null,
-    var page: Int,
-    var size: Int,
-    var filters: MutableList<Filter>? = null
+    var page: Int? = null,
+    var size: Int? = null,
+    @JsonProperty("filter_groups")
+    var filterGroups: MutableList<FilterGroup>? = null
     ){
-    companion object{
-        data class Filter(
-            val key: String?,
-            val operator: String?,
-            val value: String?
-        )
-    }
+        data class FilterGroup(
+            @JsonProperty("condition_type")
+            var conditionType: String = "AND",
+            var filters: List<Filter>
+        ){
+            data class Filter(
+                var table: String,
+                var column: String,
+                var operator: String,
+                var value: String
+            )
+        }
 }

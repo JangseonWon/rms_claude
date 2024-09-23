@@ -1,7 +1,7 @@
-import {Paging} from "@/model/Paging";
+import {Query} from "@/model/Query";
 
-export async function getExtensionsPage(search: Paging) {
-    return await fetch(`/w-api/management-service/extension-page`, {
+export async function getExtensionsPage(search: Query) {
+    return await fetch(`/w-api/management-service/extensions`, {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",

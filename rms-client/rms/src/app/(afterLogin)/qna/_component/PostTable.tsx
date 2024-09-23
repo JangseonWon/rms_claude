@@ -5,7 +5,7 @@ import style from "./postTable.module.css";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
-import {Paging} from "@/model/Paging";
+import {Query} from "@/model/Query";
 import {Post} from "@/model/Post";
 import {useRouter} from "next/navigation";
 import {faComment} from "@fortawesome/free-regular-svg-icons";
@@ -21,12 +21,12 @@ const categoryMap: { [key: string]: string } = {
 };
 
 export default function PostTable() {
-
-    const router = useRouter();
+    return null
+    /*const router = useRouter();
     const [postData, setPostData] = useState<Post[]>([]);
     const [totalPage, setTotalPage] = useState<number>(4);
     const [search, setSearch] =
-        useState<Paging>({filters: [], sort_by:"create_at", asc: false, size:14, page:1});
+        useState<Query>({filters: [], sort_by:"create_at", asc: false, size:14, page:1});
     const [searchKey, setSearchKey] = useState<string>("title");
     const [searchValue, setSearchValue] = useState<string>("");
     const [pageRange, setPageRange] = useState<{ start: number, end: number }>({ start: 1, end: 10 });
@@ -93,7 +93,7 @@ export default function PostTable() {
         return pageNumbers;
     };
 
-    const fetchData = useCallback(async (search: Paging) => {
+    const fetchData = useCallback(async (search: Query) => {
         const response = await getPostSearch(search);
         const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
         const responseData = await response.json();
@@ -181,5 +181,5 @@ export default function PostTable() {
                 </div>
             </section>
         </>
-    );
+    );*/
 }

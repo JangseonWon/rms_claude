@@ -8,6 +8,7 @@ import {Extensions} from "@/model/ServiceExtensionAndSampleType";
 import InputBox from "@/app/_component/InputBox";
 import SelectBox from "@/app/_component/SelectBox";
 import TextBox from "@/app/_component/TextBox";
+import {SelectBoxOption} from "@/model/SelectBoxOption";
 
 interface ExtensionInputComponentProps {
     onChange: (path: string, value: any) => void;
@@ -45,7 +46,7 @@ export default function ExtensionInputComponent({ onChange }: ExtensionInputComp
         onChange(id, value);
     };
 
-    const handleSelectChange = (id: string, option: { name: string, value: any }) => {
+    const handleSelectChange = (id: string, option: SelectBoxOption) => {
         setValues(prevValues => ({ ...prevValues, [id]: option.name }));
         onChange(id, option.value);
     };
@@ -123,7 +124,7 @@ export default function ExtensionInputComponent({ onChange }: ExtensionInputComp
             {textComponents.length > 0 && (
                 <div className={style.textContainer}>
                     {textComponents.map(extension => (
-                        <div key={extension.id} className={style.singleItem}>
+                        <div key={extension.id}>
                             {renderExtensionComponent(extension)}
                         </div>
                     ))}

@@ -1,6 +1,6 @@
-import {Paging} from "@/model/Paging";
+import {Query} from "@/model/Query";
 
-export async function getUsers(search: Paging) {
+export async function getUsers(search: Query) {
     return await fetch(`/w-api/management-service/users`, {
         method: 'POST',
         headers: {

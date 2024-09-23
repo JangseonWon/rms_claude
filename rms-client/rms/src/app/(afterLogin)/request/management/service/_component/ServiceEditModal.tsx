@@ -5,37 +5,33 @@ import style from "@/app/(afterLogin)/request/management/service/_component/serv
 import {faTrash, faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
-import {ServiceManage} from "@/model/ServiceManage";
 import SelectBox from "@/app/_component/SelectBox";
 import {Categories} from "@/model/Categories";
 import {getCategories} from "@/app/(afterLogin)/request/management/service/_api/getCategories";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
-import {ServiceExtensionAndSampleType} from "@/model/ServiceExtensionAndSampleType";
-import {getService} from "@/app/(afterLogin)/_api/getService";
 import SelectSearchBox from "@/app/(afterLogin)/request/management/_component/SelectSearchBox";
 import {postSampleType} from "@/app/(afterLogin)/request/management/service/_api/postSampleType";
-import {postExtension} from "@/app/(afterLogin)/request/management/service/_api/postExtensions";
+import {putExtension} from "@/app/(afterLogin)/request/management/service/_api/postExtensions";
 import {deleteSampleType} from "@/app/(afterLogin)/request/management/service/_api/deleteSampleType";
 import {deleteExtension} from "@/app/(afterLogin)/request/management/service/_api/deleteExtension";
 import {patchService} from "@/app/(afterLogin)/request/management/service/_api/patchService";
 import {Service} from "@/model/Service";
+import {getService} from "@/app/(afterLogin)/_api/getService";
+import {isThenable} from "next/dist/client/components/router-reducer/router-reducer-types";
 
 
 type Props = {
-    service?: ServiceManage;
-    open: boolean;
+    serviceId: string
     closeModal: () => void;
     refreshData: () => void;
 }
 
-export default function ServiceEditModal({service, open, closeModal, refreshData}: Props) {
-    const [serviceId, setServiceId] = useState('');
-    const [serviceName, setServiceName] = useState('');
-    const [selectedCategoryName, setSelectedCategoryName] = useState<string>('');
+export default function ServiceEditModal({serviceId, closeModal, refreshData}: Props) {
+    const [selectedCategoryName, setSelectedCategoryName] = useState<string>();
     const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
+    const [service, setService] = useState<Service>();
     const [categories, setCategories] = useState<SelectBoxOption[]>([]);
     const [required, setRequired] = useState<boolean>(false);
-    const [serviceData, setServiceData] = useState<ServiceExtensionAndSampleType>();
     const [selectedSampleType, setSelectedSampleType] = useState<SelectBoxOption | null>(null);
     const [selectedExtension, setSelectedExtension] = useState<SelectBoxOption | null>(null);
 
@@ -50,78 +46,62 @@ export default function ServiceEditModal({service, open, closeModal, refreshData
             name: value.name
         }));
     };
+    const fetchServiceData = async (serviceId: string) => {
+        const response = await getService(serviceId);
+        const data = await response.json();
+        const service = data as Service
+        setService(service);
+        return service
+    }
 
     const fetchCategoryData = async () => {
         const response = await getCategories();
         const data = await response.json();
         setCategories(transformCategoryToOptions(data as Categories[]));
     }
-
-    const fetchServiceData = async (userId: string) => {
-        const response = await getService(userId);
-        const data = await response.json();
-        setServiceData(data as ServiceExtensionAndSampleType);
-    }
-
     useEffect(() => {
-        if (open && service) {
-            setServiceId(service.service_id!);
-            setServiceName(service.service_name!);
-            setSelectedCategoryName(service.category_name!);
-            fetchServiceData(service.service_id!);
-        } else {
-            setServiceId('');
-            setServiceName('');
-            setSelectedCategoryName('');
-        }
-    }, [open, service]);
-
+        fetchCategoryData();
+        fetchServiceData(serviceId)
+            .then((service) => setSelectedCategoryName(service.category?.name)
+        )
+    }, []);
     const handleServiceCategoryChangeClick = async () => {
         if (service && selectedCategoryId) {
-            const serviceData : Service = {id: service.service_id, category_id: selectedCategoryId};
+            const serviceData : Service = {id: service.id, category_id: selectedCategoryId};
             await patchService(serviceData);
-            await fetchServiceData(service.service_id!);
             refreshData();
         }
     }
 
     const handleSampleTypeAddClick = async () => {
         if (selectedSampleType && service) {
-            const sampleTypeData = {service_id : service.service_id, sample_type_id: selectedSampleType?.value};
+            const sampleTypeData = {service_id : service.id, sample_type_id: selectedSampleType?.value};
             await postSampleType(sampleTypeData);
-            await fetchServiceData(service.service_id!);
         }
     }
 
     const handleSampleTypeDeleteClick = async (sampleTypeId: string) => {
         if (service) {
-            await deleteSampleType(service.service_id, sampleTypeId);
-            await fetchServiceData(service.service_id!);
+            await deleteSampleType(service.id, sampleTypeId);
         }
     }
 
     const handleExtensionAddClick = async () => {
         if (selectedExtension && service) {
-            const extensionData = {service_id : service.service_id, extension_id: selectedExtension?.value, required: required};
-            await postExtension(extensionData);
-            await fetchServiceData(service.service_id!);
+            const extensionData = {service_id : service.id, extension_id: selectedExtension?.value, required: required};
+            await putExtension(extensionData);
         }
     }
 
     const handleExtensionDeleteClick = async (extensionId: string) => {
         if (service) {
-            await deleteExtension(service.service_id, extensionId);
-            await fetchServiceData(service.service_id!);
+            await deleteExtension(service.id, extensionId);
         }
     }
 
     const handleSelectRequiredChange = (value: boolean) => {
         setRequired(value);
     }
-
-    useEffect(() => {
-        fetchCategoryData();
-    }, []);
 
     return (
         <div className={style.modalBackground}>
@@ -140,16 +120,14 @@ export default function ServiceEditModal({service, open, closeModal, refreshData
                     <section className={style.topBody}>
                         <InputBox
                             label={"Service Id"}
-                            value={serviceId}
+                            value={service?.id}
                             disabled={true}
-                            onChange={setServiceId}
                             type="categoryName"
                         />
                         <InputBox
                             label={"Service Name"}
-                            value={serviceName}
+                            value={service?.name}
                             disabled={true}
-                            onChange={setServiceName}
                             type="categoryName"
                         />
                         <div className={style.categoryBox}>
@@ -158,7 +136,7 @@ export default function ServiceEditModal({service, open, closeModal, refreshData
                                 value={selectedCategoryName}
                                 options={categories}
                                 onChange={(value) => {
-                                    setSelectedCategoryName(value.name);
+                                    setSelectedCategoryName(value.name!);
                                     setSelectedCategoryId(value.value);
                                 }}
                             />
@@ -191,7 +169,7 @@ export default function ServiceEditModal({service, open, closeModal, refreshData
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {serviceData?.sample_types?.map((sampleType, index) => (
+                                        {service?.sample_types?.map((sampleType, index) => (
                                             <tr key={index}>
                                                 <td>{sampleType.id}</td>
                                                 <td>{sampleType.name}</td>
@@ -237,7 +215,7 @@ export default function ServiceEditModal({service, open, closeModal, refreshData
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {serviceData?.extensions?.map((extension, index) => (
+                                        {service?.extensions?.map((extension, index) => (
                                             <tr key={index}>
                                                 <td>{extension.id}</td>
                                                 <td>{extension.name}</td>
@@ -246,7 +224,7 @@ export default function ServiceEditModal({service, open, closeModal, refreshData
                                                     <FontAwesomeIcon
                                                         className={style.deleteButton}
                                                         icon={faTrash}
-                                                        onClick={() => handleExtensionDeleteClick(extension.id)}
+                                                        onClick={() => handleExtensionDeleteClick(extension.id!)}
                                                     />
                                                 </td>
                                             </tr>

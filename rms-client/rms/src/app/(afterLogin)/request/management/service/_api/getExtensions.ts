@@ -1,12 +1,12 @@
-import {Filter} from "@/model/Filter";
+import {Query} from "@/model/Query";
 
-export async function getExtensions(search: Filter) {
+export async function getExtensions(query: Query) {
     return await fetch(`/w-api/management-service/extensions`, {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify(search),
+        body: JSON.stringify(query),
         credentials: 'include',
         cache: 'no-store'
     });

@@ -4,10 +4,8 @@ import React, {useEffect, useState} from "react";
 import style from "@/app/(afterLogin)/request/management/user/_component/serviceModal.module.css";
 import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {getServicesByUserId} from "@/app/(afterLogin)/request/management/user/_api/getServicesByUserId";
-import {ServiceExtensionAndSampleType} from "@/model/ServiceExtensionAndSampleType";
+import {getUserWithServices} from "@/app/(afterLogin)/request/management/user/_api/getServicesByUserId";
 import {Service} from "@/model/Service";
-import {Filter} from "@/model/Filter";
 
 type Props = {
     id: string;
@@ -16,14 +14,13 @@ type Props = {
 }
 
 export default function ServiceModal({id, open, closeModal}: Props) {
-    const [serviceData, setServiceData] = useState<ServiceExtensionAndSampleType[]>([]);
+    const [serviceData, setServiceData] = useState<Service[]>([]);
     const [selectService, setSelectService] = useState<Service>();
 
     const fetchServiceData = async (userId: string) => {
-        const filter: Filter = { value: '' };
-        const response = await getServicesByUserId(userId, filter);
+        const response = await getUserWithServices(userId);
         const data = await response.json();
-        setServiceData(data as ServiceExtensionAndSampleType[]);
+        setServiceData(data as Service[]);
     }
 
     useEffect(() => {

@@ -1,12 +1,12 @@
-import {Filter} from "@/model/Filter";
+import {Query} from "@/model/Query";
 
-export async function getServices(search: Filter) {
+export async function getServices(query: Query) {
     return await fetch(`/w-api/management-service/services`, {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify(search),
+        body: JSON.stringify(query),
         credentials: 'include',
         cache: 'no-store'
     });

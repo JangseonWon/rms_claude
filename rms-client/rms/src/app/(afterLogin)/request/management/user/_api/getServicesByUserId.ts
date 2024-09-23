@@ -1,12 +1,12 @@
-import {Filter} from "@/model/Filter";
+import {Query} from "@/model/Query";
 
-export async function getServicesByUserId(userId: string, search: Filter) {
-    return await fetch(`/w-api/management-service/services/users/${userId}`, {
+export async function getUserWithServices(userId: string, query?: Query) {
+    return await fetch(`/w-api/management-service/users/${userId}/services`, {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify(search),
+        body: query ? JSON.stringify(query) : undefined,
         credentials: 'include',
         cache: 'no-store'
     });

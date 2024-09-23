@@ -6,7 +6,7 @@ import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import type {Request} from "@/model/Request";
 import {fetchFinishedOrder} from "@/app/(afterLogin)/request/result/download/_api/fetchFinishedOrder";
-import {Paging} from "@/model/Paging";
+import {Query} from "@/model/Query";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import {format} from "date-fns";
 import InputBox from "@/app/_component/InputBox";
@@ -17,10 +17,11 @@ interface RequestWithSelected extends Request {
 }
 
 export default function ReSampleTable() {
-    const [requestData, setRequestData] = useState<RequestWithSelected[]>([]);
+    return null
+    /*const [requestData, setRequestData] = useState<RequestWithSelected[]>([]);
     const isSelectedAll = requestData && requestData.length > 0 ? requestData.every((row) => row.isSelected) : false;
     const [search, setSearch] =
-        useState<Paging>({filters: [], sort_by:"status", asc: true, size:10, page:1});
+        useState<Query>({filters: [], sort_by:"status", asc: true, size:10, page:1});
     const [totalPage, setTotalPage] = useState<number>(0);
 
     const handlePageChange = (newPageNumber: number) => {
@@ -70,7 +71,7 @@ export default function ReSampleTable() {
         alert("closed");
     }
 
-    const fetchData = async (search: Paging) => {
+    const fetchData = async (search: Query) => {
         try {
             const response = await fetchFinishedOrder(search)
             const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
@@ -176,16 +177,16 @@ export default function ReSampleTable() {
                     <span> 1-{totalPage} of {search.page} </span>
                     <button
                         disabled={search.page === 1}
-                        onClick={() => handlePageChange(search.page - 1)}
+                        onClick={() => handlePageChange((search.page ?? 1) - 1)}
                     ><FontAwesomeIcon icon={faAngleLeft}/>
                     </button>
                     <button
                         disabled={search.page === totalPage}
-                        onClick={() => handlePageChange(search.page + 1)}
+                        onClick={() => handlePageChange((search.page ?? 1) + 1)}
                     ><FontAwesomeIcon icon={faAngleRight}/>
                     </button>
                 </div>
             </section>
         </>
-    );
+    );*/
 }

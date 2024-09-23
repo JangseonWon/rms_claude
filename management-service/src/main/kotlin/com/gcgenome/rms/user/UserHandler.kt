@@ -2,14 +2,12 @@ package com.gcgenome.rms.user
 
 import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.dao.OrganizationDao
+import com.gcgenome.rms.dao.ServiceDao
 import com.gcgenome.rms.dao.UserDao
+import com.gcgenome.rms.dao.UserServiceDao
 import com.gcgenome.rms.data.*
 import com.gcgenome.rms.exception.*
-import com.gcgenome.rms.tables.pojos.Organization
-import org.jooq.Condition
 import org.jooq.DSLContext
-import org.jooq.impl.DSL
-import org.jooq.impl.DSL.field
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
@@ -19,55 +17,27 @@ import reactor.core.publisher.Mono
 class UserHandler(
     val dslContext: DSLContext,
     val encoder: BCryptPasswordEncoder,
-): UserDao, OrganizationDao {
+): UserServiceDao, ServiceDao, UserDao, OrganizationDao {
 
-    fun selectUserById(userId: String): Mono<User> {
+    fun selectUserById(userId: String): Mono<UserDTO> {
         return Mono.from(dslContext.selectUserById(userId))
     }
 
-    fun selectUsers(query: Query): Mono<Page<User>> {
-        val whereClause = buildWhereClause(query.filters)
-        val users = dslContext.dsl().selectUsers(query,whereClause)
-        return dslContext.selectUsersCount(query,whereClause)
-            .flatMap { totalCount ->
-                val totalPage = (totalCount + query.size -1) / query.size
-                users.collectList().flatMap {
-                    val page = Page(totalCount,totalPage,query.size,query.page+1,it)
-                    Mono.just(page)
-                }
-            }
-
+    fun selectUsers(query: Query): Mono<Page<UserDTO>> {
+        return dslContext.selectUsersWithPage(query)
+    }
+    fun selectUserWithServices(userId: String, query: Query): Mono<UserDTO> {
+        return dslContext.selectUserWithServicesQuery(userId, query)
     }
 
-    fun selectUserOrganizations(userId: String): Flux<Organization> {
+    fun selectUserOrganizations(userId: String): Flux<OrganizationDTO> {
         return Flux.from(dslContext.run {
             selectUserById(userId).switchIfEmpty(Mono.error(UserNotFoundException(userId)))
                 .thenMany(selectOrganizationByUserId(userId))
         })
     }
 
-    fun buildWhereClause(filters:List<Query.Companion.Filter>?) : Condition {
-        return filters?.let {
-            it.filter { filter -> filter.key != null && filter.value?.isNotBlank() == true }
-                .map { filter ->
-                    val key = filter.key!!
-                    val value = filter.value!!
-                    val condition = when (filter.operator) {
-                        "=" -> field(key).eq(value)
-                        "LIKE" -> field(key).likeIgnoreCase("%$value%")
-                        ">" -> field(key).gt(value)
-                        "<" -> field(key).lt(value)
-                        ">=" -> field(key).ge(value)
-                        "<=" -> field(key).le(value)
-                        else -> throw FilterOperatorNotFoundException()
-                    }
-                    condition
-                }
-                .reduceOrNull { acc, condition -> acc.and(condition) ?: condition } ?: DSL.trueCondition()
-        } ?: DSL.trueCondition()
-    }
-
-    fun updateUserById(authentication: UserAuthentication, user: User): Mono<User> {
+    fun updateUserById(authentication: UserAuthentication, user: UserDTO): Mono<UserDTO> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
                 if (isAuthorized(authentication, user)) {
@@ -79,17 +49,17 @@ class UserHandler(
             }
         })
     }
-    private fun isAuthorized(authentication: UserAuthentication, user: User): Boolean {
+    private fun isAuthorized(authentication: UserAuthentication, user: UserDTO): Boolean {
         return authentication.user.role in listOf(Role.ADMIN.toString(), Role.MANAGER.toString()) ||
                 authentication.user.id == user.id
     }
-    fun insertUserOrganization(organization: Organization): Mono<Organization_> {
+    fun insertUserOrganization(organization: OrganizationDTO): Mono<OrganizationDTO> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run { insertOrganization(organization) }
         })
     }
 
-    fun deleteUserOrganization(organization: Organization): Mono<Organization> {
+    fun deleteUserOrganization(organization: OrganizationDTO): Mono<OrganizationDTO> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
                 deleteOrganizationById(organization)
@@ -98,9 +68,33 @@ class UserHandler(
         })
     }
 
-    fun updateUserOrganization(organization: Organization): Mono<Organization> {
+    fun updateUserOrganization(organization: OrganizationDTO): Mono<OrganizationDTO> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run { updateOrganizationByUserId(organization) }
+        })
+    }
+
+    fun insertUserService(userService: UserServiceDTO): Mono<UserDTO> {
+        return Mono.from(dslContext.transactionPublisher{ trx ->
+            trx.dsl().run {
+                selectUserById(userService.userId!!)
+                    .switchIfEmpty(Mono.error(UserNotFoundException(userService.userId!!)))
+                    .flatMap {
+                        selectServiceById(userService.serviceId!!)
+                            .switchIfEmpty(Mono.error(ServiceNotFoundException(userService.serviceId!!)))
+                    }.flatMap { insertUserService(userService) }
+                    .then(selectUserWithServicesQuery(userService.userId!!, Query()))
+            }
+        })
+    }
+
+    fun deleteUserService(userService: UserServiceDTO): Mono<UserServiceDTO> {
+        return Mono.from(dslContext.transactionPublisher { trx ->
+            trx.dsl().run {
+                selectUserServiceById(userService)
+                        .switchIfEmpty(Mono.error(ServiceNotFoundException(userService.serviceId!!)))
+                        .then(deleteUserService(userService))
+            }
         })
     }
 }

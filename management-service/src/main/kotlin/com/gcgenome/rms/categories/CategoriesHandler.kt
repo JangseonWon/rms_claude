@@ -3,14 +3,10 @@ package com.gcgenome.rms.categories
 import com.gcgenome.rms.dao.CategoryDao
 import com.gcgenome.rms.dao.ServiceDao
 import com.gcgenome.rms.data.CategoryOrderType
-import com.gcgenome.rms.data.Query
-import com.gcgenome.rms.data.Service_
 import com.gcgenome.rms.exception.CategoryNotFoundException
 import com.gcgenome.rms.exception.CategoryOrderTypeNotFoundException
 import com.gcgenome.rms.tables.pojos.Category
-import org.jooq.Condition
 import org.jooq.DSLContext
-import org.jooq.impl.DSL.field
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -48,17 +44,6 @@ class CategoriesHandler(
             .then(dslContext.updateCategory(category))
     }
 
-    fun selectServiceInfoByCategoryId(categoryId: UUID, filter: Query.Companion.Filter): Flux<Service_> {
-        val whereClause = buildServiceIdOrNameWhereClause(filter)
-        return Flux.from(checkCategoryById(categoryId)
-            .thenMany(dslContext.selectServiceInfoByCategoryId(categoryId, whereClause)))
-    }
-
-    fun checkCategoryById(categoryId: UUID): Mono<Category> {
-        return dslContext.selectCategoryById(categoryId)
-            .switchIfEmpty(Mono.error(CategoryNotFoundException()))
-    }
-
     fun checkCategoryOrderType(category: Category): Mono<Boolean> {
         val orderType = category.orderType
         return if (orderType != null &&
@@ -67,9 +52,5 @@ class CategoriesHandler(
         } else {
             Mono.error(CategoryOrderTypeNotFoundException())
         }
-    }
-
-    fun buildServiceIdOrNameWhereClause(filter: Query.Companion.Filter) : Condition {
-        return field("service.id").like("%${filter.value}%").or(field("service.name").like("%${filter.value}%"))
     }
 }

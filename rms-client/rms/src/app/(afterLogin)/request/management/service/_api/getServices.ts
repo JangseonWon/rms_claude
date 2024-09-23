@@ -1,7 +1,7 @@
-import {Paging} from "@/model/Paging";
+import {Query} from "@/model/Query";
 
-export async function getServiceCategory(search: Paging) {
-    return await fetch(`/w-api/management-service/service_category`, {
+export async function getServices(search: Query) {
+    return await fetch(`/w-api/management-service/services`, {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",

@@ -8,13 +8,13 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
 import java.time.LocalDateTime
 
 
-data class UserService (
+data class UserServiceDTO (
     @JsonProperty("user_id")
-    val userId: String?,
+    var userId: String? = null,
     @JsonProperty("service_id")
-    val serviceId: String?,
+    var serviceId: String? = null,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("create_at")
-    val createAt: LocalDateTime?
+    var createAt: LocalDateTime? = null,
 )

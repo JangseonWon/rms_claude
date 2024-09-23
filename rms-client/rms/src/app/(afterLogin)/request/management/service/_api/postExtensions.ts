@@ -1,10 +1,10 @@
-export async function postExtension(extension: {
+export async function putExtension(extension: {
     extension_id: any;
     service_id: string | undefined;
     required: undefined | boolean
 }) {
     return await fetch(`/w-api/management-service/services/${extension.service_id}/extensions/${extension.extension_id}`, {
-        method: 'POST',
+        method: 'PUT',
         headers: {
             "Content-Type": "application/json",
         },

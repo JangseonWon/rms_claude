@@ -7,49 +7,35 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
 import SelectBox from "@/app/_component/SelectBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
-import {Extensions} from "@/model/ServiceExtensionAndSampleType";
+import {Extension, ExtensionType} from "@/model/Extension";
 import {patchExtension} from "@/app/(afterLogin)/request/management/additional-info/_api/patchExtension";
 import BlueButton from "@/app/_component/BlueButton";
 
 type Props = {
-    getExtension?: Extensions;
-    type: string;
-    open: boolean;
+    extensionData: Extension;
     closeModal: () => void;
     refreshTable: () => void;
 }
 
-export default function ExtensionModal({getExtension, type, open, closeModal, refreshTable}: Props) {
-    const [extension, setExtension] = useState<Extensions>();
-    const [extensionRegex, setExtensionRegex] = useState<string | undefined>();
-    const [extensionType, setExtensionType] = useState<string>();
+export default function ExtensionModal({extensionData, closeModal, refreshTable}: Props) {
+    const [extension, setExtension] = useState<Extension>(extensionData)
     const [listInputs, setListInputs] = useState<string[]>(['','']);
-    const [regexList, setRegexList] = useState<string>('');
 
     const extensionOptions: SelectBoxOption[] = [
-        {value: '\\b(?:true|false)\\b', name: 'Boolean'},
-        {value: '.*', name: 'String'},
-        {value: '-?\\d+', name: 'Number'},
-        {value: regexList, name: 'List'}
+        {value: '\\b(?:true|false)\\b', name: ExtensionType.BOOLEAN},
+        {value: '.*', name: ExtensionType.STRING},
+        {value: '.*', name: ExtensionType.TEXT},
+        {value: '-?\\d+', name: ExtensionType.INTEGER},
+        {value: '-?\\d+(\\.\\d+)?', name: ExtensionType.FLOAT},
+        {name: ExtensionType.LIST}
     ];
-
     useEffect(() => {
-        setExtension(getExtension);
-        setExtensionRegex(type);
-
-        if (type === "List" && getExtension?.regex) {
-            const splitRegex = getExtension.regex.replace(/\\b\(\?:|\)\\b/g, '').split('|');
+        if (extension.type === ExtensionType.LIST && extension.regex) {
+            const splitRegex = extension.regex.replace(/\\b\(\?:|\)\\b/g, '').split('|');
             setListInputs(splitRegex);
         }
-    }, [getExtension]);
+    }, [extension]);
 
-    useEffect(() => {
-        if (extensionRegex === 'List') {
-            const regex = `\\b(?:${listInputs.filter(input => input).join('|')})\\b`;
-            setRegexList(regex);
-            setExtensionType('List');
-        }
-    }, [listInputs, extensionRegex]);
 
     const handleAddInput = () => {
         setListInputs([...listInputs, '']);
@@ -67,20 +53,11 @@ export default function ExtensionModal({getExtension, type, open, closeModal, re
     };
 
     const handleUpdateButtonClick = async () => {
-        if (!extension) {
-            alert('There is no extended information.');
-            return;
-        }
-
-        if (!extensionType) {
-            alert('Extension Type is not selected.');
-            return;
-        }
-
-        const updatedRegex = extensionRegex === 'List' ? regexList : extensionType;
-
         try {
-            await patchExtension(extension.id, updatedRegex);
+            if(extension.type === ExtensionType.LIST) {
+                extension.regex = `\\b(?:${listInputs.filter(input => input).join('|')})\\b`
+            }
+            await patchExtension(extension);
             alert('Update Complete');
             closeModal();
             refreshTable();
@@ -108,19 +85,22 @@ export default function ExtensionModal({getExtension, type, open, closeModal, re
                         <div className={style.categoryName}>
                             <InputBox
                                 label={"Extension Name"}
-                                value={extension?.name}
+                                value={extension.name}
                                 disabled={true}
                                 required={false}
                             />
                             <SelectBox
                                 label={"Extension Type"}
-                                value={extensionRegex}
+                                value={extension.type}
                                 options={extensionOptions}
                                 width={'11vw'}
                                 required={true}
-                                onChange={(value) => {
-                                    setExtensionRegex(value.name);
-                                    setExtensionType(value.value);
+                                onChange={(selectedOption) => {
+                                    setExtension({
+                                        ...extension,
+                                        type: selectedOption.name,
+                                        regex: selectedOption.value
+                                    })
                                 }}
                             />
                             <BlueButton
@@ -130,7 +110,7 @@ export default function ExtensionModal({getExtension, type, open, closeModal, re
                         </div>
                     </div>
                     <div className={style.rightBody}>
-                        {extensionRegex === 'List' && (
+                        {extension.type === ExtensionType.LIST && (
                             <>
                             {listInputs.map((input, index) => (
                                     <div key={index} style={{display: 'flex', marginBottom: '2vh'}}>

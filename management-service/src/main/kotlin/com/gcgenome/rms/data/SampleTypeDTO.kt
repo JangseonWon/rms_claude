@@ -1,6 +1,6 @@
 package com.gcgenome.rms.data
 
-data class SampleType(
+data class SampleTypeDTO(
     val id: String,
     val name: String?
 )

@@ -1,6 +1,7 @@
-import {Filter} from "@/model/Filter";
+import {Query} from "@/model/Query";
 
-export async function getSampleTypes(search: Filter) {
+
+export async function getSampleTypes(search: Query) {
     return await fetch(`/w-api/management-service/sample-types`, {
         method: 'POST',
         headers: {

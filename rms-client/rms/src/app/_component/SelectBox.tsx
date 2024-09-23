@@ -8,7 +8,7 @@ type Props = {
     options: SelectBoxOption[]
     label: string
     value?: any
-    onChange?: (selectedValue: any) => void;
+    onChange?: (selectedValue: SelectBoxOption) => void;
     required?: boolean
     width?: string;
 }
@@ -16,7 +16,7 @@ type Props = {
 export default function SelectBox({ label, value, options, onChange, required=false, width }: Props) {
     const [selectedValue, setSelectedValue] = useState<string>('');
     const [isOpen, setIsOpen] = useState<boolean>(false)
-    const [hasError, setHasError] = useState(false);
+    const [hasError, setHasError] = useState<boolean | undefined>(false);
     const selectBoxRef = useRef<HTMLDivElement>(null);
 
     const handleOptionClick = (option: SelectBoxOption) => {

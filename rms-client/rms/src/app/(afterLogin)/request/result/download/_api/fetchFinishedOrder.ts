@@ -1,6 +1,6 @@
-import {Paging} from "@/model/Paging";
+import {Query} from "@/model/Query";
 
-export async function fetchFinishedOrder(search: Paging) {
+export async function fetchFinishedOrder(search: Query) {
     const res = await fetch(`/w-api/order-service/requests?status=download`, {
         method: 'POST',
         headers: {

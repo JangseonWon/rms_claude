@@ -5,12 +5,13 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import {Filter} from "@/model/Filter";
 import {Service} from "@/model/Service";
-import {getServicesByUserId} from "@/app/(afterLogin)/request/management/user/_api/getServicesByUserId";
+import {getUserWithServices} from "@/app/(afterLogin)/request/management/user/_api/getServicesByUserId";
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
 
 export default function ServiceSearchBox() {
-    const router = useRouter();
+    return null
+    /*const router = useRouter();
     const [selectedValue, setSelectedValue] = useState<string>('');
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const [options, setOptions] = useState<SelectBoxOption[]>([]);
@@ -44,7 +45,7 @@ export default function ServiceSearchBox() {
     const fetchOptions = async () => {
         setOptions([]);
         const filter: Filter = { value: selectedValue };
-        const response = await getServicesByUserId(session?.user?.id!, filter);
+        const response = await getUserWithServices(session?.user?.id!, filter);
 
         const data = await response.json();
         setOptions(transformDataToOptions(data));
@@ -93,5 +94,5 @@ export default function ServiceSearchBox() {
                 </div>
             </section>
         </div>
-    )
+    )*/
 }

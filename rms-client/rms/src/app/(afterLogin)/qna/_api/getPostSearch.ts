@@ -1,6 +1,6 @@
-import {Paging} from "@/model/Paging";
+import {Query} from "@/model/Query";
 
-export async function getPostSearch(search: Paging) {
+export async function getPostSearch(search: Query) {
     return await fetch(`/w-api/post-service/post/search`, {
         method: 'POST',
         headers: {

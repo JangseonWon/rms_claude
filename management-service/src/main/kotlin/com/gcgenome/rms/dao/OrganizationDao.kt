@@ -1,7 +1,6 @@
 package com.gcgenome.rms.dao
 
-import com.gcgenome.rms.data.Organization_
-import com.gcgenome.rms.tables.pojos.Organization
+import com.gcgenome.rms.data.OrganizationDTO
 import com.gcgenome.rms.tables.references.ORGANIZATION
 import com.gcgenome.rms.tables.references.SAMPLE
 import org.jooq.DSLContext
@@ -11,7 +10,7 @@ import reactor.core.publisher.Mono
 
 interface OrganizationDao{
 
-    fun DSLContext.insertOrganization(organization: Organization): Mono<Organization_> {
+    fun DSLContext.insertOrganization(organization: OrganizationDTO): Mono<OrganizationDTO> {
         return Mono.from(
             insertInto(ORGANIZATION)
                 .set(ORGANIZATION.ID, organization.id)
@@ -21,22 +20,16 @@ interface OrganizationDao{
                 .set(ORGANIZATION.REGISTRATION_NUMBER, organization.registrationNumber)
                 .set(ORGANIZATION.TYPE, organization.type)
                 .returning()
-        ).map{it.into(Organization_::class.java)}
+        ).map{it.into(OrganizationDTO::class.java)}
     }
 
-    fun DSLContext.selectOrganizationByUserId(userId: String): Flux<Organization> {
+    fun DSLContext.selectOrganizationByUserId(userId: String): Flux<OrganizationDTO> {
         return Flux.from(
             selectFrom(ORGANIZATION).where(ORGANIZATION.USER_ID.eq(userId))
-        ).map { it.into(Organization::class.java) }
+        ).map { it.into(OrganizationDTO::class.java) }
     }
 
-    fun DSLContext.selectUserByOrganizationId(userId: String, organizationId: String): Mono<Organization> {
-        return Mono.from(
-            selectFrom(ORGANIZATION).where(ORGANIZATION.USER_ID.eq(userId).and(ORGANIZATION.ID.eq(organizationId)))
-        ).map { it.into(Organization::class.java) }
-    }
-
-    fun DSLContext.deleteOrganizationById(organization: Organization): Mono<Organization> {
+    fun DSLContext.deleteOrganizationById(organization: OrganizationDTO): Mono<OrganizationDTO> {
         return Mono.from(
             deleteFrom(ORGANIZATION)
                 .where(ORGANIZATION.USER_ID.eq(organization.userId)
@@ -47,10 +40,10 @@ interface OrganizationDao{
                     ))
                 )
                 .returning()
-        ).map { it.into(Organization::class.java) }
+        ).map { it.into(OrganizationDTO::class.java) }
     }
 
-    fun DSLContext.updateOrganizationByUserId(organization: Organization): Mono<Organization> {
+    fun DSLContext.updateOrganizationByUserId(organization: OrganizationDTO): Mono<OrganizationDTO> {
         return Mono.from(
             update(ORGANIZATION)
                 .set(ORGANIZATION.NAME, organization.name)
@@ -59,6 +52,6 @@ interface OrganizationDao{
                 .set(ORGANIZATION.REGISTRATION_NUMBER, organization.registrationNumber)
                 .where(ORGANIZATION.ID.eq(organization.id).and(ORGANIZATION.USER_ID.eq(organization.userId)))
                 .returning()
-        ).map { it.into(Organization::class.java) }
+        ).map { it.into(OrganizationDTO::class.java) }
     }
 }

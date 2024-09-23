@@ -8,11 +8,11 @@ import InputBox from "@/app/_component/InputBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import SelectSearchBox from "@/app/(afterLogin)/request/management/_component/SelectSearchBox";
 import {User} from "@/model/User";
-import {getServicesByUserId} from "@/app/(afterLogin)/request/management/user/_api/getServicesByUserId";
+import {getUserWithServices} from "@/app/(afterLogin)/request/management/user/_api/getServicesByUserId";
 import {Service} from "@/model/Service";
-import {Filter} from "@/model/Filter";
 import {deleteUserService} from "@/app/(afterLogin)/request/management/user/_api/deleteUserService";
 import {putUserService} from "@/app/(afterLogin)/request/management/user/_api/putUserService";
+import {Query} from "@/model/Query";
 
 
 type Props = {
@@ -22,39 +22,52 @@ type Props = {
 }
 
 export default function UserServiceEditModal({user, open, closeModal}: Props) {
-    const [serviceData, setServiceData] = useState<Service[]>();
+    const [userData, setUserData] = useState<User>();
     const [search, setSearch] = useState<string>('');
     const [selectedAddService, setSelectedAddService] = useState<SelectBoxOption | null>(null);
 
-    const transformOptionToService = (option: SelectBoxOption): Service => {
-        return {
-            id: option.value,
-            name: option.name
-        }
-    };
 
     const fetchServiceData = async (userId: string) => {
-        const filter: Filter = { value: search };
-        const response = await getServicesByUserId(userId, filter);
+        const query: Query = {
+            filter_groups:[
+                {
+                    condition_type: "OR",
+                    filters:[
+                        {
+                            table: "service",
+                            column: "id",
+                            value: search,
+                            operator: "LIKE"
+                        },
+                        {
+                            table: "service",
+                            column: "name",
+                            value: search,
+                            operator: "LIKE"
+                        }
+                    ]
+                }
+            ]
+        };
+        const response = await getUserWithServices(userId, query);
         const data = await response.json();
-        setServiceData(data as Service[]);
+        setUserData(data as User);
     }
 
     const handleUserServiceInsertClick = async () => {
         if (selectedAddService) {
-            const newService = transformOptionToService(selectedAddService);
-            const response = await putUserService(user?.id, [newService]);
+            const response = await putUserService(user.id, selectedAddService.value);
             if (response.ok) {
                 alert('Service added successfully!');
             } else {
                 alert('Failed to add service.');
             }
-            await fetchServiceData(user?.id);
+            await fetchServiceData(user.id);
         }
     }
 
     const handleUserServiceDeleteClick = async (service: Service) => {
-        const response = await deleteUserService(user?.id, [service]);
+        const response = await deleteUserService(user.id, service.id!);
         if (response.ok) {
             alert('Service deleted successfully!');
         } else {
@@ -95,7 +108,7 @@ export default function UserServiceEditModal({user, open, closeModal}: Props) {
                             />
                         </div>
                         <div className={style.secondTop}>
-                            <div className={style.serviceAddContainer}>
+                            <div>
                                 <SelectSearchBox type={'service'} onSelect={setSelectedAddService} width={'15vw'}/>
                             </div>
                             <button className={style.addButton}
@@ -114,7 +127,7 @@ export default function UserServiceEditModal({user, open, closeModal}: Props) {
                     <section className={style.bottomBody}>
                         <div className={style.tableBody}>
                             <div className={style.innerBody}>
-                                <div className={style.serviceAddContainer}>
+                                <div>
                                     <table className={style.table}>
                                         <thead>
                                         <tr>
@@ -124,7 +137,7 @@ export default function UserServiceEditModal({user, open, closeModal}: Props) {
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {serviceData?.map((service, index) => (
+                                        {userData?.services?.map((service, index) => (
                                             <tr key={index}>
                                                 <td>{service.id}</td>
                                                 <td>{service.name}</td>

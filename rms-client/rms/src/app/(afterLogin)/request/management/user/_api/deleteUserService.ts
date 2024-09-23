@@ -1,12 +1,9 @@
-import {Service} from "@/model/Service";
-
-export async function deleteUserService(userId: string, service: Service[]) {
-    return await fetch(`/w-api/management-service/users/${userId}/services`, {
+export async function deleteUserService(userId: string, serviceId: string) {
+    return await fetch(`/w-api/management-service/users/${userId}/services/${serviceId}`, {
         method: 'DELETE',
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify(service),
         credentials: 'include',
         cache: 'no-store'
     });

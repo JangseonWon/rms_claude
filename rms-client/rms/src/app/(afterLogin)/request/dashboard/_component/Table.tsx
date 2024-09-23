@@ -11,14 +11,15 @@ import InputBox from "@/app/_component/InputBox";
 import SelectBox from "@/app/_component/SelectBox";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import {useSetStatus, useStatus} from "@/app/(afterLogin)/request/dashboard/store/useStatusStore";
-import {Paging} from "@/model/Paging";
+import {Query} from "@/model/Query";
 import DownloadExcelButton from "@/app/(afterLogin)/request/dashboard/_component/DownloadExcelButton";
 import {Status} from "@/model/Status";
 
 export default function Table() {
-    const [requestData, setRequestData] = useState<Request[]>([]);
+    return null
+    /*const [requestData, setRequestData] = useState<Request[]>([]);
     const [search, setSearch] =
-        useState<Paging>({filters: [], sort_by:"status", asc: true, size:5, page:1});
+        useState<Query>({filters: [], sort_by:"status", asc: true, size:5, page:1});
     const [totalPage, setTotalPage] = useState<number>();
     const status = useStatus();
     const setStatus = useSetStatus();
@@ -31,7 +32,7 @@ export default function Table() {
         {name: "COMPLETE", value: Status.COMPLETE}
     ]
 
-    const fetchData = async (search: Paging) => {
+    const fetchData = async (search: Query) => {
         const response = await getRequests(search)
         const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
         const responseData = await response.json();
@@ -183,5 +184,5 @@ export default function Table() {
                 </button>
             </div>
         </div>
-    )
+    )*/
 }

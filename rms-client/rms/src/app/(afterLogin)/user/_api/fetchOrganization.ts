@@ -1,6 +1,6 @@
-import {Paging} from "@/model/Paging";
+import {Query} from "@/model/Query";
 
-export async function fetchOrganization(search: Paging) {
+export async function fetchOrganization(search: Query) {
     return await fetch(`/w-api/organization-service/organizations`, {
         method: 'POST',
         headers: {

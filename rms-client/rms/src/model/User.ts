@@ -1,3 +1,5 @@
+import {Service} from "@/model/Service";
+
 export interface User {
     id: string
     name?: string
@@ -8,4 +10,5 @@ export interface User {
     phone_number?: string
     branch_serial?: string
     branch_name?: string
+    services?: Service[]
 }

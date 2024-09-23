@@ -1,63 +1,13 @@
 package com.gcgenome.rms.dao
 
-import com.gcgenome.rms.data.Extension
-import com.gcgenome.rms.data.Query
-import com.gcgenome.rms.tables.pojos.ServiceExtension
-import com.gcgenome.rms.tables.references.EXTENSION
-import com.gcgenome.rms.tables.references.SERVICE
+import com.gcgenome.rms.data.ServiceExtensionDTO
 import com.gcgenome.rms.tables.references.SERVICE_EXTENSION
-import org.jooq.Condition
 import org.jooq.DSLContext
-import org.jooq.SortOrder
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 
 interface ServiceExtensionDao{
-
-    fun DSLContext.selectServiceExtensionByNameOrId(whereClause: Condition, serviceId: String): Flux<Extension> {
-        return Flux.from(
-            select(
-                EXTENSION.ID,
-                EXTENSION.NAME,
-                EXTENSION.REGEX,
-                SERVICE_EXTENSION.REQUIRED
-            ).from(SERVICE_EXTENSION)
-                .leftJoin(SERVICE).on(SERVICE.ID.eq(SERVICE_EXTENSION.SERVICE_ID))
-                .leftJoin(EXTENSION).on(SERVICE_EXTENSION.EXTENSION_ID.eq(EXTENSION.ID))
-                .where(SERVICE.ID.eq(serviceId).and(whereClause))
-        ).map { it.into(Extension::class.java) }
-    }
-
-    fun DSLContext.selectExtensionByNameOrdId(where: Condition): Flux<Extension> {
-        return Flux.from(
-            selectFrom(EXTENSION).where(where)
-        ).map { it.into(Extension::class.java) }
-    }
-
-    fun DSLContext.selectExtensionByWhereCount(whereClause:Condition): Mono<Int> {
-        return Mono.from(
-            selectCount().from(EXTENSION).where(whereClause)
-        ).map { it.component1() }
-    }
-
-    fun DSLContext.selectExtensionsByWhereCondition(query: Query, whereClause: Condition): Flux<Extension> {
-        val asc: SortOrder = when(query.asc) {
-            true -> SortOrder.ASC
-            false -> SortOrder.DESC
-            else -> SortOrder.DEFAULT
-        }
-
-        return Flux.from(
-            selectFrom(EXTENSION)
-                .where(whereClause)
-                .orderBy(EXTENSION.ID.sort(asc))
-                .limit(query.size)
-                .offset(query.page*query.size)
-        ).map { it.into(Extension::class.java) }
-    }
-
-    fun DSLContext.insertServiceExtensionByService(serviceExtension: ServiceExtension): Mono<ServiceExtension> {
+    fun DSLContext.insertServiceExtensionByService(serviceExtension: ServiceExtensionDTO): Mono<ServiceExtensionDTO> {
         return Mono.from(
             insertInto(SERVICE_EXTENSION)
                 .set(SERVICE_EXTENSION.SERVICE_ID, serviceExtension.serviceId)
@@ -65,15 +15,15 @@ interface ServiceExtensionDao{
                 .set(SERVICE_EXTENSION.REQUIRED, serviceExtension.required)
                 .onDuplicateKeyIgnore()
                 .returning()
-        ).map { it.into(ServiceExtension::class.java) }
+        ).map { it.into(ServiceExtensionDTO::class.java) }
     }
 
-    fun DSLContext.deleteServiceExtensionById(serviceExtension: ServiceExtension): Mono<ServiceExtension> {
+    fun DSLContext.deleteServiceExtensionById(serviceExtension: ServiceExtensionDTO): Mono<ServiceExtensionDTO> {
         return Mono.from(
             deleteFrom(SERVICE_EXTENSION)
                 .where(SERVICE_EXTENSION.SERVICE_ID.eq(serviceExtension.serviceId)
                     .and(SERVICE_EXTENSION.EXTENSION_ID.eq(serviceExtension.extensionId)))
                 .returning()
-        ).map { it.into(ServiceExtension::class.java) }
+        ).map { it.into(ServiceExtensionDTO::class.java) }
     }
 }

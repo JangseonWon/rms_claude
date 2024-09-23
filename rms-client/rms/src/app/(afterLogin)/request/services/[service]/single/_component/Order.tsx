@@ -21,7 +21,8 @@ import ExtensionInputComponent
 import TextBox from "@/app/_component/TextBox";
 
 export default function Order() {
-    const [organizationOptions, setOrganizationOptions] = useState<SelectBoxOption[]>([])
+    return null
+    /*const [organizationOptions, setOrganizationOptions] = useState<SelectBoxOption[]>([])
     const [sampleTypeOptions, setSampleTypeOptions] = useState<SelectBoxOption[]>([])
     const [request, setRequest] = useState<Request>({})
     const [selectedOrganization, setSelectedOrganization] = useState<SelectBoxOption | null>(null);
@@ -312,5 +313,5 @@ export default function Order() {
                 />
             </div>
         </div>
-    )
+    )*/
 }

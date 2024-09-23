@@ -1,11 +1,14 @@
-export async function patchExtension(extensionId: string, regex: string) {
-    return await fetch(`/w-api/management-service/extension/${extensionId}`, {
+import {Extension} from "@/model/Extension";
+
+export async function patchExtension(extension: Extension) {
+    return await fetch(`/w-api/management-service/extensions/${extension.id}`, {
         method: 'PATCH',
         headers: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            regex: regex
+            type: extension.type,
+            regex: extension.regex
         }),
         credentials: 'include',
         cache: 'no-store'

@@ -12,7 +12,7 @@ import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import {format} from "date-fns";
 import SelectBox from "@/app/_component/SelectBox";
 import InputBox from "@/app/_component/InputBox";
-import {Paging} from "@/model/Paging";
+import {Query} from "@/model/Query";
 import {fetchMultiDownloadFile} from "@/app/(afterLogin)/request/result/download/_api/fetchMultiDownloadFile";
 import BlueButton from "@/app/_component/BlueButton";
 
@@ -21,12 +21,13 @@ interface RequestWithSelected extends Request {
 }
 
 export default function DownloadTable() {
-    const [requestData, setRequestData] = useState<RequestWithSelected[]>([]);
+    return null
+    /*const [requestData, setRequestData] = useState<RequestWithSelected[]>([]);
     const isSelectedAll = requestData && requestData.length > 0 ? requestData.every((row) => row.isSelected) : false;
     const [totalPage, setTotalPage] = useState<number>(0);
     const [status, setStatus] = useState<string>('-');
     const [search, setSearch] =
-        useState<Paging>({filters: [], sort_by:"status", asc: true, size:10, page:1});
+        useState<Query>({filters: [], sort_by:"status", asc: true, size:10, page:1});
     const statusList = [
         {name:"DELIVERED", value:"DELIVERED"},
         {name:"COMPLETE", value:"FINISHED"}
@@ -75,7 +76,7 @@ export default function DownloadTable() {
         );
     };
 
-    const fetchData = async (search: Paging) => {
+    const fetchData = async (search: Query) => {
         try {
             const response = await fetchFinishedOrder(search)
             const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
@@ -245,16 +246,16 @@ export default function DownloadTable() {
                     <span> 1-{totalPage} of {search.page} </span>
                     <button
                         disabled={search.page === 1}
-                        onClick={() => handlePageChange(search.page - 1)}
+                        onClick={() => handlePageChange((search.page ?? 1) - 1)}
                     ><FontAwesomeIcon icon={faAngleLeft}/>
                     </button>
                     <button
                         disabled={search.page === totalPage}
-                        onClick={() => handlePageChange(search.page + 1)}
+                        onClick={() => handlePageChange((search.page ?? 1) + 1)}
                     ><FontAwesomeIcon icon={faAngleRight}/>
                     </button>
                 </div>
             </section>
         </>
-    );
+    );*/
 }

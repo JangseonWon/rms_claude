@@ -4,10 +4,10 @@ import {faChevronDown} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import {getSampleTypes} from "@/app/(afterLogin)/request/management/service/_api/getSampleTypes";
-import {Filter} from "@/model/Filter";
 import {SampleType} from "@/model/SampleType";
 import {getExtensions} from "@/app/(afterLogin)/request/management/service/_api/getExtensions";
 import {getServices} from "@/app/(afterLogin)/request/management/_api/getServices";
+import {Query} from "@/model/Query";
 
 interface Props {
     type: 'sampleType' | 'extension' | 'service';
@@ -47,18 +47,80 @@ export default function SelectSearchBox({ type, onSelect, width }: Props) {
 
     const fetchOptions = async () => {
         setOptions([]);
-        const filter: Filter = { value: selectedValue };
+        const sampleTypeQuery: Query = {
+            filter_groups:[
+                {
+                    condition_type: "OR",
+                    filters: [
+                        {
+                            table: "sample_type",
+                            column: "id",
+                            value: selectedValue,
+                            operator: "LIKE"
+                        },
+                        {
+                            table: "sample_type",
+                            column: "name",
+                            value: selectedValue,
+                            operator: "LIKE"
+                        }
+                    ]
+                }
+            ]
+        }
+        const extensionQuery: Query = {
+            filter_groups:[
+                {
+                    condition_type: "OR",
+                    filters: [
+                        {
+                            table: "extension",
+                            column: "id",
+                            value: selectedValue,
+                            operator: "LIKE"
+                        },
+                        {
+                            table: "extension",
+                            column: "name",
+                            value: selectedValue,
+                            operator: "LIKE"
+                        }
+                    ]
+                }
+            ]
+        }
+        const serviceQuery: Query = {
+            filter_groups:[
+                {
+                    condition_type: "OR",
+                    filters: [
+                        {
+                            table: "service",
+                            column: "id",
+                            value: selectedValue,
+                            operator: "LIKE"
+                        },
+                        {
+                            table: "service",
+                            column: "name",
+                            value: selectedValue,
+                            operator: "LIKE"
+                        }
+                    ]
+                }
+            ]
+        }
         let response;
 
         switch (type) {
             case 'sampleType' :
-                response = await getSampleTypes(filter);
+                response = await getSampleTypes(sampleTypeQuery);
                 break;
             case 'extension' :
-                response = await getExtensions(filter);
+                response = await getExtensions(extensionQuery);
                 break;
             case 'service' :
-                response = await getServices(filter);
+                response = await getServices(serviceQuery);
                 break;
             default:
                 return;
@@ -95,7 +157,7 @@ export default function SelectSearchBox({ type, onSelect, width }: Props) {
                         value={selectedValue}
                         onChange={handleSearchChange}
                     />
-                    <FontAwesomeIcon icon={faChevronDown} className={style.icon}/>
+                    <FontAwesomeIcon icon={faChevronDown}/>
                 </div>
                 <div className={`${style.searchList} ${isOpen ? style.open : ''}`} style={{width: `calc(${width} + 2vw)`}}>
                     <ul className={style.listMember}>

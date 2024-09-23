@@ -7,14 +7,14 @@ import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {fetchOrganization} from "@/app/(afterLogin)/user/_api/fetchOrganization";
 import InputBox from "@/app/_component/InputBox";
-import {Paging} from "@/model/Paging";
 import InstitutionAddModal from "@/app/(afterLogin)/user/_component/InstitutionAddModal";
 import InstitutionEditModal from "@/app/(afterLogin)/user/_component/InstitutionEditModal";
 import BlueButton from "@/app/_component/BlueButton";
 import RectangleButton from "@/app/_component/RectangleButton";
 
 export default function InstitutionTable() {
-    const [organizationData, setOrganizationData] = useState<Organization[]>([])
+    return null
+    /*const [organizationData, setOrganizationData] = useState<Organization[]>([])
     const [totalPage, setTotalPage] = useState<number>(0);
     const [search, setSearch] =
         useState<Paging>({filters: [], sort_by:"id", asc: true, size:10, page:1});
@@ -167,5 +167,5 @@ export default function InstitutionTable() {
                 />
             )}
         </div>
-    );
+    );*/
 }

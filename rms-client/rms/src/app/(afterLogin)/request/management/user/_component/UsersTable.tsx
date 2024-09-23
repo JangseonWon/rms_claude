@@ -5,7 +5,7 @@ import style from "@/app/(afterLogin)/request/management/user/_component/usersTa
 import {faAngleLeft, faAngleRight, faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
-import {Paging} from "@/model/Paging";
+import {Query} from "@/model/Query";
 import {User} from "@/model/User";
 import {getUsers} from "@/app/(afterLogin)/request/management/user/_api/getUsers";
 import SwitchButton from "@/app/_component/SwitchButton";
@@ -16,6 +16,7 @@ import SelectBox from "@/app/_component/SelectBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import RectangleButton from "@/app/_component/RectangleButton";
 import BlueButton from "@/app/_component/BlueButton";
+import {Filter} from "@/model/Filter";
 
 interface UserWithSelected extends User {
     isSelected?: boolean;
@@ -25,7 +26,7 @@ export default function UsersTable() {
     const [userData, setUserData] = useState<UserWithSelected[]>([]);
     const [totalPage, setTotalPage] = useState<number>(0);
     const [search, setSearch] =
-        useState<Paging>({filters: [], sort_by:"name", asc: true, size:10, page:1});
+        useState<Query>({sort_by:"id", asc: true, size:10, page:1});
     const [searchKey, setSearchKey] = useState<string>("id");
     const [searchValue, setSearchValue] = useState<string>("");
     const [serviceModalOpen, setServiceModalOpen] = useState<boolean>(false);
@@ -61,11 +62,22 @@ export default function UsersTable() {
     };
 
     const handleSearchChange = (newFilter: { key: string; value: string }) => {
-        const filterWithOperator = { ...newFilter, operator: "LIKE" };
         setSearch((prevSearch) => ({
             ...prevSearch,
-            filters: [filterWithOperator],
-            page: 1
+            page: 1,
+            filter_groups: [
+                {
+                    condition_type: "AND",
+                    filters: [
+                        {
+                            table: "user",
+                            column: newFilter.key,
+                            value: newFilter.value,
+                            operator: "LIKE"
+                        }
+                    ]
+                }
+            ]
         }));
     };
 
@@ -75,13 +87,12 @@ export default function UsersTable() {
         handleSearchChange({key: key, value: searchValue});
     };
 
-    const fetchData = async (search: Paging) => {
+    const fetchData = async (search: Query) => {
         try {
             const response = await getUsers(search)
             const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
             const responseData = await response.json();
-            const data = responseData.data;
-            setUserData(data as User[]);
+            setUserData(responseData as User[]);
             setTotalPage(totalPage)
         } catch(error) {
             console.error("Failed to fetch data:", error);
@@ -204,12 +215,12 @@ export default function UsersTable() {
                     <span> 1-{totalPage} of {search.page} </span>
                     <button
                         disabled={search.page === 1}
-                        onClick={() => handlePageChange(search.page - 1)}
+                        onClick={() => handlePageChange((search.page ?? 1) - 1)}
                     ><FontAwesomeIcon icon={faAngleLeft}/>
                     </button>
                     <button
                         disabled={search.page === totalPage}
-                        onClick={() => handlePageChange(search.page + 1)}
+                        onClick={() => handlePageChange((search.page ?? 1) + 1)}
                     ><FontAwesomeIcon icon={faAngleRight}/>
                     </button>
                 </div>
