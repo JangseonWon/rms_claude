@@ -1,16 +1,19 @@
 import style from './alertDialog.module.css';
 import React from "react";
-import {useOpenAlertDialog} from "@/store/useAlertDialogStore";
+import {useOpenAlertDialogB} from "@/store/useBeforeLoginAlertDialogStore";
+import {useOpenAlertDialogA} from "@/store/useAfterLoginAlertDialogStore";
 
 type Props = {
     message: string;
 };
 
 export default function AlertDialog({ message }: Props) {
-    const setShowDialog = useOpenAlertDialog();
+    const setShowDialogA = useOpenAlertDialogA();
+    const setShowDialogB = useOpenAlertDialogB();
 
     const handleCloseDialog = () => {
-        setShowDialog(false);
+        setShowDialogA(false);
+        setShowDialogB(false);
     }
 
     const formattedMessage = message.split('\n').map((line, index) => (

@@ -1,3 +1,5 @@
+'use client';
+
 import style from './changePassword.module.css';
 import * as React from "react";
 import {useState} from "react";
@@ -5,7 +7,11 @@ import InputBox from "@/app/_component/InputBox";
 import GreenButton from "@/app/_component/GreenButton";
 import {useSession} from "next-auth/react";
 import {fetchUserPassword} from "@/app/(afterLogin)/user/_api/fetchUserPassword";
-import {useOpenAlertDialog, useSetIconAlertDialog, useSetMessageAlertDialog} from "@/store/useAlertDialogStore";
+import {
+    useOpenAlertDialogA,
+    useSetIconAlertDialogA,
+    useSetMessageAlertDialogA
+} from "@/store/useAfterLoginAlertDialogStore";
 
 export default function ChangePassword() {
     const [oldPassword, setOldPassword] = useState('');
@@ -13,9 +19,9 @@ export default function ChangePassword() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const { data: session } = useSession();
 
-    const setShowAlertDialog = useOpenAlertDialog();
-    const setMessage = useSetMessageAlertDialog();
-    const setIcon = useSetIconAlertDialog();
+    const setShowAlertDialog = useOpenAlertDialogA();
+    const setMessage = useSetMessageAlertDialogA();
+    const setIcon = useSetIconAlertDialogA();
 
     const handleSave = async () => {
         if (newPassword !== confirmPassword) {

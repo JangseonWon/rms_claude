@@ -5,12 +5,12 @@ import style from "@/app/(beforeLogin)/layout.module.css";
 import Header from "@/app/(beforeLogin)/_component/Header";
 import Footer from "@/app/_component/Footer";
 import AlertDialog from "@/app/_component/AlertDialog";
-import {useAlertDialog, useMessageAlertDialog} from "@/store/useAlertDialogStore";
+import {useAlertDialogB, useMessageAlertDialogB} from "@/store/useBeforeLoginAlertDialogStore";
 
 type Props = { children: ReactNode};
 export default function Layout({ children }: Props) {
-    const showAlertDialog = useAlertDialog();
-    const message = useMessageAlertDialog();
+    const showAlertDialog = useAlertDialogB();
+    const message = useMessageAlertDialogB();
 
     return (
         <div className={style.container}>

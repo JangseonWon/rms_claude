@@ -7,7 +7,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import type {Request} from "@/model/Request";
 import {fetchFinishedOrder} from "@/app/(afterLogin)/request/result/download/_api/fetchFinishedOrder";
 import {fetchDownloadFile} from "@/app/(afterLogin)/request/result/download/_api/fetchDownloadFile";
-import {useOpenAlertDialog, useSetIconAlertDialog, useSetMessageAlertDialog} from "@/store/useAlertDialogStore";
+import {useOpenAlertDialogB, useSetIconAlertDialogB, useSetMessageAlertDialogB} from "@/store/useBeforeLoginAlertDialogStore";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import {format} from "date-fns";
 import SelectBox from "@/app/_component/SelectBox";

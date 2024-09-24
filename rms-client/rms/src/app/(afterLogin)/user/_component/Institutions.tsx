@@ -1,3 +1,5 @@
+'use client';
+
 import style from "@/app/(afterLogin)/user/_component/institutions.module.css";
 import * as React from "react";
 import InstitutionTable from "@/app/(afterLogin)/user/_component/InstitutionTable";

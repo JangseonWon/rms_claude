@@ -127,3 +127,11 @@
     color: red;
     margin-top: 1vh;
 }
+.changePassword {
+    margin: 2vh auto 0 6.3vw;
+    color: #002b49;
+    cursor: pointer;
+}
+.changePassword:hover {
+    font-weight: bold;
+}

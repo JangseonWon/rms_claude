@@ -7,16 +7,16 @@ import style from "@/app/(beforeLogin)/login/_component/login.module.css";
 import Image from "next/image";
 import loginImg from "@/../public/login-img.png";
 import logoImg from "@/../public/gc-logo.png";
-import {useOpenAlertDialog, useSetIconAlertDialog, useSetMessageAlertDialog} from "@/store/useAlertDialogStore";
+import {useOpenAlertDialogB, useSetIconAlertDialogB, useSetMessageAlertDialogB} from "@/store/useBeforeLoginAlertDialogStore";
 
 export default function Login() {
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const setShowAlertDialog = useOpenAlertDialog();
-    const setMessage = useSetMessageAlertDialog();
-    const setIcon = useSetIconAlertDialog();
+    const setShowAlertDialog = useOpenAlertDialogB();
+    const setMessage = useSetMessageAlertDialogB();
+    const setIcon = useSetIconAlertDialogB();
 
     const router = useRouter();
 
@@ -85,6 +85,7 @@ export default function Login() {
                             {loading ? <div className={style.spinner}></div> : 'Log In'}
                         </button>
                         <button className={style.healthcareButton}>Not a Healthcare Provider?</button>
+                        <label className={style.changePassword}>Issuance of temporary password</label>
                     </div>
                 </form>
             </div>
