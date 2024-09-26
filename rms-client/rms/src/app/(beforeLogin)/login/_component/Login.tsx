@@ -7,13 +7,18 @@ import style from "@/app/(beforeLogin)/login/_component/login.module.css";
 import Image from "next/image";
 import loginImg from "@/../public/login-img.png";
 import logoImg from "@/../public/gc-logo.png";
-import {useOpenAlertDialogB, useSetIconAlertDialogB, useSetMessageAlertDialogB} from "@/store/useBeforeLoginAlertDialogStore";
+import {
+    useOpenAlertDialogB,
+    useSetIconAlertDialogB,
+    useSetMessageAlertDialogB
+} from "@/store/useBeforeLoginAlertDialogStore";
+import PasswordChangeModal from "@/app/(beforeLogin)/login/_component/PasswordChangeModal";
 
 export default function Login() {
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
-
+    const [passwordModalOpen, setPasswordModalOpen] = useState<boolean>(false);
     const setShowAlertDialog = useOpenAlertDialogB();
     const setMessage = useSetMessageAlertDialogB();
     const setIcon = useSetIconAlertDialogB();
@@ -55,6 +60,14 @@ export default function Login() {
         setPassword(e.target.value);
     };
 
+    const openModal = () => {
+        setPasswordModalOpen(true);
+    }
+
+    const closeModal = () => {
+        setPasswordModalOpen(false);
+    }
+
     return (
         <div className={style.container}>
             <div className={style.left}>
@@ -85,9 +98,12 @@ export default function Login() {
                             {loading ? <div className={style.spinner}></div> : 'Log In'}
                         </button>
                         <button className={style.healthcareButton}>Not a Healthcare Provider?</button>
-                        <label className={style.changePassword}>Issuance of temporary password</label>
+                        <label className={style.changePassword} onClick={openModal}>Issuance of temporary password</label>
                     </div>
                 </form>
+                {passwordModalOpen && (
+                    <PasswordChangeModal closeModal={closeModal}/>
+                )}
             </div>
         </div>
     );
