@@ -3,8 +3,9 @@ package com.gcgenome.rms.dao
 import com.gcgenome.rms.tables.pojos.User
 import com.gcgenome.rms.tables.references.USER
 import org.jooq.DSLContext
+import org.jooq.impl.DSL.coalesce
+import org.jooq.impl.DSL.`val`
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
 import java.time.LocalDateTime
 
 interface UserDao{
@@ -12,6 +13,7 @@ interface UserDao{
         return Mono.from(selectFrom(USER).where(USER.ID.eq(userId)))
             .map { it.into(User::class.java) }
     }
+
     fun DSLContext.insertUser(dto: User): Mono<User> {
         return Mono.from(
             insertInto(USER)
@@ -28,5 +30,20 @@ interface UserDao{
                 .set(USER.CREATE_AT, LocalDateTime.now())
                 .returning(USER.ID, USER.NAME, USER.ROLE, USER.TYPE, USER.EMAIL, USER.KEY, USER.STATE,USER.BRANCH_SERIAL, USER.BRANCH_NAME, USER.CREATE_AT)
         ).map { it.into(User::class.java) }
+    }
+
+    fun DSLContext.checkUserByIdAndMail(dto: User): Mono<User> {
+        return Mono.from(
+            selectFrom(USER).where(USER.ID.eq(dto.id).and(USER.EMAIL.eq(dto.email)))
+        ).map { it.into(User::class.java) }
+    }
+
+    fun DSLContext.changePasswordByUserId(id: String, password: String): Mono<User> {
+        return Mono.from(
+            update(USER)
+                .set(USER.PASSWORD, coalesce(`val`(password), USER.PASSWORD))
+                .where(USER.ID.eq(id))
+                .returning()
+        ).map{it.into(User::class.java)}
     }
 }

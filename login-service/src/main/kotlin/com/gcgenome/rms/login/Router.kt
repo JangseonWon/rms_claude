@@ -22,6 +22,7 @@ class Router (
     fun route() = router {
         POST("/w-api/login-service/login", ::login)
         POST("/w-api/login-service/signup", ::signup)
+        POST("/w-api/login-service/temporary-password", ::temporaryPassword)
     }
 
     private fun login(request: ServerRequest): Mono<ServerResponse> {
@@ -37,5 +38,13 @@ class Router (
             .flatMap { handler.signup(it) }
             .flatMap { ServerResponse.ok().body(Mono.just(it),User::class.java) }
             .onErrorResume (UserNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
+    }
+
+    private fun temporaryPassword(request: ServerRequest): Mono<ServerResponse> {
+        return request.bodyToMono(User::class.java)
+            .flatMap { handler.temporaryPassword(it) }
+            .flatMap { ServerResponse.ok().body(Mono.just(it),String::class.java) }
+            .onErrorResume (UserNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
+            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
     }
 }

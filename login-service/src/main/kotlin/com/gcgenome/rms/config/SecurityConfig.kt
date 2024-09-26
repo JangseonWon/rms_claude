@@ -45,7 +45,12 @@ class SecurityConfig {
             authorizeExchange {
                 authorize(ServerWebExchangeMatchers.pathMatchers(HttpMethod.OPTIONS, "/**"), permitAll)
                 authorize (ServerWebExchangeMatchers.pathMatchers(HttpMethod.GET, "/actuator/health/**"), permitAll)
-                authorize(ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, "/w-api/login-service/login", "/w-api/login-service/signup"), permitAll)
+                authorize(ServerWebExchangeMatchers.pathMatchers(
+                    HttpMethod.POST,
+                    "/w-api/login-service/login",
+                    "/w-api/login-service/signup",
+                    "/w-api/login-service/temporary-password"
+                ), permitAll)
                 authorize(anyExchange, authenticated)
             }
         }
