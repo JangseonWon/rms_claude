@@ -19,6 +19,7 @@ dependencies {
     implementation(libs.bundles.jjwt.runtime)
     implementation(libs.bouncycastle.bcprov)
     jooqGenerator("org.postgresql:postgresql:42.6.0")
+    implementation("org.springframework.boot:spring-boot-starter-mail:3.3.0")
 }
 
 jib {
