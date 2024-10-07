@@ -5,35 +5,24 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
-import com.gcgenome.rms.tables.pojos.User
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
-data class Post_(
+data class CommentDTO (
     @JsonProperty("id")
-    val id: String,
-    @JsonProperty("title")
-    val title: String,
+    var id: UUID? = null,
     @JsonProperty("content")
-    val content: String?,
+    var content: String? = null,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("create_at")
-    val createAt: LocalDateTime,
+    var createAt: LocalDateTime? = null,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("last_modify_at")
-    val lastModifyAt: LocalDateTime,
-    @JsonProperty("read")
-    val read: Boolean,
-    @JsonProperty("user_id")
-    val userId: String?,
-    @JsonProperty("post_category_id")
-    val postCategoryId: UUID,
+    var lastModifyAt: LocalDateTime? = null,
     @JsonProperty("user")
-    val user: User?,
-    @JsonProperty("files")
-    val files: Array<File_>?,
-    @JsonProperty("comments")
-    val comments: Array<CommentDTO>?,
+    var user: UserDTO? = null,
+    @JsonProperty("post")
+    var post: PostDTO? = null
 )

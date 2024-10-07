@@ -6,23 +6,31 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
-data class Comment (
+data class PostDTO(
     @JsonProperty("id")
-    val id: UUID?,
+    var id: UUID? = null,
+    @JsonProperty("title")
+    var title: String? = null,
     @JsonProperty("content")
-    val content: String,
+    var content: String? = null,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("create_at")
-    val createAt: LocalDateTime?,
+    var createAt: LocalDateTime? = null,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("last_modify_at")
-    val lastModifyAt: LocalDateTime?,
-    @JsonProperty("user_id")
-    val userId: String?,
-    @JsonProperty("post_id")
-    val postId: UUID,
+    var lastModifyAt: LocalDateTime? = null,
+    @JsonProperty("read")
+    var read: Boolean? = null,
+    @JsonProperty("post_category")
+    var postCategory: PostCategoryDTO? = null,
+    @JsonProperty("user")
+    var user: UserDTO? = null,
+    @JsonProperty("comments")
+    var comments: List<CommentDTO>? = null,
+    @JsonProperty("post_files")
+    var postFiles: List<PostFileDTO>? = null
 )

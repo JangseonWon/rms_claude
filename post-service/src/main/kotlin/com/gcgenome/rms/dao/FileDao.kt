@@ -8,13 +8,6 @@ import java.time.LocalDateTime
 import java.util.*
 
 interface FileDao {
-    fun DSLContext.getFileById(postId: UUID, fileId: UUID): Mono<PostFile> {
-        return Mono.from(
-            selectFrom(POST_FILE)
-                .where(POST_FILE.POST_ID.eq(postId).and(POST_FILE.ID.eq(fileId)))
-        ).map { it.into(PostFile::class.java) }
-    }
-
     fun DSLContext.getFileByPostId(postId: UUID): Mono<PostFile> {
         return Mono.from(
             selectFrom(POST_FILE)

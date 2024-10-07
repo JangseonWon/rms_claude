@@ -1,15 +1,19 @@
-package com.gcgenome.rms.route
+package com.gcgenome.rms.post
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.gcgenome.rms.auth.AuthenticationHandler
 import com.gcgenome.rms.data.JandiRequest
+import com.gcgenome.rms.data.PostDTO
 import com.gcgenome.rms.data.Query
-import com.gcgenome.rms.exceptions.AuthenticationNotFoundException
-import com.gcgenome.rms.service.PostHandler
+import com.gcgenome.rms.data.UserDTO
+import com.gcgenome.rms.exception.AuthenticationNotFoundException
 import com.gcgenome.rms.tables.pojos.Post
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.http.codec.multipart.FilePart
+import org.springframework.http.codec.multipart.FormFieldPart
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.router
@@ -19,69 +23,101 @@ import java.util.*
 @Configuration
 class PostRouter (
     private val authenticationHandler: AuthenticationHandler,
-    private val serviceHandler: PostHandler
+    private val serviceHandler: PostHandler,
+    private val objectMapper: ObjectMapper,
 ) {
     @Bean("PostRouter")
     fun route() = router {
-        POST("/w-api/post-service/post/search", ::selectPostSearch)
-        GET("/w-api/post-service/post/{post_id}", ::selectPostByPostId)
-        PUT("/w-api/post-service/post/{post_id}", ::postIdCheckSwitch)
-        POST("/w-api/post-service/post", ::insertPost)
-        PATCH("/w-api/post-service/post/{post_id}", ::updatePost)
-        DELETE("/w-api/post-service/post/{post_id}", ::deletePost)
-        POST("/w-api/post-service/post/{post_id}/message/{category}", ::jandiWebHook)
+        POST("/w-api/post-service/posts", ::selectPosts)
+        GET("/w-api/post-service/posts/{post-id}", ::selectPostById)
+        PUT("/w-api/post-service/posts", ::insertPost)
+        DELETE("/w-api/post-service/posts/{post-id}", ::deletePost)
+        PATCH("/w-api/post-service/posts/{post-id}", ::updatePost)
+        /*PUT("/w-api/post-service/post/{post_id}", ::postIdCheckSwitch)
+        POST("/w-api/post-service/post/{post_id}/message/{category}", ::jandiWebHook)*/
     }
 
-    private fun selectPostSearch(request: ServerRequest): Mono<ServerResponse> {
+    private fun selectPosts(request: ServerRequest): Mono<ServerResponse> {
         return Mono.zip(authenticationHandler.principal(request), request.bodyToMono(Query::class.java))
-            .flatMap { serviceHandler.getPostAll(it.t1, it.t2.copy(page= it.t2.page -1 )) }
+            .flatMap { serviceHandler.selectPosts(it.t1, it.t2) }
             .flatMap { ServerResponse.ok()
+                .header("X-Total-Count", it.totalCount.toString())
                 .header("X-Total-Page", it.totalPage.toString())
+                .header("X-Page-Size", it.pageSize.toString())
+                .header("X-Current-Page", it.currentPage.toString())
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(it) }
+                .body(Mono.just(it.data), PostDTO::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
-            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error: ${it.cause}") }
     }
 
-    private fun selectPostByPostId(request: ServerRequest): Mono<ServerResponse> {
-        val postId = UUID.fromString(request.pathVariable("post_id"))
+    private fun selectPostById(request: ServerRequest): Mono<ServerResponse> {
+        val postId = UUID.fromString(request.pathVariable("post-id"))
         return authenticationHandler.principal(request)
-            .flatMap { serviceHandler.getPostByPostId(postId) }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
+            .flatMap { serviceHandler.selectPost(postId, it) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), PostDTO::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
-            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error: ${it.cause}") }
     }
 
     private fun insertPost(request: ServerRequest): Mono<ServerResponse> {
-        return Mono.zip(authenticationHandler.principal(request), request.bodyToMono(Post::class.java))
-            .flatMap { serviceHandler.insertPost(it.t1, it.t2) }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
+        return request.multipartData()
+            .flatMap { parts ->
+                val fileParts = parts["file"]?.filterIsInstance<FilePart>() ?: emptyList()
+                val jsonPart = parts["data"]?.filterIsInstance<FormFieldPart>()?.firstOrNull()?.value() ?: ""
+                val postDTO = objectMapper.readValue(jsonPart, PostDTO::class.java)
+                Mono.zip(
+                    authenticationHandler.principal(request),
+                    Mono.just(fileParts),
+                    Mono.just(postDTO)
+                )
+            }.flatMap {
+                val auth = it.t1
+                val fileParts = it.t2
+                val postDTO = it.t3
+                postDTO.user = UserDTO(id = auth.user.id)
+                serviceHandler.insertPost(postDTO, fileParts)
+            }
+            .flatMap { ServerResponse.ok().build() }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
-            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error: ${it.cause}") }
     }
 
     private fun updatePost(request: ServerRequest): Mono<ServerResponse> {
-        val postId = UUID.fromString(request.pathVariable("post_id"))
-        return authenticationHandler.principal(request)
-            .flatMap { request.bodyToMono(Post::class.java) }
-            .flatMap { serviceHandler.updatePost(postId, it) }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
+        val postId = UUID.fromString(request.pathVariable("post-id"))
+        return request.multipartData()
+            .flatMap { parts ->
+                val fileParts = parts["file"]?.filterIsInstance<FilePart>() ?: emptyList()
+                val jsonPart = parts["data"]?.filterIsInstance<FormFieldPart>()?.firstOrNull()?.value() ?: ""
+                val postDTO = objectMapper.readValue(jsonPart, PostDTO::class.java)
+                Mono.zip(
+                    authenticationHandler.principal(request),
+                    Mono.just(fileParts),
+                    Mono.just(postDTO)
+                )
+            }.flatMap {
+                val auth = it.t1
+                val fileParts = it.t2
+                val postDTO = it.t3.apply { id = postId }
+                postDTO.user = UserDTO(id = auth.user.id)
+                serviceHandler.updatePost(postDTO, fileParts)
+            }
+            .flatMap { ServerResponse.ok().build() }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
-            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error: ${it.cause}") }
     }
 
     private fun deletePost(request: ServerRequest): Mono<ServerResponse> {
-        val postId = UUID.fromString(request.pathVariable("post_id"))
+        val postId = UUID.fromString(request.pathVariable("post-id"))
         return authenticationHandler.principal(request)
             .flatMap { serviceHandler.deletePost(postId) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
-            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error: ${it.cause}") }
     }
 
     private fun postIdCheckSwitch(request: ServerRequest): Mono<ServerResponse> {
