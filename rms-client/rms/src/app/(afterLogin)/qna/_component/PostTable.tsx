@@ -10,27 +10,23 @@ import {Post} from "@/model/Post";
 import {useRouter} from "next/navigation";
 import {faComment} from "@fortawesome/free-regular-svg-icons";
 import {getPostSearch} from "@/app/(afterLogin)/qna/_api/getPostSearch";
-import {useSession} from "next-auth/react";
-import {fetchPostId} from "@/app/(afterLogin)/qna/_api/fetchPostId";
-
-const categoryMap: { [key: string]: string } = {
-    "f9476263-f8b2-4ff9-b5f9-ed680715401e": "Service",
-    "7cefa58c-d85b-4f9e-82ff-dc46ba953e27": "Bug",
-    "f1d0a814-8c90-4103-bbd5-6c0e54d37808": "Result",
-    "f86a9106-e431-4649-a4f9-c61e73ec7bab": "Others",
-};
+import SelectBox from "@/app/_component/SelectBox";
+import {SelectBoxOption} from "@/model/SelectBoxOption";
 
 export default function PostTable() {
-    return null
-    /*const router = useRouter();
+    const router = useRouter();
     const [postData, setPostData] = useState<Post[]>([]);
     const [totalPage, setTotalPage] = useState<number>(4);
-    const [search, setSearch] =
-        useState<Query>({filters: [], sort_by:"create_at", asc: false, size:14, page:1});
-    const [searchKey, setSearchKey] = useState<string>("title");
-    const [searchValue, setSearchValue] = useState<string>("");
+    const [search, setSearch] = useState<Query>({sort_by:"create_at", asc: false, size:14, page:1});
+    const [selectOption, setSelectOption] = useState<SelectBoxOption>({ table: "post", column: "title", name: "Title" });
     const [pageRange, setPageRange] = useState<{ start: number, end: number }>({ start: 1, end: 10 });
-    const { data: session } = useSession();
+
+    const selectBoxOptions: SelectBoxOption[] = [
+        { table: "post", column: "title", name: "Title" },
+        { table: "post_category", column: "name", name: "Category" },
+        { table: "user", column: "id", name: "ID" },
+        { table: "user", column: "name", name: "Name" },
+    ];
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -52,24 +48,29 @@ export default function PostTable() {
         }
     };
 
-    const handleSearchChange = (newFilter: { key: string; value: string }) => {
-        const filterWithOperator = { ...newFilter, operator: "LIKE" };
+    const handleSearchChange = (option: SelectBoxOption, value: string) => {
         setSearch((prevSearch) => ({
             ...prevSearch,
-            filters: [filterWithOperator],
+            filter_groups:[
+                {
+                    condition_type: "OR",
+                    filters: [
+                        {
+                            table: option.table!,
+                            column: option.column!,
+                            value: value,
+                            operator: "LIKE"
+                        }
+                    ]
+                }
+            ],
             page:1
         }));
         setPageRange({ start: 1, end: 10 });
     };
 
-    const handleSearchKeyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const key = event.target.value;
-        setSearchKey(key);
-        handleSearchChange({key: key, value: searchValue});
-    };
-
     const handleRowClick = async (post: Post, userId: string) => {
-        if (session?.user.role === 'USER') await fetchPostId(post.id!, false);
+        //if (session?.user. === 'USER') await fetchPostId(post.id!, false);
         router.push(`/qna/${userId}/${post.id}`);
     };
 
@@ -97,14 +98,11 @@ export default function PostTable() {
         const response = await getPostSearch(search);
         const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
         const responseData = await response.json();
-        const data = responseData.data;
-
-        setPostData(data as Post[]);
+        setPostData(responseData as Post[]);
         setTotalPage(totalPage);
     }, []);
 
     useEffect(() => {
-        setPostData([]);
         fetchData(search)
     }, [search]);
 
@@ -112,15 +110,18 @@ export default function PostTable() {
         <>
             <section className={style.filterContainer}>
                 <div className={style.filterContainerLeft}>
-                    <select className={style.selectSearchKey} onChange={handleSearchKeyChange}>
-                        <option value="title">Title</option>
-                        <option value="user_id">User</option>
-                    </select>
+                    <SelectBox
+                        value={selectOption.name}
+                        options={selectBoxOptions}
+                        label={" "}
+                        onChange={(selectedOption) =>{
+                            setSelectOption(selectedOption);
+                        }}
+                    />
                 </div>
                 <div className={style.filterContainerRight}>
-                    <InputBox label={"search"} onChange={(value) => {
-                        setSearchValue(value);
-                        handleSearchChange({key: searchKey, value: value})
+                    <InputBox onChange={(value) => {
+                        handleSearchChange(selectOption, value)
                     }}></InputBox>
                 </div>
             </section>
@@ -141,10 +142,8 @@ export default function PostTable() {
                         <tr key={rowIndex} onClick={() => handleRowClick(row, row.user?.id!)}>
                             <td>{row.read ? 'Finished' : 'To Be Confirmed'}</td>
                             <td>
-                                <span
-                                    className={`${style.category} ${style[`category-${categoryMap[row.post_category_id!!]}`]}`}
-                                >
-                                    {categoryMap[row.post_category_id!!] || row.post_category_id}
+                                <span className={`${style.category} ${style[`category-${row.post_category!.name}`]}`}>
+                                    {row.post_category!.name}
                                 </span>
                             </td>
                             <td className={style.titleTd}>
@@ -152,8 +151,8 @@ export default function PostTable() {
                             </td>
                             <td className={style.newAndComment}>
                                 <FontAwesomeIcon className={style.commentIcon} icon={faComment}/>
-                                {row.comments && row.comments.length > 0 ? row.comments.length : 0}
-                                {row.read && session?.user.role === 'USER' && <span className={style.new}>New</span>}
+                                {/*{row.comments && row.comments.length > 0 ? row.comments.length : 0}
+                                {row.read && session?.user.role === 'USER' && <span className={style.new}>New</span>}*/}
                             </td>
                             <td>{row.user?.name}</td>
                             <td>{formatDate(row.create_at!!)}</td>
@@ -168,18 +167,18 @@ export default function PostTable() {
                     <button
                         className={style.paginationAngle}
                         disabled={search.page === 1}
-                        onClick={() => handlePageChange(search.page - 1)}
+                        onClick={() => handlePageChange((search.page ?? 1) - 1)}
                     ><FontAwesomeIcon icon={faAngleLeft}/>
                     </button>
                     {renderPageNumbers()}
                     <button
                         className={style.paginationAngle}
                         disabled={search.page === totalPage}
-                        onClick={() => handlePageChange(search.page + 1)}
+                        onClick={() => handlePageChange((search.page ?? 1) + 1)}
                     ><FontAwesomeIcon icon={faAngleRight}/>
                     </button>
                 </div>
             </section>
         </>
-    );*/
+    );
 }

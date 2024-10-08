@@ -83,23 +83,19 @@
     font-weight: 700;
     border: none;
 }
-.category-Bug {
+.category-bug {
     font-weight: 700;
     color: #cd4855;
 }
-.category-Result {
+.category-result {
     font-weight: 700;
     color: #007bff;
 }
-.category-Service {
-    font-weight: 700;
-    color: #28a745;
-}
-.category-Service {
+.category-service {
     font-weight: 700;
     color: #a75928;
 }
-.category-Others {
+.category-others {
     font-weight: 700;
     color: #90BA2D;
 }

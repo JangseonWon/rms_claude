@@ -3,10 +3,9 @@
 import style from './question.module.css';
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
-import {fetchPost} from "@/app/(afterLogin)/qna/_api/fetchPost";
+import {putPost} from "@/app/(afterLogin)/qna/_api/putPost";
 import {Post} from "@/model/Post";
 import React, {ChangeEvent, useState} from "react";
-import {fetchFile} from "@/app/(afterLogin)/qna/_api/fetchFile";
 import {fetchSendToJandi} from "@/app/(afterLogin)/qna/_api/fetchSendToJandi";
 import QnaLoading from "@/app/(afterLogin)/qna/_component/QnaLoading";
 
@@ -17,8 +16,7 @@ export default function Question() {
     const [content, setContent] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-    const [categoryId, setCategoryId] =
-        useState('f9476263-f8b2-4ff9-b5f9-ed680715401e');
+    const [categoryId, setCategoryId] = useState('f9476263-f8b2-4ff9-b5f9-ed680715401e');
     const [categoryName, setCategoryName] = useState('service');
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -42,24 +40,14 @@ export default function Question() {
             try {
                 const postData: Post = {
                     title: title,
-                    post_category_id: categoryId,
-                    content: content,
-                    user_id: session?.user.id
+                    post_category: {
+                        id: categoryId
+                    },
+                    content: content
                 };
 
-                const postResponse = await fetchPost(postData);
-                if (!postResponse.ok) {
-                    console.error('Post creation failed');
-                }
-
-                const postId = (await postResponse.json()).id;
-                if (selectedFiles.length > 0) {
-                    const fileUploadResponse = await fetchFile(postId, selectedFiles);
-                    if (!fileUploadResponse.ok) {
-                        console.error('File upload failed');
-                    }
-                }
-                await fetchSendToJandi(session?.user.name!, postId, categoryName, postData);
+                await putPost(postData, selectedFiles)
+                //await fetchSendToJandi(session?.user.name!, postId, categoryName, postData);
             } finally {
                 alert('Registered successfully.');
                 setIsLoading(false);

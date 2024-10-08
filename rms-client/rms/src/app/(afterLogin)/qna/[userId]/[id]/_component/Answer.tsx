@@ -8,28 +8,28 @@ import {faFile, faFilePdf, faImage} from "@fortawesome/free-regular-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Post} from "@/model/Post";
 import {getPostByPostId} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/getPostByPostId";
-import {PostComment} from "@/model/PostComment";
-import {fetchComment} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/fetchComment";
+import {putComment} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/putComment";
 import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import {deleteCommentById} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/deleteCommentById";
 import {deletePostById} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/deletePostById";
-import {getFileById} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/getFileById";
-import {deleteFileByPostId} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/deleteFileByPostId";
+import {getPostFile} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/getPostFile";
 import {fetchSendToJandi} from "@/app/(afterLogin)/qna/_api/fetchSendToJandi";
-import {fetchPostId} from "@/app/(afterLogin)/qna/_api/fetchPostId";
 import {fetchFile} from "@/app/(afterLogin)/qna/_api/fetchFile";
 import {updatePost} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/updatePost";
-import {deleteFileById} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/deleteFileById";
+import {deletePostFileById} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/deletePostFileById";
 import QnaLoading from "@/app/(afterLogin)/qna/_component/QnaLoading";
+import {PostFile} from "@/model/PostFile";
+import {Role} from "@/model/Role";
+import {Comment} from "@/model/Comment";
 
 export default function Answer() {
     const [postData, setPostData] = useState<Post>();
-    const [commentData, setCommentData] = useState('');
+    const [commentData, setCommentData] = useState<Comment>();
     const [writerCheck, setWriterCheck] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const route = useRouter();
-    const { data: session } = useSession();
+    const {data: session} = useSession();
 
     const pathname = usePathname();
     const pathSegments = pathname.split('/');
@@ -52,9 +52,7 @@ export default function Answer() {
         }
     }
 
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-
+    const formatDate = (date: Date) => {
         const options: Intl.DateTimeFormatOptions = {
             year: 'numeric',
             month: '2-digit',
@@ -77,20 +75,8 @@ export default function Answer() {
             if (confirmed) {
                 setIsLoading(true);
                 try {
-                    const postId = postData?.id!
-                    const postResponse =
-                        await updatePost(postId, {title: postData?.title!, content: postData?.content!});
-                    if (!postResponse.ok) {
-                        console.error('Post creation failed');
-                    }
-                    if (selectedFiles.length > 0) {
-                        const fileUploadResponse = await fetchFile(postId, selectedFiles);
-                        if (!fileUploadResponse.ok) {
-                            console.error('File upload failed');
-                        }
-                    }
-                    await fetchSendToJandi(session?.user.name!, postId, "update", postData!);
-
+                    await updatePost(postData!, selectedFiles);
+                    //await fetchSendToJandi(session?.user?.name!, postId, "update", postData!);
                     alert('It has been corrected properly.');
                     route.push('/qna');
                 } finally {
@@ -107,7 +93,6 @@ export default function Answer() {
         if (confirmed) {
             setIsLoading(true);
             try {
-                await deleteFileByPostId(postId);
                 await deletePostById(postId);
             } finally {
                 alert('Deletion has been completed.');
@@ -122,16 +107,12 @@ export default function Answer() {
         setPostData(prevData => prevData ? { ...prevData, [name]: value } : undefined);
     };
 
-    const handleCommentChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-        setCommentData(e.target.value);
-    };
-
-    const handleFileNameClick = async (postId: string, fileId: string) => {
+    const handleFileNameClick = async (postFile: PostFile) => {
         try {
-            const response = await getFileById(postId, fileId);
+            const response = await getPostFile(postFile.id!);
             if (response.ok) {
                 const contentDisposition = response.headers.get('Content-Disposition');
-                let filename = fileId;
+                let filename = postFile.name;
 
                 if (contentDisposition) {
                     const filenameMatch = contentDisposition.match(/filename[^;=\n]*[=\s](.*?)(;|$)/);
@@ -144,7 +125,7 @@ export default function Answer() {
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = filename;
+                a.download = postFile.name!;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -155,20 +136,20 @@ export default function Answer() {
         }
     }
 
-    const handleCommentDeleteClick = async (postId: string, commentId: string) => {
+    const handleCommentDeleteClick = async (commentId: string) => {
         const confirmed = window.confirm('Are you sure you want to delete your comment?');
         if (confirmed) {
-            await deleteCommentById(postId, commentId);
+            await deleteCommentById(commentId);
             fetchData();
         }
     }
 
-    const handleFileDeleteClick = async (postId: string, fileId: string) => {
+    const handleFileDeleteClick = async (postFileId: string) => {
         const confirmed = window.confirm('Are you sure you want to delete the file?');
         if (confirmed) {
             setIsLoading(true);
             try{
-                await deleteFileById(postId, fileId);
+                await deletePostFileById(postFileId);
             } finally {
                 fetchData();
                 setIsLoading(false);
@@ -181,21 +162,16 @@ export default function Answer() {
     }
 
     const handleCommentClick = async () => {
-        if (commentData.length > 0) {
-            const comment : PostComment = {
-                post_id: postId,
-                content: commentData,
-                user_id: session?.user.id
-            }
-            await fetchComment(comment);
-            if (session?.user.role !== "USER") {
+        if (commentData) {
+            alert(commentData.content)
+            await putComment(postId, commentData);
+            /*if (session?.user.role !== "USER") {
                 await fetchPostId(postId, true);
             } else {
                 await fetchSendToJandi(session?.user.name!, postId, "comment", postData!, comment);
-            }
-
+            }*/
             fetchData();
-            setCommentData('');
+            setCommentData(undefined);
         } else {
             alert('Please enter a comment');
         }
@@ -278,20 +254,19 @@ export default function Answer() {
                     </div>
                 )}
                 <ul className={style.fileInput}>
-                    {postData?.files?.map((file, index) => (
+                    {postData?.post_files?.map((file, index) => (
                         <div className={style.fileItem} key={index}>
                             <span
                                 key={index}
                                 className={style.fileName}
-                                onClick={() => handleFileNameClick(file.post_id, file.id)}
+                                onClick={() => handleFileNameClick(file)}
                             >
-                            {renderFileIcon(file.name)}
-                                {file.name}
+                            {renderFileIcon(file.name!)}{file.name}
                             </span>
                             {session?.user?.role === 'USER' && (<FontAwesomeIcon
                                 className={style.fileDelete}
                                 icon={faXmark}
-                                onClick={()=> handleFileDeleteClick(file.post_id, file.id)}
+                                onClick={()=> handleFileDeleteClick(file.id!)}
                             />)}
                         </div>
                     ))}
@@ -303,30 +278,30 @@ export default function Answer() {
                     {postData?.comments?.map((comment, index) => (
                         <div key={index} className={style.commentUser}>
                             <div className={style.commentNameAndDelete}>
-                                <p className={comment.user_id === 'manager' ? style.commentManagerName : style.commentUserName}>
-                                    {comment.user_id}
+                                <p className={comment.user?.role === Role.MANAGER ? style.commentManagerName : style.commentUserName}>
+                                    {comment.user?.id}
                                 </p>
-                                {comment.user_id === session?.user?.id && (
+                                {comment.user?.id === session?.user?.id && (
                                     <FontAwesomeIcon
                                         className={style.commentDelete}
                                         icon={faXmark}
-                                        onClick={()=> handleCommentDeleteClick(comment.post_id!!, comment.id!!)}
+                                        onClick={()=> handleCommentDeleteClick(comment.id!)}
                                     />
                                 )}
                             </div>
                             <pre className={style.commentContent}>{comment.content}</pre>
-                            <p className={style.commentDate}>{formatDate(comment.create_at ?? '')}</p>
+                            <p className={style.commentDate}>{formatDate(comment.create_at!)}</p>
                         </div>
                     ))}
                     <div className={style.firstCommentContainer}>
                         <div className={style.secondCommentContainer}>
                             <p className={style.inputCommentUser}>{session?.user.id}</p>
                             <textarea
-                                value={commentData}
+                                value={commentData?.content || ''}
                                 rows={5}
                                 className={style.inputComment}
                                 name={'comment'}
-                                onChange={handleCommentChange}
+                                onChange={e => setCommentData({content: e.target.value})}
                             />
                         </div>
                         <button className={style.inputCommendButton} onClick={handleCommentClick}>
@@ -337,7 +312,7 @@ export default function Answer() {
             </section>
             <section className={style.buttonContainer}>
                 {writerCheck && (
-                    <button className={style.editButton} onClick={editButtonClick}>
+                    <button onClick={editButtonClick}>
                         Edit Post
                     </button>
                 )}

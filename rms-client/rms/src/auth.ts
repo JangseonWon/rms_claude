@@ -4,7 +4,7 @@ import JWTParser from "jsonwebtoken"
 import {cookies} from "next/headers";
 import cookie from 'cookie'
 
-declare module 'next-auth' {
+declare module '@auth/core/types' {
     interface Session {
         user: {
             id: string,
@@ -85,7 +85,7 @@ export const{handlers: {GET, POST}, auth} = NextAuth({
                     const expiresDate = new Date(expires);
                     const maxAge = Math.floor((expiresDate.getTime() - Date.now()) / 1000);
 
-                    cookies().set('Authorization', authorization, {maxAge});
+                    cookies().set('Authorization' as any, authorization as any, {maxAge} as any);
                     return JWTParser.decode(authorization, {complete:true})?.payload
                 }
             }
