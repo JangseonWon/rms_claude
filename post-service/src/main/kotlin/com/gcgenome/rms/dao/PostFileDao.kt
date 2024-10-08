@@ -1,7 +1,6 @@
 package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.PostFileDTO
-import com.gcgenome.rms.tables.pojos.PostFile
 import com.gcgenome.rms.tables.references.POST_FILE
 import org.jooq.DSLContext
 import reactor.core.publisher.Flux

@@ -7,7 +7,6 @@ import com.gcgenome.rms.data.PostDTO
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.UserDTO
 import com.gcgenome.rms.exception.AuthenticationNotFoundException
-import com.gcgenome.rms.tables.pojos.Post
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
