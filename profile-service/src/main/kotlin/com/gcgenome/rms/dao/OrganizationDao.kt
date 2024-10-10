@@ -1,11 +1,21 @@
 package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.OrganizationDTO
+import com.gcgenome.rms.data.Page
+import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.tables.references.ORGANIZATION
 import org.jooq.DSLContext
 import reactor.core.publisher.Mono
 
 interface OrganizationDao : QueryDao{
+    fun DSLContext.selectUserWithOrganizations(userId: String, query: Query): Mono<Page<OrganizationDTO>> {
+        return Mono.from(
+            selectPage(ORGANIZATION, query) { record ->
+                record.into(OrganizationDTO::class.java)
+            }
+        )
+    }
+
     fun DSLContext.insertOrganization(organization: OrganizationDTO): Mono<OrganizationDTO> {
         return Mono.from(
             insertInto(ORGANIZATION)

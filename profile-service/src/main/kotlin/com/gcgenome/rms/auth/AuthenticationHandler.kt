@@ -8,6 +8,10 @@ import reactor.core.publisher.Mono
 
 @Component
 class AuthenticationHandler {
+    fun principal(request: ServerRequest): Mono<UserAuthentication> {
+        return request.principal().switchIfEmpty(Mono.error(AuthenticationNotFoundException()))
+            .cast(UserAuthentication::class.java)
+    }
     fun chkUser(request: ServerRequest, userId: String): Mono<UserAuthentication> {
         return request.principal()
             .switchIfEmpty(Mono.error(AuthenticationNotFoundException()))

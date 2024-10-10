@@ -2,6 +2,7 @@ package com.gcgenome.rms.profile.organization
 
 import com.gcgenome.rms.auth.AuthenticationHandler
 import com.gcgenome.rms.data.OrganizationDTO
+import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.exceptions.AuthenticationNotFoundException
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -19,8 +20,22 @@ class OrganizationRouter (
 ) {
     @Bean("OrganizationRouter")
     fun route() = router {
+        POST("/w-api/profile-service/organizations", ::selectUserWithOrganization)
         PUT("/w-api/profile-service/users/{user-id}/organizations/{organization-id}", ::insertOrganization)
         PATCH("/w-api/profile-service/users/{user-id}/organizations/{organization-id}", ::updateOrganization)
+    }
+    private fun selectUserWithOrganization(request: ServerRequest): Mono<ServerResponse> {
+        return Mono.zip(authenticationHandler.principal(request), request.bodyToMono(Query::class.java))
+            .flatMap { organizationHandler.selectUserWithOrganizations(it.t1.user.id!!, it.t2) }
+            .flatMap { ServerResponse.ok()
+                .header("X-Total-Count", it.totalCount.toString())
+                .header("X-Total-Page", it.totalPage.toString())
+                .header("X-Page-Size", it.pageSize.toString())
+                .header("X-Current-Page", it.currentPage.toString())
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(it.data), OrganizationDTO::class.java) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error: ${it.cause}") }
     }
 
     private fun insertOrganization(request: ServerRequest): Mono<ServerResponse> {

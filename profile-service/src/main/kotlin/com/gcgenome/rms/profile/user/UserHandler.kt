@@ -1,8 +1,6 @@
 package com.gcgenome.rms.profile.user
 
 import com.gcgenome.rms.dao.UserDao
-import com.gcgenome.rms.data.Page
-import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.UserDTO
 import org.jooq.DSLContext
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -26,9 +24,5 @@ class UserHandler(
                 updateUserById(user)
             }
         })
-    }
-
-    fun selectUserWithOrganizations(userId: String, query: Query):  Mono<Page<UserDTO>> {
-        return dslContext.selectUserWithOrganizations(userId, query)
     }
 }

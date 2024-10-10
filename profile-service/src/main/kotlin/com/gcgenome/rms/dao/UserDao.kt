@@ -1,12 +1,10 @@
 package com.gcgenome.rms.dao
 
-import com.gcgenome.rms.data.Page
-import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.UserDTO
-import com.gcgenome.rms.tables.references.ORGANIZATION
 import com.gcgenome.rms.tables.references.USER
 import org.jooq.DSLContext
-import org.jooq.impl.DSL.*
+import org.jooq.impl.DSL.coalesce
+import org.jooq.impl.DSL.`val`
 import reactor.core.publisher.Mono
 
 interface UserDao : QueryDao{
@@ -30,30 +28,5 @@ interface UserDao : QueryDao{
                 .where(USER.ID.eq(user.id))
                 .returningResult(USER.ID,USER.NAME,USER.ROLE,USER.TYPE,USER.EMAIL,USER.PHONE_NUMBER,USER.STATE,USER.BRANCH_SERIAL,USER.BRANCH_NAME,USER.CREATE_AT)
         ).map{it.into(UserDTO::class.java)}
-    }
-
-    fun DSLContext.selectUserWithOrganizations(userId: String, query: Query): Mono<Page<UserDTO>> {
-        val joins = listOf(
-            QueryDao.JoinInfo(ORGANIZATION, USER.ID.eq(ORGANIZATION.USER_ID), QueryDao.JoinType.LEFT),
-        )
-        val fields = listOf(
-            USER.ID.`as`("id"),
-            USER.NAME.`as`("name"),
-            jsonArrayAgg(
-                jsonObject(
-                    key("id").value(ORGANIZATION.ID),
-                    key("name").value(ORGANIZATION.NAME),
-                    key("nursing_number").value(ORGANIZATION.NURSING_NUMBER),
-                    key("registration_number").value(ORGANIZATION.REGISTRATION_NUMBER),
-                    key("type").value(ORGANIZATION.TYPE)
-                )
-            ).`as`("organizations")
-        )
-        val where = USER.ID.eq(userId)
-        val groupByFields = listOf(USER.ID)
-
-        return selectPage(mainTable = USER, query = query, selectFields = fields, where = where, joinTables = joins, groupByFields = groupByFields) { record ->
-            record.into(UserDTO::class.java)
-        }
     }
 }
