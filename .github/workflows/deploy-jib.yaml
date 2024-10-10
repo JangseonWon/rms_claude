@@ -16,6 +16,7 @@ on:
       - api/**
       - post-service/**
       - alis-api/**
+      - profile-api/**
 permissions: write-all
 jobs:
   extract:
