@@ -26,7 +26,7 @@ class OrganizationRouter (
     }
     private fun selectUserWithOrganization(request: ServerRequest): Mono<ServerResponse> {
         return Mono.zip(authenticationHandler.principal(request), request.bodyToMono(Query::class.java))
-            .flatMap { organizationHandler.selectUserWithOrganizations(it.t1.user.id!!, it.t2) }
+            .flatMap { organizationHandler.selectUserWithOrganizations(it.t1, it.t2) }
             .flatMap { ServerResponse.ok()
                 .header("X-Total-Count", it.totalCount.toString())
                 .header("X-Total-Page", it.totalPage.toString())

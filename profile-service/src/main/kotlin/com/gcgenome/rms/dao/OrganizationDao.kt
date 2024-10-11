@@ -4,12 +4,12 @@ import com.gcgenome.rms.data.OrganizationDTO
 import com.gcgenome.rms.data.Page
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.tables.references.ORGANIZATION
+import org.jooq.Condition
 import org.jooq.DSLContext
 import reactor.core.publisher.Mono
 
 interface OrganizationDao : QueryDao{
-    fun DSLContext.selectUserWithOrganizations(userId: String, query: Query): Mono<Page<OrganizationDTO>> {
-        val where = ORGANIZATION.USER_ID.eq(userId)
+    fun DSLContext.selectUserWithOrganizations(where: Condition, query: Query): Mono<Page<OrganizationDTO>> {
         return Mono.from(
             selectPage(mainTable = ORGANIZATION, query = query, where = where) { record ->
                 record.into(OrganizationDTO::class.java)
