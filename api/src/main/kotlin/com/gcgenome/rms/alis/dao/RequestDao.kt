@@ -18,9 +18,7 @@ interface RequestDao {
         )
         val finalCondition = if (alisQuery.search.userId != null) {
             baseCondition.and(ORGANIZATION.USER_ID.eq(alisQuery.search.userId))
-        } else {
-            baseCondition
-        }
+        } else { baseCondition }
 
         return Flux.from(
             select(
