@@ -5,21 +5,7 @@
 .searchContainer {
     float: right;
     display: flex;
-}
-.institutionAddButton {
-    margin-top: 2vh;
-}
-.selectSearchKey {
-    padding: 0.2vh 0.2vw 0.2vh 0.2vw;
-    margin: 2.5vh 1vw 2.5vh 1vw;
-    height: 3.5vh;
-    width: 6vw;
-    font-size: 0.6vw;
-    border-radius: 15px;
-    border: 1px solid #DAE2ED;
-    box-shadow: 0 2px 2px #F3F6F9;
-    color: #666666;
-    outline: none;
+    margin-bottom: 2vh;
 }
 .table {
     width: 100%;
@@ -73,14 +59,21 @@
     align-items: center;
     justify-content: flex-end;
 }
-.pagination span {
-    padding: 10px 20px;
-    font-size: 0.8vw;
-    color: #1a1a1a;
-    align-items: center;
+.activePage {
+    margin: 0 0.3vw;
+    font-size: 1vw;
+    background: none;
+    border: none;
 }
-.pagination span:first-child {
-    padding: 1vh 0.5vw 1vh 0;
+.deActivePage {
+    margin: 0 0.3vw;
+    font-size: 0.7vw;
+    background: none;
+    border: none;
+}
+.activePage:hover, .deActivePage:hover {
+    background: none !important;
+    font-weight: 700;
 }
 .pagination button {
     border: none;

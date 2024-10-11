@@ -7,7 +7,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
 import {useSession} from "next-auth/react";
 import {Organization} from "@/model/Organization";
-import {PatchOrganization} from "@/app/(afterLogin)/user/_api/patchOrganization";
+import {patchOrganization} from "@/app/(afterLogin)/user/_api/patchOrganization";
 
 
 type Props = {
@@ -33,7 +33,7 @@ export default function InstitutionEditModal({organization, open, closeModal}: P
             registration_number: registrationNumber,
             type: type,
         }
-        const response = await PatchOrganization(organization);
+        const response = await patchOrganization(session?.user.id!, organization);
         if (response.ok) {
             alert("Institution update successfully!");
             closeModal();

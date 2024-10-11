@@ -8,8 +8,8 @@ import InputBox from "@/app/_component/InputBox";
 import {getUser} from "@/app/(afterLogin)/user/_api/getUser";
 import {User} from "@/model/User";
 import {useSession} from "next-auth/react";
-import {fetchUserUpdate} from "@/app/(afterLogin)/_api/fetchUserUpdate";
 import Loading from "@/app/(afterLogin)/_component/Loading";
+import {patchUser} from "@/app/(afterLogin)/user/_api/patchUser";
 
 export default function Profile() {
     const {data: session, status} = useSession();
@@ -37,9 +37,16 @@ export default function Profile() {
         return newObj;
     };
     const handleOnClickSave = async () => {
-        const res = await fetchUserUpdate(user!)
-        if(res.ok) alert("success!")
-        else alert("fail!")
+        if (!user) {
+            alert("Please correct the word");
+            return;
+        }
+        const res = await patchUser(user)
+        if (res.status === 200) {
+            alert("success!");
+        } else {
+            alert("fail!");
+        }
     }
 
     useEffect(() => {

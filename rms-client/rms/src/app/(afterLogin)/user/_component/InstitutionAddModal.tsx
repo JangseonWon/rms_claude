@@ -6,7 +6,7 @@ import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
 import {useSession} from "next-auth/react";
-import {PutOrganization} from "@/app/(afterLogin)/user/_api/putOrganization";
+import {putOrganization} from "@/app/(afterLogin)/user/_api/putOrganization";
 import {Organization} from "@/model/Organization";
 
 
@@ -32,7 +32,7 @@ export default function InstitutionAddModal({open, closeModal}: Props) {
             registration_number: registrationNumber,
             type: type,
         }
-        const response = await PutOrganization(organization);
+        const response = await putOrganization(session?.user.id!, organization);
         if (response.ok) {
             alert("Institution added successfully!");
             closeModal();

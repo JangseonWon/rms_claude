@@ -5,31 +5,45 @@ import style from "@/app/(afterLogin)/user/_component/institutionTable.module.cs
 import type {Organization} from "@/model/Organization";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {fetchOrganization} from "@/app/(afterLogin)/user/_api/fetchOrganization";
+import {postOrganizations} from "@/app/(afterLogin)/user/_api/postOrganizations";
 import InputBox from "@/app/_component/InputBox";
 import InstitutionAddModal from "@/app/(afterLogin)/user/_component/InstitutionAddModal";
 import InstitutionEditModal from "@/app/(afterLogin)/user/_component/InstitutionEditModal";
 import BlueButton from "@/app/_component/BlueButton";
 import RectangleButton from "@/app/_component/RectangleButton";
+import {Query} from "@/model/Query";
+import {SelectBoxOption} from "@/model/SelectBoxOption";
+import SelectBox from "@/app/_component/SelectBox";
 
 export default function InstitutionTable() {
-    return null
-    /*const [organizationData, setOrganizationData] = useState<Organization[]>([])
+    const [organizationData, setOrganizationData] = useState<Organization[]>([])
     const [totalPage, setTotalPage] = useState<number>(0);
-    const [search, setSearch] =
-        useState<Paging>({filters: [], sort_by:"id", asc: true, size:10, page:1});
-    const [searchKey, setSearchKey] = useState<string>("id");
-    const [searchValue, setSearchValue] = useState<string>("");
+    const [search, setSearch] = useState<Query>({sort_by:"id", asc: false, size:10, page:1});
+    const [pageRange, setPageRange] = useState<{ start: number, end: number }>({ start: 1, end: 10 });
+    const [selectOption, setSelectOption] = useState<SelectBoxOption>({ table: "organization", column: "id", name: "Id" });
     const [selectInstitution, setSelectInstitution] = useState<Organization>();
     const [institutionEditModalOpen, setInstitutionEditModalOpen] = useState<boolean>(false);
     const [institutionAddModalOpen, setInstitutionAddModalOpen] = useState<boolean>(false);
 
+    const selectBoxOptions: SelectBoxOption[] = [
+        { table: "organization", column: "id", name: "Id" },
+        { table: "organization", column: "name", name: "Name" },
+        { table: "organization", column: "type", name: "Type" },
+        { table: "organization", column: "nursing_number", name: "Nursing Number" },
+        { table: "organization", column: "registration_number", name: "Registration Number" },
+    ];
+
     const handlePageChange = (newPageNumber: number) => {
-        setSearch(prevPage =>({
+        setSearch(prevPage => ({
             ...prevPage,
             page: newPageNumber
         }));
+        if (newPageNumber < pageRange.start || newPageNumber > pageRange.end) {
+            const newStart = Math.floor((newPageNumber - 1) / 10) * 10 + 1;
+            setPageRange({ start: newStart, end: newStart + 9 });
+        }
     };
+
     const handlePageSizeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const newSize = parseInt(event.target.value);
         setSearch(prevSearch => ({
@@ -39,19 +53,24 @@ export default function InstitutionTable() {
         }));
     };
 
-    const handleSearchChange = (newFilter: { key: string; value: string }) => {
-        const filterWithOperator = { ...newFilter, operator: "LIKE" };
+    const handleSearchChange = (option: SelectBoxOption, value: string) => {
         setSearch((prevSearch) => ({
             ...prevSearch,
-            filters: [filterWithOperator],
-            page: 1
+            filter_groups:[
+                {
+                    condition_type: "OR",
+                    filters: [
+                        {
+                            table: option.table!,
+                            column: option.column!,
+                            value: value,
+                            operator: "LIKE"
+                        }
+                    ]
+                }
+            ],
+            page:1
         }));
-    };
-
-    const handleSearchKeyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const key = event.target.value;
-        setSearchKey(key);
-        handleSearchChange({key: key, value: searchValue});
     };
 
     const openInstitutionAddModal = () => {
@@ -73,13 +92,11 @@ export default function InstitutionTable() {
         fetchData(search);
     }
 
-    const fetchData = useCallback(async (search: Paging) => {
-        const response = await fetchOrganization(search);
+    const fetchData = useCallback(async (search: Query) => {
+        const response = await postOrganizations(search);
         const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
         const responseData = await response.json();
-        const data = responseData.data;
-
-        setOrganizationData(data as Organization[]);
+        setOrganizationData(responseData as Organization[]);
         setTotalPage(totalPage);
     }, []);
 
@@ -94,17 +111,18 @@ export default function InstitutionTable() {
                 <div className={style.institutionAddButton}>
                     <BlueButton name={"Institution Add"} onClick={openInstitutionAddModal}/>
                 </div>
-                <select className={style.selectSearchKey} onChange={handleSearchKeyChange}>
-                    <option value="id">Id</option>
-                    <option value="name">Name</option>
-                    <option value="type">Type</option>
-                    <option value="registration_number">Registration Number</option>
-                    <option value="nursing_number">Nursing Number</option>
-                </select>
-                <InputBox label={"search"} onChange={(value) => {
-                    setSearchValue(value);
-                    handleSearchChange({key: searchKey, value: value})
-                }}></InputBox>
+                <SelectBox
+                    value={selectOption.name}
+                    options={selectBoxOptions}
+                    label={" "}
+                    onChange={(selectedOption) =>{
+                        setSelectOption(selectedOption);
+                    }}
+                />
+                <InputBox
+                    label={" "}
+                    onChange={(value) => {handleSearchChange(selectOption, value)}}>
+                </InputBox>
             </section>
             <table className={style.table}>
                 <thead>
@@ -144,12 +162,12 @@ export default function InstitutionTable() {
                 <span> 1-{totalPage} of {search.page} </span>
                 <button
                     disabled={search.page === 1}
-                    onClick={() => handlePageChange(search.page - 1)}
+                    onClick={() => handlePageChange((search.page ?? 1) - 1)}
                 ><FontAwesomeIcon icon={faAngleLeft}/>
                 </button>
                 <button
                     disabled={search.page === totalPage}
-                    onClick={() => handlePageChange(search.page + 1)}
+                    onClick={() => handlePageChange((search.page ?? 1) + 1)}
                 ><FontAwesomeIcon icon={faAngleRight}/>
                 </button>
             </div>
@@ -167,5 +185,5 @@ export default function InstitutionTable() {
                 />
             )}
         </div>
-    );*/
+    );
 }
