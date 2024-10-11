@@ -35,6 +35,10 @@ const nextConfig = {
                 source: '/w-api/post-service/:path*',
                 destination: `https://rms-test.gcgenome.com/w-api/post-service/:path*`,
             },
+            {
+                source: '/w-api/profile-service/:path*',
+                destination: `https://rms-test.gcgenome.com/w-api/profile-service/:path*`,
+            },
         ];
     },
     output: 'standalone',

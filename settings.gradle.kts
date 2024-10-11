@@ -15,6 +15,7 @@ include("dashboard-service")
 include("cart-service")
 include("alis-service")
 include("post-service")
+include("profile-service")
 
 
 dependencyResolutionManagement {

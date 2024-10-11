@@ -6,12 +6,13 @@ import {useState} from "react";
 import InputBox from "@/app/_component/InputBox";
 import GreenButton from "@/app/_component/GreenButton";
 import {useSession} from "next-auth/react";
-import {fetchUserPassword} from "@/app/(afterLogin)/user/_api/fetchUserPassword";
+import {patchUser} from "@/app/(afterLogin)/user/_api/patchUser";
 import {
     useOpenAlertDialogA,
     useSetIconAlertDialogA,
     useSetMessageAlertDialogA
 } from "@/store/useAfterLoginAlertDialogStore";
+import {User} from "@/model/User";
 
 export default function ChangePassword() {
     const [oldPassword, setOldPassword] = useState('');
@@ -30,8 +31,12 @@ export default function ChangePassword() {
             setShowAlertDialog(true);
             return;
         }
+        const updatedUser: User = {
+            id: session?.user.id!,
+            password: newPassword
+        };
 
-        await fetchUserPassword(session?.user.id!, newPassword, confirmPassword);
+        await patchUser(updatedUser);
         setIcon('good');
         setMessage('Password changed successfully.');
         setShowAlertDialog(true);

@@ -4,6 +4,7 @@ import {Role} from "@/model/Role";
 export interface User {
     id: string
     name?: string
+    password?: string
     role?: Role
     type?: string
     email?: string

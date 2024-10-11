@@ -16,6 +16,7 @@ on:
       - api/**
       - post-service/**
       - alis-api/**
+      - profile-service/**
 permissions: write-all
 jobs:
   extract:
@@ -44,7 +45,8 @@ jobs:
           "$module_name" == "api" ||
           "$module_name" == "post-service" ||
           "$module_name" == "alis-api" ||
-          "$module_name" == "product-service" ]] && module_names+=("$module_name")
+          "$module_name" == "product-service" ||
+          "$module_name" == "profile-service" ]] && module_names+=("$module_name")
           done
           module_names=($(printf '%s\n' "${module_names[@]}" | sort -u))
           echo "matrix=[$(printf '"%s",' "${module_names[@]}" | sed 's/,$//')]"

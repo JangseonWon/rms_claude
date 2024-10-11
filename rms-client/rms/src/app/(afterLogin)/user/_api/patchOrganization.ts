@@ -1,7 +1,7 @@
 import {Organization} from "@/model/Organization";
 
-export async function PatchOrganization(organization: Organization) {
-    return await fetch(`/w-api/organization-service/organizations/${organization.id}`, {
+export async function patchOrganization(userId: string, organization: Organization) {
+    return await fetch(`/w-api/profile-service/users/${userId}/organizations/${organization.id}`, {
         method: 'PATCH',
         headers: {
             "Content-Type": "application/json",
