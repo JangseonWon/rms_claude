@@ -9,8 +9,9 @@ import reactor.core.publisher.Mono
 
 interface OrganizationDao : QueryDao{
     fun DSLContext.selectUserWithOrganizations(userId: String, query: Query): Mono<Page<OrganizationDTO>> {
+        val where = ORGANIZATION.USER_ID.eq(userId)
         return Mono.from(
-            selectPage(ORGANIZATION, query) { record ->
+            selectPage(mainTable = ORGANIZATION, query = query, where = where) { record ->
                 record.into(OrganizationDTO::class.java)
             }
         )
