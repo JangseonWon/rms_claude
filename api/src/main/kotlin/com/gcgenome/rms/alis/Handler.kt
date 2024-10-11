@@ -1,7 +1,8 @@
 package com.gcgenome.rms.alis
 
-import com.gcgenome.rms.dao.*
-import com.gcgenome.rms.data.*
+import com.gcgenome.rms.alis.dao.RequestDao
+import com.gcgenome.rms.alis.data.AlisQuery
+import com.gcgenome.rms.alis.data.Body
 import com.gcgenome.rms.exceptions.AuthenticationNotFoundException
 import org.jooq.DSLContext
 import org.springframework.beans.factory.annotation.Value
@@ -33,9 +34,7 @@ class Handler(
     }
     fun getRequests(alisQuery: AlisQuery): Mono<Body> {
         return Mono.from(dslContext.run {
-            checkUser(alisQuery)
-                .then(selectBody(alisQuery))
-
+            checkUser(alisQuery).then(selectBody(alisQuery))
         })
     }
     fun checkUser(alisQuery: AlisQuery): Mono<Void>{

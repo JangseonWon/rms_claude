@@ -1,9 +1,10 @@
 package com.gcgenome.rms.alis
 
-import com.gcgenome.rms.data.AlisQuery
+import com.gcgenome.rms.alis.data.AlisQuery
 import com.gcgenome.rms.exceptions.*
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.codec.DecodingException
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.server.*
@@ -29,7 +30,8 @@ class Router (
         return request.bodyToMono(AlisQuery::class.java)
             .flatMap { handler.getRequests(it) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_XML).bodyValue(it) }
-            .onErrorResume(ServerWebInputException::class.java) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("입력 정보가 잘못되었습니다.")}
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(ServerWebInputException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("필수 입력값이 누락되었거나 잘못된 형식입니다.")}
+            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Error: ${e.cause}") }
     }
 }

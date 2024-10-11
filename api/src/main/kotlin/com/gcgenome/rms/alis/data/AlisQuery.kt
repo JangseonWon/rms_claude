@@ -1,4 +1,4 @@
-package com.gcgenome.rms.data
+package com.gcgenome.rms.alis.data
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
@@ -15,12 +15,12 @@ data class AlisQuery(
             val pwd: String
         )
         data class Search(
+            @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+            val requestDateFrom: LocalDate,
+            @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+            val requestDateTo: LocalDate,
             @JsonDeserialize(using = EmptyStringAsNullDeserializer::class)
-            val organization: String,
-            @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
-            val startdate: LocalDate,
-            @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
-            val enddate: LocalDate
+            val userId: String? = null
         )
     }
 }
