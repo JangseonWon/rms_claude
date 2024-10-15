@@ -13,7 +13,7 @@ import {
     useSetMessageNoticeDialog,
     useSetOkNotice
 } from "@/store/useNoticeDialogStore";
-import {Extensions} from "@/model/ServiceExtensionAndSampleType";
+import {Extension} from "@/model/Extension";
 import {fetchServiceExtensions} from "@/app/(afterLogin)/request/services/_api/fetchServiceExtensions";
 import {usePathname} from "next/navigation";
 import DownloadExcelButton from "@/app/(afterLogin)/request/services/[service]/multi/_component/DownloadExcelButton";
@@ -51,11 +51,11 @@ export default function Order() {
     const pathSegments = pathname.split('/');
     const serviceId = decodeURIComponent(pathSegments[pathSegments.length - 2]);
     const [requestData, setRequestData] = useState<RequestData[]>([]);
-    const [extensions, setExtensions] = useState<Extensions[]>([]);
+    const [extensions, setExtensions] = useState<Extension[]>([]);
 
     const fetchExtensions = async () => {
         const response = await fetchServiceExtensions(serviceId);
-        setExtensions(response as Extensions[]);
+        setExtensions(response as Extension[]);
     };
 
     const handleFileUpload = useCallback((data: any[]) => {
@@ -141,7 +141,7 @@ export default function Order() {
 
             const extensionData = extensions.map(extension => ({
                 id: extension.id,
-                value: item.extensions[extension.name]
+                value: item.extensions[extension.name!]
             }));
 
             const sex = item.gender === "Male" ? "M" : item.gender === "Female" ? "F" : item.gender;
@@ -300,8 +300,8 @@ export default function Order() {
                             <td>{item.race || ''}</td>
                             {extensions.map((extension, extIndex) => (
                                 <td key={extIndex}>
-                                    {item.extensions && item.extensions[extension.name] !== undefined
-                                        ? formatBooleanValue(item.extensions[extension.name])
+                                    {item.extensions && item.extensions[extension.name!] !== undefined
+                                        ? formatBooleanValue(item.extensions[extension.name!])
                                         : '-'}
                                 </td>
                             ))}

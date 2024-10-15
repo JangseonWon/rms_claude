@@ -1,4 +1,4 @@
-package com.gcgenome.rms.service
+package com.gcgenome.rms.auth
 
 import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.exception.AuthenticationNotFoundException

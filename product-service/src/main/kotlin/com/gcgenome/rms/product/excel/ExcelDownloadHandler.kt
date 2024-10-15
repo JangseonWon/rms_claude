@@ -1,4 +1,4 @@
-package com.gcgenome.rms.service
+package com.gcgenome.rms.product.excel
 
 import com.fasterxml.jackson.databind.JsonNode
 import org.apache.poi.ss.usermodel.Cell

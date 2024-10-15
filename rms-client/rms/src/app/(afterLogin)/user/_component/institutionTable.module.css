@@ -2,10 +2,17 @@
     width: 100%;
     margin: 0 auto;
 }
-.searchContainer {
-    float: right;
+.filterContainer {
+    margin: 2vh 1.5vw;
     display: flex;
-    margin-bottom: 2vh;
+}
+.filterContainerLeft {
+    display: flex;
+    margin-left: auto;
+}
+.filterContainerRight {
+    margin-left: 0.5vw;
+    width: 20vw;
 }
 .table {
     width: 100%;
@@ -54,11 +61,6 @@
 .addButton:hover {
     background: linear-gradient(to right, #bf7171, #cd4d4d);
 }
-.pagination {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-}
 .activePage {
     margin: 0 0.3vw;
     font-size: 1vw;
@@ -74,6 +76,20 @@
 .activePage:hover, .deActivePage:hover {
     background: none !important;
     font-weight: 700;
+}
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+.pagination span {
+    padding: 1vh 1vw;
+    font-size: 0.8vw;
+    color: #1a1a1a;
+    align-items: center;
+}
+.pagination span:first-child {
+    padding: 1vh 0.5vw 1vh 0;
 }
 .pagination button {
     border: none;

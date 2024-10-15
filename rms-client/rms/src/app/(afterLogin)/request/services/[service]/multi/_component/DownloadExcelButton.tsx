@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import ExcelJS from 'exceljs';
-import {Extensions} from "@/model/ServiceExtensionAndSampleType";
+import {Extension, ExtensionType} from "@/model/Extension";
 import style from './downloadExcelButton.module.css'
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faDownload} from "@fortawesome/free-solid-svg-icons";
@@ -12,7 +12,7 @@ import {SampleType} from "@/model/SampleType";
 import {Organization} from "@/model/Organization";
 
 interface DownloadExcelButtonProps {
-    extensions: Extensions[];
+    extensions: Extension[];
 }
 
 export default function DownloadExcelButton({ extensions }: DownloadExcelButtonProps) {
@@ -57,7 +57,7 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
         worksheet.addRow(headers);
 
         worksheet.columns = headers.map(header => {
-            return { width: Math.max(header.length, 20) };
+            return { width: Math.max(header!.length, 20) };
         });
 
         const sampleTypeFormulae = sampleTypeList?.map(sample => `${sample.id}/${sample.name}`).join(',') || '';
@@ -125,17 +125,17 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
             const columnIndex = headers.indexOf(extension.name) + 1;
             for (let i = 2; i <= 101; i++) {
                 switch (extension.type) {
-                    case 'List':
+                    case ExtensionType.LIST:
                         worksheet.getCell(i, columnIndex).dataValidation = {
                             type: 'list',
                             allowBlank: !extension.required,
-                            formulae: [`"${extension.regex.replace(/\\b\(\?:|\)\\b/g, '').split('|').join(',')}"`], // regex를 리스트로 변환
+                            formulae: [`"${extension.regex!.replace(/\\b\(\?:|\)\\b/g, '').split('|').join(',')}"`], // regex를 리스트로 변환
                             showErrorMessage: true,
                             errorTitle: 'Invalid Selection',
                             error: `Please select a valid option for ${extension.name}.`,
                         };
                         break;
-                    case 'Int':
+                    case ExtensionType.INTEGER:
                         worksheet.getCell(i, columnIndex).dataValidation = {
                             type: 'whole',
                             allowBlank: !extension.required,
@@ -146,7 +146,7 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
                             error: `Please enter a valid integer for ${extension.name}.`,
                         };
                         break;
-                    case 'Number':
+                    case ExtensionType.NUMBER:
                         worksheet.getCell(i, columnIndex).dataValidation = {
                             type: 'decimal',
                             allowBlank: !extension.required,
@@ -157,7 +157,7 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
                             error: `Please enter a valid number for ${extension.name}.`,
                         };
                         break;
-                    case 'Boolean':
+                    case ExtensionType.BOOLEAN:
                         worksheet.getCell(i, columnIndex).dataValidation = {
                             type: 'list',
                             allowBlank: !extension.required,

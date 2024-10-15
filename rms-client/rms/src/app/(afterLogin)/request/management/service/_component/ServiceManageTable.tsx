@@ -11,7 +11,6 @@ import SelectBox from "@/app/_component/SelectBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import BlueButton from "@/app/_component/BlueButton";
 import RectangleButton from "@/app/_component/RectangleButton";
-import {ServiceManage} from "@/model/ServiceManage";
 import ServiceEditModal from "@/app/(afterLogin)/request/management/service/_component/ServiceEditModal";
 import {Service} from "@/model/Service";
 

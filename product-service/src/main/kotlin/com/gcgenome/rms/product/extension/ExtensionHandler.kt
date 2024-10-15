@@ -1,4 +1,4 @@
-package com.gcgenome.rms.service
+package com.gcgenome.rms.product.extension
 
 import com.gcgenome.rms.dao.ExtensionDao
 import com.gcgenome.rms.dao.ServiceDao

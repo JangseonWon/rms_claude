@@ -1,5 +1,6 @@
-package com.gcgenome.rms.service
+package com.gcgenome.rms.product.extension
 
+import com.gcgenome.rms.auth.AuthenticationHandler
 import com.gcgenome.rms.data.ServiceExtension
 import com.gcgenome.rms.exception.AuthenticationNotFoundException
 import com.gcgenome.rms.exception.CategoryNotFoundException
@@ -19,7 +20,7 @@ class ExtensionRouter (
     private val handler: ExtensionHandler,
     private val authentication: AuthenticationHandler
 ){
-    @Bean("ExtensionServiceRouter")
+    @Bean("ExtensionRouter")
     fun route() = router {
         GET("/w-api/product-service/services/{serviceId}/extensions", ::serviceExtensions)
         GET("/w-api/product-service/categories/{categoryId}/extensions", ::categoryExtensions)

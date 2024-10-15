@@ -107,22 +107,28 @@ export default function InstitutionTable() {
 
     return (
         <div className={style.container}>
-            <section className={style.searchContainer}>
-                <div className={style.institutionAddButton}>
-                    <BlueButton name={"Institution Add"} onClick={openInstitutionAddModal}/>
+            <section className={style.filterContainer}>
+                <div className={style.filterContainerLeft}>
+                    <div className={style.institutionAddButton}>
+                        <BlueButton name={"Institution Add"} onClick={openInstitutionAddModal}/>
+                    </div>
+                    <SelectBox
+                        value={selectOption.name}
+                        options={selectBoxOptions}
+                        label={" "}
+                        onChange={(selectedOption) => {
+                            setSelectOption(selectedOption);
+                        }}
+                    />
                 </div>
-                <SelectBox
-                    value={selectOption.name}
-                    options={selectBoxOptions}
-                    label={" "}
-                    onChange={(selectedOption) =>{
-                        setSelectOption(selectedOption);
-                    }}
-                />
-                <InputBox
-                    label={" "}
-                    onChange={(value) => {handleSearchChange(selectOption, value)}}>
-                </InputBox>
+                <div className={style.filterContainerRight}>
+                    <InputBox
+                        label={" "}
+                        onChange={(value) => {
+                            handleSearchChange(selectOption, value)
+                        }}>
+                    </InputBox>
+                </div>
             </section>
             <table className={style.table}>
                 <thead>

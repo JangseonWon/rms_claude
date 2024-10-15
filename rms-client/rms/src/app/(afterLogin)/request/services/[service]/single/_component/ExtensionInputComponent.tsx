@@ -4,7 +4,7 @@ import {usePathname} from "next/navigation";
 import {useEffect, useState} from "react";
 import style from './extensionInputComponent.module.css';
 import {fetchServiceExtensions} from "@/app/(afterLogin)/request/services/_api/fetchServiceExtensions";
-import {Extensions} from "@/model/ServiceExtensionAndSampleType";
+import {Extension, ExtensionType} from "@/model/Extension";
 import InputBox from "@/app/_component/InputBox";
 import SelectBox from "@/app/_component/SelectBox";
 import TextBox from "@/app/_component/TextBox";
@@ -18,7 +18,7 @@ export default function ExtensionInputComponent({ onChange }: ExtensionInputComp
     const pathname = usePathname();
     const pathSegments = pathname.split('/');
     const serviceId = decodeURIComponent(pathSegments[pathSegments.length - 2]);
-    const [extensions, setExtensions] = useState<Extensions[]>([]);
+    const [extensions, setExtensions] = useState<Extension[]>([]);
     const [values, setValues] = useState<{ [key: string]: any }>({});
 
     const generateSelectList = (regex: string): { name: string, value: string }[] => {
@@ -38,7 +38,7 @@ export default function ExtensionInputComponent({ onChange }: ExtensionInputComp
 
     const fetchExtensions = async () => {
         const response = await fetchServiceExtensions(serviceId);
-        setExtensions(response as Extensions[]);
+        setExtensions(response as Extension[]);
     };
 
     const handleInputChange = (id: string, value: any) => {
@@ -51,49 +51,49 @@ export default function ExtensionInputComponent({ onChange }: ExtensionInputComp
         onChange(id, option.value);
     };
 
-    const renderExtensionComponent = (extension: Extensions) => {
-        let value = values[extension.id] || '';
+    const renderExtensionComponent = (extension: Extension) => {
+        let value = values[extension.id!] || '';
 
         switch (extension.type) {
-            case 'List':
-                const selectList = generateSelectList(extension.regex);
+            case ExtensionType.LIST:
+                const selectList = generateSelectList(extension.regex || '');
                 return <SelectBox
                     key={extension.id}
-                    label={extension.name}
+                    label={extension.name!}
                     value={value}
                     options={selectList}
                     required={extension.required}
-                    onChange={(selectedOption) => handleSelectChange(extension.id, selectedOption)}
+                    onChange={(selectedOption) => handleSelectChange(extension.id!, selectedOption)}
                     width="11vw"
                 />;
-            case 'Boolean':
+            case ExtensionType.BOOLEAN:
                 const booleanList = [
                     {name: "TRUE", value: true},
                     {name: "FALSE", value: false}
                 ];
                 return <SelectBox
                     key={extension.id}
-                    label={extension.name}
+                    label={extension.name!}
                     value={value}
                     options={booleanList}
                     required={extension.required}
-                    onChange={(selectedOption) => handleSelectChange(extension.id, selectedOption)}
+                    onChange={(selectedOption) => handleSelectChange(extension.id!, selectedOption)}
                     width="11vw"
                 />;
-            case 'Int':
-            case 'Number':
-            case 'String':
+            case ExtensionType.INTEGER:
+            case ExtensionType.FLOAT:
+            case ExtensionType.STRING:
                 return <InputBox
                     key={extension.id}
                     label={extension.name}
                     required={extension.required}
-                    onChange={(inputValue) => handleInputChange(extension.id, inputValue)}
+                    onChange={(inputValue) => handleInputChange(extension.id!, inputValue)}
                 />;
-            case 'Text':
+            case ExtensionType.TEXT:
                 return <TextBox
                     key={extension.id}
-                    label={extension.name}
-                    onChange={(inputValue) => handleInputChange(extension.id, inputValue)}
+                    label={extension.name!}
+                    onChange={(inputValue) => handleInputChange(extension.id!, inputValue)}
                 />;
             default:
                 return null;
@@ -104,8 +104,8 @@ export default function ExtensionInputComponent({ onChange }: ExtensionInputComp
         fetchExtensions();
     }, []);
 
-    const textComponents = extensions.filter(extension => extension.type === 'Text');
-    const otherComponents = extensions.filter(extension => extension.type !== 'Text');
+    const textComponents = extensions.filter(extension => extension.type === ExtensionType.TEXT);
+    const otherComponents = extensions.filter(extension => extension.type !== ExtensionType.TEXT);
 
     return (
         <div className={style.section}>
