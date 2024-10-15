@@ -232,7 +232,7 @@ export default function Order() {
 
     const formatNotes = (text: string | undefined) => {
         if (!text) return '';
-        return text.replace(/\r\n|\n|\r/g, '<br />');
+        return String(text).replace(/\r\n|\n|\r/g, '<br />');
     };
 
     const formatBooleanValue = (value: string | number | boolean) => {

@@ -129,7 +129,7 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
                         worksheet.getCell(i, columnIndex).dataValidation = {
                             type: 'list',
                             allowBlank: !extension.required,
-                            formulae: [`"${extension.regex!.replace(/\\b\(\?:|\)\\b/g, '').split('|').join(',')}"`], // regex를 리스트로 변환
+                            formulae: [`"${extension.regex!.replace(/\\b\(\?:|\)\\b/g, '').split('|').join(',')}"`],
                             showErrorMessage: true,
                             errorTitle: 'Invalid Selection',
                             error: `Please select a valid option for ${extension.name}.`,
