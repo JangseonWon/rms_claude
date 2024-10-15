@@ -66,7 +66,7 @@ class ServiceRouter (
 
     private fun findService(request: ServerRequest): Mono<ServerResponse> {
         val serviceId = request.pathVariable("service_id")
-        return authenticationHandler.chkManager(request)
+        return authenticationHandler.principal(request)
             .flatMap { serviceHandler.selectService(serviceId) }
             .flatMap { ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
