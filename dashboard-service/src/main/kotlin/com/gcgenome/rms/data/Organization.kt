@@ -1,11 +1,23 @@
 package com.gcgenome.rms.data
 
-data class Organization(
-    var id: String?,
-    var user: User?,
-    var name: String?,
-    var registrationNumber: String?,
-    var type: String?,
-    var nursingNumber: String?
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.gcgenome.rms.tables.pojos.User
 
+data class Organization(
+    @JsonProperty("id")
+    val id:String,
+    @JsonProperty("name")
+    val name:String?,
+    @JsonProperty("type")
+    val type:String?,
+    @JsonProperty("registration_number")
+    val registrationNumber:String?,
+    @JsonProperty("nursing_number")
+    val nursingNumber:String?,
+    @JsonProperty("branch_code")
+    val branchCode:String?,
+    @JsonProperty("branch_name")
+    val branchName:String?,
+    @JsonProperty("user")
+    val user: User?,
 )
