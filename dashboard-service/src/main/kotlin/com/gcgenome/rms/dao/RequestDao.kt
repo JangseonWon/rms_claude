@@ -115,7 +115,7 @@ interface RequestDao: QueryDao {
             baseCondition.and(ORDER.USER_ID.eq(userDto.id))
         } else {
             baseCondition
-        }
+        }.and(REQUEST.STATUS.ne("CART"))
 
         return selectPage(mainTable = REQUEST, query = query,
             joinTables = joins, selectFields = fields, where = finalCondition) { record ->

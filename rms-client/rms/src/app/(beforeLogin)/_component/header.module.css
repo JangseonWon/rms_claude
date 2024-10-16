@@ -1,7 +1,7 @@
 .header {
     background-color: #182847;
     padding: 1vh 8vw 1.5vh 8vw;
-    min-height: 5.5vh;
+    min-height: 50px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -9,19 +9,21 @@
 .gPortalLogo{
     text-decoration: none;
     color: #ffffff;
-    font-size: 2vw;
+    font-size: 35pt;
     font-optical-sizing: auto;
     font-weight: 600;
     font-style: normal;
 }
 .needHelp {
-    background-color: #80B700;
-    border-radius: 2.5vh;
+    background-color: #86B90C;
+    border-radius: 18px;
     padding: 0.8vh 1.4vw;
-    color: #ffffff;
-    font-size: 1vw;
-    font-weight: 300;
+    color: #002B49;
+    font-size: 13pt;
+    font-weight: 600;
     border: none;
+    width: 150px;
+    height: 36px;
     text-decoration: none;
 }
 .needHelp:hover {

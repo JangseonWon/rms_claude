@@ -17,6 +17,7 @@ export const config = {
       '/home/:path*',
       '/user/:path*',
       '/users/:path*',
+      '/dashboard/:path*',
       '/organizations/:path*',
       '/post/:path*',
       '/qna/:path*'

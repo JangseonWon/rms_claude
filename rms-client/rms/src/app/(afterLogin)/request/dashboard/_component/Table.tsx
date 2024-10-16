@@ -1,9 +1,9 @@
 "use client"
 
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import style from "@/app/(afterLogin)/request/dashboard/_component/table.module.css"
 import type {Request} from "@/model/Request";
-import {getRequests} from "@/app/(afterLogin)/request/dashboard/_api/getRequests";
+import {postRequests} from "@/app/(afterLogin)/request/dashboard/_api/postRequests";
 import {format} from "date-fns";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -14,13 +14,16 @@ import {useSetStatus, useStatus} from "@/app/(afterLogin)/request/dashboard/stor
 import {Query} from "@/model/Query";
 import DownloadExcelButton from "@/app/(afterLogin)/request/dashboard/_component/DownloadExcelButton";
 import {Status} from "@/model/Status";
+import {SelectBoxOption} from "@/model/SelectBoxOption";
+import { GrPowerReset } from "react-icons/gr";
 
 export default function Table() {
-    return null
-    /*const [requestData, setRequestData] = useState<Request[]>([]);
-    const [search, setSearch] =
-        useState<Query>({filters: [], sort_by:"status", asc: true, size:5, page:1});
+    const [requestData, setRequestData] = useState<Request[]>([]);
+    const [search, setSearch] = useState<Query>({sort_by:"create_at", asc: false, size:5, page:1});
+    const [searchValue, setSearchValue] = useState<string>('');
     const [totalPage, setTotalPage] = useState<number>();
+    const [pageRange, setPageRange] = useState<{ start: number, end: number }>({ start: 1, end: 5 });
+    const [selectOption, setSelectOption] = useState<SelectBoxOption>({ table: "sample", column: "id", name: "Registration ID" });
     const status = useStatus();
     const setStatus = useSetStatus();
     const statusList = [
@@ -31,31 +34,44 @@ export default function Table() {
         {name: "DELIVERED", value: Status.DELIVERED},
         {name: "COMPLETE", value: Status.COMPLETE}
     ]
+    const selectBoxOptions: SelectBoxOption[] = [
+        { table: "sample", column: "barcode", name: "Registration ID" },
+        { table: "organization", column: "id", name: "Institution" },
+        { table: "patient", column: "name", name: "Patient(s) Name" },
+        { table: "service", column: "name", name: "Service" },
+        { table: "patient", column: "serial", name: "MRN" },
+        { table: "patient", column: "birth_year", name: "Patient BOD" },
+        { table: "request", column: "report_at", name: "Report Date" },
+        { table: "user", column: "name", name: "User Name" },
+    ];
 
-    const fetchData = async (search: Query) => {
-        const response = await getRequests(search)
+    const fetchData = useCallback(async (search: Query) => {
+        const response = await postRequests(search)
         const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
         const responseData = await response.json();
-        const data = responseData.data;
-        setRequestData(data as Request[]);
-        setTotalPage(totalPage)
-    }
+        setRequestData(responseData as Request[]);
+        setTotalPage(totalPage);
+    },[]);
 
     useEffect(() => {
         fetchData(search)
     }, [search]);
 
     useEffect(() => {
-        console.log('status changed:', status);
-        handleSearchChange({key: "status", value: status})
-    }, [status]);
+        handleSearchChange(selectOption);
+    }, [status, searchValue]);
 
     const handlePageChange = (newPageNumber: number) => {
-        setSearch(prevPage =>({
+        setSearch(prevPage => ({
             ...prevPage,
             page: newPageNumber
         }));
+        if (newPageNumber < pageRange.start || newPageNumber > pageRange.end) {
+            const newStart = Math.floor((newPageNumber - 1) / 10) * 10 + 1;
+            setPageRange({ start: newStart, end: newStart + 9 });
+        }
     };
+
     const handlePageSizeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const newSize = parseInt(event.target.value);
         setSearch(prevSearch => ({
@@ -64,22 +80,51 @@ export default function Table() {
             page: 1
         }));
     };
-    const handleSearchChange = (newFilter: { key: string; value: string }) => {
+    const handleSearchChange = (option: SelectBoxOption) => {
         setSearch((prevSearch) => {
-            const updatedFilters = prevSearch.filters?.slice() || [];
-            const existingFilterIndex = updatedFilters.findIndex((filter) => filter.key === newFilter.key);
-            if (existingFilterIndex !== -1) {
-                updatedFilters[existingFilterIndex] = newFilter;
-            } else {
-                updatedFilters.push(newFilter);
-            }
-            return { ...prevSearch, filters: updatedFilters, page:1 }
+            const newFilter = {
+                table: option.table!,
+                column: option.column!,
+                value: searchValue,
+                operator: "LIKE"
+            };
+
+            return {
+                ...prevSearch,
+                filter_groups: [
+                    {
+                        condition_type: "AND",
+                        filters: [
+                            newFilter,
+                            ...(status !== Status.TOTAL
+                                ? [{
+                                    table: 'request',
+                                    column: 'status',
+                                    value: status,
+                                    operator: "LIKE"
+                                }]
+                                : [{
+                                    table: 'request',
+                                    column: 'status',
+                                    value: 'CART',
+                                    operator: "!="
+                                }])
+                        ]
+                    },
+                    ...(prevSearch.filter_groups || []).filter(group => group.filters.some(filter => filter.column === "create_at"))
+                ],
+                page: 1
+            };
         });
     };
 
     const handleSelectStatusChange = (status: Status) => {
         setStatus(status);
-    }
+    };
+
+    const handleSearchValueChange = (value: string) => {
+        setSearchValue(value);
+    };
 
     const formatDate = (year: number | undefined, month: number | undefined, day: number | undefined) => {
         const parts = [];
@@ -97,6 +142,49 @@ export default function Table() {
         return parts.length > 0 ? parts.join('-') : '-';
     };
 
+    const addDateFilter = (from: Date | null, to: Date | null) => {
+        if (!from || !to) return;
+
+        setSearch((prevSearch) => {
+            const updatedFilters = prevSearch.filter_groups?.filter(group =>
+                !group.filters.some(filter => filter.column === "create_at")
+            ) || [];
+
+            return {
+                ...prevSearch,
+                filter_groups: [
+                    ...updatedFilters,
+                    {
+                        condition_type: "AND",
+                        filters: [
+                            {
+                                table: "request",
+                                column: "create_at",
+                                value: format(from, "yyyy-MM-dd"),
+                                operator: ">="
+                            },
+                            {
+                                table: "request",
+                                column: "create_at",
+                                value: format(to, "yyyy-MM-dd"),
+                                operator: "<="
+                            }
+                        ]
+                    }
+                ],
+                page: 1
+            };
+        });
+    };
+
+    const handleReset = () => {
+        console.log('dsafdsfasdf');
+        setSearch({ sort_by: "create_at", asc: false, size: 5, page: 1 });
+        setSearchValue('');
+        setStatus(Status.TOTAL);
+        setSelectOption({ table: "sample", column: "id", name: "Registration ID" });
+    };
+
     return (
         <div className={style.container}>
             <div className={style.filterContainer}>
@@ -104,26 +192,35 @@ export default function Table() {
                     <DatePickerRangeBox
                         label={"from-to"}
                         onChange={(from, to) =>{
-                            handleSearchChange({ key: "date_from", value: format(from, "yyyy-MM-dd")})
-                            handleSearchChange({ key: "date_to", value: format(to, "yyyy-MM-dd")})
+                            addDateFilter(from, to);
                         }}/>
-                    <div>
-                        <SelectBox
-                            width={"7vw"}
-                            value={status}
-                            options={statusList}
-                            label={"status"}
-                            onChange={(selectedOption) =>{
-                                handleSelectStatusChange(selectedOption.value);
-                            }}
-                        />
-                    </div>
+                    <SelectBox
+                        width={"7vw"}
+                        value={status}
+                        options={statusList}
+                        label={"status"}
+                        onChange={(selectedOption) =>{
+                            handleSelectStatusChange(selectedOption.value);
+                        }}
+                    />
+                    <GrPowerReset
+                        className={style.resetButton}
+                        onClick={handleReset}/>
                 </div>
                 <div className={style.filterContainerLeft}>
                     <DownloadExcelButton requestData={requestData} status={status} />
+                    <SelectBox
+                        width={'155px'}
+                        value={selectOption.name}
+                        options={selectBoxOptions}
+                        label={" "}
+                        onChange={(selectedOption) => {
+                            setSelectOption(selectedOption);
+                        }}
+                    />
                     <div className={style.search}>
-                        <InputBox label={"search"} onChange={(value) =>{
-                            handleSearchChange({key: "search", value: value})
+                        <InputBox label={""} onChange={(value) =>{
+                            handleSearchValueChange(value);
                         }}></InputBox>
                     </div>
                 </div>
@@ -174,15 +271,15 @@ export default function Table() {
                 <span> 1-{totalPage} of {search.page} </span>
                 <button
                     disabled={search.page === 1}
-                    onClick={() => handlePageChange(search.page - 1)}
+                    onClick={() => handlePageChange((search.page ?? 1) - 1)}
                 ><FontAwesomeIcon icon={faAngleLeft}/>
                 </button>
                 <button
                     disabled={search.page === totalPage}
-                    onClick={() => handlePageChange(search.page + 1)}
+                    onClick={() => handlePageChange((search.page ?? 1) + 1)}
                 ><FontAwesomeIcon icon={faAngleRight}/>
                 </button>
             </div>
         </div>
-    )*/
+    )
 }
