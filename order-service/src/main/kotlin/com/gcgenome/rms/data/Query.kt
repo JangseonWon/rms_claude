@@ -3,22 +3,24 @@ package com.gcgenome.rms.data
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class Query(
-    @JsonProperty("page")
-    val page: Int,
-    @JsonProperty("size")
-    val size: Int,
     @JsonProperty("sort_by")
-    val sortBy: String?,
-    @JsonProperty("asc")
-    var asc: Boolean = true,
-    @JsonProperty("filters")
-    val filters: MutableList<Filter>?
+    var sortBy: String? = null,
+    var asc: Boolean? = null,
+    var page: Int? = null,
+    var size: Int? = null,
+    @JsonProperty("filter_groups")
+    var filterGroups: MutableList<FilterGroup>? = null
 ){
-    companion object {
+    data class FilterGroup(
+        @JsonProperty("condition_type")
+        var conditionType: String = "AND",
+        var filters: List<Filter>
+    ){
         data class Filter(
-            val key: String?,
-            val value: String?,
-            val operator: String?
+            var table: String,
+            var column: String,
+            var operator: String,
+            var value: String
         )
     }
 }
