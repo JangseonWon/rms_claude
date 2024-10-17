@@ -1,3 +1,6 @@
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.5.0"
+}
 rootProject.name = "rms"
 
 include("entity")
@@ -16,7 +19,7 @@ include("cart-service")
 include("alis-service")
 include("post-service")
 include("profile-service")
-
+include("catalog-service")
 
 dependencyResolutionManagement {
     versionCatalogs {
