@@ -1,5 +1,6 @@
 import {Sample} from "@/model/Sample";
 import {Service} from "@/model/Service";
+import {Report} from "@/model/Report"
 
 export interface Request {
     service?: Service
@@ -18,8 +19,10 @@ export interface Request {
     price?: number
     outsourcing_cost?: number
     sample?: Sample
+    reports?: Report[]
     create_at?: Date
     complete_at?: Date
     resample_at?: Date
+    reported_at?: Date
     serial?: string
 }

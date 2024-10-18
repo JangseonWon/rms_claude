@@ -2,40 +2,63 @@
 
 import React, {useEffect, useState} from "react";
 import style from "@/app/(afterLogin)/request/result/download/_component/downloadTable.module.css";
-import {faAngleLeft, faAngleRight, faDownload} from "@fortawesome/free-solid-svg-icons";
+import {faAngleLeft, faAngleRight, faDownload, faFileDownload, faFilePdf} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import type {Request} from "@/model/Request";
-import {fetchFinishedOrder} from "@/app/(afterLogin)/request/result/download/_api/fetchFinishedOrder";
-import {fetchDownloadFile} from "@/app/(afterLogin)/request/result/download/_api/fetchDownloadFile";
-import {useOpenAlertDialogB, useSetIconAlertDialogB, useSetMessageAlertDialogB} from "@/store/useBeforeLoginAlertDialogStore";
+import {postRequests} from "@/app/(afterLogin)/request/result/download/_api/postRequests";
+import {getReportFile} from "@/app/(afterLogin)/request/result/download/_api/getReportFile";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
-import {format} from "date-fns";
 import SelectBox from "@/app/_component/SelectBox";
 import InputBox from "@/app/_component/InputBox";
-import {Query} from "@/model/Query";
-import {fetchMultiDownloadFile} from "@/app/(afterLogin)/request/result/download/_api/fetchMultiDownloadFile";
 import BlueButton from "@/app/_component/BlueButton";
+import {SelectBoxOption} from "@/model/SelectBoxOption";
+import {Filter} from "@/model/Filter";
+import {Query} from "@/model/Query";
+import {Report} from "@/model/Report";
+import {getReportFiles} from "@/app/(afterLogin)/request/result/download/_api/getReportFiles";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;
 }
+const selectBoxOptions: SelectBoxOption[] = [
+    { table: "sample", column: "barcode", name: "Registration Number" },
+    { table: "service", column: "name", name: "Service Name" },
+    { table: "patient", column: "name", name: "Patient(s) Name" },
+    { table: "patient", column: "serial", name: "MRN" },
+    { table: "organization", column: "name", name: "Institution" },
+    { table: "request", column: "status", name: "Status" },
+
+];
 
 export default function DownloadTable() {
-    return null
-    /*const [requestData, setRequestData] = useState<RequestWithSelected[]>([]);
+    const [requestData, setRequestData] = useState<RequestWithSelected[]>([]);
     const isSelectedAll = requestData && requestData.length > 0 ? requestData.every((row) => row.isSelected) : false;
     const [totalPage, setTotalPage] = useState<number>(0);
-    const [status, setStatus] = useState<string>('-');
-    const [search, setSearch] =
-        useState<Query>({filters: [], sort_by:"status", asc: true, size:10, page:1});
-    const statusList = [
-        {name:"DELIVERED", value:"DELIVERED"},
-        {name:"COMPLETE", value:"FINISHED"}
-    ];
-
-    const setShowAlertDialog = useOpenAlertDialog();
-    const setMessage = useSetMessageAlertDialog();
-    const setIcon = useSetIconAlertDialog();
+    const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
+    const [filter, setFilter] = useState<Filter>({
+            table: selectBoxOptions[0].table!,
+            column: selectBoxOptions[0].column!,
+            operator: "LIKE",
+            value: ""
+    })
+    const [search, setSearch] = useState<Query>(
+{
+            size:10,
+            page:1,
+            filter_groups: [
+                {
+                    filters: [
+                        {
+                            table: "request",
+                            column: "reported_at",
+                            operator: "IS NOT NULL",
+                            value: ""
+                        }
+                    ]
+                }
+            ]
+        }
+    );
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage =>({
@@ -60,16 +83,6 @@ export default function DownloadTable() {
         });
     };
 
-    const handleSearchChange = (newFilter: { key: string; value: string }) => {
-        setSearch((prevSearch) => {
-            const updatedFilters = prevSearch.filters?.slice() || [];
-            const existingFilterIndex = updatedFilters.findIndex((filter) => filter.key === newFilter.key)
-            if (existingFilterIndex !== -1) updatedFilters[existingFilterIndex] = newFilter;
-            else updatedFilters.push(newFilter);
-            return { ...prevSearch, filters: updatedFilters, page:1 }
-        });
-    };
-
     const handleSelectAll = (isSelected: boolean) => {
         setRequestData((prevData) =>
             prevData.map((row) => ({ ...row, isSelected }))
@@ -78,11 +91,10 @@ export default function DownloadTable() {
 
     const fetchData = async (search: Query) => {
         try {
-            const response = await fetchFinishedOrder(search)
+            const response = await postRequests(search)
             const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
             const responseData = await response.json();
-            const data = responseData.data;
-            setRequestData(data as Request[]);
+            setRequestData(responseData as Request[]);
             setTotalPage(totalPage)
         } catch(error) {
             console.error("Failed to fetch data:", error);
@@ -92,27 +104,39 @@ export default function DownloadTable() {
     }
 
     useEffect(() => {
+        setSearch((prevSearch) => ({
+            ...prevSearch,
+            filter_groups: [
+                {
+                    ...prevSearch?.filter_groups?.[0] || {},
+                    filters: [
+                        ...(prevSearch?.filter_groups?.[0]?.filters || []),
+                        filter,
+                    ],
+                },
+            ],
+        }));
+    }, [filter]);
+
+    useEffect(() => {
         fetchData(search)
     }, [search]);
 
-    const handleDownloadOnClick = async (requestId: string) => {
+    const handleDownloadOnClick = async (report: Report, request: Request) => {
         try {
-            const response = await fetchDownloadFile(requestId);
+            const response = await getReportFile(report.id!);
             if (response.ok) {
                 const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
+                const url = URL.createObjectURL(blob)
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `${requestId}.pdf`;
+                a.download = `${request.sample?.barcode || 'NA'}_${request.service?.id || 'NA'}.pdf`;
                 document.body.appendChild(a);
                 a.click();
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-                fetchData(search);
+                a.remove();
+                URL.revokeObjectURL(url);
             } else {
-                setMessage(response.statusText);
-                setShowAlertDialog(true);
-                setIcon('error');
+                alert("Download failed")
             }
         } catch (error) {
             console.error("Failed to fetch download file:", error);
@@ -120,19 +144,14 @@ export default function DownloadTable() {
     };
 
     const handleMultiDownloadOnClick = async () => {
-        const selectedIds = requestData.filter(row => row.isSelected).map(row => `${row.sample?.barcode}_${row.service?.id}`);
-        if (selectedIds.length === 0) {
-            setMessage("No items selected for download.");
-            setShowAlertDialog(true);
-            setIcon('warning');
-            return;
-        }
-
+        const selectedIds = requestData
+            .filter(row => row.isSelected)
+            .map(row => `${row.sample?.barcode}_${row.service?.id}`);
         try {
-            const response = await fetchMultiDownloadFile(selectedIds);
+            const response = await getReportFiles(selectedIds);
             if (response.ok) {
                 const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
+                const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 const today = new Date().toISOString().split('T')[0];
                 a.href = url;
@@ -140,12 +159,10 @@ export default function DownloadTable() {
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
+                URL.revokeObjectURL(url);
                 fetchData(search);
             } else {
-                setMessage(response.statusText);
-                setShowAlertDialog(true);
-                setIcon('error');
+                alert("Download failed")
             }
         } catch (error) {
             console.error("Failed to fetch multi download file:", error);
@@ -155,34 +172,37 @@ export default function DownloadTable() {
     return (
         <>
             <section className={style.filterContainer}>
-                <div className={style.filterContainerLeft}>
-                    <DatePickerRangeBox
-                        label={"date-from-to"}
-                        onChange={(from, to) => {
-                            handleSearchChange({key: "date_from", value: format(from, "yyyy-MM-dd")})
-                            handleSearchChange({key: "date_to", value: format(to, "yyyy-MM-dd")})
-                        }}/>
-                    <SelectBox options={statusList} label={"status"} value={status} onChange={(value) => {
-                        setStatus(value.value);
-                        handleSearchChange({key: "status", value: value.value})
-                    }}/>
-                </div>
                 <div className={style.filterContainerRight}>
-                    <InputBox label={"search"} onChange={(value) => {
-                        handleSearchChange({key: "search", value: value})
-                    }}></InputBox>
+                    <BlueButton name={"Batch Download"} onClick={handleMultiDownloadOnClick}/>
                 </div>
-            </section>
-            <section>
-                <div className={style.downloadButton}>
-                    <BlueButton name={"Report Download"} onClick={handleMultiDownloadOnClick}/>
+                <div className={style.filterContainerLeft}>
+                    <SelectBox
+                        width={"10vw"}
+                        value={selectedOption.name}
+                        options={selectBoxOptions}
+                        label={"filter"}
+                        onChange={(option) => {
+                            setSelectedOption(option);
+                            setFilter(prev => ({
+                                ...prev,
+                                table: option.table!,
+                                column: option.column!
+                            }))
+                        }}
+                    />
+                    <InputBox label={"search"} onChange={(value) => {
+                        setFilter(prev => ({
+                            ...prev,
+                            value: value
+                        }))
+                    }}></InputBox>
                 </div>
             </section>
             <section className={style.tableContainer}>
                 <table className={style.table}>
                     <thead>
                     <tr>
-                        <th>
+                    <th>
                             <label form="agree" className={style.checkbox}>
                                 <input
                                     type="checkbox"
@@ -194,41 +214,44 @@ export default function DownloadTable() {
                             </label>
                         </th>
                         <th>Registration Number</th>
+                        <th>Service Name</th>
                         <th>Patient(s) Name</th>
                         <th>MRN</th>
                         <th>Institution</th>
-                        <th>Physician Name</th>
                         <th>Report out<br/>(YYYY/MM/DD)</th>
                         <th>Status</th>
                         <th>Report Download</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {requestData && requestData.length > 0 && requestData.map((row, rowIndex) => (
-                        <tr key={row.order_id! + row.service!.id + row.sample!.id}>
+                    {requestData.map((request, rowIndex) => (
+                        <tr key={request!.sample!.barcode! + request!.service!.id!}>
                             <td>
                                 <label form="agree" className={style.checkbox}>
                                     <input
                                         type="checkbox"
-                                        checked={row.isSelected || false}
-                                        onChange={() => handleSelectChange(rowIndex, !row.isSelected)}
+                                        checked={request.isSelected || false}
+                                        onChange={() => handleSelectChange(rowIndex, !request.isSelected)}
                                         className={style.checkbox}
                                     />
                                     <span className={style.checkmark}></span>
                                 </label>
                             </td>
-                            <td>{row.sample?.barcode}</td>
-                            <td>{row.sample?.patient?.name}</td>
-                            <td>{row.sample?.patient?.serial}</td>
-                            <td>{row.sample?.patient?.organization?.id}</td>
-                            <td>{row.physician}</td>
-                            <td>{row.complete_at ? new Date(row.complete_at).toLocaleDateString() : 'N/A'}</td>
-                            <td>{row.status}</td>
+                            <td>{request.sample?.barcode}</td>
+                            <td>{request.service?.name}</td>
+                            <td>{request.sample?.patient?.name}</td>
+                            <td>{request.sample?.patient?.serial}</td>
+                            <td>{request.sample?.patient?.organization?.name}</td>
+                            <td>{request.reported_at ? new Date(request.reported_at).toLocaleDateString() : '-'}</td>
+                            <td>{request.status}</td>
                             <td>
-                                <FontAwesomeIcon
-                                    className={style.downloadIcon}
-                                    icon={faDownload}
-                                    onClick={() => handleDownloadOnClick(`${row.sample?.barcode}_${row.service?.id}` || '')}/>
+                                {(request.reports as Report[]).filter((report: Report) => report.type === 'PDF').map((report, reportIndex) => (
+                                    <FontAwesomeIcon
+                                        key={report.id}
+                                        className={style.downloadIcon}
+                                        icon={faFilePdf}
+                                        onClick={() => handleDownloadOnClick(report, request)}/>
+                                ))}
                             </td>
                         </tr>
                     ))}
@@ -257,5 +280,5 @@ export default function DownloadTable() {
                 </div>
             </section>
         </>
-    );*/
+    );
 }

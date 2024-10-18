@@ -42,6 +42,10 @@ const nextConfig = {
             {
                 source: '/w-api/catalog-service/:path*',
                 destination: `https://rms-test.gcgenome.com/w-api/catalog-service/:path*`,
+            },
+            {
+                source: '/w-api/result-service/:path*',
+                destination: `https://rms-test.gcgenome.com/w-api/result-service/:path*`,
             }
         ];
     },

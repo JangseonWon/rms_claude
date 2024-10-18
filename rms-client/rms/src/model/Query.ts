@@ -9,6 +9,6 @@ export interface Query {
 }
 
 export interface FilterGroup {
-    condition_type: string;  // AND 또는 OR
-    filters: Filter[];
+    condition_type?: string;  // AND 또는 OR
+    filters?: Filter[];
 }

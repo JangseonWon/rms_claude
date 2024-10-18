@@ -21,21 +21,9 @@ import {useSetCategory} from "@/store/useCategoryStore";
 
 export default function NavMenu() {
     const segment = useSelectedLayoutSegment();
-    const [showServicesDropdown, setShowServicesDropdown] = useState(false);
     const [showResultDropdown, setShowResultDropdown] = useState(false);
     const [showManagementDropdown, setShowManagementDropdown] = useState(false);
-    const setCategoryData = useSetCategory();
     const { data: session } = useSession();
-
-    const fetchData = async () => {
-        const response = await getCategories()
-        const data = await response.json();
-        setCategoryData(data as Categories[]);
-    }
-
-    const toggleServicesDropdown = () => {
-        setShowServicesDropdown(!showServicesDropdown);
-    }
 
     const toggleResultDropdown = () => {
         setShowResultDropdown(!showResultDropdown);
@@ -44,10 +32,6 @@ export default function NavMenu() {
     const toggleManagementDropdown = () => {
         setShowManagementDropdown(!showManagementDropdown);
     }
-
-    useEffect(() => {
-        fetchData()
-    }, []);
 
     return (
         <li className={style.navPill}>
@@ -82,25 +66,6 @@ export default function NavMenu() {
                         </div>
                     </Link>
                 </li>
-                {/*<li onClick={toggleServicesDropdown}>
-                    <div className={style.navItem}>
-                        <FontAwesomeIcon
-                            className={segment === 'services' ? style.clickIcon : style.icon}
-                            icon={faBorderAll}/>
-                        <span className={segment === 'services' ? style.clickSpan : ''}>Services</span>
-                    </div>
-                </li>
-                {showServicesDropdown && (
-                    <>
-                        {categoryData.map(category => (
-                            <ol key={category.id}>
-                                <Link href={`/request/services/${category.name}/${category.order_type === 'SINGLE' ? 'single' : 'multi'}`}>
-                                    {category.name}
-                                </Link>
-                            </ol>
-                        ))}
-                    </>
-                )}*/}
                 <li>
                     <Link href={"/request/cart"}>
                         <div className={style.navItem}>

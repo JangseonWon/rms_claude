@@ -1,13 +1,13 @@
 .filterContainer {
-    margin: 2vh 1.5vw;
+    margin: 2vh 1vw;
     display: flex;
     justify-content: space-between;
 }
-.filterContainerLeft {
+.filterContainerRight {
     display: flex;
 }
-.filterContainerRight {
-    width: 20vw;
+.filterContainerLeft {
+    display: flex;
 }
 .downloadButton {
     display: flex;
@@ -137,4 +137,6 @@
 }
 .downloadIcon {
     cursor: pointer;
+    margin-right: 8px;
+    font-size: 20px;
 }

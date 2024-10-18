@@ -1,8 +1,9 @@
-export async function fetchMultiDownloadFile(requestIds: Array<string>) {
-    return await fetch(`/w-api/order-service/requests/reports/multi-download`, {
+export async function getReportFiles(requestIds: string[]) {
+    return await fetch(`/w-api/result-service/reports`, {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
+            'Accept': 'application/zip'
         },
         body: JSON.stringify({ ids: requestIds }),
         credentials: 'include',

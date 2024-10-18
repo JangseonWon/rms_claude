@@ -5,7 +5,7 @@ import style from "@/app/(afterLogin)/request/result/resample/_component/reSampl
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import type {Request} from "@/model/Request";
-import {fetchFinishedOrder} from "@/app/(afterLogin)/request/result/download/_api/fetchFinishedOrder";
+import {postRequests} from "@/app/(afterLogin)/request/result/download/_api/postRequests";
 import {Query} from "@/model/Query";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import {format} from "date-fns";

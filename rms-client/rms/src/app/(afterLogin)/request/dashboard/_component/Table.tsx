@@ -111,7 +111,7 @@ export default function Table() {
                                 }])
                         ]
                     },
-                    ...(prevSearch.filter_groups || []).filter(group => group.filters.some(filter => filter.column === "create_at"))
+                    ...(prevSearch.filter_groups || []).filter(group => group.filters?.some(filter => filter.column === "create_at"))
                 ],
                 page: 1
             };
@@ -146,8 +146,8 @@ export default function Table() {
         if (!from || !to) return;
 
         setSearch((prevSearch) => {
-            const updatedFilters = prevSearch.filter_groups?.filter(group =>
-                !group.filters.some(filter => filter.column === "create_at")
+            const updatedFilters = (prevSearch.filter_groups || []).filter(group =>
+                !group.filters?.some(filter => filter.column === "create_at")
             ) || [];
 
             return {
