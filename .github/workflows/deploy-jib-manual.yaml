@@ -5,7 +5,7 @@ on:
       submodules:
         description: "모듈 목록을 JSON String 배열로 입력하세요"
         required: true
-        default: '["management-service", "login-service", "dashboard-service", "product-service", "organization-service", "order-service", "cart-service", "lims-service", "api", "post-service", "profile-service", "catalog-service"]'
+        default: '["management-service", "login-service", "dashboard-service", "product-service", "organization-service", "order-service", "cart-service", "lims-service", "api", "post-service", "profile-service", "catalog-service", "result-service"]'
 
 permissions: write-all
 jobs:

@@ -20,6 +20,7 @@ include("alis-service")
 include("post-service")
 include("profile-service")
 include("catalog-service")
+include("result-service")
 
 dependencyResolutionManagement {
     versionCatalogs {

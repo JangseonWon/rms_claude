@@ -18,6 +18,7 @@ on:
       - alis-api/**
       - profile-service/**
       - catalog-service/**
+      - result-service/**
 permissions: write-all
 jobs:
   extract:
@@ -48,6 +49,7 @@ jobs:
           "$module_name" == "alis-api" ||
           "$module_name" == "product-service" ||
           "$module_name" == "catalog-service" ||
+          "$module_name" == "result-service" ||
           "$module_name" == "profile-service" ]] && module_names+=("$module_name")
           done
           module_names=($(printf '%s\n' "${module_names[@]}" | sort -u))
