@@ -20,8 +20,8 @@ class OrderHandler(
         return dslContext.selectOrderStatusRequestsWithPage(query, user.user)
     }
 
-    fun checkRequest(orderId: UUID, sampleId: UUID, serviceId: String) : Mono<Request> {
-        return dslContext.selectRequestByPK(orderId, sampleId,  serviceId)
+    fun checkRequest(sampleId: UUID, serviceId: String) : Mono<Request> {
+        return dslContext.selectRequestByPK(sampleId,  serviceId)
             .switchIfEmpty(Mono.error(RequestNotFoundException()))
     }
 }

@@ -5,12 +5,13 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import React, {useEffect, useState} from "react";
 import type {Request} from "@/model/Request";
-import type {Page} from "@/model/Page";
 import {format} from "date-fns";
 import {useRouter} from "next/navigation";
 import {faFileLines} from "@fortawesome/free-regular-svg-icons/faFileLines";
-import {getRequestOrders} from "@/app/(afterLogin)/request/order/_api/getRequestOrders";
+import {postRequestOrders} from "@/app/(afterLogin)/request/order/_api/postRequestOrders";
 import BarcodeButton from "@/app/(afterLogin)/request/order/_component/BarcodeButton";
+import {Query} from "@/model/Query";
+import {SelectBoxOption} from "@/model/SelectBoxOption";
 
 export interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -18,7 +19,8 @@ export interface RequestWithSelected extends Request {
 
 export default function OrderTable() {
     const [requestData, setRequestData] = useState<RequestWithSelected[]>([]);
-    const [page, setPage] = useState<Page>({size:10, number:1});
+    const [totalPage, setTotalPage] = useState<number>(0);
+    const [search, setSearch] = useState<Query>({sort_by:"id", asc: true, size:10, page:1});
     const router = useRouter();
     const isSelectedAll = requestData.every((row) => row.isSelected);
 
@@ -37,33 +39,58 @@ export default function OrderTable() {
     };
 
     const handlePageChange = (newPageNumber: number) => {
-        setPage(prevPage =>({...prevPage, number: newPageNumber}));
+        setSearch(prevPage =>({
+            ...prevPage,
+            page: newPageNumber
+        }));
     };
     const handlePageSizeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const newSize = parseInt(event.target.value);
-        setPage((prevPage) => ({ ...prevPage, size: newSize, number: 1 }));
+        setSearch(prevSearch => ({
+            ...prevSearch,
+            size: newSize,
+            page: 1
+        }));
     };
 
-    const fetchData = async (pageSize: number, pageNumber: number) => {
-        const response = await getRequestOrders(pageSize, pageNumber);
-        const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
-        const responseData = await response.json();
-        const data = responseData.data;
+    const handleSearchChange = (option: SelectBoxOption, value: string) => {
+        setSearch((prevSearch) => ({
+            ...prevSearch,
+            filter_groups:[
+                {
+                    condition_type: "OR",
+                    filters: [
+                        {
+                            table: option.table!,
+                            column: option.column!,
+                            value: value,
+                            operator: "LIKE"
+                        }
+                    ]
+                }
+            ],
+            page:1
+        }));
+    };
 
+    const fetchData = async (search: Query) => {
+        const response = await postRequestOrders(search);
+        const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
+        const data = await response.json();
         setRequestData(data as Request[]);
-        setPage(prevPage => ({ ...prevPage, totalPage: totalPage }));
+        setTotalPage(totalPage);
     };
 
 
     const handleInfoClick = (row: RequestWithSelected) => {
-        router.push(`/request/order/info?order=${row.order_id}&service=${row.service!.id}&sample=${row.sample!.id}&user_id=${row.sample!.patient!.organization!.user!.id}`);
+        router.push(`/request/order/info?service=${row.service!.id}&sample=${row.sample!.id}&user_id=${row.sample!.patient!.organization!.user!.id}`);
     };
 
     const selectedRequest = requestData.filter((row) => row.isSelected);
 
     useEffect(() => {
-        fetchData(page.size, page.number)
-    }, [page.size, page.number]);
+        fetchData(search)
+    }, [search]);
 
     return (
         <div className={style.container}>
@@ -131,21 +158,21 @@ export default function OrderTable() {
             <div className={style.pagination}>
                 <span>items per page:</span>
                 <div className={style.select}>
-                    <select onChange={handlePageSizeChange} defaultValue={page.size}>
+                    <select onChange={handlePageSizeChange}>
                         <option value="10">10</option>
                         <option value="20">20</option>
                         <option value="50">50</option>
                     </select>
                 </div>
-                <span> 1-{page.totalPage} of {page.number} </span>
+                <span> 1-{totalPage} of {search.page} </span>
                 <button
-                    disabled={page.number === 1}
-                    onClick={() => handlePageChange(page.number - 1)}
+                    disabled={search.page === 1}
+                    onClick={() => handlePageChange((search.page ?? 1) - 1)}
                 ><FontAwesomeIcon icon={faAngleLeft}/>
                 </button>
                 <button
-                    disabled={page.number === page.totalPage}
-                    onClick={() => handlePageChange(page.number + 1)}
+                    disabled={search.page === totalPage}
+                    onClick={() => handlePageChange((search.page ?? 1) + 1)}
                 ><FontAwesomeIcon icon={faAngleRight}/>
                 </button>
             </div>

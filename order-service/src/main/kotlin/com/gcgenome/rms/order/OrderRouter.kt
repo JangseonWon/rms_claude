@@ -24,7 +24,7 @@ class OrderRouter(
     @Bean("OrderRouter")
     fun route() = router {
         POST("/w-api/order-service/requests", ::selectRequestsStatusOrder)
-        GET("/w-api/order-service/orders/{order_id}/services/{service_id}/samples/{sample_id}", :: selectRequest)
+        GET("/w-api/order-service/services/{service_id}/samples/{sample_id}", :: selectRequest)
     }
 
     private fun selectRequestsStatusOrder(request: ServerRequest) : Mono<ServerResponse> {
@@ -43,11 +43,10 @@ class OrderRouter(
     }
 
     private fun selectRequest(request: ServerRequest) : Mono<ServerResponse> {
-        val orderId = UUID.fromString(request.pathVariable("order_id"))
         val serviceId = request.pathVariable("service_id")
         val sampleId = UUID.fromString(request.pathVariable("sample_id"))
         return authenticationHandler.principal(request)
-            .flatMap { orderHandler.checkRequest(orderId, sampleId, serviceId) }
+            .flatMap { orderHandler.checkRequest(sampleId, serviceId) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(DataAccessException::class.java)  {e ->  ColumnNotFoundException(e).toServerResponse()}

@@ -124,7 +124,7 @@ interface RequestDao: QueryDao {
         }
     }
 
-    fun DSLContext.selectRequestByPK(orderId: UUID, sampleId: UUID, serviceId: String): Mono<Request> =
+    fun DSLContext.selectRequestByPK(sampleId: UUID, serviceId: String): Mono<Request> =
         Mono.from(
             select(
                 jsonObject(
@@ -215,8 +215,7 @@ interface RequestDao: QueryDao {
                 .join(SAMPLE_TYPE).on(SAMPLE.SAMPLE_TYPE_ID.eq(SAMPLE_TYPE.ID))
                 .join(ORGANIZATION).on(ORGANIZATION.ID.eq(PATIENT.ORGANIZATION_ID)
                     .and(ORGANIZATION.USER_ID.eq(PATIENT.USER_ID)))
-                .where(REQUEST.ORDER_ID.eq(orderId)
-                    .and(REQUEST.SAMPLE_ID.eq(sampleId))
+                .where(REQUEST.SAMPLE_ID.eq(sampleId)
                     .and(REQUEST.SERVICE_ID.eq(serviceId)))
         ).map { record -> Request.toPatientModel(record) }
 }

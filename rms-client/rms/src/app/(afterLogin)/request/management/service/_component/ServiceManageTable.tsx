@@ -6,7 +6,7 @@ import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
 import {Query} from "@/model/Query";
-import {getServices} from "@/app/(afterLogin)/request/management/service/_api/getServices";
+import {postServices} from "@/app/(afterLogin)/request/management/service/_api/postServices";
 import SelectBox from "@/app/_component/SelectBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import BlueButton from "@/app/_component/BlueButton";
@@ -81,11 +81,11 @@ export default function ServiceManageTable() {
 
     const fetchData = async (search: Query) => {
         try {
-            const response = await getServices(search)
+            const response = await postServices(search)
             const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
             const responseData = await response.json();
             setServiceManageData(responseData as Service[]);
-            setTotalPage(totalPage)
+            setTotalPage(totalPage);
         } catch(error) {
             console.error("Failed to fetch data:", error);
             setServiceManageData([]);

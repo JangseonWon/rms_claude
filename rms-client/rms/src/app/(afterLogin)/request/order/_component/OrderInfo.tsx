@@ -15,7 +15,6 @@ export default function OrderInfo() {
     const [request, setRequest] = useState<Request>()
     const router = useRouter();
     const searchParams = useSearchParams()
-    const orderId = searchParams!.get("order")
     const serviceId = searchParams!.get("service")
     const sampleId = searchParams!.get("sample")
 
@@ -45,10 +44,10 @@ export default function OrderInfo() {
     };
 
     const fetchRequest = useCallback(async () => {
-        const response = await getRequestOrderInfo(orderId!, serviceId!, sampleId!)
+        const response = await getRequestOrderInfo(serviceId!, sampleId!)
         const json = await response.json()
         setRequest(json as Request)
-    },[orderId, serviceId, sampleId]);
+    },[serviceId, sampleId]);
 
     const formatDate = (date: Date): string => {
         const year = date.getFullYear();
