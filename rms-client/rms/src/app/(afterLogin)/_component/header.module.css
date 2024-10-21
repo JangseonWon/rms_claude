@@ -23,6 +23,7 @@
     color: #fff;
     text-decoration: none;
     padding: 1vh 1.5vw 0.5vh 1vw;
+    margin-right: 3vw;
     transition: background-color 0.3s ease;
     border-bottom: solid #90BA2D;
 }
