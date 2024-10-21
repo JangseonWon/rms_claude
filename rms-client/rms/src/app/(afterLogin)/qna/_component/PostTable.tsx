@@ -9,7 +9,7 @@ import {Query} from "@/model/Query";
 import {Post} from "@/model/Post";
 import {useRouter} from "next/navigation";
 import {faComment} from "@fortawesome/free-regular-svg-icons";
-import {getPostSearch} from "@/app/(afterLogin)/qna/_api/getPostSearch";
+import {postPosts} from "@/app/(afterLogin)/qna/_api/postPosts";
 import SelectBox from "@/app/_component/SelectBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 
@@ -95,7 +95,7 @@ export default function PostTable() {
     };
 
     const fetchData = useCallback(async (search: Query) => {
-        const response = await getPostSearch(search);
+        const response = await postPosts(search);
         const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
         const responseData = await response.json();
         setPostData(responseData as Post[]);

@@ -1,6 +1,6 @@
 import {Query} from "@/model/Query";
 
-export async function getExtensionsPage(search: Query) {
+export async function postExtensionsPage(search: Query) {
     return await fetch(`/w-api/management-service/extensions`, {
         method: 'POST',
         headers: {

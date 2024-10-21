@@ -9,7 +9,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {Query} from "@/model/Query";
 import InputBox from "@/app/_component/InputBox";
-import {getExtensionsPage} from "@/app/(afterLogin)/request/management/additional-info/_api/getExtensionsPage";
+import {postExtensionsPage} from "@/app/(afterLogin)/request/management/additional-info/_api/postExtensionsPage";
 import BlueButton from "@/app/_component/BlueButton";
 import SelectBox from "@/app/_component/SelectBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
@@ -65,7 +65,7 @@ export default function ExtensionTable() {
 
     const fetchData = async (search: Query) => {
         try {
-            const response = await getExtensionsPage(search);
+            const response = await postExtensionsPage(search);
             const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
             const responseData = await response.json();
             setExtensionData(responseData as Extension[]);

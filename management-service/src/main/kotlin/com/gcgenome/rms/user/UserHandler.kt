@@ -19,10 +19,6 @@ class UserHandler(
     val encoder: BCryptPasswordEncoder,
 ): UserServiceDao, ServiceDao, UserDao, OrganizationDao {
 
-    fun selectUserById(userId: String): Mono<UserDTO> {
-        return Mono.from(dslContext.selectUserById(userId))
-    }
-
     fun selectUsers(query: Query): Mono<Page<UserDTO>> {
         return dslContext.selectUsersWithPage(query)
     }
@@ -52,26 +48,6 @@ class UserHandler(
     private fun isAuthorized(authentication: UserAuthentication, user: UserDTO): Boolean {
         return authentication.user.role in listOf(Role.ADMIN.toString(), Role.MANAGER.toString()) ||
                 authentication.user.id == user.id
-    }
-    fun insertUserOrganization(organization: OrganizationDTO): Mono<OrganizationDTO> {
-        return Mono.from(dslContext.transactionPublisher { trx ->
-            trx.dsl().run { insertOrganization(organization) }
-        })
-    }
-
-    fun deleteUserOrganization(organization: OrganizationDTO): Mono<OrganizationDTO> {
-        return Mono.from(dslContext.transactionPublisher { trx ->
-            trx.dsl().run {
-                deleteOrganizationById(organization)
-                    .switchIfEmpty(Mono.error(OrganizationNotDeleteException()))
-            }
-        })
-    }
-
-    fun updateUserOrganization(organization: OrganizationDTO): Mono<OrganizationDTO> {
-        return Mono.from(dslContext.transactionPublisher { trx ->
-            trx.dsl().run { updateOrganizationByUserId(organization) }
-        })
     }
 
     fun insertUserService(userService: UserServiceDTO): Mono<UserDTO> {

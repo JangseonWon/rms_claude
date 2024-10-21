@@ -1,14 +1,12 @@
-export async function putExtension(extension: {
-    extension_id: any;
-    service_id: string | undefined;
-    required: undefined | boolean
-}) {
-    return await fetch(`/w-api/management-service/services/${extension.service_id}/extensions/${extension.extension_id}`, {
-        method: 'PUT',
+import {Query} from "@/model/Query";
+
+export async function postExtensions(query: Query) {
+    return await fetch(`/w-api/management-service/extensions`, {
+        method: 'POST',
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify(extension),
+        body: JSON.stringify(query),
         credentials: 'include',
         cache: 'no-store'
     });

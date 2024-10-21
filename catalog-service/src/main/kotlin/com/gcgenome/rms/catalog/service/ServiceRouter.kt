@@ -22,7 +22,7 @@ class ServiceRouter (
     @Bean("ServiceRouter")
     fun route() = router {
         GET("/w-api/catalog-service/services", :: getServices)
-        POST("/w-api/catalog-service/users/{user_id}/services", :: findUserWithServices)
+        POST("/w-api/catalog-service/services", :: findUserWithServices)
         GET("/w-api/catalog-service/sample_types", :: getSampleTypeByServiceId)
         GET("/w-api/catalog-service/services/{serviceId}/extensions", ::serviceExtensions)
     }
@@ -30,17 +30,16 @@ class ServiceRouter (
     private fun getServices(request: ServerRequest): Mono<ServerResponse> {
         val categoryId = UUID.fromString(request.queryParam("category_id").get())
         return authenticationHandler.principal(request)
-            .flatMap { serviceHandler.getServices(it.user.id!!, categoryId).collectList() }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), OrganizationDTO::class.java) }
+            .flatMap { serviceHandler.getServices(it, categoryId).collectList() }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), ServiceDTO::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
     }
 
     private fun findUserWithServices(request: ServerRequest): Mono<ServerResponse> {
-        val userId = request.pathVariable("user_id")
-        return authenticationHandler.chkManager(request)
-            .flatMap { request.bodyToMono(Query::class.java).defaultIfEmpty(Query()) }
-            .flatMap { query -> serviceHandler.selectUserWithServices(userId, query) }
+        return Mono.zip(authenticationHandler.chkManager(request),
+            request.bodyToMono(Query::class.java).defaultIfEmpty(Query()))
+            .flatMap { serviceHandler.selectUserWithServices(it.t1.user.id!!, it.t2) }
             .flatMap { ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(it), UserDTO::class.java) }

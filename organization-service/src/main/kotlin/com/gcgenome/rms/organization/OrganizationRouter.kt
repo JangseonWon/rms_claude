@@ -27,10 +27,11 @@ class OrganizationRouter (
 ) {
     @Bean
     fun route() = router {
-        PUT("/w-api/organization-service/organizations", ::insertOrganization)
+        /*다 사용 하지 않음*/
+        /*PUT("/w-api/organization-service/organizations", ::insertOrganization)
         POST("/w-api/organization-service/organizations", ::selectOrganizations)
         GET("/w-api/organization-service/organizations/{organization_id}", ::getOrganizationById)
-        PATCH("/w-api/organization-service/organizations/{organization_id}", ::updateOrganization)
+        PATCH("/w-api/organization-service/organizations/{organization_id}", ::updateOrganization)*/
     }
 
     private fun insertOrganization(request: ServerRequest) : Mono<ServerResponse> {

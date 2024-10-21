@@ -11,13 +11,12 @@ import {getCategories} from "@/app/(afterLogin)/request/management/service/_api/
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import SelectSearchBox from "@/app/(afterLogin)/request/management/_component/SelectSearchBox";
 import {postSampleType} from "@/app/(afterLogin)/request/management/service/_api/postSampleType";
-import {putExtension} from "@/app/(afterLogin)/request/management/service/_api/postExtensions";
+import {putExtensions} from "@/app/(afterLogin)/request/management/service/_api/putExtensions";
 import {deleteSampleType} from "@/app/(afterLogin)/request/management/service/_api/deleteSampleType";
 import {deleteExtension} from "@/app/(afterLogin)/request/management/service/_api/deleteExtension";
 import {patchService} from "@/app/(afterLogin)/request/management/service/_api/patchService";
 import {Service} from "@/model/Service";
 import {getService} from "@/app/(afterLogin)/_api/getService";
-import {isThenable} from "next/dist/client/components/router-reducer/router-reducer-types";
 
 
 type Props = {
@@ -89,7 +88,7 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
     const handleExtensionAddClick = async () => {
         if (selectedExtension && service) {
             const extensionData = {service_id : service.id, extension_id: selectedExtension?.value, required: required};
-            await putExtension(extensionData);
+            await putExtensions(extensionData);
         }
     }
 

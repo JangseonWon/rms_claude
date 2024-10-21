@@ -1,5 +1,6 @@
 package com.gcgenome.rms.catalog.organization
 
+
 import com.gcgenome.rms.auth.AuthenticationHandler
 import com.gcgenome.rms.exceptions.AuthenticationNotFoundException
 import com.gcgenome.rms.tables.pojos.Organization
@@ -23,7 +24,7 @@ class OrganizationRouter (
     }
     private fun getOrganizations(request: ServerRequest): Mono<ServerResponse> {
         return authenticationHandler.principal(request)
-            .flatMap { organizationHandler.getOrganizations(it.user.id!!).collectList() }
+            .flatMap { organizationHandler.getOrganizations(it).collectList() }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), Organization::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}

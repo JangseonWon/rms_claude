@@ -21,8 +21,8 @@ class Router (
     @Bean
     fun route() = router {
         POST("/w-api/login-service/login", ::login)
-        POST("/w-api/login-service/signup", ::signup)
-        POST("/w-api/login-service/temporary-password", ::temporaryPassword)
+        /*미사용*/POST("/w-api/login-service/signup", ::signup)
+        /*미사용*/POST("/w-api/login-service/temporary-password", ::temporaryPassword)
     }
 
     private fun login(request: ServerRequest): Mono<ServerResponse> {

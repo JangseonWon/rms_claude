@@ -1,11 +1,14 @@
 package com.gcgenome.rms.catalog.service
 
+import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.dao.ExtensionDao
 import com.gcgenome.rms.dao.SampleTypeDao
 import com.gcgenome.rms.dao.ServiceDao
 import com.gcgenome.rms.dao.UserDao
 import com.gcgenome.rms.data.*
+import com.gcgenome.rms.tables.references.USER_SERVICE
 import org.jooq.DSLContext
+import org.jooq.impl.DSL
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -15,8 +18,9 @@ import javax.management.ServiceNotFoundException
 @Component
 class ServiceHandler(val dslContext: DSLContext): ServiceDao, SampleTypeDao, UserDao, ExtensionDao {
 
-    fun getServices(userId: String, categoryId: UUID): Flux<ServiceDTO> {
-        return dslContext.selectServiceByUserIdAndCategoryId(userId, categoryId)
+    fun getServices(user: UserAuthentication, categoryId: UUID): Flux<ServiceDTO> {
+        val andWhere = if (user.user.role == "USER") USER_SERVICE.USER_ID.eq(user.user.id) else DSL.noCondition()
+        return dslContext.selectServiceByUserIdAndCategoryId(andWhere, categoryId)
     }
 
     fun selectUserWithServices(userId: String, query: Query): Mono<UserDTO> {

@@ -3,10 +3,10 @@ import React, {useEffect, useRef, useState} from "react";
 import {faChevronDown} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
-import {getSampleTypes} from "@/app/(afterLogin)/request/management/service/_api/getSampleTypes";
+import {postSampleTypes} from "@/app/(afterLogin)/request/management/service/_api/postSampleTypes";
 import {SampleType} from "@/model/SampleType";
-import {getExtensions} from "@/app/(afterLogin)/request/management/service/_api/getExtensions";
-import {getServices} from "@/app/(afterLogin)/request/management/_api/getServices";
+import {postExtensions} from "@/app/(afterLogin)/request/management/service/_api/postExtensions";
+import {postServices} from "@/app/(afterLogin)/request/management/_api/postServices";
 import {Query} from "@/model/Query";
 
 interface Props {
@@ -114,13 +114,13 @@ export default function SelectSearchBox({ type, onSelect, width }: Props) {
 
         switch (type) {
             case 'sampleType' :
-                response = await getSampleTypes(sampleTypeQuery);
+                response = await postSampleTypes(sampleTypeQuery);
                 break;
             case 'extension' :
-                response = await getExtensions(extensionQuery);
+                response = await postExtensions(extensionQuery);
                 break;
             case 'service' :
-                response = await getServices(serviceQuery);
+                response = await postServices(serviceQuery);
                 break;
             default:
                 return;
