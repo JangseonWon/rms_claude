@@ -7,7 +7,7 @@ import org.jooq.DSLContext
 import reactor.core.publisher.Flux
 
 interface SampleTypeDao  {
-    fun DSLContext.selectSampleTypeByServicId(serviceId: String): Flux<SampleType> {
+    fun DSLContext.selectSampleTypeByServiceId(serviceId: String): Flux<SampleType> {
         return Flux.from(
             select(
                 SAMPLE_TYPE.ID,

@@ -26,7 +26,7 @@ class ServiceRouter (
     private fun getServices(request: ServerRequest): Mono<ServerResponse> {
         val categoryId = UUID.fromString(request.queryParam("category_id").get())
         return authentication.principal(request)
-            .flatMap { handler.getServices(it.user.id!!, categoryId).collectList() }
+            .flatMap { handler.getServices(it, categoryId).collectList() }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), Organization::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}

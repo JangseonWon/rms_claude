@@ -11,6 +11,6 @@ class SampleTypeHandler(val dslContext: DSLContext):
     OrganizationDao, ServiceDao, SampleTypeDao, OrderDao, RequestDao, PatientDao, SampleDao, SampleExtensionDao
 {
     fun getSampleTypes(serviceId: String): Flux<SampleType> {
-        return dslContext.selectSampleTypeByServicId(serviceId)
+        return dslContext.selectSampleTypeByServiceId(serviceId)
     }
 }
