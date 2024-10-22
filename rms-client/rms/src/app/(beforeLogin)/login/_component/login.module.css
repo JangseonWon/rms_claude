@@ -1,7 +1,7 @@
 .container {
     display: flex;
     width: 100%;
-    height: calc(100vh - 8vh - 14vh);
+    height: calc(1050px - 80px - 140px);
     gap: 2%;
 }
 .left, .right {
@@ -19,17 +19,22 @@
 }
 .left img {
     width: 100%;
-    height: calc(100vh - 8vh - 14vh);
+    height: calc(1050px - 80px - 140px);
     object-fit: cover;
+}
+.right {
+    justify-content: center;
+    align-items: center;
+    place-items: center;
 }
 .horizontalLogo {
     display: flex;
     align-items: center;
     border-bottom: solid #999999;
     border-width: thin;
-    width: 100%;
-    padding-bottom: 2vh;
-    margin: 5vh 0 0 0;
+    width: 500px;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
 }
 .labelContainer {
     display: flex;
@@ -37,46 +42,44 @@
 }
 .mainLabel {
     font-weight: 700;
-    font-size: 2.5vw;
+    font-size: 22pt;
     color: #002B49;
 }
 .subLabel {
     font-weight: 400;
-    font-size: 1.84vw;
+    font-size: 16pt;
     color: #002B49;
 }
 .logo {
-    width: 10vw;
-    height: 10vh;
-    padding-right: 3vw;
+    padding-right: 15px;
 }
 .login {
-    margin: 2.5vh 0 4vh 8vw;
     display: grid;
     align-items: center;
+    margin-bottom: 20px;
 }
 .loginLabel {
-    font-size: 1.5vw;
+    font-size: 15pt;
     font-weight: 300;
-    margin-bottom: 0.5vh;
+    margin-bottom: 5px;
 }
 .loginInput {
-    height: 5vh;
-    width: 24.4vw;
-    border-radius: 0.9vh;
+    height: 50px;
+    width: 400px;
+    border-radius: 9px;
     border: none;
     background-color: #C8C9CB;
     outline: none;
-    padding-left: 1vh;
-    font-size: 1.2vw;
+    padding-left: 10px;
+    font-size: 14pt;
 }
 .loginButton,
 .healthcareButton {
-    height: 5vh;
-    width: 25vw;
-    font-size: 1.3vw;
+    height: 50px;
+    width: 412px;
+    font-size: 13pt;
     font-weight: 600;
-    border-radius: 1vh;
+    border-radius: 10px;
 }
 .loginButton {
     background: linear-gradient(135deg, #182847, #354e6d);
@@ -128,10 +131,14 @@
     margin-top: 1vh;
 }
 .changePassword {
-    margin: 2vh auto 0 6.3vw;
+    margin: 20px auto 0 145px;
     color: #002b49;
+    font-weight: bold;
+    font-size: 12pt;
+    border-bottom: solid #002b49;
+    border-width: thin;
     cursor: pointer;
 }
 .changePassword:hover {
-    font-weight: bold;
+    font-weight: 900;
 }
