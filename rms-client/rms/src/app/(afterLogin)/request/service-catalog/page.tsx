@@ -10,7 +10,6 @@ export default async function Page() {
                     <CategoryTitle/>
                 </div>
                 <div className={style.orderContainer}>
-                    {/*<MainPage/>*/}
                     <ListServicePage/>
                 </div>
             </div>

@@ -13,12 +13,13 @@ import java.util.*
 interface ServiceDao  {
     fun DSLContext.selectServiceByUserIdAndCategoryId(andWhere: Condition, categoryId: UUID): Flux<Service> {
         return Flux.from(
-            select(
+            selectDistinct(
                 SERVICE.ID,
                 SERVICE.NAME
             ).from(SERVICE)
-                .join(USER_SERVICE).on(SERVICE.ID.eq(USER_SERVICE.SERVICE_ID))
+                .leftJoin(USER_SERVICE).on(SERVICE.ID.eq(USER_SERVICE.SERVICE_ID))
                 .where(SERVICE.CATEGORY_ID.eq(categoryId).and(andWhere))
+                .orderBy(SERVICE.ID, SERVICE.NAME)
         ).map { it.into(Service::class.java) }
     }
 

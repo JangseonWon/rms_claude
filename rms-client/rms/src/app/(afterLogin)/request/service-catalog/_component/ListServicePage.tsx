@@ -91,6 +91,7 @@ export default function ListServicePage() {
 
     useEffect(() => {
         if (selectCategory) {
+            setServiceData([]);
             fetchServiceData(selectCategory.id!);
         }
     }, [selectCategory]);
