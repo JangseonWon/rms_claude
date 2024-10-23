@@ -228,13 +228,13 @@ export default function Table() {
             <table className={style.table}>
                 <thead>
                 <tr>
-                    <th>Order Date</th>
+                    <th>Order Date<br/>(DD/MM/YYYY)</th>
                     <th>Registration ID</th>
                     <th>Institution</th>
                     <th>Patient(s) Name</th>
                     <th>Service</th>
                     <th>MRN</th>
-                    <th>Patient BOD</th>
+                    <th>Patient BOD<br/>(DD/MM/YYYY)</th>
                     <th>Current Status</th>
                     <th>Report Date</th>
                     <th>User Name</th>
