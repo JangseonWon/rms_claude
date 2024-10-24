@@ -13,7 +13,7 @@ import java.util.*
 interface ServiceDao  {
     fun DSLContext.selectServiceByUserIdAndCategoryId(andWhere: Condition, categoryId: UUID): Flux<ServiceDTO> {
         return Flux.from(
-            select(
+            selectDistinct(
                 SERVICE.ID,
                 SERVICE.NAME
             ).from(SERVICE)
