@@ -3,20 +3,17 @@ import React, {useEffect, useRef, useState} from "react";
 import {faChevronDown} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
-import {Filter} from "@/model/Filter";
 import {Service} from "@/model/Service";
-import {getUserWithServices} from "@/app/(afterLogin)/request/management/user/_api/getServicesByUserId";
-import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
+import {Query} from "@/model/Query";
+import {postServiceByUser} from "@/app/(afterLogin)/request/service-catalog/_api/postServiceByUser";
 
 export default function ServiceSearchBox() {
-    return null
-    /*const router = useRouter();
-    const [selectedValue, setSelectedValue] = useState<string>('');
+    const router = useRouter();
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const [options, setOptions] = useState<SelectBoxOption[]>([]);
+    const [search, setSearch] = useState<string>('');
     const selectBoxRef = useRef<HTMLDivElement>(null);
-    const { data: session } = useSession();
 
     const transformDataToOptions = (data: Service[]): SelectBoxOption[] => {
         if (!data) {
@@ -33,20 +30,33 @@ export default function ServiceSearchBox() {
     }
 
     const handleOptionClick = (option: SelectBoxOption) => {
-        setSelectedValue(option.name!);
+        setSearch(option.name!);
         router.push(`/request/services/${option.value}/single`);
         setIsOpen(!isOpen);
     };
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSelectedValue(event.target.value);
+        setSearch(event.target.value);
     };
 
     const fetchOptions = async () => {
         setOptions([]);
-        const filter: Filter = { value: selectedValue };
-        const response = await getUserWithServices(session?.user?.id!, filter);
-
+        const query: Query = {
+            filter_groups: [
+                {
+                    condition_type: "AND",
+                    filters: [
+                        {
+                            table: "service",
+                            column: "name",
+                            value: search,
+                            operator: "LIKE"
+                        }
+                    ]
+                }
+            ]
+        };
+        const response = await postServiceByUser(query);
         const data = await response.json();
         setOptions(transformDataToOptions(data));
     };
@@ -59,7 +69,7 @@ export default function ServiceSearchBox() {
 
     useEffect(() => {
         fetchOptions();
-    }, [selectedValue]);
+    }, [search]);
 
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
@@ -76,7 +86,7 @@ export default function ServiceSearchBox() {
                     <input
                         className={style.selectInput}
                         type="text"
-                        value={selectedValue}
+                        value={search}
                         onChange={handleSearchChange}
                     />
                     <FontAwesomeIcon icon={faChevronDown} className={style.icon}/>
@@ -94,5 +104,5 @@ export default function ServiceSearchBox() {
                 </div>
             </section>
         </div>
-    )*/
+    )
 }

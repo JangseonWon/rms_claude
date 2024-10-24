@@ -19,6 +19,7 @@ export const config = {
       '/users/:path*',
       '/dashboard/:path*',
       '/organizations/:path*',
+      '/service-catalog/:path*',
       '/post/:path*',
       '/qna/:path*'
   ],

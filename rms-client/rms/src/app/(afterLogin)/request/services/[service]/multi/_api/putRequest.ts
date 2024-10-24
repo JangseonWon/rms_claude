@@ -1,7 +1,7 @@
 import {Order} from "@/model/Order";
 
 export async function putRequest(order: Order) {
-    return await fetch(`/w-api/product-service/requests`, {
+    return await fetch(`/w-api/catalog-service/requests`, {
         method: 'PUT',
         headers: {
             "Content-Type": "application/json",

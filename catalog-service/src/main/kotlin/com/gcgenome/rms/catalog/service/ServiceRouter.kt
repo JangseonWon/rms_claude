@@ -22,7 +22,7 @@ class ServiceRouter (
     @Bean("ServiceRouter")
     fun route() = router {
         GET("/w-api/catalog-service/services", :: getServices)
-        POST("/w-api/catalog-service/services", :: findUserWithServices)
+        POST("/w-api/catalog-service/search", :: findUserWithServices)
         GET("/w-api/catalog-service/sample_types", :: getSampleTypeByServiceId)
         GET("/w-api/catalog-service/services/{serviceId}/extensions", ::serviceExtensions)
     }
@@ -37,7 +37,7 @@ class ServiceRouter (
     }
 
     private fun findUserWithServices(request: ServerRequest): Mono<ServerResponse> {
-        return Mono.zip(authenticationHandler.chkManager(request),
+        return Mono.zip(authenticationHandler.principal(request),
             request.bodyToMono(Query::class.java).defaultIfEmpty(Query()))
             .flatMap { serviceHandler.selectUserWithServices(it.t1.user.id!!, it.t2) }
             .flatMap { ServerResponse.ok()
