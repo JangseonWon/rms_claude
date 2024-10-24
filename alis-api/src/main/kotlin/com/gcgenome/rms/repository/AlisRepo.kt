@@ -47,6 +47,7 @@ class AlisRepo(
                 OrganizationDTO::class.java,
                 progCompCode.compCode,
                 progCompCode.compName,
+                progCompMngCode.compMngName,
                 Expressions.stringTemplate("substring(str({0}), 1, 3)", progCompMngCode.compMngBeginNo)
             ))
             .from(progCompCode)
