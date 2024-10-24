@@ -6,9 +6,9 @@ import com.gcgenome.rms.model.LabSampleCodeDTO
 import com.gcgenome.rms.model.LabTestCodeDTO
 import com.gcgenome.rms.model.OrganizationDTO
 import com.querydsl.core.types.Projections
+import com.querydsl.core.types.dsl.Expressions
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.stereotype.Repository
-import java.security.cert.Extension
 
 @Repository
 class AlisRepo(
@@ -47,10 +47,11 @@ class AlisRepo(
                 OrganizationDTO::class.java,
                 progCompCode.compCode,
                 progCompCode.compName,
-                progCompMngCode.compMngBeginNo
+                Expressions.stringTemplate("substring(str({0}), 1, 3)", progCompMngCode.compMngBeginNo)
             ))
             .from(progCompCode)
             .join(progCompMngCode).on(progCompCode.compMngCode.eq(progCompMngCode.compMngCode))
+            .where(progCompMngCode.compMngBeginNo.length().eq(7))
             .fetch()
     }
 
