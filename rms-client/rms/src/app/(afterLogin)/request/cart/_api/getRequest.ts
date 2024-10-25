@@ -1,5 +1,5 @@
-export async function getRequest(orderId: string, serviceId: string, sampleId: string) {
-    const res = await fetch(`/w-api/cart-service/orders/${orderId}/services/${serviceId}/samples/${sampleId}`, {
+export async function getRequest(serviceId: string, sampleId: string) {
+    const res = await fetch(`/w-api/cart-service/services/${serviceId}/samples/${sampleId}`, {
         method: 'GET',
         credentials: 'include',
         cache: 'no-store'

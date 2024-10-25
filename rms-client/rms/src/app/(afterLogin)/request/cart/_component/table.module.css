@@ -4,6 +4,10 @@
 .buttonSection {
     text-align: right;
 }
+.filterContainerLeft {
+    float: right;
+    display: flex;
+}
 .table {
     width: 100%;
     border-collapse: collapse;

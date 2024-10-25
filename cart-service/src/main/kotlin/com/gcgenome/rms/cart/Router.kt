@@ -21,20 +21,19 @@ class Router (
     @Bean("CartServiceRouter")
     fun route() = router {
         POST("/w-api/cart-service/search", :: requestSearch)
-        GET("/w-api/cart-service/orders/{order_id}/services/{service_id}/samples/{sample_id}", ::cartInfo)
+        GET("/w-api/cart-service/services/{service_id}/samples/{sample_id}", ::cartInfo)
         GET("/w-api/cart-service/organizations", :: organizations)
         PUT("/w-api/cart-service/requests", :: cartToOrder)
-        PATCH("/w-api/cart-service/orders/{order_id}/services/{service_id}/samples/{sample_id}", :: updateRequest)
+        PATCH("/w-api/cart-service/services/{service_id}/samples/{sample_id}", :: updateRequest)
         GET("/w-api/cart-service/sample_types", :: sampleTypes)
         DELETE("/w-api/cart-service/requests", :: deleteCart)
     }
 
     private fun cartInfo(request: ServerRequest): Mono<ServerResponse> {
-        val orderId = UUID.fromString(request.pathVariable("order_id"))
         val sampleId = UUID.fromString(request.pathVariable("sample_id"))
         val serviceId = request.pathVariable("service_id")
         return principal(request)
-            .flatMap { handler.getCartInfo(orderId, sampleId, serviceId) }
+            .flatMap { handler.getCartInfo(sampleId, serviceId) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), Order::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(OrderNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }

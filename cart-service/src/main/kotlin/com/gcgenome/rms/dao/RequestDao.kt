@@ -30,8 +30,8 @@ interface RequestDao: QueryDao {
                 SERVICE.NAME,
                 SERVICE.CATEGORY_ID
             ).`as`("service"),
-            ORDER.SERIAL,
-            ORDER.ID,
+            ORDER.ID.`as`("order_id"),
+            ORDER.SERIAL.`as`("serial"),
             REQUEST.USER_SERVICE_ID,
             REQUEST.STATUS,
             REQUEST.MEMO,
@@ -159,7 +159,7 @@ interface RequestDao: QueryDao {
         ).map { it.into(Request::class.java) }
     }
 
-    fun DSLContext.selectRequestById(orderId: UUID, sampleId: UUID, serviceId: String): Mono<Request> {
+    fun DSLContext.selectRequestById(sampleId: UUID, serviceId: String): Mono<Request> {
         return Mono.from(
             select(
                 REQUEST.ORDER_ID,
@@ -230,9 +230,8 @@ interface RequestDao: QueryDao {
                         .and(PATIENT.USER_ID.eq(ORGANIZATION.USER_ID)))
                 .join(USER).on(ORGANIZATION.USER_ID.eq(USER.ID))
                 .where(
-                    REQUEST.ORDER_ID.eq(orderId)
-                        .and(REQUEST.SERVICE_ID.eq(serviceId))
-                        .and(REQUEST.SAMPLE_ID.eq(sampleId))
+                    REQUEST.SERVICE_ID.eq(serviceId)
+                    .and(REQUEST.SAMPLE_ID.eq(sampleId))
                 )
 
         ).map{it.into(Request::class.java)}

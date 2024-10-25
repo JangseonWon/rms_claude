@@ -26,7 +26,6 @@ export default function Info() {
     const [sampleTypeOptions, setSampleTypeOptions] = useState<SelectBoxOption[]>([])
     const router = useRouter();
     const searchParams = useSearchParams()
-    const orderId = searchParams!.get("order")
     const serviceId = searchParams!.get("service")
     const sampleId = searchParams!.get("sample")
     const userId = searchParams!.get("user_id")
@@ -54,10 +53,10 @@ export default function Info() {
         };
     };
     const fetchRequest = useCallback(async () => {
-        const response = await getRequest(orderId!, serviceId!, sampleId!)
+        const response = await getRequest(serviceId!, sampleId!)
         const json = await response.json()
         setRequest(json as Request)
-    },[orderId, serviceId, sampleId]);
+    },[serviceId, sampleId]);
 
     const fetchOrganizations = useCallback(async () => {
         const response = await getOrganization(userId!);
@@ -96,8 +95,8 @@ export default function Info() {
         if (!request?.sample?.patient?.name) return false;
         if (!request?.sample?.patient?.serial) return false;
         if (!request?.sample?.sample_type?.name) return false;
-        if (!request?.sample?.quantity) return false;
-        return true;
+        return request?.sample?.quantity;
+
     };
     const getDateFromComponents = (year?: number, month?: number, day?: number): Date | undefined => {
         if (!year || !month || !day) return undefined;

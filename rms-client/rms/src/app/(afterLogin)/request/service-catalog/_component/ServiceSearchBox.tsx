@@ -3,10 +3,10 @@ import React, {useEffect, useRef, useState} from "react";
 import {faChevronDown} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
-import {Service} from "@/model/Service";
 import {useRouter} from "next/navigation";
 import {Query} from "@/model/Query";
 import {postServiceByUser} from "@/app/(afterLogin)/request/service-catalog/_api/postServiceByUser";
+import {User} from "@/model/User";
 
 export default function ServiceSearchBox() {
     const router = useRouter();
@@ -15,11 +15,11 @@ export default function ServiceSearchBox() {
     const [search, setSearch] = useState<string>('');
     const selectBoxRef = useRef<HTMLDivElement>(null);
 
-    const transformDataToOptions = (data: Service[]): SelectBoxOption[] => {
-        if (!data) {
+    const transformDataToOptions = (user: User): SelectBoxOption[] => {
+        if (!user.services) {
             return [];
         }
-        return data.map(value => ({
+        return user.services.map(value => ({
             value: value.id,
             name: value.name
         }));
@@ -57,8 +57,9 @@ export default function ServiceSearchBox() {
             ]
         };
         const response = await postServiceByUser(query);
-        const data = await response.json();
-        setOptions(transformDataToOptions(data));
+        const data = response.ok && response.headers.get("Content-Length") !== "0" ? await response.json() : null;
+        if (data) {setOptions(transformDataToOptions(data));}
+        else {setOptions([]);}
     };
 
     const handleClickOutside = (event: MouseEvent) => {

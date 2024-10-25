@@ -15,10 +15,10 @@ class Handler(val dslContext: DSLContext ) :
     RequestDao, OrganizationDao, SampleTypeDao, PatientDao, SampleDao, OrderDao, SampleExtensionDao
 {
 
-    fun getCartInfo(orderId: UUID, sampleId: UUID, serviceId: String): Mono<Request> {
+    fun getCartInfo(sampleId: UUID, serviceId: String): Mono<Request> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
-                selectRequestById(orderId, sampleId, serviceId)
+                selectRequestById(sampleId, serviceId)
                 .switchIfEmpty(Mono.error(OrderNotFoundException()))
             }
         })
@@ -32,13 +32,13 @@ class Handler(val dslContext: DSLContext ) :
     fun updateRequest(request: Request): Mono<Request> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
-                selectRequestById(request.orderId!!, request.sampleId!!, request.serviceId!!)
+                selectRequestById(request.sampleId!!, request.serviceId!!)
                     .flatMap { r->
                         insertPatient(request.sample!!.patient!!)
                             .then(updateSample(request.sample!!))
                             .then(deletePatientById(r.sample!!.patient!!))
                             .then(updateRequest(request))
-                            .then(selectRequestById(request.orderId!!, request.sampleId!!, request.serviceId!!))
+                            .then(selectRequestById(request.sampleId!!, request.serviceId!!))
                     }
             }
         })
@@ -50,7 +50,7 @@ class Handler(val dslContext: DSLContext ) :
                     updateOrderSerialAndCreatedAtById(request.orderId!!, request.sample!!.patient!!.organization!!.user!!.id!!)
                         .then(updateRequestStatusAndCreateAtById(request.orderId!!, request.sample!!.id!!, request.service!!.id!!))
                         .then(updateSampleBarcodeAndCreateAtById(request.sample!!.id!!, request.sample!!.patient!!.organization!!.user!!.branchSerial!!))
-                        .then(selectRequestById(request.orderId!!, request.sample!!.id!!, request.service!!.id!!))
+                        .then(selectRequestById(request.sample!!.id!!, request.service!!.id!!))
                 }
             }
         })
@@ -67,7 +67,7 @@ class Handler(val dslContext: DSLContext ) :
                             .then(deleteSampleExtensionBySampleId(request.sample!!.id!!))
                             .then(deleteSampleById(request.sample!!.id!!))
                             .then(deletePatientById(request.sample!!.patient!!))
-                            .then(selectRequestById(request.orderId!!, request.sample!!.id!!, request.service!!.id!!))
+                            .then(selectRequestById(request.sample!!.id!!, request.service!!.id!!))
 
                 }
             }

@@ -20,7 +20,7 @@ class OrganizationRouter (
 ) {
     @Bean("OrganizationRouter")
     fun route() = router {
-        POST("/w-api/profile-service/organizations", ::selectUserWithOrganization)
+        POST("/w-api/profile-service/search", ::selectUserWithOrganization)
         PUT("/w-api/profile-service/users/{user-id}/organizations/{organization-id}", ::insertOrganization)
         PATCH("/w-api/profile-service/users/{user-id}/organizations/{organization-id}", ::updateOrganization)
     }
