@@ -13,6 +13,8 @@ data class ProgCompMngCode(
     val compMngId: String,
     @Column(name = "CompMngCode")
     val compMngCode: String,
+    @Column(name = "CompMngName")
+    val compMngName: String,
     @Column(name = "CompMngBeginNo")
     val compMngBeginNo: String,
 )
