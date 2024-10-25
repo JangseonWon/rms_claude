@@ -4,7 +4,7 @@ import React, {useEffect, useState} from "react";
 import style from "@/app/(afterLogin)/request/management/user/_component/serviceModal.module.css";
 import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {getUserWithServices} from "@/app/(afterLogin)/request/management/user/_api/getServicesByUserId";
+import {postUserServices} from "@/app/(afterLogin)/request/management/user/_api/postUserservices";
 import {Service} from "@/model/Service";
 
 type Props = {
@@ -18,7 +18,7 @@ export default function ServiceModal({id, open, closeModal}: Props) {
     const [selectService, setSelectService] = useState<Service>();
 
     const fetchServiceData = async (userId: string) => {
-        const response = await getUserWithServices(userId);
+        const response = await postUserServices(userId);
         const data = await response.json();
         setServiceData(data as Service[]);
     }

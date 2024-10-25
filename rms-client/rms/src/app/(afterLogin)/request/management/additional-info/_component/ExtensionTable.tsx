@@ -13,9 +13,12 @@ import {postExtensionsPage} from "@/app/(afterLogin)/request/management/addition
 import BlueButton from "@/app/_component/BlueButton";
 import SelectBox from "@/app/_component/SelectBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
+import {putAlisServices} from "@/app/(afterLogin)/request/management/service/_api/putAlisServices";
+import {Service} from "@/model/Service";
+import {putAlisExtensions} from "@/app/(afterLogin)/request/management/additional-info/_api/putAlisExtensions";
 
 export default function ExtensionTable() {
-    const [extensionData, setExtensionData] = useState<Extension[]>([]);
+    const [extensions, setExtensions] = useState<Extension[]>([]);
     const [selectExtensionData, setSelectExtensionData] = useState<Extension>();
     const [extensionEditModalOpen, setExtensionEditModalOpen] = useState<boolean>(false);
     const [search, setSearch] = useState<Query>({sort_by:"id", asc: true, size:10, page:1});
@@ -68,11 +71,11 @@ export default function ExtensionTable() {
             const response = await postExtensionsPage(search);
             const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
             const responseData = await response.json();
-            setExtensionData(responseData as Extension[]);
+            setExtensions(responseData as Extension[]);
             setTotalPage(totalPage);
         } catch(error) {
             console.error("Failed to fetch data:", error);
-            setExtensionData([]);
+            setExtensions([]);
             setTotalPage(0);
         }
     }
@@ -86,8 +89,20 @@ export default function ExtensionTable() {
         setExtensionEditModalOpen(false);
     }
 
-    const handleAlisSyncClick = () => {
-        alert('sync complete');
+    const handleAlisSyncButtonClick = async(search: Query) => {
+        try {
+            const response = await putAlisExtensions(search)
+            const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
+            const responseData = await response.json();
+            setExtensions(responseData as Extension[]);
+            setTotalPage(totalPage)
+            if(response.ok){
+                await fetchData(search)
+                alert("sync success!")
+            }
+        } catch(error) {
+            alert(`fail: ${error}`)
+        }
     }
 
     useEffect(() => {
@@ -99,7 +114,7 @@ export default function ExtensionTable() {
             <section className={style.searchContainer}>
                 <div className={style.filterContainerLeft}>
                     <div className={style.alisSyncButton}>
-                        <BlueButton name={"Alis-Sync"} onClick={handleAlisSyncClick}/>
+                        <BlueButton name={"Alis-Sync"} onClick={() => handleAlisSyncButtonClick(search)}/>
                     </div>
                     <SelectBox
                         width={"7vw"}
@@ -129,7 +144,7 @@ export default function ExtensionTable() {
                     </tr>
                     </thead>
                     <tbody>
-                    {extensionData && extensionData.length > 0 && extensionData.map((row, rowIndex) => (
+                    {extensions && extensions.length > 0 && extensions.map((row, rowIndex) => (
                         <tr key={rowIndex}>
                             <td>{row.id}</td>
                             <td>{row.name}</td>

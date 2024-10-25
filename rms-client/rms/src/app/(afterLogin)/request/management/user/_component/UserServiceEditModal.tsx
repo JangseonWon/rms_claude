@@ -8,7 +8,7 @@ import InputBox from "@/app/_component/InputBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import SelectSearchBox from "@/app/(afterLogin)/request/management/_component/SelectSearchBox";
 import {User} from "@/model/User";
-import {getUserWithServices} from "@/app/(afterLogin)/request/management/user/_api/getServicesByUserId";
+import {postUserServices} from "@/app/(afterLogin)/request/management/user/_api/postUserservices";
 import {Service} from "@/model/Service";
 import {deleteUserService} from "@/app/(afterLogin)/request/management/user/_api/deleteUserService";
 import {putUserService} from "@/app/(afterLogin)/request/management/user/_api/putUserService";
@@ -49,7 +49,7 @@ export default function UserServiceEditModal({user, open, closeModal}: Props) {
                 }
             ]
         };
-        const response = await getUserWithServices(userId, query);
+        const response = await postUserServices(userId, query);
         const data = await response.json();
         setUserData(data as User);
     }

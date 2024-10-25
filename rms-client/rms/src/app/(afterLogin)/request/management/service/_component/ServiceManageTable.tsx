@@ -13,13 +13,14 @@ import BlueButton from "@/app/_component/BlueButton";
 import RectangleButton from "@/app/_component/RectangleButton";
 import ServiceEditModal from "@/app/(afterLogin)/request/management/service/_component/ServiceEditModal";
 import {Service} from "@/model/Service";
+import {putAlisServices} from "@/app/(afterLogin)/request/management/service/_api/putAlisServices";
 
-interface InstitutionWithSelected extends Service {
+interface ServiceWithSelected extends Service {
     isSelected?: boolean;
 }
 
 export default function ServiceManageTable() {
-    const [serviceManageData, setServiceManageData] = useState<InstitutionWithSelected[]>([]);
+    const [services, setServices] = useState<ServiceWithSelected[]>([]);
     const [totalPage, setTotalPage] = useState<number>(0);
     const [search, setSearch] = useState<Query>({sort_by:"id", asc: true, size:10, page:1});
     const [selectOption, setSelectOption] = useState<SelectBoxOption>({ table: "service", column: "id", name: "Service Id" });
@@ -84,17 +85,29 @@ export default function ServiceManageTable() {
             const response = await postServices(search)
             const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
             const responseData = await response.json();
-            setServiceManageData(responseData as Service[]);
+            setServices(responseData as Service[]);
             setTotalPage(totalPage);
         } catch(error) {
             console.error("Failed to fetch data:", error);
-            setServiceManageData([]);
+            setServices([]);
             setTotalPage(0);
         }
     }
 
-    const handleAlisSyncClick = () => {
-        alert('sync complete');
+    const handleAlisSyncButtonClick = async(search: Query) => {
+        try {
+            const response = await putAlisServices(search)
+            const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
+            const responseData = await response.json();
+            setServices(responseData as Service[]);
+            setTotalPage(totalPage)
+            if(response.ok){
+                await fetchData(search)
+                alert("sync success!")
+            }
+        } catch(error) {
+            alert(`fail: ${error}`)
+        }
     }
 
     useEffect(() => {
@@ -106,7 +119,7 @@ export default function ServiceManageTable() {
             <section className={style.filterContainer}>
                 <div className={style.filterContainerLeft}>
                     <div className={style.alisSyncButton}>
-                        <BlueButton name={"Alis-Sync"} onClick={handleAlisSyncClick}/>
+                        <BlueButton name={"Alis-Sync"} onClick={()=>handleAlisSyncButtonClick(search)}/>
                     </div>
                     <SelectBox
                         width={"7vw"}
@@ -135,7 +148,7 @@ export default function ServiceManageTable() {
                     </tr>
                     </thead>
                     <tbody>
-                    {serviceManageData && serviceManageData.length > 0 && serviceManageData.map((row, rowIndex) => (
+                    {services && services.length > 0 && services.map((row, rowIndex) => (
                         <tr key={rowIndex}>
                             <td>{row.id}</td>
                             <td>{row.name}</td>

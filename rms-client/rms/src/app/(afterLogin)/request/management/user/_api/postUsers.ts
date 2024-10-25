@@ -1,8 +1,8 @@
 import {Query} from "@/model/Query";
 
-export async function putAlisServices(search: Query) {
-    return await fetch(`/w-api/management-service/alis/services`, {
-        method: 'PUT',
+export async function postUsers(search: Query) {
+    return await fetch(`/w-api/management-service/users/search`, {
+        method: 'POST',
         headers: {
             "Content-Type": "application/json",
         },
