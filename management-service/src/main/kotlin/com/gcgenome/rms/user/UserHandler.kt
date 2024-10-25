@@ -18,7 +18,6 @@ class UserHandler(
     val dslContext: DSLContext,
     val encoder: BCryptPasswordEncoder,
 ): UserServiceDao, ServiceDao, UserDao, OrganizationDao {
-
     fun selectUsers(query: Query): Mono<Page<UserDTO>> {
         return dslContext.selectUsersWithPage(query)
     }

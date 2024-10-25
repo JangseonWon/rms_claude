@@ -2,6 +2,8 @@ package com.gcgenome.rms.alis
 
 import com.gcgenome.rms.auth.AuthenticationHandler
 import com.gcgenome.rms.data.Query
+import com.gcgenome.rms.data.ServiceDTO
+import com.gcgenome.rms.data.UserDTO
 import com.gcgenome.rms.exception.AuthenticationNotFoundException
 import com.gcgenome.rms.exception.ManagerAuthenticationException
 import com.gcgenome.rms.tables.pojos.Extension
@@ -23,15 +25,15 @@ class AlisRouter (
 ) {
     @Bean("AlisRouter")
     fun route() = router {
+        PUT("/w-api/management-service/alis/users", :: users)
         PUT("/w-api/management-service/alis/services", :: services)
         PUT("/w-api/management-service/alis/sample-types", :: sampleTypes)
         PUT("/w-api/management-service/alis/extensions", :: extensions)
     }
-
-    private fun services(request: ServerRequest): Mono<ServerResponse> {
-        val query = Query(page = 1, size = 10)
+    private fun users(request: ServerRequest): Mono<ServerResponse> {
         return authenticationHandler.chkManager(request)
-            .then(alisHandler.updateServices(query))
+            .then(request.bodyToMono(Query::class.java))
+            .flatMap { alisHandler.updateUsers(it) }
             .flatMap {
                 ServerResponse.ok()
                     .header("X-Total-Count", it.totalCount.toString())
@@ -39,16 +41,34 @@ class AlisRouter (
                     .header("X-Page-Size", it.pageSize.toString())
                     .header("X-Current-Page", it.currentPage.toString())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(Flux.fromIterable(it.data), com.gcgenome.rms.data.ServiceDTO::class.java)
+                    .body(Mono.just(it.data), UserDTO::class.java)
+            }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue( "${e.message}") }
+            .onErrorResume(ManagerAuthenticationException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue( "${e.message}") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error : $it") }
+    }
+
+    private fun services(request: ServerRequest): Mono<ServerResponse> {
+        return authenticationHandler.chkManager(request)
+            .then(request.bodyToMono(Query::class.java))
+            .flatMap { alisHandler.updateServices(it) }
+            .flatMap {
+                ServerResponse.ok()
+                    .header("X-Total-Count", it.totalCount.toString())
+                    .header("X-Total-Page", it.totalPage.toString())
+                    .header("X-Page-Size", it.pageSize.toString())
+                    .header("X-Current-Page", it.currentPage.toString())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Flux.fromIterable(it.data), ServiceDTO::class.java)
             }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue( "${e.message}") }
             .onErrorResume(ManagerAuthenticationException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue( "${e.message}") }
             .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error : $it") }
     }
     private fun sampleTypes(request: ServerRequest): Mono<ServerResponse> {
-        val query = Query(page = 1, size = 10)
         return authenticationHandler.chkManager(request)
-            .then(alisHandler.updateSampleTypes(query))
+            .then(request.bodyToMono(Query::class.java))
+            .flatMap { alisHandler.updateSampleTypes(it) }
             .flatMap {
                 ServerResponse.ok()
                     .header("X-Total-Count", it.totalCount.toString())
@@ -63,9 +83,9 @@ class AlisRouter (
             .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error : $it") }
     }
     private fun extensions(request: ServerRequest): Mono<ServerResponse> {
-        val query = Query(page = 1, size = 10)
         return authenticationHandler.chkManager(request)
-            .then(alisHandler.updateExtensions(query))
+            .then(request.bodyToMono(Query::class.java))
+            .flatMap { alisHandler.updateExtensions(it) }
             .flatMap {
                 ServerResponse.ok()
                     .header("X-Total-Count", it.totalCount.toString())

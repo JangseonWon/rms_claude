@@ -48,7 +48,7 @@ interface ServiceDao : QueryDao{
                 )
             ).`as`("extensions")
         )
-        val groupByFields = listOf(SERVICE.ID, CATEGORY.ID, EXTENSION.ID)
+        val groupByFields = listOf(SERVICE.ID, CATEGORY.ID)
         return selectPage(mainTable = SERVICE, query = query, joinTables = joins, selectFields = fields, groupByFields = groupByFields) {record ->
             record.into(ServiceDTO::class.java)
         }

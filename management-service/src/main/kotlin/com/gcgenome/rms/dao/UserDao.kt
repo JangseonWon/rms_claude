@@ -6,9 +6,33 @@ import com.gcgenome.rms.tables.references.USER
 import com.gcgenome.rms.tables.references.USER_SERVICE
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.*
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import reactor.core.publisher.Mono
+import java.time.LocalDateTime
 
 interface UserDao : QueryDao{
+    fun DSLContext.upsertUsers(alisOrganization: AlisOrganization, pwd: String): Mono<Int> {
+        return Mono.from(
+            insertInto(USER)
+                .set(USER.ID, alisOrganization.compCode)
+                .set(USER.NAME, alisOrganization.compName)
+                .set(USER.PASSWORD, pwd)
+                .set(USER.ROLE, Role.USER.toString())
+                .set(USER.TYPE, UserType.GENERAL_INSTITUTION.toString())
+                .set(USER.STATE, UserState.INACTIVE.toString())
+                .set(USER.BRANCH_SERIAL, alisOrganization.compMngBeginNo)
+                .set(USER.BRANCH_NAME, alisOrganization.compMngName)
+                .set(USER.CREATE_AT, LocalDateTime.now())
+                .onConflict(USER.ID)
+                .doUpdate()
+                .set(USER.NAME, alisOrganization.compName)
+                .set(USER.BRANCH_SERIAL, alisOrganization.compMngBeginNo)
+                .set(USER.BRANCH_NAME, alisOrganization.compMngName)
+        )
+
+
+    }
+
     fun DSLContext.selectUserWithServicesQuery(userId: String, query: Query): Mono<UserDTO> {
         val joins = listOf(
             QueryDao.JoinInfo(USER_SERVICE, USER.ID.eq(USER_SERVICE.USER_ID), QueryDao.JoinType.LEFT),

@@ -25,12 +25,12 @@ class UserRouter(
 ) {
     @Bean("UserRouter")
     fun route() = router {
-        POST("/w-api/management-service/users", :: findUsers)
-        PATCH("/w-api/management-service/users/{userId}", ::updateUser)
-        POST("/w-api/management-service/users/{user_id}/services", :: findUserWithServices)
-        PUT("/w-api/management-service/users/{user_id}/services/{service_id}", ::saveUserService)
-        DELETE("/w-api/management-service/users/{user_id}/services/{service_id}", ::deleteUserServices)
-        GET("/w-api/management-service/users/{user_id}/organizations", :: findUserOrganizations)
+        POST("/w-api/management-service/users/search", :: findUsers)
+        PATCH("/w-api/management-service/users/{user-id}", ::updateUser)
+        POST("/w-api/management-service/users/{user-id}/services", :: findUserWithServices)
+        PUT("/w-api/management-service/users/{user-id}/services/{service-id}", ::saveUserService)
+        DELETE("/w-api/management-service/users/{user-id}/services/{service-id}", ::deleteUserServices)
+        GET("/w-api/management-service/users/{user-id}/organizations", :: findUserOrganizations)
     }
 
     private fun findUsers(request: ServerRequest): Mono<ServerResponse> {
@@ -49,7 +49,7 @@ class UserRouter(
     }
 
     private fun findUserWithServices(request: ServerRequest): Mono<ServerResponse> {
-        val userId = request.pathVariable("user_id")
+        val userId = request.pathVariable("user-id")
         return authenticationHandler.chkManager(request)
             .flatMap { request.bodyToMono(Query::class.java).defaultIfEmpty(Query()) }
             .flatMap { query -> userHandler.selectUserWithServices(userId, query) }
@@ -61,7 +61,7 @@ class UserRouter(
     }
 
     private fun findUserOrganizations(request: ServerRequest): Mono<ServerResponse> {
-        val userId = request.pathVariable("user_id")
+        val userId = request.pathVariable("user-id")
         return authenticationHandler.principal(request)
             .then(userHandler.selectUserOrganizations(userId).collectList())
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
@@ -74,7 +74,7 @@ class UserRouter(
     }
 
     private fun updateUser(request: ServerRequest): Mono<ServerResponse> {
-        val userId = request.pathVariable("userId")
+        val userId = request.pathVariable("user-id")
         return Mono.zip(authenticationHandler.principal(request), request.bodyToMono(UserDTO::class.java))
             .flatMap { p -> userHandler.updateUserById(p.t1, p.t2.apply { id = userId }) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), UserDTO::class.java) }
@@ -85,8 +85,8 @@ class UserRouter(
     }
 
     private fun saveUserService(request: ServerRequest): Mono<ServerResponse> {
-        val userId = request.pathVariable("user_id")
-        val serviceId = request.pathVariable("service_id")
+        val userId = request.pathVariable("user-id")
+        val serviceId = request.pathVariable("service-id")
         return authenticationHandler.chkManager(request)
             .then(userHandler.insertUserService(UserServiceDTO(userId = userId, serviceId = serviceId)))
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), UserDTO::class.java ) }
@@ -99,8 +99,8 @@ class UserRouter(
     }
 
     private fun deleteUserServices(request: ServerRequest): Mono<ServerResponse> {
-        val userId = request.pathVariable("user_id")
-        val serviceId = request.pathVariable("service_id")
+        val userId = request.pathVariable("user-id")
+        val serviceId = request.pathVariable("service-id")
         return authenticationHandler.chkManager(request)
             .then(userHandler.deleteUserService(UserServiceDTO(userId = userId, serviceId = serviceId)))
             .flatMap { ServerResponse.status(HttpStatus.OK).bodyValue("${userId}의 서비스 삭제 완료") }
