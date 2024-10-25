@@ -1,6 +1,6 @@
 package com.gcgenome.rms.cart
 
-import com.gcgenome.rms.authentication.User
+import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.dao.*
 import com.gcgenome.rms.data.*
 import com.gcgenome.rms.exceptions.OrderNotFoundException
@@ -23,16 +23,8 @@ class Handler(val dslContext: DSLContext ) :
             }
         })
     }
-    fun requests(user: User, query: Query): Mono<Pair<List<Request>, Page>> {
-        return dslContext.selectRequestCountByUserId(user)
-            .flatMap { count ->
-                val adjustedQuery = query.apply { page.number -= 1 }
-                val requests = dslContext.selectRequestByUserId(user, adjustedQuery)
-                val totalPages = Mono.just((count + query.page.size - 1) / query.page.size)
-                Mono.zip(requests.collectList(), totalPages) { request, pageCount ->
-                    Pair(request, Page(query.page.size, query.page.number + 1, pageCount, count))
-                }
-            }
+    fun requestSearch(user: UserAuthentication, query: Query): Mono<Page<RequestDTO>> {
+        return dslContext.selectRequestCartByUserId(user.user, query)
     }
     fun organizations(userId: String): Flux<Organization> {
         return dslContext.selectOrganizationByUserId(userId)

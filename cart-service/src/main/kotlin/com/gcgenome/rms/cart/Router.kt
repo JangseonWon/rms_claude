@@ -20,9 +20,9 @@ class Router (
 ){
     @Bean("CartServiceRouter")
     fun route() = router {
+        POST("/w-api/cart-service/search", :: requestSearch)
         GET("/w-api/cart-service/orders/{order_id}/services/{service_id}/samples/{sample_id}", ::cartInfo)
         GET("/w-api/cart-service/organizations", :: organizations)
-        POST("/w-api/cart-service/requests", :: requests)
         PUT("/w-api/cart-service/requests", :: cartToOrder)
         PATCH("/w-api/cart-service/orders/{order_id}/services/{service_id}/samples/{sample_id}", :: updateRequest)
         GET("/w-api/cart-service/sample_types", :: sampleTypes)
@@ -39,14 +39,17 @@ class Router (
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(OrderNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
     }
-    private fun requests(request: ServerRequest): Mono<ServerResponse> {
+    private fun requestSearch(request: ServerRequest): Mono<ServerResponse> {
         return principal(request)
             .zipWith(request.bodyToMono(Query::class.java))
-            .flatMap { handler.requests(it.t1.user, it.t2) }
+            .flatMap { handler.requestSearch(it.t1, it.t2) }
             .flatMap { ServerResponse.ok()
+                .header("X-Total-Count", it.totalCount.toString())
+                .header("X-Total-Page", it.totalPage.toString())
+                .header("X-Page-Size", it.pageSize.toString())
+                .header("X-Current-Page", it.currentPage.toString())
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("X-Total-Page", it.second.totalPage.toString())
-                .body(Mono.just(it.first), Request::class.java) }
+                .body(Mono.just(it.data), RequestDTO::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
     }

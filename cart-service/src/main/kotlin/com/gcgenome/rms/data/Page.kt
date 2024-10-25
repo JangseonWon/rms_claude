@@ -1,8 +1,9 @@
 package com.gcgenome.rms.data
 
-data class Page(
-    var size: Int,
-    var number: Int,
-    var totalPage: Int?,
-    var totalItem: Int?
+data class Page<T>(
+    val totalCount: Int? = null,
+    val totalPage: Int? = null,
+    val pageSize: Int? = null,
+    val currentPage: Int? = null,
+    val data: List<T>
 )
