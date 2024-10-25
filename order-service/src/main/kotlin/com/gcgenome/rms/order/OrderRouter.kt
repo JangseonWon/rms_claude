@@ -23,7 +23,7 @@ class OrderRouter(
 ) {
     @Bean("OrderRouter")
     fun route() = router {
-        POST("/w-api/order-service/requests", ::selectRequestsStatusOrder)
+        POST("/w-api/order-service/search", ::selectRequestsStatusOrder)
         GET("/w-api/order-service/services/{service_id}/samples/{sample_id}", :: selectRequest)
     }
 

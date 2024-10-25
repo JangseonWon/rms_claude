@@ -20,7 +20,7 @@ export interface RequestWithSelected extends Request {
 export default function OrderTable() {
     const [requestData, setRequestData] = useState<RequestWithSelected[]>([]);
     const [totalPage, setTotalPage] = useState<number>(0);
-    const [search, setSearch] = useState<Query>({sort_by:"id", asc: true, size:10, page:1});
+    const [search, setSearch] = useState<Query>({asc: true, size:10, page:1});
     const router = useRouter();
     const isSelectedAll = requestData.every((row) => row.isSelected);
 
