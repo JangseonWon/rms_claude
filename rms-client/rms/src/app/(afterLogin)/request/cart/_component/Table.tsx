@@ -75,7 +75,6 @@ export default function Table() {
             setRequestData(responseData as Request[]);
             setTotalPage(totalPage);
         } catch (error) {
-            console.error("Error fetching data:", error);
             setRequestData([]);
         }
     }, []);
@@ -195,14 +194,13 @@ export default function Table() {
                                 <span className={style.checkmark}></span>
                             </label>
                         </th>
-                        <th>Order Date<br/>(DD/MM/YYYY)</th>
-                        <th>Registration ID</th>
                         <th>Institution</th>
                         <th>Patient(s) Name</th>
                         <th>Service</th>
-                        <th>MRN</th>
                         <th>Patient BOD<br/>(DD/MM/YYYY)</th>
-                        <th>Report Date</th>
+                        <th>Gender</th>
+                        <th>MRN</th>
+                        <th>Collection Date<br/>(DD/MM/YYYY)</th>
                         <th>Info</th>
                     </tr>
                     </thead>
@@ -220,16 +218,15 @@ export default function Table() {
                                     <span className={style.checkmark}></span>
                                 </label>
                             </td>
-                            <td>{row.create_at ? format(new Date(row.create_at), "yyyy-MMM-dd") : '-'}</td>
-                            <td>{row.sample!.barcode}</td>
                             <td>{row.sample!.patient!.organization!.id}</td>
                             <td>{row.sample!.patient!.name}</td>
                             <td>{row.service!.name}</td>
-                            <td>{row.sample!.patient!.serial}</td>
                             <td>{row.sample?.patient ?
                                 formatDate(row.sample.patient.birth_year, row.sample.patient.birth_month, row.sample.patient.birth_day) : '-'}
                             </td>
-                            <td>report date</td>
+                            <td>{row.sample!.patient!.sex}</td>
+                            <td>{row.sample!.patient!.serial}</td>
+                            <td>{row.cart_at ? format(new Date(row.cart_at), "dd-MMM-yyyy") : '-'}</td>
                             <td>
                                 <FontAwesomeIcon
                                     icon={faFileLines}

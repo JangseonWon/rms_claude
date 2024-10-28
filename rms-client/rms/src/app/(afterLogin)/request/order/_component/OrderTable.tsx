@@ -12,17 +12,39 @@ import {postRequestOrders} from "@/app/(afterLogin)/request/order/_api/postReque
 import BarcodeButton from "@/app/(afterLogin)/request/order/_component/BarcodeButton";
 import {Query} from "@/model/Query";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
+import SelectBox from "@/app/_component/SelectBox";
+import InputBox from "@/app/_component/InputBox";
+import {Filter} from "@/model/Filter";
 
 export interface RequestWithSelected extends Request {
     isSelected?: boolean;
 }
 
+const selectBoxOptions: SelectBoxOption[] = [
+    { table: "sample", column: "barcode", name: "Global courier" },
+    { table: "organization", column: "id", name: "AirWaybill no" },
+    { table: "patient", column: "name", name: "Institution" },
+    { table: "patient", column: "name", name: "Registration ID" },
+    { table: "service", column: "name", name: "Service" },
+    { table: "patient", column: "name", name: "Patient(s) Name" },
+    { table: "patient", column: "birth_year", name: "Patient BOD" },
+    { table: "patient", column: "sex", name: "Gender" },
+    { table: "patient", column: "serial", name: "MRN" },
+];
+
 export default function OrderTable() {
     const [requestData, setRequestData] = useState<RequestWithSelected[]>([]);
+    const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
     const [totalPage, setTotalPage] = useState<number>(0);
     const [search, setSearch] = useState<Query>({asc: true, size:10, page:1});
     const router = useRouter();
     const isSelectedAll = requestData.every((row) => row.isSelected);
+    const [filter, setFilter] = useState<Filter>({
+        table: selectBoxOptions[0].table!,
+        column: selectBoxOptions[0].column!,
+        operator: "LIKE",
+        value: ""
+    })
 
     const handleSelectChange = (rowIndex: number, isSelected: boolean) => {
         setRequestData((prevData) => {
@@ -53,32 +75,17 @@ export default function OrderTable() {
         }));
     };
 
-    const handleSearchChange = (option: SelectBoxOption, value: string) => {
-        setSearch((prevSearch) => ({
-            ...prevSearch,
-            filter_groups:[
-                {
-                    condition_type: "OR",
-                    filters: [
-                        {
-                            table: option.table!,
-                            column: option.column!,
-                            value: value,
-                            operator: "LIKE"
-                        }
-                    ]
-                }
-            ],
-            page:1
-        }));
-    };
-
     const fetchData = async (search: Query) => {
-        const response = await postRequestOrders(search);
-        const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
-        const data = await response.json();
-        setRequestData(data as Request[]);
-        setTotalPage(totalPage);
+        try {
+            const response = await postRequestOrders(search);
+            const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
+            const data = await response.json();
+            setRequestData(data as Request[]);
+            setTotalPage(totalPage);
+        }
+        catch {
+            setRequestData([]);
+        }
     };
 
 
@@ -89,12 +96,52 @@ export default function OrderTable() {
     const selectedRequest = requestData.filter((row) => row.isSelected);
 
     useEffect(() => {
+        setSearch((prevSearch) => ({
+            ...prevSearch,
+            filter_groups: [
+                {
+                    ...prevSearch?.filter_groups?.[0] || {},
+                    filters: [
+                        filter,
+                    ],
+                },
+            ],
+        }));
+    }, [filter]);
+
+    useEffect(() => {
         fetchData(search)
     }, [search]);
 
     return (
         <div className={style.container}>
-            <BarcodeButton selectRequest={selectedRequest}/>
+            <section>
+                <div className={style.buttonSection}>
+                    <BarcodeButton selectRequest={selectedRequest}/>
+                </div>
+                <div className={style.filterContainerLeft}>
+                    <SelectBox
+                        width={"10vw"}
+                        value={selectedOption.name}
+                        options={selectBoxOptions}
+                        label={"filter"}
+                        onChange={(option) => {
+                            setSelectedOption(option);
+                            setFilter(prev => ({
+                                ...prev,
+                                table: option.table!,
+                                column: option.column!
+                            }))
+                        }}
+                    />
+                    <InputBox label={"search"} onChange={(value) => {
+                        setFilter(prev => ({
+                            ...prev,
+                            value: value
+                        }))
+                    }}></InputBox>
+                </div>
+            </section>
             <table className={style.table}>
                 <thead>
                 <tr>
@@ -109,14 +156,15 @@ export default function OrderTable() {
                             <span className={style.checkmark}></span>
                         </label>
                     </th>
-                    <th>Service Name</th>
+                    <th>Global courier</th>
+                    <th>AirWaybill no.</th>
+                    <th>Institution</th>
+                    <th>Registration ID</th>
+                    <th>Service</th>
                     <th>Patient(s) Name</th>
                     <th>Patient BOD<br/>(DD/MM/YYYY)</th>
                     <th>Gender</th>
-                    <th>Physician Name</th>
-                    <th>Collection Date<br/>(DD/MM/YYYY)</th>
                     <th>MRN</th>
-                    <th>Service Code</th>
                     <th>Info</th>
                 </tr>
                 </thead>
@@ -134,14 +182,15 @@ export default function OrderTable() {
                                 <span className={style.checkmark}></span>
                             </label>
                         </td>
+                        <td>Global courier</td>
+                        <td>AirWaybill no.</td>
+                        <td>{row.sample!.patient!.organization!.id}</td>
+                        <td>{row.sample?.barcode}</td>
                         <td>{row.service?.name}</td>
                         <td>{row.sample?.patient?.name}</td>
                         <td>{row.sample?.patient?.birth_day}-{row.sample?.patient?.birth_month}-{row.sample?.patient?.birth_year}</td>
                         <td>{row.sample?.patient?.sex}</td>
-                        <td>{row.physician}</td>
-                        <td>{row.sample?.sampling_on ? format(new Date(row.sample.sampling_on), "dd-MM-yyyy") : '-'}</td>
                         <td>{row.sample?.patient?.serial}</td>
-                        <td>{row.service?.id}</td>
                         <td>
                             <FontAwesomeIcon
                                 icon={faFileLines}

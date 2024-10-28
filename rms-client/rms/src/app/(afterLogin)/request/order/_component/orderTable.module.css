@@ -1,6 +1,10 @@
 .container {
     padding: 2vh 2vw;
 }
+.filterContainerLeft {
+    float: right;
+    display: flex;
+}
 .buttonSection {
     text-align: right;
 }

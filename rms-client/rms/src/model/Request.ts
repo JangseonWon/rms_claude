@@ -21,6 +21,7 @@ export interface Request {
     sample?: Sample
     reports?: Report[]
     create_at?: Date
+    cart_at?: Date
     complete_at?: Date
     resample_at?: Date
     reported_at?: Date
