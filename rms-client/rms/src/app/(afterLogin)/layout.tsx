@@ -23,7 +23,9 @@ export default function Layout({ children }: Props) {
                 <Header/>
             </div>
             <div className={style.content}>
-                {children}
+                <div className={style.bodyContent}>
+                    {children}
+                </div>
                 <Footer/>
             </div>
         </div>

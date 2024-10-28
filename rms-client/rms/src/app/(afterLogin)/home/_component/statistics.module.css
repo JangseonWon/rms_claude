@@ -1,20 +1,20 @@
 .container {
-    padding: 6vh 1vw 6vh 0;
+    padding: 50px 5px 50px 0;
 }
 .container h1 {
     color: #002b49;
-    font-size: 1.6vw;
+    font-size: 20pt;
 }
 .container h1 span button {
     cursor: pointer;
-    margin-left: 1vw;
-    padding: 0.3vh 0.8vw;
-    border-radius: 15vh;
-    font-size: 1vw;
+    margin-left: 10px;
+    padding: 3px 8px;
+    border-radius: 15px;
+    font-size: 10pt;
     color: #002b49;
     font-weight: 600;
     background-color: #fff;
-    border: 0.1vh solid #002b49;
+    border: 1px solid #002b49;
 }
 .container h1 span button:hover {
     color: #fff;
@@ -32,12 +32,12 @@
     flex-direction: column;
     border-radius: 20px;
     justify-content: space-between;
-    padding: 1vh 1vw;
-    width: 20vw;
-    height: 15vh;
+    padding: 20px 20px;
+    width: 200px;
+    height: 110px;
     background-color: #fff;
     color:#002b49;
-    margin: 1vh 1vw
+    margin: 15px
 }
 .card:first-child{
     margin-left: 0;
@@ -50,21 +50,12 @@
     background: linear-gradient(to right, #023a60, #5676a2);
 }
 .cardLabel{
-    font-size: 1vw;
+    font-size: 15pt;
     font-weight: 500;
     text-align: left;
 }
-.line {
-    width: 4%;
-    height: 0.5vh;
-    background-color: #002b49;
-}
 .cardValue{
-    font-size: 1.7vw;
+    font-size: 22pt;
     font-weight: 600;
     text-align: right;
-}
-.cardValue img {
-    width: 20%;
-    height: auto;
 }

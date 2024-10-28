@@ -6,7 +6,7 @@ import style from './page.module.css';
 
 export default async function Page() {
     return(
-        <div>
+        <div className={style.container}>
             <MainImage/>
             <section className={style.bodyContainer}>
                 <div className={style.leftSection}>

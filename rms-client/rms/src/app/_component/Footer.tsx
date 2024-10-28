@@ -26,13 +26,9 @@ export default function Footer() {
     return (
         <footer className={style.footer}>
             <div className={style.menu}>
-                <div className={style.flex}>
-                    <div className={style.div1Menu}>
-                        <label className={style.followUsOn}>Follow Us On</label>
-                    </div>
-                </div>
-                <div className={style.flex}>
-                    <div className={style.div3Menu}>
+                <div className={style.iconContainer}>
+                    <label className={style.followUsOn}>Follow Us On</label>
+                    <div className={style.footerIcon}>
                         <a href="https://oversea.gcgenome.com/" target="_blank" rel="noopener noreferrer">
                             <Image
                                 className={style.avatarIcon}
@@ -66,7 +62,8 @@ export default function Footer() {
                                 alt="Social Icon 3"
                             />
                         </a>
-                        <a href="https://www.linkedin.com/company/73449146/admin/feed/posts/" target="_blank" rel="noopener noreferrer">
+                        <a href="https://www.linkedin.com/company/73449146/admin/feed/posts/" target="_blank"
+                           rel="noopener noreferrer">
                             <Image
                                 className={style.avatarIcon}
                                 src={getIconSrc("icon images-01")}
@@ -78,7 +75,9 @@ export default function Footer() {
                             />
                         </a>
                     </div>
-                    <div className={style.div4Menu}>
+                </div>
+                <div className={style.flex}>
+                    <div className={style.footerCertificate}>
                         <Image src={footerImg} alt="img"/>
                     </div>
                 </div>

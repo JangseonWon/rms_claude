@@ -3,12 +3,10 @@
     flex-direction: column;
     height: 100vh;
 }
-
 .header {
     flex: 0;
     background-color: #f0f0f0;
 }
-
 .content {
     flex: 1;
 }

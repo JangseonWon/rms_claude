@@ -3,7 +3,7 @@
 import style from "./profileButton.module.css"
 import React, {useRef, useState} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faUser} from "@fortawesome/free-regular-svg-icons";
+import {faBell, faUser} from "@fortawesome/free-regular-svg-icons";
 import {faChevronDown} from "@fortawesome/free-solid-svg-icons";
 import {useRouter} from "next/navigation";
 import {signOut, useSession} from "next-auth/react";
@@ -33,20 +33,27 @@ export default function ProfileButton() {
     };
 
     return(
-        <div className={style.profileContainer} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+        <div className={style.container}>
             <div className={style.profile}>
-                <FontAwesomeIcon icon={faUser} />
-                <span>{session?.user?.name}</span>
-                <FontAwesomeIcon icon={faChevronDown} />
+                <FontAwesomeIcon className={style.bell} icon={faBell}/>
             </div>
-            {showDropdown && (
-                <div className={style.profileDropdown} ref={dropdownRef}>
-                    <ul>
-                        <li onClick={onProfile}>My profile</li>
-                        <li onClick={onLogout}>Logout</li>
-                    </ul>
+            <div className={style.profileContainer} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+                <div className={style.profile}>
+                    <FontAwesomeIcon className={style.user} icon={faUser}/>
+                    <div className={style.userName}>
+                        <span>{session?.user?.name}</span>
+                    </div>
+                    <FontAwesomeIcon className={style.ChevronDown} icon={faChevronDown}/>
                 </div>
-            )}
+                {showDropdown && (
+                    <div className={style.profileDropdown} ref={dropdownRef}>
+                        <ul>
+                            <li onClick={onProfile}>My profile</li>
+                            <li onClick={onLogout}>Logout</li>
+                        </ul>
+                    </div>
+                )}
+            </div>
         </div>
     )
 }

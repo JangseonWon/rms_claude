@@ -1,29 +1,32 @@
+.leftContainer {
+    margin-left: 120px;
+}
 .rightContainer {
     display: flex;
 }
 .header {
     background-color: #182847;
-    padding: 1vh 8vw 1.5vh 8vw;
+    padding: 10px 160px 15px 160px;
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 .headerMenu {
-    font-size: 0.9vw;
+    font-size: 16pt;
     font-weight: normal;
     color: #fff;
     text-decoration: none;
-    padding: 1vh 1.5vw 0.5vh 1vw;
-    margin-right: 3vw;
+    padding: 16px 15px 0 10px;
+    margin: 0 60px 10px 0;
     transition: background-color 0.3s ease;
 }
 .headerMenuActive{
-    font-size: 1vw;
+    font-size: 16pt;
     font-weight: normal;
     color: #fff;
     text-decoration: none;
-    padding: 1vh 1.5vw 0.5vh 1vw;
-    margin-right: 3vw;
+    padding: 16px 15px 0 10px;
+    margin: 0 60px 10px 0;
     transition: background-color 0.3s ease;
     border-bottom: solid #90BA2D;
 }
@@ -34,9 +37,9 @@
 .gPortalLogo{
     text-decoration: none;
     color: #ffffff;
-    font-size: 2vw;
+    font-size: 20pt;
     font-optical-sizing: auto;
     font-weight: 600;
     font-style: normal;
-    margin-right: 5vw;
+    margin-right: 100px;
 }
