@@ -91,7 +91,7 @@ interface ServiceDao : QueryDao{
                 .leftJoin(SERVICE_EXTENSION).on(SERVICE.ID.eq(SERVICE_EXTENSION.SERVICE_ID))
                 .leftJoin(EXTENSION).on(SERVICE_EXTENSION.EXTENSION_ID.eq(EXTENSION.ID))
                 .where(SERVICE.ID.eq(serviceId))
-                .groupBy(SERVICE.ID, CATEGORY.ID, EXTENSION.ID)
+                .groupBy(SERVICE.ID, CATEGORY.ID)
         ).map { it.into(ServiceDTO::class.java) }
     }
 
