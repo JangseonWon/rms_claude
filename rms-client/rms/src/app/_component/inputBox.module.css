@@ -1,17 +1,17 @@
 .inputBox p {
-    font-size: 0.7vw;
+    font-size: 9pt;
     color: #666666;
     margin: 0 0 5px 0;
 }
 .inputBox input {
     width: 100%;
-    height: 3.5vh;
-    min-width: 10vw;
+    height: 35px;
+    min-width: 200px;
     border: 1px solid #DAE2ED;
     border-radius: 20px;
-    padding: 0.6vh 1vw;
+    padding: 6px 20px;
     box-sizing: border-box;
-    font-size: 0.7vw;
+    font-size: 9pt;
     box-shadow: 0 2px 2px #F3F6F9;
 }
 .inputBox.error input{
@@ -21,10 +21,10 @@
     color: red;
 }
 .inputBox input:not(:disabled):hover {
-    outline: 0.2vh solid #CCE492;
+    outline: 2px solid #CCE492;
     border: 1px solid #90BA2D;
 }
 .inputBox input:focus {
-    outline: 0.2vh solid #CCE492;
+    outline: 2px solid #CCE492;
     border: 1px solid #90BA2D;
 }

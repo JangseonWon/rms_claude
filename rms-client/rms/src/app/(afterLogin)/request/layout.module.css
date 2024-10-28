@@ -1,6 +1,8 @@
 .container {
     display: flex;
     align-items: stretch;
+    width: 1400px;
+    margin: 0 auto;
 }
 .leftSection {
     margin-top: 2vh;

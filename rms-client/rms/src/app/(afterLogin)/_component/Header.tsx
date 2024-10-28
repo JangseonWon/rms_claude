@@ -9,12 +9,15 @@ export default function Header() {
     const segment = useSelectedLayoutSegment();
     return (
         <header className={style.header}>
-            <div className={style.leftContainer}>
-                <Link href={"/home"} className={style.gPortalLogo}>G-Portal</Link>
-            </div>
-            <div className={style.rightContainer}>
-                <Link href={"/qna"} className={segment?.includes('qna') ? style.headerMenuActive : style.headerMenu }>QnA</Link>
-                <ProfileButton/>
+            <div className={style.headerWidth}>
+                <div className={style.leftContainer}>
+                    <Link href={"/home"} className={style.gPortalLogo}>G-Portal</Link>
+                </div>
+                <div className={style.rightContainer}>
+                    <Link href={"/qna"}
+                          className={segment?.includes('qna') ? style.headerMenuActive : style.headerMenu}>QnA</Link>
+                    <ProfileButton/>
+                </div>
             </div>
         </header>
     )

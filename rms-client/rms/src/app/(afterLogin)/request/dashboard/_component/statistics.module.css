@@ -1,6 +1,6 @@
 .container {
-    margin-top: 3vh;
-    padding: 2vh 5vw;
+    margin-top: 50px;
+    padding: 20px 100px;
     background-color: white;
     border-radius: 20px;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
@@ -10,18 +10,18 @@
     justify-content: space-between;
     align-items: stretch;
     gap: 10%;
-    padding: 2vh 0 4vh 0;
+    padding: 20px 0 40px 0;
 }
 .mainTitle{
     color: #002b49;
-    font-size: 2.5vw;
+    font-size: 32pt;
     font-weight: 800;
     text-shadow: 2px 2px 2px #b6b6b6;
 }
 .subTitle {
     align-self: flex-end;
     color: #808080;
-    font-size: 0.8vw;
+    font-size: 12pt;
     font-weight: 600;
 }
 .subTitle span {
@@ -32,16 +32,16 @@
 }
 .card {
     position: relative;
-    margin: 2vh 0.5vw;
+    margin: 20px 10px;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
     border-radius: 10px;
     justify-content: space-between;
-    padding: 2vh 1vw;
-    height: 14vh;
-    width: 6vw;
+    padding: 20px 15px;
+    height: 80px;
+    width: 115px;
 }
 .card:hover {
     background: linear-gradient(135deg, #002C4B, #004A88);
@@ -58,13 +58,13 @@
     height: auto;
 }
 .cardLabel{
-    font-size: 0.9vw;
+    font-size: 13pt;
     color:#002b49;
     font-weight: 600;
     text-align: left;
 }
 .cardValue{
-    font-size: 1.6vw;
+    font-size: 20pt;
     color:#002b49;
     font-weight: 600;
     text-align: right;
