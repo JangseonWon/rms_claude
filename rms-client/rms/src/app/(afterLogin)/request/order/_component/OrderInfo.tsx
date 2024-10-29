@@ -66,8 +66,12 @@ export default function OrderInfo() {
         const handleKeyPress = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {router.back();}
         };
+        document.body.style.overflow = 'hidden';
         window.addEventListener('keydown', handleKeyPress);
-        return () => {window.removeEventListener('keydown', handleKeyPress);};
+        return () => {
+            document.body.style.overflow = 'auto';
+            window.removeEventListener('keydown', handleKeyPress);
+        };
     }, [fetchRequest, router]);
 
     return (

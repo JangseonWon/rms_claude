@@ -29,7 +29,7 @@
     color: #ffffff;
     font-size: 10pt;
     font-weight: 600;
-    white-space: nowrap;
+    /*white-space: nowrap;*/
 }
 .table thead tr th:first-child {
     border-radius: 20px 0 0 0;
@@ -39,7 +39,7 @@
 }
 .table tbody {
     font-weight: 300;
-    white-space: nowrap;
+    /*white-space: nowrap;*/
 }
 .table tbody tr {
     border-bottom: 1px solid #838689;

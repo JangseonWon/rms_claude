@@ -7,11 +7,12 @@
     left: 0;
     right: 0;
     bottom: 0;
+    z-index: 2;
 }
 .modal {
     background: #ffffff;
-    position: relative;
-    top: 5%;
+    position: absolute;
+    top: 10%;
     max-width: 80vw;
     max-height: 80vh;
     min-width: 50vw;
@@ -20,6 +21,7 @@
     flex-direction: column;
     overflow: auto;
     padding: 30px;
+    z-index: 3;
 }
 .modalTitle {
     display: flex;
