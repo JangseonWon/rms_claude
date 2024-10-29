@@ -141,68 +141,70 @@ export default function OrderTable() {
                     }}></InputBox>
                 </div>
             </section>
-            <table className={style.table}>
-                <thead>
-                <tr>
-                    <th>
-                        <label form="agree" className={style.checkbox}>
-                            <input
-                                type="checkbox"
-                                checked={isSelectedAll}
-                                onChange={() => handleSelectAll(!isSelectedAll)}
-                                className={style.checkbox}
-                            />
-                            <span className={style.checkmark}></span>
-                        </label>
-                    </th>
-                    <th>Global courier</th>
-                    <th>AirWaybill no.</th>
-                    <th>Institution</th>
-                    <th>Registration ID</th>
-                    <th>Service</th>
-                    <th>Patient(s) Name</th>
-                    <th>Patient BOD<br/>(DD/MM/YYYY)</th>
-                    <th>Gender</th>
-                    <th>MRN</th>
-                    <th>Info</th>
-                </tr>
-                </thead>
-                <tbody>
-                {requestData && requestData.length > 0 && requestData.map((row, rowIndex) => (
-                    <tr key={row.order_id! + row.service!.id + row.sample!.id}>
-                        <td onClick={(e) => e.stopPropagation()}>
+            <div className={style.tableContainer}>
+                <table className={style.table}>
+                    <thead>
+                    <tr>
+                        <th>
                             <label form="agree" className={style.checkbox}>
                                 <input
                                     type="checkbox"
-                                    checked={row.isSelected || false}
-                                    onChange={() => handleSelectChange(rowIndex, !row.isSelected)}
+                                    checked={isSelectedAll}
+                                    onChange={() => handleSelectAll(!isSelectedAll)}
                                     className={style.checkbox}
                                 />
                                 <span className={style.checkmark}></span>
                             </label>
-                        </td>
-                        <td>Global courier</td>
-                        <td>AirWaybill no.</td>
-                        <td>{row.sample!.patient!.organization!.id}</td>
-                        <td>{row.sample?.barcode}</td>
-                        <td>{row.service?.name}</td>
-                        <td>{row.sample?.patient?.name}</td>
-                        <td>{row.sample?.patient?.birth_day}-{row.sample?.patient?.birth_month}-{row.sample?.patient?.birth_year}</td>
-                        <td>{row.sample?.patient?.sex}</td>
-                        <td>{row.sample?.patient?.serial}</td>
-                        <td>
-                            <FontAwesomeIcon
-                                icon={faFileLines}
-                                className={style.info}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleInfoClick(row);
-                                }}/>
-                        </td>
+                        </th>
+                        <th className={style.shortColumn}>Global courier</th>
+                        <th className={style.shortColumn}>AirWaybill no.</th>
+                        <th className={style.shortColumn}>Institution</th>
+                        <th>Registration ID</th>
+                        <th className={style.longColumn}>Service</th>
+                        <th>Patient(s) Name</th>
+                        <th>Patient BOD<br/>(DD/MM/YYYY)</th>
+                        <th>Gender</th>
+                        <th className={style.longColumn}>MRN</th>
+                        <th>Info</th>
                     </tr>
-                ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                    {requestData && requestData.length > 0 && requestData.map((row, rowIndex) => (
+                        <tr key={row.order_id! + row.service!.id + row.sample!.id}>
+                            <td onClick={(e) => e.stopPropagation()}>
+                                <label form="agree" className={style.checkbox}>
+                                    <input
+                                        type="checkbox"
+                                        checked={row.isSelected || false}
+                                        onChange={() => handleSelectChange(rowIndex, !row.isSelected)}
+                                        className={style.checkbox}
+                                    />
+                                    <span className={style.checkmark}></span>
+                                </label>
+                            </td>
+                            <td>Global courier</td>
+                            <td>AirWaybill no.</td>
+                            <td>{row.sample!.patient!.organization!.id}</td>
+                            <td>{row.sample?.barcode}</td>
+                            <td>{row.service?.name}</td>
+                            <td>{row.sample?.patient?.name}</td>
+                            <td>{row.sample?.patient?.birth_day}-{row.sample?.patient?.birth_month}-{row.sample?.patient?.birth_year}</td>
+                            <td>{row.sample?.patient?.sex}</td>
+                            <td>{row.sample?.patient?.serial}</td>
+                            <td>
+                                <FontAwesomeIcon
+                                    icon={faFileLines}
+                                    className={style.info}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleInfoClick(row);
+                                    }}/>
+                            </td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            </div>
             <div className={style.pagination}>
                 <span>items per page:</span>
                 <div className={style.select}>

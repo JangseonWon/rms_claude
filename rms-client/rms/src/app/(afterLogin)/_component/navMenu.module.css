@@ -4,6 +4,7 @@
     margin: 30px auto 10px auto;
     border-radius: 15px;
     width: 200px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 .navPill ul {
     padding: 10px 5px;

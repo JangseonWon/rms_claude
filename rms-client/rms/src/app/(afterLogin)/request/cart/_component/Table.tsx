@@ -179,7 +179,7 @@ export default function Table() {
                     }}></InputBox>
                 </div>
             </section>
-            <div>
+            <div className={style.tableContainer}>
                 <table className={style.table}>
                     <thead>
                     <tr>
@@ -194,13 +194,13 @@ export default function Table() {
                                 <span className={style.checkmark}></span>
                             </label>
                         </th>
-                        <th>Institution</th>
-                        <th>Patient(s) Name</th>
-                        <th>Service</th>
+                        <th className={style.shortColumn}>Institution</th>
+                        <th className={style.shortColumn}>Patient(s) Name</th>
+                        <th className={style.longColumn}>Service</th>
                         <th>Patient BOD<br/>(DD/MM/YYYY)</th>
                         <th>Gender</th>
-                        <th>MRN</th>
-                        <th>Collection Date<br/>(DD/MM/YYYY)</th>
+                        <th className={style.longColumn}>MRN</th>
+                        <th className={style.dateColumn}>Collection Date<br/>(DD/MM/YYYY)</th>
                         <th>Info</th>
                     </tr>
                     </thead>
@@ -240,29 +240,29 @@ export default function Table() {
                     ))}
                     </tbody>
                 </table>
-                <div className={style.pagination}>
-                    <span>items per page:</span>
-                    <div className={style.select}>
-                        <select onChange={handlePageSizeChange}>
-                            <option value="10">10</option>
-                            <option value="20">20</option>
-                            <option value="50">50</option>
-                        </select>
-                    </div>
-                    <span> 1-{totalPage} of {search.page} </span>
-                    <button
-                        className={style.pageButton}
-                        disabled={search.page === 1}
-                        onClick={() => handlePageChange((search.page ?? 1) - 1)}
-                    ><FontAwesomeIcon icon={faAngleLeft}/>
-                    </button>
-                    <button
-                        className={style.pageButton}
-                        disabled={search.page === totalPage}
-                        onClick={() => handlePageChange((search.page ?? 1) + 1)}
-                    ><FontAwesomeIcon icon={faAngleRight}/>
-                    </button>
+            </div>
+            <div className={style.pagination}>
+                <span>items per page:</span>
+                <div className={style.select}>
+                    <select onChange={handlePageSizeChange}>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                    </select>
                 </div>
+                <span> 1-{totalPage} of {search.page} </span>
+                <button
+                    className={style.pageButton}
+                    disabled={search.page === 1}
+                    onClick={() => handlePageChange((search.page ?? 1) - 1)}
+                ><FontAwesomeIcon icon={faAngleLeft}/>
+                </button>
+                <button
+                    className={style.pageButton}
+                    disabled={search.page === totalPage}
+                    onClick={() => handlePageChange((search.page ?? 1) + 1)}
+                ><FontAwesomeIcon icon={faAngleRight}/>
+                </button>
             </div>
         </div>
     )
