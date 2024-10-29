@@ -1,15 +1,15 @@
 .blueButton {
     font-weight: 700;
-    font-size: 0.8vw;
-    padding: 0.6vh 1vw;
-    min-width: 6vw;
+    font-size: 11pt;
+    padding: 6px 20px;
+    min-width: 120px;
     border-radius: 15px;
     border: 1px solid #182847;
     transition: all 150ms ease;
     cursor: pointer;
     background: linear-gradient(135deg, #182847, #354e6d);
     color: #ffffff;
-    margin: 0.5vh 0.3vw;
+    margin: 5px 6px;
 }
 .blueButton:hover {
     background: linear-gradient(135deg, #3c6699, #9ebce6);

@@ -5,7 +5,6 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import React, {useEffect, useState} from "react";
 import type {Request} from "@/model/Request";
-import {format} from "date-fns";
 import {useRouter} from "next/navigation";
 import {faFileLines} from "@fortawesome/free-regular-svg-icons/faFileLines";
 import {postRequestOrders} from "@/app/(afterLogin)/request/order/_api/postRequestOrders";
@@ -215,11 +214,13 @@ export default function OrderTable() {
                 </div>
                 <span> 1-{totalPage} of {search.page} </span>
                 <button
+                    className={style.pageButton}
                     disabled={search.page === 1}
                     onClick={() => handlePageChange((search.page ?? 1) - 1)}
                 ><FontAwesomeIcon icon={faAngleLeft}/>
                 </button>
                 <button
+                    className={style.pageButton}
                     disabled={search.page === totalPage}
                     onClick={() => handlePageChange((search.page ?? 1) + 1)}
                 ><FontAwesomeIcon icon={faAngleRight}/>

@@ -36,7 +36,7 @@
     z-index: 10;
 }
 .table thead {
-    background-color: #002b49;
+    background: linear-gradient(to right, #023a60, #5676a2);
     color: #ffffff;
     font-size: 10pt;
     font-weight: 600;
@@ -99,40 +99,26 @@
     margin: 10px 5px;
 }
 .pagination button:hover:not([disabled]) {
-    background-color: #d3d3d3;
+    transform: scale(1.2);
     cursor: pointer;
 }
 .select {
-    position: relative;
     width: 55px;
 }
-
 .select select {
     font-size: 8pt;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    width: 100%;
     padding: 10px 10px;
     border: 1px solid #ccc;
     border-radius: 15px;
     background-color: #f8f8f8;
     cursor: pointer;
 }
-
-.select::after {
-    content: '\25BC';
-    font-size: 8pt;
-    color: #555;
-    position: absolute;
-    top: 50%;
-    right: 10px;
-    transform: translateY(-50%);
-    pointer-events: none;
-}
 .select select:focus {
     outline: none;
 }
 .select select:hover {
     border-color: #1a1a1a;
+}
+.pageButton, .pageButton:hover {
+    background: none;
 }

@@ -1,13 +1,13 @@
 .greenButton {
     background: white;
     font-weight: 700;
-    font-size: 0.8vw;
-    padding: 0.6vh 1vw;
-    min-width: 3vw;
+    font-size: 15px;
+    padding: 6px 20px;
+    min-width: 60px;
     border-radius: 15px;
     border: 1px solid #90BA2D;
     cursor: pointer;
-    margin: 0.5vh 0.3vw;
+    margin: 5px 6px;
 }
 .greenButton:hover {
     background: linear-gradient(135deg, #a1b86a, #dae8ba);

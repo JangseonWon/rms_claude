@@ -5,8 +5,8 @@
 .menu {
     display: flex;
     justify-content: space-between;
-    width: 1400px;
-    margin: 30px auto;
+    /*width: 1400px;*/
+    margin: 30px;
 }
 .iconContainer {
     width: 240px;

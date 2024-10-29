@@ -1,5 +1,6 @@
 .selectContainer {
     position: relative;
+    /*min-width: 180px;*/
 }
 .label{
     font-size: 9pt;
@@ -28,7 +29,7 @@
     border-radius: 20px;
     padding: 10px 20px;
     margin-bottom: 4px;
-    font-size: 9pt;
+    font-size: 8pt;
     background-color: #fff;
     box-shadow: 0 2px 4px #F3F6F9;
     cursor: pointer;
@@ -69,7 +70,7 @@
 .listMember li button {
     width: 100%;
     background-color: #fff;
-    font-size: 9pt;
+    font-size: 8pt;
     text-align: left;
     padding: 8px 18px;
     border: none;

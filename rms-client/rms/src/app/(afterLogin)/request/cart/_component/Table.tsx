@@ -251,11 +251,13 @@ export default function Table() {
                     </div>
                     <span> 1-{totalPage} of {search.page} </span>
                     <button
+                        className={style.pageButton}
                         disabled={search.page === 1}
                         onClick={() => handlePageChange((search.page ?? 1) - 1)}
                     ><FontAwesomeIcon icon={faAngleLeft}/>
                     </button>
                     <button
+                        className={style.pageButton}
                         disabled={search.page === totalPage}
                         onClick={() => handlePageChange((search.page ?? 1) + 1)}
                     ><FontAwesomeIcon icon={faAngleRight}/>

@@ -1,16 +1,16 @@
 .container {
     float: right;
-    margin: 1vh 1vw 1vh auto;
+    margin: 10px 20px 10px auto;
 }
 
 .barcodeButton {
-    width: 7vw;
-    height: 3.5vh;
+    width: 140px;
+    height: 35px;
     border-radius: 20px;
     border: solid #5676a2 thin;
     background: linear-gradient(to right, #023a60, #5676a2);
     color: #ffffff;
-    font-size: 0.7vw;
+    font-size: 12pt;
     font-weight: 700;
     cursor: pointer;
 }

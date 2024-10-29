@@ -1,5 +1,5 @@
 .container {
-    padding: 50px 5px 50px 0;
+    padding: 20px 5px 20px 0;
 }
 .container h1 {
     color: #002b49;
@@ -37,7 +37,8 @@
     height: 110px;
     background-color: #fff;
     color:#002b49;
-    margin: 15px
+    margin: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 .card:first-child{
     margin-left: 0;
