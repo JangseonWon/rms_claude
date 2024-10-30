@@ -103,9 +103,7 @@ export default function ListServicePage() {
                 <div className={style.search}>
                     <ServiceSearchBox/>
                 </div>
-                <section
-                    className={style.categorySection}
-                >
+                <section className={style.categorySection}>
                     {categoryArray && categoryArray.length > 0 && categoryArray.map((category) => (
                         <div key={category.id}
                              className={`${style.categoryItem} ${selectedCard === category.id ? style.selectedCard : ''}`}
@@ -132,16 +130,18 @@ export default function ListServicePage() {
                                     </div>
                                 </div>
                                 <div className={`${style.cartBottomSection} ${selectedCard === category.id ? style.expanded : ''}`}>
-                                    {serviceData && serviceData.length > 0 ? (serviceData?.map((service) => (
-                                            <div key={service.id} className={style.serviceLink} onClick={()=> serviceOnClick(service)}>
-                                                {service.name}
+                                    <div className={style.cartBottomSectionScroll}>
+                                        {serviceData && serviceData.length > 0 ? (serviceData?.map((service) => (
+                                                <div key={service.id} className={style.serviceLink} onClick={()=> serviceOnClick(service)}>
+                                                    {service.name}
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className={style.noServicesMessage}>
+                                                The service does not exist.
                                             </div>
-                                        ))
-                                    ) : (
-                                        <div className={style.noServicesMessage}>
-                                            The service does not exist.
-                                        </div>
-                                    )}
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>

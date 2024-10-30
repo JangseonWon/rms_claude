@@ -91,7 +91,6 @@
     display: grid;
     width: 900px;
     height: 0;
-    overflow-y: scroll;
     background: #fff;
     border-radius: 0 0 14px 14px;
     transition: height 0.3s ease;
@@ -99,15 +98,19 @@
 .cartBottomSection.expanded {
     height: 180px;
 }
-.cartBottomSection::-webkit-scrollbar-track {
+.cartBottomSectionScroll {
+    margin: 5px;
+    overflow-y: scroll;
+}
+.cartBottomSectionScroll::-webkit-scrollbar-track {
     background: none;
 }
-.cartBottomSection::-webkit-scrollbar-thumb {
+.cartBottomSectionScroll::-webkit-scrollbar-thumb {
     background-color: #90BA2D;
     border-radius: 15px;
     border: none;
 }
-.cartBottomSection::-webkit-scrollbar {
-    width: 0.3vw !important;
-    height: 1vh !important;
+.cartBottomSectionScroll::-webkit-scrollbar {
+    width: 5px !important;
+    height: 10px !important;
 }
