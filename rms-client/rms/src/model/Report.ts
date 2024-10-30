@@ -3,6 +3,6 @@ export interface Report {
     type?: string,
     value?: string,
     create_at?: Date,
-    reported_at?: Date,
+    downloaded_at?: Date,
     is_latest?: Boolean,
 }

@@ -2,12 +2,11 @@
 
 import React, {useEffect, useState} from "react";
 import style from "@/app/(afterLogin)/request/result/download/_component/downloadTable.module.css";
-import {faAngleLeft, faAngleRight, faDownload, faFileDownload, faFilePdf} from "@fortawesome/free-solid-svg-icons";
+import {faAngleLeft, faAngleRight, faFilePdf} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import type {Request} from "@/model/Request";
 import {postRequests} from "@/app/(afterLogin)/request/result/download/_api/postRequests";
 import {getReportFile} from "@/app/(afterLogin)/request/result/download/_api/getReportFile";
-import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import SelectBox from "@/app/_component/SelectBox";
 import InputBox from "@/app/_component/InputBox";
 import BlueButton from "@/app/_component/BlueButton";
@@ -27,8 +26,13 @@ const selectBoxOptions: SelectBoxOption[] = [
     { table: "patient", column: "serial", name: "MRN" },
     { table: "organization", column: "name", name: "Institution" },
     { table: "request", column: "status", name: "Status" },
-
 ];
+const defaultFilter: Filter = {
+    table: "request",
+    column: "reported_at",
+    operator: "IS NOT NULL",
+    value: ""
+}
 
 export default function DownloadTable() {
     const [requestData, setRequestData] = useState<RequestWithSelected[]>([]);
@@ -41,24 +45,7 @@ export default function DownloadTable() {
             operator: "LIKE",
             value: ""
     })
-    const [search, setSearch] = useState<Query>(
-{
-            size:10,
-            page:1,
-            filter_groups: [
-                {
-                    filters: [
-                        {
-                            table: "request",
-                            column: "reported_at",
-                            operator: "IS NOT NULL",
-                            value: ""
-                        }
-                    ]
-                }
-            ]
-        }
-    );
+    const [search, setSearch] = useState<Query>({size:10, page:1, filter_groups:[{filters:[defaultFilter]}]});
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage =>({
@@ -108,13 +95,12 @@ export default function DownloadTable() {
             ...prevSearch,
             filter_groups: [
                 {
-                    ...prevSearch?.filter_groups?.[0] || {},
                     filters: [
-                        ...(prevSearch?.filter_groups?.[0]?.filters || []),
-                        filter,
-                    ],
-                },
-            ],
+                        defaultFilter,
+                        filter
+                    ]
+                }
+            ]
         }));
     }, [filter]);
 
@@ -143,19 +129,17 @@ export default function DownloadTable() {
         }
     };
 
-    const handleMultiDownloadOnClick = async () => {
-        const selectedIds = requestData
-            .filter(row => row.isSelected)
-            .map(row => `${row.sample?.barcode}_${row.service?.id}`);
+    const handleBatchDownloadClick = async () => {
+        const selectedRequest: Request[] = requestData.filter(row => row.isSelected) as Request[]
         try {
-            const response = await getReportFiles(selectedIds);
+            const response = await getReportFiles(selectedRequest);
             if (response.ok) {
                 const blob = await response.blob();
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 const today = new Date().toISOString().split('T')[0];
                 a.href = url;
-                a.download = `reports_${today}.zip`;
+                a.download = `GCGenome_reports_${today}.zip`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -173,7 +157,7 @@ export default function DownloadTable() {
         <>
             <section className={style.filterContainer}>
                 <div className={style.filterContainerRight}>
-                    <BlueButton name={"Batch Download"} onClick={handleMultiDownloadOnClick}/>
+                    <BlueButton name={"Batch Download"} onClick={handleBatchDownloadClick}/>
                 </div>
                 <div className={style.filterContainerLeft}>
                     <SelectBox
@@ -245,7 +229,7 @@ export default function DownloadTable() {
                             <td>{request.reported_at ? new Date(request.reported_at).toLocaleDateString() : '-'}</td>
                             <td>{request.status}</td>
                             <td>
-                                {(request.reports as Report[]).filter((report: Report) => report.type === 'PDF').map((report, reportIndex) => (
+                                {(request.reports as Report[])?.filter((report: Report) => report.type === 'PDF').map((report, reportIndex) => (
                                     <FontAwesomeIcon
                                         key={report.id}
                                         className={style.downloadIcon}
