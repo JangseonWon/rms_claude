@@ -3,7 +3,7 @@
 import style from "@/app/(afterLogin)/request/cart/_component/table.module.css"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import type {Request} from "@/model/Request";
 import {format} from "date-fns";
 import {useRouter} from "next/navigation";
@@ -24,10 +24,10 @@ interface RequestWithSelected extends Request {
 }
 
 const selectBoxOptions: SelectBoxOption[] = [
+    { table: "service", column: "name", name: "Service Name" },
     { table: "sample", column: "barcode", name: "Registration ID" },
     { table: "organization", column: "id", name: "Institution" },
     { table: "patient", column: "name", name: "Patient(s) Name" },
-    { table: "service", column: "name", name: "Service Name" },
     { table: "patient", column: "serial", name: "MRN" },
     { table: "patient", column: "birth_year", name: "Patient BOD" },
     { table: "request", column: "report_at", name: "Report Date" }
@@ -36,7 +36,7 @@ const selectBoxOptions: SelectBoxOption[] = [
 export default function Table() {
     const [requestData, setRequestData] = useState<RequestWithSelected[]>([])
     const router = useRouter();
-    const [search, setSearch] = useState<Query>({asc: false, size:20, page:1});
+    const [search, setSearch] = useState<Query>({asc: false, size:10, page:1});
     const [totalPage, setTotalPage] = useState<number>();
     const [pageRange, setPageRange] = useState<{ start: number, end: number }>({ start: 1, end: 5 });
     const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
@@ -67,7 +67,7 @@ export default function Table() {
     }, [search]);
 
 
-    const fetchData = useCallback(async (search: Query) => {
+    const fetchData = async (search: Query) => {
         try {
             const response = await searchRequests(search);
             const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
@@ -77,7 +77,7 @@ export default function Table() {
         } catch (error) {
             setRequestData([]);
         }
-    }, []);
+    };
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage => ({
@@ -179,7 +179,7 @@ export default function Table() {
                     }}></InputBox>
                 </div>
             </section>
-            <div>
+            <div className={style.tableContainer}>
                 <table className={style.table}>
                     <thead>
                     <tr>
@@ -194,13 +194,13 @@ export default function Table() {
                                 <span className={style.checkmark}></span>
                             </label>
                         </th>
-                        <th>Institution</th>
-                        <th>Patient(s) Name</th>
-                        <th>Service</th>
+                        <th className={style.shortColumn}>Institution</th>
+                        <th className={style.shortColumn}>Patient(s) Name</th>
+                        <th className={style.longColumn}>Service</th>
                         <th>Patient BOD<br/>(DD/MM/YYYY)</th>
                         <th>Gender</th>
-                        <th>MRN</th>
-                        <th>Collection Date<br/>(DD/MM/YYYY)</th>
+                        <th className={style.longColumn}>MRN</th>
+                        <th className={style.dateColumn}>Collection Date<br/>(DD/MM/YYYY)</th>
                         <th>Info</th>
                     </tr>
                     </thead>
@@ -240,27 +240,29 @@ export default function Table() {
                     ))}
                     </tbody>
                 </table>
-                <div className={style.pagination}>
-                    <span>items per page:</span>
-                    <div className={style.select}>
-                        <select onChange={handlePageSizeChange}>
-                            <option value="5">5</option>
-                            <option value="10">10</option>
-                            <option value="20">20</option>
-                        </select>
-                    </div>
-                    <span> 1-{totalPage} of {search.page} </span>
-                    <button
-                        disabled={search.page === 1}
-                        onClick={() => handlePageChange((search.page ?? 1) - 1)}
-                    ><FontAwesomeIcon icon={faAngleLeft}/>
-                    </button>
-                    <button
-                        disabled={search.page === totalPage}
-                        onClick={() => handlePageChange((search.page ?? 1) + 1)}
-                    ><FontAwesomeIcon icon={faAngleRight}/>
-                    </button>
+            </div>
+            <div className={style.pagination}>
+                <span>items per page:</span>
+                <div className={style.select}>
+                    <select onChange={handlePageSizeChange}>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                    </select>
                 </div>
+                <span> 1-{totalPage} of {search.page} </span>
+                <button
+                    className={style.pageButton}
+                    disabled={search.page === 1}
+                    onClick={() => handlePageChange((search.page ?? 1) - 1)}
+                ><FontAwesomeIcon icon={faAngleLeft}/>
+                </button>
+                <button
+                    className={style.pageButton}
+                    disabled={search.page === totalPage}
+                    onClick={() => handlePageChange((search.page ?? 1) + 1)}
+                ><FontAwesomeIcon icon={faAngleRight}/>
+                </button>
             </div>
         </div>
     )

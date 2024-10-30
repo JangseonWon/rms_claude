@@ -154,7 +154,7 @@ export default function DownloadTable() {
     }
 
     return (
-        <>
+        <div className={style.container}>
             <section className={style.filterContainer}>
                 <div className={style.filterContainerRight}>
                     <BlueButton name={"Batch Download"} onClick={handleBatchDownloadClick}/>
@@ -185,27 +185,27 @@ export default function DownloadTable() {
             <section className={style.tableContainer}>
                 <table className={style.table}>
                     <thead>
-                    <tr>
-                    <th>
-                            <label form="agree" className={style.checkbox}>
-                                <input
-                                    type="checkbox"
-                                    checked={isSelectedAll}
-                                    onChange={() => handleSelectAll(!isSelectedAll)}
-                                    className={style.checkbox}
-                                />
-                                <span className={style.checkmark}></span>
-                            </label>
-                        </th>
-                        <th>Registration Number</th>
-                        <th>Service Name</th>
-                        <th>Patient(s) Name</th>
-                        <th>MRN</th>
-                        <th>Institution</th>
-                        <th>Report out<br/>(YYYY/MM/DD)</th>
-                        <th>Status</th>
-                        <th>Report Download</th>
-                    </tr>
+                        <tr>
+                            <th>
+                                <label form="agree" className={style.checkbox}>
+                                    <input
+                                        type="checkbox"
+                                        checked={isSelectedAll}
+                                        onChange={() => handleSelectAll(!isSelectedAll)}
+                                        className={style.checkbox}
+                                    />
+                                    <span className={style.checkmark}></span>
+                                </label>
+                            </th>
+                            <th>Registration Number</th>
+                            <th>Service Name</th>
+                            <th>Patient(s) Name</th>
+                            <th>MRN</th>
+                            <th>Institution</th>
+                            <th>Report out<br/>(YYYY/MM/DD)</th>
+                            <th>Status</th>
+                            <th>Report Download</th>
+                        </tr>
                     </thead>
                     <tbody>
                     {requestData.map((request, rowIndex) => (
@@ -252,17 +252,19 @@ export default function DownloadTable() {
                     </div>
                     <span> 1-{totalPage} of {search.page} </span>
                     <button
+                        className={style.pageButton}
                         disabled={search.page === 1}
                         onClick={() => handlePageChange((search.page ?? 1) - 1)}
                     ><FontAwesomeIcon icon={faAngleLeft}/>
                     </button>
                     <button
+                        className={style.pageButton}
                         disabled={search.page === totalPage}
                         onClick={() => handlePageChange((search.page ?? 1) + 1)}
                     ><FontAwesomeIcon icon={faAngleRight}/>
                     </button>
                 </div>
             </section>
-        </>
+        </div>
     );
 }

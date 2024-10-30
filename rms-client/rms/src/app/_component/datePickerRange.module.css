@@ -1,7 +1,7 @@
 .dateBox p {
-    font-size: 0.65vw;
+    font-size: 9pt;
     color: #666666;
-    margin: 0 0 0.5vh 0;
+    margin: 0 0 5px 0;
 }
 .dateBox.error p{
     color: red;
@@ -15,18 +15,18 @@
     width: 100%;
 }
 .testBox input {
-    width: 11vw;
-    height: 2vh;
-    padding: 0.7vh 1vw;
-    font-size: 0.7vw;
+    width: 200px;
+    height: 20px;
+    padding: 7px 20px;
+    font-size: 9pt;
     border: 1px solid #ccc;
     border-radius: 15px;
     color: grey;
 }
 .icon {
-    font-size: 1vw;
+    font-size: 13pt;
     position: absolute;
-    right: 1vw;
+    right: 20px;
     top: 50%;
     transform: translateY(-50%);
     pointer-events: none;
@@ -35,8 +35,8 @@
     border: 1px solid red;
 }
 .leftButton, .rightButton {
-    padding: 0.2vh 0.2vw;
-    margin: 0.2vh 0.4vw;
+    padding: 2px 4px;
+    margin: 2px 8px;
     background: #ffffff;
     border: none;
     cursor: pointer;
@@ -45,8 +45,8 @@
     color: #90BA2D;
 }
 .selectBox {
-    margin: 1vh 0.2vw;
-    padding: 0.2vh 0.2vw;
+    margin: 10px 3px;
+    padding: 2px 3px;
 }
 .selectBox:focus {
     outline: none;

@@ -99,50 +99,53 @@ export default function ListServicePage() {
     return (
         <div className={style.container}>
             {isLoading && <QnaLoading/>}
-            <section className={style.searchSection}>
+            <section className={style.bodySection}>
                 <div className={style.search}>
                     <ServiceSearchBox/>
                 </div>
-            </section>
-            <section className={style.bodySection}>
-                <section
-                    className={style.categorySection}
-                >
+                <section className={style.categorySection}>
                     {categoryArray && categoryArray.length > 0 && categoryArray.map((category) => (
                         <div key={category.id}
                              className={`${style.categoryItem} ${selectedCard === category.id ? style.selectedCard : ''}`}
-                             onClick={()=> cardOnClick(category)}
+                             onClick={() => cardOnClick(category)}
                         >
-                            <div className={style.cardDescription}>
-                                <span className={style.categoryTitle}>{category.name}</span>
-                                <span
-                                    className={style.categoryDescription}
-                                    dangerouslySetInnerHTML={{__html: description(category.name)}}
-                                />
-                            </div>
-                            <div className={style.cardPicture}>
-                                <Image src={'/category/' + category.name + '.jpg'}
-                                       alt={category.name}
-                                       fill
-                                       style={{objectFit: 'cover'}}
-                                />
+                            <div className={style.cardContainer}>
+                                <div className={style.cartTopSection}>
+                                    <div className={style.cardDescription}>
+                                        <span
+                                            className={`${style.categoryTitle} ${selectedCard === category.id ? style.selectedTitle : ''}`}>
+                                            {category.name}
+                                        </span>
+                                        <span
+                                            className={`${style.categoryDescription} ${selectedCard === category.id ? style.selectedDescriptionText : ''}`}
+                                            dangerouslySetInnerHTML={{__html: description(category.name)}}
+                                        />
+                                    </div>
+                                    <div
+                                        className={`${style.cardPicture} ${selectedCard === category.id ? style.selectedCardPicture : ''}`}>
+                                        <Image src={'/category/' + category.name + '.jpg'}
+                                               alt={category.name}
+                                               fill
+                                        />
+                                    </div>
+                                </div>
+                                <div className={`${style.cartBottomSection} ${selectedCard === category.id ? style.expanded : ''}`}>
+                                    <div className={style.cartBottomSectionScroll}>
+                                        {serviceData && serviceData.length > 0 ? (serviceData?.map((service) => (
+                                                <div key={service.id} className={style.serviceLink} onClick={()=> serviceOnClick(service)}>
+                                                    {service.name}
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className={style.noServicesMessage}>
+                                                The service does not exist.
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     ))}
-                </section>
-                <section className={style.serviceSection}>
-                    <div className={style.serviceContainer}>
-                        {serviceData && serviceData.length > 0 ? (serviceData?.map((service) => (
-                                <div key={service.id} className={style.serviceLink} onClick={()=> serviceOnClick(service)}>
-                                    {service.name}
-                                </div>
-                            ))
-                        ) : (
-                            <div className={style.noServicesMessage}>
-                                The service does not exist.
-                            </div>
-                        )}
-                    </div>
                 </section>
             </section>
         </div>

@@ -100,7 +100,7 @@ export default function Info() {
     };
     const getDateFromComponents = (year?: number, month?: number, day?: number): Date | undefined => {
         if (!year || !month || !day) return undefined;
-        return new Date(year, month - 1, day);  // Month is zero-based in JavaScript Date
+        return new Date(year, month - 1, day);
     }
 
     useEffect(() => {
@@ -110,15 +110,19 @@ export default function Info() {
         const handleKeyPress = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {router.back();}
         };
+        document.body.style.overflow = 'hidden';
         window.addEventListener('keydown', handleKeyPress);
-        return () => {window.removeEventListener('keydown', handleKeyPress);};
+        return () => {
+            document.body.style.overflow = 'auto';
+            window.removeEventListener('keydown', handleKeyPress);
+        };
     }, [fetchRequest, fetchOrganizations, fetchSampleType, router]);
 
     return (
         <div className={style.modalBackground}>
             <div className={style.modal}>
                 <div className={style.modalTitle}>
-                    <h1>Order Details</h1>
+                    <h1>Cart Details</h1>
                     <button onClick={onClickClose}>
                         <FontAwesomeIcon icon={faXmark}/>
                     </button>

@@ -1,14 +1,13 @@
 .container{
     padding: 20px;
+    background-color: #fff;
+    border-radius: 15px;
+    margin: 48px 20px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 .title {
-    background-color: #fff;
-    margin: 3vh 0 0;
-    padding: 2vh 4vw;
-    border-radius: 15px 15px 0 0;
+    padding: 20px;
 }
 .contents{
-    background-color: white;
-    border-radius: 0 0 15px 15px;
-    padding: 2vh 2vw;
+    padding: 20px;
 }

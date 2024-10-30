@@ -1,15 +1,29 @@
 .leftContainer {
-    margin-left: 120px;
 }
 .rightContainer {
     display: flex;
 }
+.headerWidth {
+    display: flex;
+    width: 1300px;
+    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+    margin: 0 auto;
+}
 .header {
     background-color: #182847;
-    padding: 10px 160px 15px 160px;
+    padding: 10px 20px 15px;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+}
+.gPortalLogo{
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 20pt;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+    margin-right: 850px;
 }
 .headerMenu {
     font-size: 16pt;
@@ -33,13 +47,4 @@
 .headerMenu:hover {
     border-bottom: solid #90BA2D ;
     cursor: pointer;
-}
-.gPortalLogo{
-    text-decoration: none;
-    color: #ffffff;
-    font-size: 20pt;
-    font-optical-sizing: auto;
-    font-weight: 600;
-    font-style: normal;
-    margin-right: 100px;
 }
