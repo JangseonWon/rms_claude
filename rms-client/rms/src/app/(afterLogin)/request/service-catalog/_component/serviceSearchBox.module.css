@@ -1,5 +1,5 @@
 .container {
-    margin: 2vh 2vw 1vh 0;
+    margin: 10px 40px 10px 0;
     position: relative;
 }
 .selectSection ul,
@@ -13,23 +13,23 @@
     margin-top: 0;
 }
 .label{
-    font-size: 0.65vw;
+    font-size: 9pt;
     color: #666666;
     margin-bottom: 5px;
 }
 .btnSelect {
     display: flex;
     width: 100%;
-    min-width: 10.35vw;
+    min-width: 200px;
     justify-content: space-between;
     align-items: center;
-    border: 0.1vw solid #DAE2ED;
+    border: 1px solid #DAE2ED;
     border-radius: 20px;
-    padding: 1vh 1vw;
-    margin-bottom: 0.4vh;
-    font-size: 0.6vw;
+    padding: 10px 20px;
+    margin-bottom: 4px;
+    font-size: 8pt;
     background-color: #fff;
-    box-shadow: 0 0.2vh 0.2vw #F3F6F9;
+    box-shadow: 0 2px 4px #F3F6F9;
 }
 .selectSection.error .btnSelect {
     border: 1px solid red;
@@ -38,16 +38,16 @@
     color: red;
 }
 .label {
-    font-size: 0.7vw;
+    font-size: 9pt;
     color: #666666;
     margin: 0 0 0.5vh 0.5vw;
 }
 .btnSelect:hover {
-    outline: 0.1vw solid #CCE492;
+    outline: 1px solid #CCE492;
     border: 1px solid #90BA2D;
 }
 .btnSelect.open {
-    outline: 0.1vw solid #CCE492;
+    outline: 1px solid #CCE492;
     border: 1px solid #90BA2D;
 }
 .selectInput, .selectInput:focus {
@@ -58,7 +58,7 @@
 .searchList {
     display: none;
     position: absolute;
-    outline: 0.05vw solid #C4C4C4;
+    outline: 1px solid #C4C4C4;
     border-radius: 5px;
     max-height: 200px;
     overflow-y: auto;
@@ -72,7 +72,7 @@
     border: solid #C4C4C4 0.1vw;
     width: 90%;
     border-radius: 5px;
-    margin: 0.5vh 0.2vw;
+    margin: 5px 4px;
     outline: none;
     position: sticky;
     top: 0;
@@ -83,14 +83,14 @@
     display: block;
 }
 .listMember li {
-    width: 24.2vw;
+    width: 390px;
 }
 .listMember li button {
     width: 100%;
     background-color: #fff;
-    font-size: 0.6vw;
+    font-size: 8pt;
     text-align: left;
-    padding: 0.8vh 1vw;
+    padding: 8px 20px;
     border: none;
     cursor: pointer;
 }

@@ -40,9 +40,6 @@ export default function Statistics() {
     return (
         <div className={style.container}>
             <div className={style.titleContainer}>
-                <div className={style.subTitle}>
-                    <span>Dashboard</span>
-                </div>
                 <div className={style.mainTitle}>
                     Dashboard
                 </div>

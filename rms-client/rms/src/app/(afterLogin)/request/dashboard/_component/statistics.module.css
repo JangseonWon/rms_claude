@@ -16,13 +16,6 @@
     color: #002b49;
     font-size: 32pt;
     font-weight: 800;
-    text-shadow: 2px 2px 2px #b6b6b6;
-}
-.subTitle {
-    align-self: flex-end;
-    color: #808080;
-    font-size: 12pt;
-    font-weight: 600;
 }
 .subTitle span {
     color: #002b49;
