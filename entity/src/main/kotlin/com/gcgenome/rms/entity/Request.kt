@@ -30,6 +30,8 @@ data class Request(
     val specifiedAt: LocalDateTime,
     @Column(name = "complete_at", nullable = true)
     val completeAt: LocalDateTime,
+    @Column(name =" reported_at", nullable = true)
+    val reportedAt: LocalDateTime,
     @Column(name = "resample_at", nullable = true)
     val resampleAt: LocalDateTime,
     @Column(name = "last_modify_at", nullable = false)

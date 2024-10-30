@@ -17,8 +17,8 @@ data class Report(
     val value: String,
     @Column(name = "create_at", nullable = false)
     val createAt: LocalDateTime,
-    @Column(name = "reported_at", nullable = true)
-    val reportedAt: LocalDateTime,
+    @Column(name = "downloaded_at", nullable = true)
+    val downloadedAt: LocalDateTime,
     @Column(name = "is_latest", nullable = false)
     val isLatest: Boolean,
 
