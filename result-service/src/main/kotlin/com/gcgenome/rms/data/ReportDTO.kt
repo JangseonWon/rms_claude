@@ -18,8 +18,8 @@ data class ReportDTO(
     var createAt: LocalDateTime? = null,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
-    @JsonProperty("reported_at")
-    var reportedAt: LocalDateTime? = null,
+    @JsonProperty("downloaded_at")
+    var downloadedAt: LocalDateTime? = null,
     var isLatest: Boolean? = null,
     var request: RequestDTO? = null
 )

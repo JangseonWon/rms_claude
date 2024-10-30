@@ -5,7 +5,7 @@ import com.gcgenome.rms.tables.references.*
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.*
 import reactor.core.publisher.Mono
-import java.util.*
+import java.time.LocalDateTime
 
 interface RequestDao: QueryDao{
 
@@ -93,15 +93,15 @@ interface RequestDao: QueryDao{
             record.into(RequestDTO::class.java)
         }
     }
-    fun DSLContext.updateRequestStatus(request: RequestDTO, status: Status): Mono<RequestDTO> {
-        println("${request.order!!.id}, ${request.service!!.id}, ${request.sample!!.id}")
+    fun DSLContext.updateRequestStatusFinish(request: RequestDTO): Mono<RequestDTO> {
         return Mono.from(
             update(REQUEST)
-                .set(REQUEST.STATUS, status.toString())
+                .set(REQUEST.STATUS, Status.FINISHED.toString())
+                .set(REQUEST.COMPLETE_AT, LocalDateTime.now())
                 .where(
                     REQUEST.ORDER_ID.eq(request.order!!.id)
                         .and(REQUEST.SERVICE_ID.eq(request.service!!.id))
-                        .and(REQUEST.SAMPLE_ID.eq(REQUEST.SAMPLE_ID))
+                        .and(REQUEST.SAMPLE_ID.eq(request.sample!!.id))
                 )
                 .returning()
         ).map { it.into(RequestDTO::class.java) }

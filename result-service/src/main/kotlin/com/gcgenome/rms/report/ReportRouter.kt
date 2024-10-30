@@ -1,7 +1,6 @@
 package com.gcgenome.rms.request
 
 import com.gcgenome.rms.auth.AuthenticationHandler
-import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.RequestDTO
 import com.gcgenome.rms.exception.AuthenticationNotFoundException
 import com.gcgenome.rms.report.ReportHandler
@@ -12,7 +11,6 @@ import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.router
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.util.*
 
@@ -52,6 +50,15 @@ class ReportRouter (
             .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Error code: $e") }
     }
     private fun downloadFiles(request: ServerRequest): Mono<ServerResponse> {
-        return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
+        return Mono.zip(authenticationHandler.principal(request), request.bodyToFlux(RequestDTO::class.java).collectList())
+            .flatMap { handler.downloadFiles(it.t1, it.t2) }
+            .flatMap { zipByteArray ->
+                ServerResponse.ok()
+                    .header("Content-Disposition", "attachment; filename=\"reports.zip\"")
+                    .header("Content-Type", "application/zip")
+                    .bodyValue(zipByteArray)
+            }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}") }
+            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Error code: $e") }
     }
 }

@@ -19,7 +19,7 @@ interface ReportDao{
                 REPORT.TYPE,
                 REPORT.VALUE,
                 REPORT.CREATE_AT,
-                REPORT.REPORTED_AT,
+                REPORT.DOWNLOADED_AT,
                 REPORT.IS_LATEST,
                 jsonObject(
                     key("order").value(jsonObject(
@@ -47,7 +47,7 @@ interface ReportDao{
     }
     fun DSLContext.updateReportReportedAt(reportId: UUID): Mono<ReportDTO>{
         return Mono.from(update(REPORT)
-            .set(REPORT.REPORTED_AT, LocalDateTime.now())
+            .set(REPORT.DOWNLOADED_AT, LocalDateTime.now())
             .where(REPORT.ID.eq(reportId))
             .returning()
         ).map { it.into(ReportDTO::class.java) }
