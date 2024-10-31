@@ -1,9 +1,9 @@
 .container {
-    margin: 15px 110px 10px 0;
+    margin: 15px 0 10px;
     display: flex;
 }
 .profileContainer {
-    /*padding: 10px 0;*/
+
 }
 .profile {
     padding: 0 0 5px 0;

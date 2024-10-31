@@ -8,7 +8,7 @@ import {useSelectedLayoutSegment} from "next/navigation";
 export default function Header() {
     const segment = useSelectedLayoutSegment();
     return (
-        <header className={style.header}>
+        <div className={style.header}>
             <div className={style.headerWidth}>
                 <div className={style.leftContainer}>
                     <Link href={"/home"} className={style.gPortalLogo}>G-Portal</Link>
@@ -19,6 +19,6 @@ export default function Header() {
                     <ProfileButton/>
                 </div>
             </div>
-        </header>
+        </div>
     )
 }

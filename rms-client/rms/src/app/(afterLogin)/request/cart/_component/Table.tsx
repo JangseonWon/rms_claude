@@ -197,7 +197,7 @@ export default function Table() {
                         <th className={style.shortColumn}>Institution</th>
                         <th className={style.shortColumn}>Patient(s) Name</th>
                         <th className={style.longColumn}>Service</th>
-                        <th>Patient BOD<br/>(DD/MM/YYYY)</th>
+                        <th className={style.shortColumn}>Patient BOD<br/>(DD/MM/YYYY)</th>
                         <th>Gender</th>
                         <th className={style.longColumn}>MRN</th>
                         <th className={style.dateColumn}>Collection Date<br/>(DD/MM/YYYY)</th>
