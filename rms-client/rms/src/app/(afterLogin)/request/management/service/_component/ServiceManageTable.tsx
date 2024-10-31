@@ -1,7 +1,8 @@
 "use client"
 
 import React, {useEffect, useState} from "react";
-import style from "@/app/(afterLogin)/request/management/service/_component/serviceManageTable.module.css";
+import style from "@/css/globalTable.module.css";
+import managementStyle from "@/css/managementTable.module.css";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
@@ -116,25 +117,28 @@ export default function ServiceManageTable() {
 
     return (
         <>
-            <section className={style.filterContainer}>
-                <div className={style.filterContainerLeft}>
-                    <div className={style.alisSyncButton}>
-                        <BlueButton name={"Alis-Sync"} onClick={()=>handleAlisSyncButtonClick(search)}/>
+            <section className={managementStyle.filterContainer}>
+                <div className={managementStyle.filterContainerAlis}>
+                    <div className={managementStyle.alisSyncButton}>
+                        <BlueButton name={"Alis-Sync"} onClick={() => handleAlisSyncButtonClick(search)}/>
                     </div>
+                </div>
+                <div className={managementStyle.filterContainerSearch}>
                     <SelectBox
                         width={"7vw"}
                         value={selectOption.name}
                         options={selectBoxOptions}
                         label={"status"}
-                        onChange={(selectedOption) =>{
+                        onChange={(selectedOption) => {
                             setSelectOption(selectedOption);
                         }}
                     />
-                </div>
-                <div className={style.filterContainerRight}>
-                    <InputBox label={"search"} onChange={(value) => {
-                        handleSearchChange(selectOption, value)
-                    }}></InputBox>
+                    <div className={managementStyle.search}>
+                        <InputBox label={"search"} onChange={(value) => {
+                            handleSearchChange(selectOption, value)
+                        }}>
+                        </InputBox>
+                    </div>
                 </div>
             </section>
             <section className={style.tableContainer}>
@@ -160,28 +164,28 @@ export default function ServiceManageTable() {
                     ))}
                     </tbody>
                 </table>
-                <div className={style.pagination}>
-                    <span>items per page:</span>
-                    <div className={style.select}>
-                        <select onChange={handlePageSizeChange}>
-                            <option value="10">10</option>
-                            <option value="20">20</option>
-                            <option value="50">50</option>
-                        </select>
-                    </div>
-                    <span> 1-{totalPage} of {search.page} </span>
-                    <button
-                        disabled={search.page === 1}
-                        onClick={() => handlePageChange((search.page ?? 1) - 1)}
-                    ><FontAwesomeIcon icon={faAngleLeft}/>
-                    </button>
-                    <button
-                        disabled={search.page === totalPage}
-                        onClick={() => handlePageChange((search.page ?? 1) + 1)}
-                    ><FontAwesomeIcon icon={faAngleRight}/>
-                    </button>
-                </div>
             </section>
+            <div className={style.pagination}>
+                <span>items per page:</span>
+                <div className={style.select}>
+                    <select onChange={handlePageSizeChange}>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
+                <span> 1-{totalPage} of {search.page} </span>
+                <button
+                    disabled={search.page === 1}
+                    onClick={() => handlePageChange((search.page ?? 1) - 1)}
+                ><FontAwesomeIcon icon={faAngleLeft}/>
+                </button>
+                <button
+                    disabled={search.page === totalPage}
+                    onClick={() => handlePageChange((search.page ?? 1) + 1)}
+                ><FontAwesomeIcon icon={faAngleRight}/>
+                </button>
+            </div>
             {serviceModalOpen && (
                 <ServiceEditModal
                     serviceId={selectedService?.id!}

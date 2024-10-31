@@ -1,6 +1,6 @@
 "use client"
 
-import style from "@/app/(afterLogin)/request/order/_component/orderTable.module.css";
+import style from "@/css/globalTable.module.css";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import React, {useEffect, useState} from "react";
@@ -118,7 +118,7 @@ export default function OrderTable() {
                 <div className={style.buttonSection}>
                     <BarcodeButton selectRequest={selectedRequest}/>
                 </div>
-                <div className={style.filterContainerLeft}>
+                <div className={style.topSecondSection}>
                     <SelectBox
                         width={"10vw"}
                         value={selectedOption.name}
@@ -162,7 +162,7 @@ export default function OrderTable() {
                         <th>Registration ID</th>
                         <th className={style.longColumn}>Service</th>
                         <th>Patient(s) Name</th>
-                        <th>Patient BOD<br/>(DD/MM/YYYY)</th>
+                        <th className={style.dateColumn}>Patient BOD<br/>(DD/MM/YYYY)</th>
                         <th>Gender</th>
                         <th className={style.longColumn}>MRN</th>
                         <th>Info</th>

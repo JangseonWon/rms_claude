@@ -1,7 +1,8 @@
 "use client"
 
 import React, {useEffect, useState} from "react";
-import style from "@/app/(afterLogin)/request/result/download/_component/downloadTable.module.css";
+import downloadStyle from "@/app/(afterLogin)/request/result/download/_component/downloadTable.module.css";
+import style from "@/css/globalTable.module.css";
 import {faAngleLeft, faAngleRight, faFilePdf} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import type {Request} from "@/model/Request";
@@ -155,11 +156,11 @@ export default function DownloadTable() {
 
     return (
         <div className={style.container}>
-            <section className={style.filterContainer}>
-                <div className={style.filterContainerRight}>
+            <section className={downloadStyle.filterContainer}>
+                <div className={downloadStyle.filterContainerRight}>
                     <BlueButton name={"Batch Download"} onClick={handleBatchDownloadClick}/>
                 </div>
-                <div className={style.filterContainerLeft}>
+                <div className={downloadStyle.filterContainerLeft}>
                     <SelectBox
                         width={"10vw"}
                         value={selectedOption.name}
@@ -185,27 +186,27 @@ export default function DownloadTable() {
             <section className={style.tableContainer}>
                 <table className={style.table}>
                     <thead>
-                        <tr>
-                            <th>
-                                <label form="agree" className={style.checkbox}>
-                                    <input
-                                        type="checkbox"
-                                        checked={isSelectedAll}
-                                        onChange={() => handleSelectAll(!isSelectedAll)}
-                                        className={style.checkbox}
-                                    />
-                                    <span className={style.checkmark}></span>
-                                </label>
-                            </th>
-                            <th>Registration Number</th>
-                            <th>Service Name</th>
-                            <th>Patient(s) Name</th>
-                            <th>MRN</th>
-                            <th>Institution</th>
-                            <th>Report out<br/>(YYYY/MM/DD)</th>
-                            <th>Status</th>
-                            <th>Report Download</th>
-                        </tr>
+                    <tr>
+                        <th>
+                            <label form="agree" className={style.checkbox}>
+                                <input
+                                    type="checkbox"
+                                    checked={isSelectedAll}
+                                    onChange={() => handleSelectAll(!isSelectedAll)}
+                                    className={style.checkbox}
+                                />
+                                <span className={style.checkmark}></span>
+                            </label>
+                        </th>
+                        <th className={style.longColumn}>Registration Number</th>
+                        <th className={style.longColumn}>Service</th>
+                        <th className={style.shortColumn}>Patient(s) Name</th>
+                        <th className={style.longColumn}>MRN</th>
+                        <th className={style.longColumn}>Institution</th>
+                        <th className={style.dateColumn}>Report out<br/>(YYYY/MM/DD)</th>
+                        <th>Status</th>
+                        <th className={style.longColumn}>Report Download</th>
+                    </tr>
                     </thead>
                     <tbody>
                     {requestData.map((request, rowIndex) => (
@@ -229,10 +230,10 @@ export default function DownloadTable() {
                             <td>{request.reported_at ? new Date(request.reported_at).toLocaleDateString() : '-'}</td>
                             <td>{request.status}</td>
                             <td>
-                                {(request.reports as Report[])?.filter((report: Report) => report.type === 'PDF').map((report, reportIndex) => (
+                                {(request.reports as Report[])?.filter((report: Report) => report.type === 'PDF').map((report) => (
                                     <FontAwesomeIcon
                                         key={report.id}
-                                        className={style.downloadIcon}
+                                        className={downloadStyle.downloadIcon}
                                         icon={faFilePdf}
                                         onClick={() => handleDownloadOnClick(report, request)}/>
                                 ))}
@@ -241,30 +242,30 @@ export default function DownloadTable() {
                     ))}
                     </tbody>
                 </table>
-                <div className={style.pagination}>
-                    <span>items per page:</span>
-                    <div className={style.select}>
-                        <select onChange={handlePageSizeChange}>
-                            <option value="10">10</option>
-                            <option value="20">20</option>
-                            <option value="50">50</option>
-                        </select>
-                    </div>
-                    <span> 1-{totalPage} of {search.page} </span>
-                    <button
-                        className={style.pageButton}
-                        disabled={search.page === 1}
-                        onClick={() => handlePageChange((search.page ?? 1) - 1)}
-                    ><FontAwesomeIcon icon={faAngleLeft}/>
-                    </button>
-                    <button
-                        className={style.pageButton}
-                        disabled={search.page === totalPage}
-                        onClick={() => handlePageChange((search.page ?? 1) + 1)}
-                    ><FontAwesomeIcon icon={faAngleRight}/>
-                    </button>
-                </div>
             </section>
+            <div className={style.pagination}>
+                <span>items per page:</span>
+                <div className={style.select}>
+                    <select onChange={handlePageSizeChange}>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
+                <span> 1-{totalPage} of {search.page} </span>
+                <button
+                    className={style.pageButton}
+                    disabled={search.page === 1}
+                    onClick={() => handlePageChange((search.page ?? 1) - 1)}
+                ><FontAwesomeIcon icon={faAngleLeft}/>
+                </button>
+                <button
+                    className={style.pageButton}
+                    disabled={search.page === totalPage}
+                    onClick={() => handlePageChange((search.page ?? 1) + 1)}
+                ><FontAwesomeIcon icon={faAngleRight}/>
+                </button>
+            </div>
         </div>
     );
 }

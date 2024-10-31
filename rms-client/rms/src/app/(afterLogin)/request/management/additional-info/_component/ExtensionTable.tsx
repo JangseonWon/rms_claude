@@ -1,6 +1,7 @@
 'use client';
 
-import style from "./extensionTable.module.css";
+import style from "@/css/globalTable.module.css";
+import managementStyle from "@/css/managementTable.module.css";
 import React, {useEffect, useState} from "react";
 import {Extension} from "@/model/Extension";
 import ExtensionModal from "@/app/(afterLogin)/request/management/additional-info/_component/ExtensionModal";
@@ -13,8 +14,6 @@ import {postExtensionsPage} from "@/app/(afterLogin)/request/management/addition
 import BlueButton from "@/app/_component/BlueButton";
 import SelectBox from "@/app/_component/SelectBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
-import {putAlisServices} from "@/app/(afterLogin)/request/management/service/_api/putAlisServices";
-import {Service} from "@/model/Service";
 import {putAlisExtensions} from "@/app/(afterLogin)/request/management/additional-info/_api/putAlisExtensions";
 
 export default function ExtensionTable() {
@@ -111,11 +110,13 @@ export default function ExtensionTable() {
 
     return (
         <>
-            <section className={style.searchContainer}>
-                <div className={style.filterContainerLeft}>
-                    <div className={style.alisSyncButton}>
+            <section className={managementStyle.filterContainer}>
+                <div className={managementStyle.filterContainerAlis}>
+                    <div className={managementStyle.alisSyncButton}>
                         <BlueButton name={"Alis-Sync"} onClick={() => handleAlisSyncButtonClick(search)}/>
                     </div>
+                </div>
+                <div className={managementStyle.filterContainerSearch}>
                     <SelectBox
                         width={"7vw"}
                         value={selectOption.name}
@@ -125,11 +126,11 @@ export default function ExtensionTable() {
                             setSelectOption(selectedOption);
                         }}
                     />
-                </div>
-                <div className={style.filterContainerRight}>
-                    <InputBox label={"search"} onChange={(value) => {
-                        handleSearchChange(selectOption, value)
-                    }}></InputBox>
+                    <div className={managementStyle.search}>
+                        <InputBox label={"search"} onChange={(value) => {
+                            handleSearchChange(selectOption, value)
+                        }}></InputBox>
+                    </div>
                 </div>
             </section>
             <section className={style.tableContainer}>
@@ -157,28 +158,28 @@ export default function ExtensionTable() {
                     ))}
                     </tbody>
                 </table>
-                <div className={style.pagination}>
-                    <span>items per page:</span>
-                    <div className={style.select}>
-                        <select onChange={handlePageSizeChange}>
-                            <option value="10">10</option>
-                            <option value="20">20</option>
-                            <option value="50">50</option>
-                        </select>
-                    </div>
-                    <span> 1-{totalPage} of {search.page} </span>
-                    <button
-                        disabled={search.page === 1}
-                        onClick={() => handlePageChange((search.page ?? 1) - 1)}
-                    ><FontAwesomeIcon icon={faAngleLeft}/>
-                    </button>
-                    <button
-                        disabled={search.page === totalPage}
-                        onClick={() => handlePageChange((search.page ?? 1) + 1)}
-                    ><FontAwesomeIcon icon={faAngleRight}/>
-                    </button>
-                </div>
             </section>
+            <div className={style.pagination}>
+                <span>items per page:</span>
+                <div className={style.select}>
+                    <select onChange={handlePageSizeChange}>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
+                <span> 1-{totalPage} of {search.page} </span>
+                <button
+                    disabled={search.page === 1}
+                    onClick={() => handlePageChange((search.page ?? 1) - 1)}
+                ><FontAwesomeIcon icon={faAngleLeft}/>
+                </button>
+                <button
+                    disabled={search.page === totalPage}
+                    onClick={() => handlePageChange((search.page ?? 1) + 1)}
+                ><FontAwesomeIcon icon={faAngleRight}/>
+                </button>
+            </div>
             {extensionEditModalOpen && selectExtensionData && (
                 <ExtensionModal
                     extensionData={selectExtensionData}

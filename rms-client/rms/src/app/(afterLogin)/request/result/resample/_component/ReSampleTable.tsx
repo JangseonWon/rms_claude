@@ -1,16 +1,6 @@
 "use client"
 
-import React, {useEffect, useState} from "react";
-import style from "@/app/(afterLogin)/request/result/resample/_component/reSampleTable.module.css";
-import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import type {Request} from "@/model/Request";
-import {postRequests} from "@/app/(afterLogin)/request/result/download/_api/postRequests";
-import {Query} from "@/model/Query";
-import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
-import {format} from "date-fns";
-import InputBox from "@/app/_component/InputBox";
-import GreenButton from "@/app/_component/GreenButton";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;

@@ -1,6 +1,6 @@
 "use client"
 
-import style from "@/app/(afterLogin)/request/cart/_component/table.module.css"
+import style from "@/css/globalTable.module.css";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import React, {useEffect, useState} from "react";
@@ -152,11 +152,11 @@ export default function Table() {
     return (
         <div className={style.container}>
             <section>
-                <div className={style.buttonSection}>
+                <div className={style.topFirstSection}>
                     <GreenButton name={"Delete"} onClick={handleDeleteCart}/>
                     <BlueButton name={"Save & Order"} onClick={handleCartToOrder}/>
                 </div>
-                <div className={style.filterContainerLeft}>
+                <div className={style.topSecondSection}>
                     <SelectBox
                         width={"10vw"}
                         value={selectedOption.name}
@@ -197,7 +197,7 @@ export default function Table() {
                         <th className={style.shortColumn}>Institution</th>
                         <th className={style.shortColumn}>Patient(s) Name</th>
                         <th className={style.longColumn}>Service</th>
-                        <th className={style.shortColumn}>Patient BOD<br/>(DD/MM/YYYY)</th>
+                        <th className={style.dateColumn}>Patient BOD<br/>(DD/MM/YYYY)</th>
                         <th>Gender</th>
                         <th className={style.longColumn}>MRN</th>
                         <th className={style.dateColumn}>Collection Date<br/>(DD/MM/YYYY)</th>

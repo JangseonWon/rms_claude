@@ -6,7 +6,6 @@ import {useRouter} from "next/navigation";
 import {putPost} from "@/app/(afterLogin)/qna/_api/putPost";
 import {Post} from "@/model/Post";
 import React, {ChangeEvent, useState} from "react";
-import {fetchSendToJandi} from "@/app/(afterLogin)/qna/_api/fetchSendToJandi";
 import QnaLoading from "@/app/(afterLogin)/qna/_component/QnaLoading";
 
 export default function Question() {
@@ -17,7 +16,6 @@ export default function Question() {
     const [isLoading, setIsLoading] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [categoryId, setCategoryId] = useState('f9476263-f8b2-4ff9-b5f9-ed680715401e');
-    const [categoryName, setCategoryName] = useState('service');
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -66,7 +64,6 @@ export default function Question() {
     const handleCategoryIdChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedValue = JSON.parse(event.target.value);
         setCategoryId(selectedValue.uuid);
-        setCategoryName(selectedValue.category);
     };
 
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
