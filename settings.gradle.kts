@@ -7,7 +7,6 @@ include("entity")
 include("management-service")
 include("alis-api")
 include("lims-service")
-include("alis-sync")
 include("api")
 include("login-service")
 include("organization-service")
@@ -21,6 +20,7 @@ include("post-service")
 include("profile-service")
 include("catalog-service")
 include("result-service")
+include("home-service")
 
 dependencyResolutionManagement {
     versionCatalogs {
