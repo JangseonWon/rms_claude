@@ -1,13 +1,12 @@
 .container {
-    overflow-y: scroll;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 .innerBody {
-    margin: 4vh 0;
+    margin: 40px 0;
     background: rgb(255, 255, 255);
-    width: 80vw;
+    width: 1600px;
     height: 100%;
     border-radius: 15px;
 }

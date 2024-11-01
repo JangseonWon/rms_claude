@@ -6,6 +6,9 @@
     width: 200px;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
+.navPill * {
+    transition: 0.1s ease-out;
+}
 .navPill ul {
     padding: 10px 5px;
 }

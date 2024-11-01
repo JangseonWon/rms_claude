@@ -1,6 +1,9 @@
 .container {
     padding: 20px 5px 20px 0;
 }
+.container * {
+    transition: 0.2s ease-out;
+}
 .container h1 {
     color: #002b49;
     font-size: 20pt;

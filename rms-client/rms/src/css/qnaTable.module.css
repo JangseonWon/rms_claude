@@ -1,42 +1,43 @@
 .filterContainer {
-    margin: 2vh 3vw 4vh 3vw;
+    margin: 20px 160px 20px;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: space-between;
 }
 .filterContainerLeft {
     display: flex;
 }
-.filterContainerRight {
-    width: 350px;
+.filterContainerLeft > *{
+    padding-right: 5px;
 }
-.selectSearchKey {
-    padding: 0.2vh 0.2vw 0.2vh 0.2vw;
-    margin: 2.5vh 1vw 0 1vw;
-    height: 3.5vh;
-    width: 6vw;
-    font-size: 0.6vw;
-    border-radius: 15px;
-    border: 1px solid #DAE2ED;
-    box-shadow: 0 2px 2px #F3F6F9;
-    color: #666666;
-    outline: none;
+.filterContainerRight {
+    display: flex;
+}
+.search {
+    width: 300px;
 }
 /*테이블*/
 .tableContainer {
     display: grid;
     justify-content: center;
     align-items: center;
-    margin: 2vh 2vw;
+    margin: 20px 40px;
 }
 .table {
     width: 100%;
     border-collapse: collapse;
 }
 .table thead {
-    color: #838689;
-    font-size: 0.8vw;
+    height: 40px;
+    background: linear-gradient(to right, #023a60, #5676a2);
+    color: #ffffff;
+    font-size: 10pt;
     font-weight: 600;
+}
+.table thead tr th:first-child {
+    border-radius: 20px 0 0 0;
+}
+.table thead tr th:last-child {
+    border-radius: 0 20px 0 0;
 }
 .table tbody {
     font-weight: 300;
@@ -50,27 +51,27 @@
 }
 .table tbody tr td {
     color: #666666;
-    font-size: 0.7vw;
-    padding: 0.5vw;
+    font-size: 10pt;
+    padding: 10px;
 }
 .table tbody tr:nth-child(even) {
     background-color: #ffffff;
 }
 .table th,
 .table td {
-    padding: 0.6vh 0.6vw;
+    padding: 6px 12px;
     text-align: center;
 }
 .title {
-    width: 35vw;
+    width: 600px;
     text-align: left !important;
 }
 .titleTd {
-    max-width: 35vw;
+    max-width: 600px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-    padding: 0.6vh 0.6vw;
+    padding: 6px 12px;
     text-align: left !important;
     position: relative;
 }
@@ -78,8 +79,8 @@
 .category-bug,
 .category-update,
 .category-question{
-    width: 4vw;
-    font-size: 0.7vw;
+    width: 80px;
+    font-size: 9pt;
     font-weight: 700;
     border: none;
 }
@@ -103,37 +104,37 @@
     display: flex;
 }
 .commentIcon {
-    margin-top: 0.3vh;
+    margin-top: 3px;
 }
 .new {
-    margin-left: 0.5vw;
+    margin-left: 10px;
     display: flex;
     color: #ffffff;
-    font-size: 0.5vw;
+    font-size: 6pt;
     font-weight: 400;
     border: none;
-    padding: 0.3vh 0.25vw 0 0.25vw;
-    width: 1.5vw;
+    padding: 3px 5px 0;
+    width: 30px;
     justify-content: center;
     align-content: center;
-    height: 2vh;
+    height: 20px;
     border-radius: 18px;
     background-color: #cd4855;
 }
 .number .view .category .state {
-    width: 2vw;
+    width: 40px;
 }
 .user .date {
-    width: 5vw;
+    width: 100px;
 }
 /*추가버튼*/
 .addButton,
 .addButton {
     border-radius: 10px;
-    padding: 0.5vh 0.5vw;
+    padding: 5px 10px;
     border: none;
     cursor: pointer;
-    margin: 2vh 1vw 0 auto;
+    margin: 20px 20px 0 auto;
     color: #ffffff;
     background: linear-gradient(135deg, #182847, #354e6d);
     box-shadow: 2px 2px 2px rgba(0, 0, 0.2, 0.2);
@@ -145,26 +146,26 @@
 }
 /*페이징*/
 .pagination {
-    margin: 2vh 0 0 0;
+    margin: 20px 0 0 0;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 .paginationAngle {
-    margin: 0 0.3vw;
-    font-size: 1vw;
+    margin: 0 6px;
+    font-size: 13pt;
     background: none;
     border: none;
 }
 .activePage {
-    margin: 0 0.3vw;
-    font-size: 1vw;
+    margin: 0 6px;
+    font-size: 13pt;
     background: none;
     border: none;
 }
 .deActivePage {
-    margin: 0 0.3vw;
-    font-size: 0.7vw;
+    margin: 0 6px;
+    font-size: 8pt;
     background: none;
     border: none;
 }

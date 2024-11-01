@@ -1,7 +1,7 @@
 "use client"
 
 import React, {useCallback, useEffect, useState} from "react";
-import style from "./postTable.module.css";
+import style from "@/css/qnaTable.module.css";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
@@ -12,12 +12,14 @@ import {faComment} from "@fortawesome/free-regular-svg-icons";
 import {postPosts} from "@/app/(afterLogin)/qna/_api/postPosts";
 import SelectBox from "@/app/_component/SelectBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
+import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
+import {format} from "date-fns";
 
-export default function PostTable() {
+export default function QuestionTable() {
     const router = useRouter();
     const [postData, setPostData] = useState<Post[]>([]);
     const [totalPage, setTotalPage] = useState<number>(4);
-    const [search, setSearch] = useState<Query>({sort_by:"create_at", asc: false, size:14, page:1});
+    const [search, setSearch] = useState<Query>({sort_by:"create_at", asc: false, size:8, page:1});
     const [selectOption, setSelectOption] = useState<SelectBoxOption>({ table: "post", column: "title", name: "Title" });
     const [pageRange, setPageRange] = useState<{ start: number, end: number }>({ start: 1, end: 10 });
 
@@ -27,15 +29,6 @@ export default function PostTable() {
         { table: "user", column: "id", name: "ID" },
         { table: "user", column: "name", name: "Name" },
     ];
-
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return new Intl.DateTimeFormat("en-GB", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric"
-        }).format(date);
-    };
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage => ({
@@ -69,8 +62,42 @@ export default function PostTable() {
         setPageRange({ start: 1, end: 10 });
     };
 
+    const addDateFilter = (from: Date | null, to: Date | null) => {
+        if (!from || !to) return;
+
+        setSearch((prevSearch) => {
+            const updatedFilters = (prevSearch.filter_groups || []).filter(group =>
+                !group.filters?.some(filter => filter.column === "create_at")
+            ) || [];
+
+            return {
+                ...prevSearch,
+                filter_groups: [
+                    ...updatedFilters,
+                    {
+                        condition_type: "AND",
+                        filters: [
+                            {
+                                table: "post",
+                                column: "create_at",
+                                value: format(from, "yyyy-MM-dd"),
+                                operator: ">="
+                            },
+                            {
+                                table: "post",
+                                column: "create_at",
+                                value: format(to, "yyyy-MM-dd"),
+                                operator: "<="
+                            }
+                        ]
+                    }
+                ],
+                page: 1
+            };
+        });
+    };
+
     const handleRowClick = async (post: Post, userId: string) => {
-        //if (session?.user. === 'USER') await fetchPostId(post.id!, false);
         router.push(`/qna/${userId}/${post.id}`);
     };
 
@@ -110,19 +137,26 @@ export default function PostTable() {
         <>
             <section className={style.filterContainer}>
                 <div className={style.filterContainerLeft}>
+                    <DatePickerRangeBox
+                        label={"from-to"}
+                        onChange={(from, to) =>{
+                            addDateFilter(from, to);
+                        }}/>
+                </div>
+                <div className={style.filterContainerRight}>
                     <SelectBox
                         value={selectOption.name}
                         options={selectBoxOptions}
-                        label={" "}
+                        label={"filter"}
                         onChange={(selectedOption) =>{
                             setSelectOption(selectedOption);
                         }}
                     />
-                </div>
-                <div className={style.filterContainerRight}>
-                    <InputBox onChange={(value) => {
-                        handleSearchChange(selectOption, value)
-                    }}></InputBox>
+                    <div className={style.search}>
+                        <InputBox label={"search"} onChange={(value) => {
+                            handleSearchChange(selectOption, value)
+                        }}></InputBox>
+                    </div>
                 </div>
             </section>
             <section className={style.tableContainer}>
@@ -151,11 +185,9 @@ export default function PostTable() {
                             </td>
                             <td className={style.newAndComment}>
                                 <FontAwesomeIcon className={style.commentIcon} icon={faComment}/>
-                                {/*{row.comments && row.comments.length > 0 ? row.comments.length : 0}
-                                {row.read && session?.user.role === 'USER' && <span className={style.new}>New</span>}*/}
                             </td>
                             <td>{row.user?.name}</td>
-                            <td>{formatDate(row.create_at!!)}</td>
+                            <td>{row.create_at ? format(new Date(row.create_at), "dd-MMM-yyyy") : '-'}</td>
                         </tr>
                     ))}
                     </tbody>
