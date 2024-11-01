@@ -60,25 +60,11 @@ data class Request(
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("last_modify_at")
     val lastModifyAt: LocalDateTime?,
-    @JsonProperty("emp_id")
-    val empId: String?,
-    @JsonProperty("emp_name")
-    val empName: String?,
-    @JsonProperty("emp_mobile")
-    val empMobile: String?,
-    @JsonProperty("test")
-    val test: Boolean?,
-    @JsonProperty("credit")
-    val credit: Boolean?,
-    @JsonProperty("price")
-    val price: Int?,
-    @JsonProperty("outsourcing_cost")
-    val outsourcingCost: Int?,
     @JsonProperty("sample")
     val sample: Sample?
 ) {
     constructor(orderId: UUID, serviceId: String, sampleId: UUID) :
-            this(orderId, serviceId, null, sampleId, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
+            this(orderId, serviceId, null, sampleId, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
     companion object {
         fun toPatientModel(record: Record) =
             Request(
@@ -99,13 +85,6 @@ data class Request(
                 completeAt = record.get(REQUEST.COMPLETE_AT),
                 resampleAt = record.get(REQUEST.RESAMPLE_AT),
                 lastModifyAt = record.get(REQUEST.LAST_MODIFY_AT),
-                empId = record.get(REQUEST.EMP_ID),
-                empName = record.get(REQUEST.EMP_NAME),
-                empMobile = record.get(REQUEST.EMP_MOBILE),
-                test = record.get(REQUEST.TEST),
-                credit = record.get(REQUEST.CREDIT),
-                price = record.get(REQUEST.PRICE),
-                outsourcingCost = record.get(REQUEST.OUTSOURCING_COST),
                 sample = record.get("sample", Sample::class.java),
             )
     }
