@@ -1,21 +1,20 @@
 .container {
-    width: 100%;
     margin: 30px 0;
     display: grid;
 }
-.filterContainerLeft {
+.topFirstSection {
+    text-align: right;
+}
+.topSecondSection {
     float: right;
     display: flex;
     margin: 10px 0;
-}
-.buttonSection {
-    text-align: right;
 }
 .tableContainer {
     overflow-x: scroll;
 }
 .table {
-    /*width: 100%;*/
+    width: 100%;
     border-collapse: collapse;
 }
 .table thead {
@@ -53,10 +52,13 @@
     text-align: center;
 }
 .longColumn {
-    min-width: 200px;
+    min-width: 220px;
 }
 .shortColumn {
     min-width: 100px;
+}
+.dateColumn {
+    min-width: 140px;
 }
 .pagination {
     display: flex;
@@ -77,7 +79,7 @@
     border-radius: 18px;
     font-size: 10pt;
     padding: 10px 5px;
-    margin: 10px 10px;
+    margin: 10px 5px;
 }
 .pagination button:hover:not([disabled]) {
     transform: scale(1.2);

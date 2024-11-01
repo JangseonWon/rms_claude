@@ -13,8 +13,6 @@ import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import {deleteCommentById} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/deleteCommentById";
 import {deletePostById} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/deletePostById";
 import {getPostFile} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/getPostFile";
-import {fetchSendToJandi} from "@/app/(afterLogin)/qna/_api/fetchSendToJandi";
-import {fetchFile} from "@/app/(afterLogin)/qna/_api/fetchFile";
 import {updatePost} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/updatePost";
 import {deletePostFileById} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/deletePostFileById";
 import QnaLoading from "@/app/(afterLogin)/qna/_component/QnaLoading";

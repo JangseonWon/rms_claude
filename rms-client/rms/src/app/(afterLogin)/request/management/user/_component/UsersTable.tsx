@@ -1,7 +1,8 @@
 "use client"
 
 import React, {useEffect, useState} from "react";
-import style from "@/app/(afterLogin)/request/management/user/_component/usersTable.module.css";
+import style from "@/css/globalTable.module.css";
+import managementStyle from "@/css/managementTable.module.css";
 import {faAngleLeft, faAngleRight, faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
@@ -16,9 +17,7 @@ import SelectBox from "@/app/_component/SelectBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import RectangleButton from "@/app/_component/RectangleButton";
 import BlueButton from "@/app/_component/BlueButton";
-import {Filter} from "@/model/Filter";
 import {putAlisUsers} from "@/app/(afterLogin)/request/management/user/_api/putAlisUsers";
-import {Service} from "@/model/Service";
 
 interface UserWithSelected extends User {
     isSelected?: boolean;
@@ -147,11 +146,13 @@ export default function UsersTable() {
 
     return (
         <>
-            <section className={style.filterContainer}>
-                <div className={style.filterContainerLeft}>
-                    <div className={style.alisSyncButton}>
-                        <BlueButton name={"Alis-Sync"} onClick={()=> handleAlisSyncButtonClick(search)}/>
+            <section className={managementStyle.filterContainer}>
+                <div className={managementStyle.filterContainerAlis}>
+                    <div className={managementStyle.alisSyncButton}>
+                        <BlueButton name={"Alis-Sync"} onClick={() => handleAlisSyncButtonClick(search)}/>
                     </div>
+                </div>
+                <div className={managementStyle.filterContainerSearch}>
                     <SelectBox
                         width={"7vw"}
                         value={selectOption}
@@ -162,12 +163,12 @@ export default function UsersTable() {
                             handleSearchKeyChange({target: {value: selectedOption.value}} as React.ChangeEvent<HTMLSelectElement>);
                         }}
                     />
-                </div>
-                <div className={style.filterContainerRight}>
-                    <InputBox label={"search"} onChange={(value) => {
-                        setSearchValue(value);
-                        handleSearchChange({key: searchKey, value: value})
-                    }}></InputBox>
+                    <div className={managementStyle.search}>
+                        <InputBox label={"search"} onChange={(value) => {
+                            setSearchValue(value);
+                            handleSearchChange({key: searchKey, value: value})}}>
+                        </InputBox>
+                    </div>
                 </div>
             </section>
             <section className={style.tableContainer}>
@@ -198,7 +199,7 @@ export default function UsersTable() {
                                 <FontAwesomeIcon
                                     className={style.icon}
                                     icon={faMagnifyingGlass}
-                                    onClick={()=> handleInstitutionIconClick(row.id, row.name)}
+                                    onClick={() => handleInstitutionIconClick(row.id, row.name)}
                                 />
                             </td>
                             <td>
@@ -215,30 +216,31 @@ export default function UsersTable() {
                     ))}
                     </tbody>
                 </table>
-                <div className={style.pagination}>
-                    <span>items per page:</span>
-                    <div className={style.select}>
-                        <select onChange={handlePageSizeChange}>
-                            <option value="10">10</option>
-                            <option value="20">20</option>
-                            <option value="50">50</option>
-                        </select>
-                    </div>
-                    <span> 1-{totalPage} of {search.page} </span>
-                    <button
-                        disabled={search.page === 1}
-                        onClick={() => handlePageChange((search.page ?? 1) - 1)}
-                    ><FontAwesomeIcon icon={faAngleLeft}/>
-                    </button>
-                    <button
-                        disabled={search.page === totalPage}
-                        onClick={() => handlePageChange((search.page ?? 1) + 1)}
-                    ><FontAwesomeIcon icon={faAngleRight}/>
-                    </button>
-                </div>
             </section>
+            <div className={style.pagination}>
+                <span>items per page:</span>
+                <div className={style.select}>
+                    <select onChange={handlePageSizeChange}>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
+                <span> 1-{totalPage} of {search.page} </span>
+                <button
+                    disabled={search.page === 1}
+                    onClick={() => handlePageChange((search.page ?? 1) - 1)}
+                ><FontAwesomeIcon icon={faAngleLeft}/>
+                </button>
+                <button
+                    disabled={search.page === totalPage}
+                    onClick={() => handlePageChange((search.page ?? 1) + 1)}
+                ><FontAwesomeIcon icon={faAngleRight}/>
+                </button>
+            </div>
             {selectedInstitutionUser && (
-                <InstitutionModal id={selectedInstitutionUser.id} name={selectedInstitutionUser.name} open={institutionModalOpen} closeModal={closeModal}/>
+                <InstitutionModal id={selectedInstitutionUser.id} name={selectedInstitutionUser.name}
+                                  open={institutionModalOpen} closeModal={closeModal}/>
             )}
             {userServiceModalOpen && (
                 <UserServiceEditModal user={selectedUser!} open={serviceModalOpen} closeModal={closeModal}/>

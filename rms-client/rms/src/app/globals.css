@@ -2,7 +2,6 @@ body{
     margin: 0;
     background-color: #EBECEE;
     overflow-y: scroll;
-    /*overflow-x: hidden;*/
 }
 /*scroll*/
 ::-webkit-scrollbar {

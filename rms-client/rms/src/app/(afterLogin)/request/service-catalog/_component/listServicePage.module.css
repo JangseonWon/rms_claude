@@ -78,8 +78,8 @@
     color: #90BA2D;
 }
 .noServicesMessage {
-    margin: 1vh 1vw;
-    font-size: 0.9vw;
+    margin: 5px 20px;
+    font-size: 9pt;
     color: #002b49;
     font-weight: 700;
 }

@@ -1,20 +1,23 @@
+.header {
+    background-color: #182847;
+    padding: 10px 0 15px;
+    display: flex;
+}
 .leftContainer {
+    background: #182847;
 }
 .rightContainer {
     display: flex;
+    background: #182847;
 }
 .headerWidth {
     display: flex;
-    width: 1300px;
     align-items: center;
+    justify-content: center;
     white-space: nowrap;
-    overflow: hidden;
+    width: 100%;
+    max-width: 1200px;
     margin: 0 auto;
-}
-.header {
-    background-color: #182847;
-    padding: 10px 20px 15px;
-    display: flex;
 }
 .gPortalLogo{
     text-decoration: none;
@@ -23,9 +26,10 @@
     font-optical-sizing: auto;
     font-weight: 600;
     font-style: normal;
-    margin-right: 850px;
+    margin-right: 900px;
 }
 .headerMenu {
+    flex-grow: 1;
     font-size: 16pt;
     font-weight: normal;
     color: #fff;

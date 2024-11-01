@@ -15,7 +15,7 @@ import {Query} from "@/model/Query";
 import DownloadExcelButton from "@/app/(afterLogin)/request/dashboard/_component/DownloadExcelButton";
 import {Status} from "@/model/Status";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
-import { GrPowerReset } from "react-icons/gr";
+import {GrPowerReset} from "react-icons/gr";
 
 export default function Table() {
     const [requestData, setRequestData] = useState<Request[]>([]);

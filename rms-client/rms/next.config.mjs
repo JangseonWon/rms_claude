@@ -22,6 +22,7 @@ const nextConfig = {
             {
                 source: '/w-api/order-service/:path*',
                 destination: `https://rms-test.gcgenome.com/w-api/order-service/:path*`,
+                // destination: `http://localhost:9886/w-api/order-service/:path*`,
             },
             {
                 source: '/w-api/dashboard-service/:path*',
@@ -29,7 +30,8 @@ const nextConfig = {
             },
             {
                 source: '/w-api/cart-service/:path*',
-                destination: `https://rms-test.gcgenome.com/w-api/cart-service/:path*`,
+                // destination: `https://rms-test.gcgenome.com/w-api/cart-service/:path*`,
+                destination: `http://localhost:9886/w-api/cart-service/:path*`,
             },
             {
                 source: '/w-api/post-service/:path*',
@@ -41,7 +43,8 @@ const nextConfig = {
             },
             {
                 source: '/w-api/catalog-service/:path*',
-                destination: `https://rms-test.gcgenome.com/w-api/catalog-service/:path*`,
+                // destination: `https://rms-test.gcgenome.com/w-api/catalog-service/:path*`,
+                destination: `http://localhost:9098/w-api/catalog-service/:path*`,
             },
             {
                 source: '/w-api/result-service/:path*',

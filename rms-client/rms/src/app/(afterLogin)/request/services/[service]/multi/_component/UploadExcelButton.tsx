@@ -1,10 +1,10 @@
 'use client';
 
 import style from "@/app/(afterLogin)/request/services/[service]/multi/_component/uploadExcelButton.module.css";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { ChangeEvent, useEffect, useState, DragEvent } from "react";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import React, {ChangeEvent, DragEvent, useEffect, useState} from "react";
 import * as XLSX from "xlsx";
-import { faUpload, faFileExcel, faArrowUpFromBracket, faXmark } from "@fortawesome/free-solid-svg-icons";
+import {faArrowUpFromBracket, faFileExcel, faUpload, faXmark} from "@fortawesome/free-solid-svg-icons";
 
 type UploadExcelButtonProps = {
     onFileUpload: (data: any[][]) => void;
@@ -77,7 +77,7 @@ export default function UploadExcelButton({ onFileUpload }: UploadExcelButtonPro
                 const jsonData: (any)[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
                 const transformedData = jsonData.map((row, rowIndex) =>
-                    row.map((cell, colIndex) => {
+                    row.map((cell) => {
                         if (rowIndex === 0) return cell;
                         return cell;
                     })

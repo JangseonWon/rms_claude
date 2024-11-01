@@ -1,4 +1,4 @@
-import style from "@/app/(afterLogin)/request/cart/page.module.css";
+import style from "@/css/requestMainPage.module.css";
 import Table from "@/app/(afterLogin)/request/cart/_component/Table";
 import Title from "@/app/_component/Title";
 

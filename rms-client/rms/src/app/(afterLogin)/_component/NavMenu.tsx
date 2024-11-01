@@ -12,12 +12,9 @@ import {
     faUsers
 } from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {useSelectedLayoutSegment} from "next/navigation";
 import {useSession} from "next-auth/react";
-import {Categories} from "@/model/Categories";
-import {getCategories} from "@/app/(afterLogin)/_api/getCategories";
-import {useSetCategory} from "@/store/useCategoryStore";
 
 export default function NavMenu() {
     const segment = useSelectedLayoutSegment();
