@@ -36,20 +36,6 @@ data class Request(
     val resampleAt: LocalDateTime,
     @Column(name = "last_modify_at", nullable = false)
     val lastModifyAt: LocalDateTime,
-    @Column(name = "emp_id", length = 64, nullable = true)
-    val empId: String,
-    @Column(name = "emp_name", length = 64, nullable = true)
-    val empName: String,
-    @Column(name = "emp_mobile", length = 64, nullable = true)
-    val empMobile: String,
-    @Column(name = "test", nullable = true)
-    val test: Boolean,
-    @Column(name = "credit", nullable = true)
-    val credit: Boolean,
-    @Column(name = "price", nullable = true)
-    val price: Int,
-    @Column(name = "outsourcing_cost", nullable = true)
-    val outsourcingCost: Int,
 
     @OneToMany(mappedBy = "requestId")
     val report: List<Report>,
