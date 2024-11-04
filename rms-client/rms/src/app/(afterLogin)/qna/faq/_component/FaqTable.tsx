@@ -99,10 +99,10 @@ export default function FaqTable() {
     };
 
     const handleRowClick = async (post: Post, userId: string) => {
-        router.push(`/qna/${userId}/${post.id}`);
+        router.push(`/qna/faq/${userId}/${post.id}`);
     };
 
-    const qnaButtonClick = () => {
+    const faqAddButtonClick = () => {
         router.push('/qna/question');
     }
 
@@ -190,7 +190,7 @@ export default function FaqTable() {
                     </tbody>
                 </table>
                 {session?.user.role !== 'USER' && (
-                    <button className={style.addButton}>
+                    <button className={style.addButton} onClick={faqAddButtonClick}>
                         FAQ
                     </button>
                 )}

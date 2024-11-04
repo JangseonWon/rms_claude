@@ -2,12 +2,9 @@
     display: grid;
     gap: 10px;
     margin: 30px 30px;
-    padding: 20px 30px;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    background-color: #f9f9f9;
 }
-.userContainer, .titleContainer, .contentContainer, .fileContainer, .commentContainer {
+.userContainer, .contentContainer, .fileContainer, .commentContainer {
     display: grid;
     margin: 10px 40px;
     gap: 10px;
@@ -17,13 +14,32 @@
     font-size: 12pt;
     color: #333;
 }
-.inputUser, .inputTitle, .textareaContent, .fileInput {
+.inputUser, .inputTitle, .textareaContent {
     padding: 10px 20px;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    outline: none;
+    border-radius: 25px;
     font-size: 10pt;
     background-color: #fff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.titleContainer {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 40px;
+    gap: 10px;
+}
+.title, .category {
+    width: 500px;
+    display: grid;
+    gap: 10px;
+}
+.title {
+    width: 700px;
+}
+.fileInput {
+    padding-left: 10px !important;
+    font-size: 10pt;
 }
 .inputButton {
     font-size: 9pt;

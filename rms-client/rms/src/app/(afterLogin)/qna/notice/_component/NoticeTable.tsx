@@ -99,11 +99,11 @@ export default function NoticeTable() {
     };
 
     const handleRowClick = async (post: Post, userId: string) => {
-        router.push(`/qna/${userId}/${post.id}`);
+        router.push(`/qna/notice/${userId}/${post.id}`);
     };
 
-    const qnaButtonClick = () => {
-        router.push('/qna/question');
+    const noticeAddButtonClick = () => {
+        router.push('/qna/notice');
     }
 
     const renderPageNumbers = () => {
@@ -190,7 +190,7 @@ export default function NoticeTable() {
                     </tbody>
                 </table>
                 {session?.user.role !== 'USER' && (
-                    <button className={style.addButton}>
+                    <button className={style.addButton} onClick={noticeAddButtonClick}>
                         Notice
                     </button>
                 )}
