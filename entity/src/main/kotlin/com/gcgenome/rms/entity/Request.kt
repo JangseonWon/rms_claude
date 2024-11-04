@@ -13,7 +13,8 @@ data class Request(
     @Column(name = "user_service_id", length = 64, nullable = false)
     val userServiceId: String,
     @Column(name = "status", length = 64, nullable = false)
-    val status: String,
+    @Enumerated(EnumType.STRING)
+    val status: RequestStatus,
     @Column(name = "memo", nullable = true)
     val memo: String,
     @Column(name = "department", length = 64, nullable = true)
@@ -60,4 +61,14 @@ data class Request(
         @Column(name = "service_id") val serviceId: String,
         @Column(name = "sample_id") val sampleId: UUID
     ) : Serializable
+
+    enum class RequestStatus {
+        TOTAL,
+        UNCONFIRMED_ORDER,
+        COMPLETED_ORDER,
+        IN_PROGRESS,
+        TEST_FAILED,
+        DELIVERED,
+        COMPLETE
+    }
 }
