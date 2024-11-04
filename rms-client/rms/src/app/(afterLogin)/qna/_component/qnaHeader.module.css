@@ -28,7 +28,7 @@
     cursor: pointer;
     color: #666666;
 }
-.qnaBody span:hover {
+.qnaBody span:hover, .qnaBody span.active {
     color: #182847;
     text-decoration: underline 2px #182847;
 }

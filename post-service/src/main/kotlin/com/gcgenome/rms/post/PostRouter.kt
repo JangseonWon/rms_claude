@@ -27,18 +27,19 @@ class PostRouter (
 ) {
     @Bean("PostRouter")
     fun route() = router {
-        POST("/w-api/post-service/posts", ::selectPosts)
-        GET("/w-api/post-service/posts/{post-id}", ::selectPostById)
+        POST("/w-api/post-service/post/search", ::selectPosts)
+        GET("/w-api/post-service/post/{post-id}", ::selectPostById)
         PUT("/w-api/post-service/posts", ::insertPost)
-        DELETE("/w-api/post-service/posts/{post-id}", ::deletePost)
-        PATCH("/w-api/post-service/posts/{post-id}", ::updatePost)
+        DELETE("/w-api/post-service/post/{post-id}", ::deletePost)
+        PATCH("/w-api/post-service/post/{post-id}", ::updatePost)
         /*PUT("/w-api/post-service/post/{post_id}", ::postIdCheckSwitch)
         POST("/w-api/post-service/post/{post_id}/message/{category}", ::jandiWebHook)*/
     }
 
     private fun selectPosts(request: ServerRequest): Mono<ServerResponse> {
+        val category = request.queryParam("category").get()
         return Mono.zip(authenticationHandler.principal(request), request.bodyToMono(Query::class.java))
-            .flatMap { serviceHandler.selectPosts(it.t1, it.t2) }
+            .flatMap { serviceHandler.selectPosts(it.t1, it.t2, category) }
             .flatMap { ServerResponse.ok()
                 .header("X-Total-Count", it.totalCount.toString())
                 .header("X-Total-Page", it.totalPage.toString())

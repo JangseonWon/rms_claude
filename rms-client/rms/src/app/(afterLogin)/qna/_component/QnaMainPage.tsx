@@ -5,6 +5,8 @@ import React, {useState} from "react";
 import QuestionTable from "@/app/(afterLogin)/qna/question/_component/QuestionTable";
 import style from "@/app/(afterLogin)/user/page.module.css";
 import QnaHeader from "@/app/(afterLogin)/qna/_component/QnaHeader";
+import NoticeTable from "@/app/(afterLogin)/qna/notice/_component/NoticeTable";
+import FaqTable from "@/app/(afterLogin)/qna/faq/_component/FaqTable";
 
 export default function QnaMainPage() {
     const [currentComponent, setCurrentComponent] = useState('Notice');
@@ -12,13 +14,13 @@ export default function QnaMainPage() {
     const renderComponent = () => {
         switch (currentComponent) {
             case 'Notice':
-                return <QuestionTable/>;
+                return <NoticeTable/>;
             case 'FAQ':
-                return <QuestionTable/>;
+                return <FaqTable/>;
             case 'Q&A':
                 return <QuestionTable/>;
             default:
-                return <QuestionTable/>;
+                return <NoticeTable/>;
         }
     };
 

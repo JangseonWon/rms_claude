@@ -15,7 +15,7 @@ import java.util.*
 
 interface PostDao: QueryDao{
 
-    fun DSLContext.selectPostsWithPage(query: Query): Mono<Page<PostDTO>> {
+    fun DSLContext.selectPostsWithPage(query: Query, category: String): Mono<Page<PostDTO>> {
         val joins = listOf(
             QueryDao.JoinInfo(POST_CATEGORY, POST.POST_CATEGORY_ID.eq(POST_CATEGORY.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(USER, POST.USER_ID.eq(USER.ID), QueryDao.JoinType.LEFT),
@@ -48,7 +48,9 @@ interface PostDao: QueryDao{
                 )
             ).`as`("user"),
         )
-        return selectPage(mainTable = POST, query = query, joinTables = joins, selectFields = fields) {record ->
+        val where = POST_CATEGORY.NAME.eq(category)
+
+        return selectPage(mainTable = POST, query = query, joinTables = joins, selectFields = fields, where= where) {record ->
             record.into(PostDTO::class.java)
         }
     }

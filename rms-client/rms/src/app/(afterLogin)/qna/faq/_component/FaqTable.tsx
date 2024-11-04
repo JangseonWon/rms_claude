@@ -14,14 +14,16 @@ import SelectBox from "@/app/_component/SelectBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import {format} from "date-fns";
+import {useSession} from "next-auth/react";
 
-export default function QuestionTable() {
+export default function FaqTable() {
     const router = useRouter();
     const [postData, setPostData] = useState<Post[]>([]);
     const [totalPage, setTotalPage] = useState<number>(4);
     const [search, setSearch] = useState<Query>({sort_by:"create_at", asc: false, size:8, page:1});
     const [selectOption, setSelectOption] = useState<SelectBoxOption>({ table: "post", column: "title", name: "Title" });
     const [pageRange, setPageRange] = useState<{ start: number, end: number }>({ start: 1, end: 10 });
+    const { data: session } = useSession();
 
     const selectBoxOptions: SelectBoxOption[] = [
         { table: "post", column: "title", name: "Title" },
@@ -121,7 +123,7 @@ export default function QuestionTable() {
     };
 
     const fetchData = useCallback(async (search: Query) => {
-        const response = await postSearchPosts(search, 'qna');
+        const response = await postSearchPosts(search, 'faq');
         const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
         const responseData = await response.json();
         setPostData(responseData as Post[]);
@@ -187,9 +189,11 @@ export default function QuestionTable() {
                     ))}
                     </tbody>
                 </table>
-                <button className={style.addButton} onClick={qnaButtonClick}>
-                    QnA
-                </button>
+                {session?.user.role !== 'USER' && (
+                    <button className={style.addButton}>
+                        FAQ
+                    </button>
+                )}
                 <div className={style.pagination}>
                     <button
                         className={style.paginationAngle}

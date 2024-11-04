@@ -35,7 +35,7 @@ class PostHandler(
         .build()
 
 
-    fun selectPosts(authentication: UserAuthentication, query: Query):  Mono<Page<PostDTO>> {
+    fun selectPosts(authentication: UserAuthentication, query: Query, category: String):  Mono<Page<PostDTO>> {
         authentication.takeIf { it.user.role == Role.USER.toString() }?.let {
             query.filterGroups = query.filterGroups ?: mutableListOf()  // null 체크 및 초기화
             query.filterGroups?.add(
@@ -51,7 +51,7 @@ class PostHandler(
                 )
             )
         }
-        return dslContext.selectPostsWithPage(query)
+        return dslContext.selectPostsWithPage(query, category)
     }
 
     fun selectPost(postId: UUID, user: UserAuthentication): Mono<PostDTO> {
