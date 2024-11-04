@@ -6,7 +6,7 @@ export async function updatePost(post: Post, files: File[]) {
         formData.append('file', file);
     });
     formData.append('data', JSON.stringify(post))
-    return await fetch(`/w-api/post-service/posts/${post.id}`, {
+    return await fetch(`/w-api/post-service/post/${post.id}`, {
         method: 'PATCH',
         body: formData,
         credentials: 'include',
