@@ -22,6 +22,10 @@ data class Request(
     val ward: String,
     @Column(name = "physician", length = 64, nullable = true)
     val physician: String,
+    @Column(name = "courier_company", length = 64, nullable = true)
+    val courierCompany: String,
+    @Column(name = "airwaybill_number", length = 64, nullable = true)
+    val airwaybillNumber: String,
     @Column(name = "create_at", nullable = true)
     val createAt: LocalDateTime,
     @Column(name = "cart_at", nullable = true)
