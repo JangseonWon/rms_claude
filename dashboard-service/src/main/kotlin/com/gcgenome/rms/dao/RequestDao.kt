@@ -1,12 +1,10 @@
 package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.authentication.User
-import com.gcgenome.rms.data.Page
-import com.gcgenome.rms.data.Query
-import com.gcgenome.rms.data.RequestDTO
-import com.gcgenome.rms.data.StatusCount
+import com.gcgenome.rms.data.*
 import com.gcgenome.rms.tables.references.*
 import org.jooq.DSLContext
+import org.jooq.impl.DSL
 import org.jooq.impl.DSL.*
 import reactor.core.publisher.Mono
 
@@ -120,19 +118,19 @@ interface RequestDao: QueryDao {
     fun DSLContext.selectStatusCount(user: User): Mono<StatusCount> {
         return Mono.from(
             select(
-                count().filterWhere("status != 'CART'"),
-                count().filterWhere("status = 'ORDERED'"),
-                count().filterWhere("status = 'SPECIFIED'"),
-                count().filterWhere("status = 'INPROGRESS'"),
-                count().filterWhere("status = 'TESTFAILED'"),
-                count().filterWhere("status = 'DELIVERED'"),
-                count().filterWhere("status = 'FINISHED'")
+                count().filterWhere(REQUEST.STATUS.ne(Status.CART.name)),
+                count().filterWhere(REQUEST.STATUS.eq(Status.UNCONFIRMED_ORDER.name)),
+                count().filterWhere(REQUEST.STATUS.eq(Status.COMPLETED_ORDER.name)),
+                count().filterWhere(REQUEST.STATUS.eq(Status.IN_PROGRESS.name)),
+                count().filterWhere(REQUEST.STATUS.eq(Status.TEST_FAILED.name)),
+                count().filterWhere(REQUEST.STATUS.eq(Status.DELIVERED.name)),
+                count().filterWhere(REQUEST.STATUS.eq(Status.COMPLETED.name))
             )
                 .from(REQUEST)
                 .join(ORDER).on(REQUEST.ORDER_ID.eq(ORDER.ID))
                 .where().apply {
                     when(user.role) {
-                        "USER" -> and(ORDER.USER_ID.eq(user.id))
+                        Role.USER.name -> and(ORDER.USER_ID.eq(user.id))
                     }
                 }
         ).map(StatusCount::toModel)
