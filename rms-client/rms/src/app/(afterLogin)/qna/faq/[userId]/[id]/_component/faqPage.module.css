@@ -29,6 +29,18 @@
     margin: 10px 40px;
     gap: 10px;
 }
+.headTitle {
+    font-size: 32pt;
+}
+.backButton {
+    font-size: 22pt;
+}
+.backButton:hover {
+    cursor: pointer;
+}
+.backButton:active {
+    color: #90BA2D;
+}
 .title, .category {
     width: 500px;
     display: grid;

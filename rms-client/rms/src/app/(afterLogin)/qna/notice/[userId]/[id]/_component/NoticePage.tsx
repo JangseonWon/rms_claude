@@ -10,6 +10,7 @@ import {Post} from "@/model/Post";
 import {getPostByPostId} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/getPostByPostId";
 import {getPostFile} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/getPostFile";
 import {PostFile} from "@/model/PostFile";
+import {faArrowLeft} from "@fortawesome/free-solid-svg-icons";
 
 export default function NoticePage() {
     const [postData, setPostData] = useState<Post>();
@@ -90,6 +91,10 @@ export default function NoticePage() {
 
     return (
         <div className={style.container}>
+            <section className={style.titleContainer}>
+                <h1 className={style.headTitle}>Notice</h1>
+                <FontAwesomeIcon className={style.backButton} icon={faArrowLeft} onClick={() => route.back()}/>
+            </section>
             <section className={style.titleContainer}>
                 <div className={style.category}>
                     <label className={style.titleLabel}>Category</label>

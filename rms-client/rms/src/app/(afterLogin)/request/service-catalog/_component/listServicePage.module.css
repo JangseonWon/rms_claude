@@ -68,8 +68,9 @@
     color: #666;
 }
 .serviceLink {
+    display: flex;
     margin: 5px 20px;
-    font-size: 9pt;
+    font-size: 11pt;
     color: #002b49;
     font-weight: 700;
     cursor: pointer;
@@ -77,9 +78,16 @@
 .serviceLink:hover {
     color: #90BA2D;
 }
+.serviceCode {
+    width: 100px;
+    margin: 5px 0 5px 20px;
+}
+.serviceName {
+    margin: 5px 0;
+}
 .noServicesMessage {
     margin: 5px 20px;
-    font-size: 9pt;
+    font-size: 11pt;
     color: #002b49;
     font-weight: 700;
 }
@@ -96,7 +104,7 @@
     transition: height 0.3s ease;
 }
 .cartBottomSection.expanded {
-    height: 180px;
+    height: 250px;
 }
 .cartBottomSectionScroll {
     margin: 5px;
