@@ -1,5 +1,5 @@
 export async function getStatisticsRequest() {
-    const res = await fetch(`/w-api/dashboard-service/statistics`, {
+    const res = await fetch(`/w-api/home-service/statistics`, {
         method: 'GET',
         credentials: 'include',
         cache: 'no-store'

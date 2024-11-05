@@ -27,12 +27,12 @@ export default function Table() {
     const status = useStatus();
     const setStatus = useSetStatus();
     const statusList = [
-        {name: "ALL", value: Status.TOTAL},
-        {name: "ORDERED", value: Status.ORDERED},
-        {name: "INPROGRESS", value: Status.INPROGRESS},
-        {name: "TESTFAILED", value: Status.TESTFAILED},
+        {name: "TOTAL", value: Status.TOTAL},
+        {name: "COMPLETED_ORDER", value: Status.COMPLETED_ORDER},
+        {name: "IN_PROGRESS", value: Status.IN_PROGRESS},
+        {name: "TESTFAILED", value: Status.TEST_FAILED},
         {name: "DELIVERED", value: Status.DELIVERED},
-        {name: "COMPLETE", value: Status.COMPLETE}
+        {name: "COMPLETED", value: Status.COMPLETED}
     ]
     const selectBoxOptions: SelectBoxOption[] = [
         { table: "sample", column: "barcode", name: "Registration ID" },

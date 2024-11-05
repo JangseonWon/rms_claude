@@ -1,9 +1,9 @@
 export interface Statistics {
     total: number
-    ordered: number
-    specified: number
+    unconfirmed_order: number
+    completed_order: number
     in_progress: number
     test_failed: number
     delivered: number
-    finished: number
+    completed: number
 }

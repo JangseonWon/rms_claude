@@ -22,11 +22,12 @@ export default function Statistics() {
 
     const statisticsCards = [
         { label: "Total", value: statisticsData?.total },
-        { label: "Ordered", value: statisticsData?.ordered },
+        { label: "Unconfirmed Order", value: statisticsData?.unconfirmed_order },
+        { label: "Completed Order", value: statisticsData?.completed_order },
         { label: "In progress", value: statisticsData?.in_progress },
         { label: "Test failed", value: statisticsData?.test_failed },
         { label: "Delivered", value: statisticsData?.delivered },
-        { label: "Complete", value: statisticsData?.finished },
+        { label: "Completed", value: statisticsData?.completed },
     ];
 
     return (

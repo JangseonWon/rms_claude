@@ -1,0 +1,23 @@
+.filterContainer {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 10px;
+}
+.filterContainerRight{
+    display: flex;
+}
+.filterContainerRight > *{
+    padding-right: 5px;
+}
+.filterContainerLeft{
+    margin-top: 15px;
+    display: flex;
+}
+.search {
+    width: 380px;
+}
+.line {
+    width: 4%;
+    height: 4px;
+    background-color: #002b49;
+}

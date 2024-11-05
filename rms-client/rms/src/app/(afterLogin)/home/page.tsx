@@ -3,8 +3,11 @@ import Statistics from "@/app/(afterLogin)/home/_component/Statistics";
 import TestOption from "@/app/(afterLogin)/home/_component/TestOption";
 import NavMenu from "@/app/(afterLogin)/_component/NavMenu";
 import style from './page.module.css';
+import {auth} from "@/auth";
+import NonArrivedTable from "@/app/(afterLogin)/home/_component/NonArrivedTable";
 
 export default async function Page() {
+    const session = await auth();
     return(
         <div className={style.container}>
             <MainImage/>
@@ -15,6 +18,9 @@ export default async function Page() {
                 <div className={style.rightSection}>
                     <Statistics/>
                     <TestOption/>
+                    {(session?.user.role === "ADMIN" || session?.user.role === "MANAGER") && (
+                        <NonArrivedTable/>
+                    )}
                 </div>
             </section>
         </div>

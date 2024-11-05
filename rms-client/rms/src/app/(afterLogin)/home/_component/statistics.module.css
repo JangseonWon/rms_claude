@@ -35,12 +35,12 @@
     flex-direction: column;
     border-radius: 20px;
     justify-content: space-between;
-    padding: 20px 20px;
+    padding: 25px 20px;
     width: 200px;
     height: 110px;
     background-color: #fff;
     color:#002b49;
-    margin: 15px;
+    margin: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 .card:first-child{
@@ -54,12 +54,12 @@
     background: linear-gradient(to right, #023a60, #5676a2);
 }
 .cardLabel{
-    font-size: 15pt;
-    font-weight: 500;
+    font-size: 13pt;
+    font-weight: 600;
     text-align: left;
 }
 .cardValue{
-    font-size: 22pt;
+    font-size: 20pt;
     font-weight: 600;
     text-align: right;
 }

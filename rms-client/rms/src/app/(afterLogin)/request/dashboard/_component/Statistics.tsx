@@ -30,11 +30,12 @@ export default function Statistics() {
         status: Status
     }[] = [
         { label: "Total", value: statisticsData?.total, status: Status.TOTAL },
-        { label: "Ordered", value: statisticsData?.ordered, status: Status.ORDERED },
-        { label: "In progress", value: statisticsData?.in_progress, status: Status.INPROGRESS },
-        { label: "Test failed", value: statisticsData?.test_failed, status: Status.TESTFAILED },
+        { label: "Unconfirmed Order", value: statisticsData?.unconfirmed_order, status: Status.UNCONFIRMED_ORDER },
+        { label: "Completed Order", value: statisticsData?.completed_order, status: Status.COMPLETED_ORDER },
+        { label: "In progress", value: statisticsData?.in_progress, status: Status.IN_PROGRESS },
+        { label: "Test failed", value: statisticsData?.test_failed, status: Status.TEST_FAILED },
         { label: "Delivered", value: statisticsData?.delivered, status: Status.DELIVERED },
-        { label: "Complete", value: statisticsData?.finished, status: Status.COMPLETE },
+        { label: "Completed", value: statisticsData?.completed, status: Status.COMPLETED },
     ];
 
     return (
