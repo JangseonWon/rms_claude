@@ -8,8 +8,10 @@ data class Service(
     @Id
     @Column(name = "id", length = 8)
     val id: String,
-    @Column(name = "name", length = 128, nullable = false)
+    @Column(name = "name", length = 128, nullable = true)
     val name: String,
+    @Column(name = "name_kr", length = 128, nullable = false)
+    val nameKr: String,
 
     @ManyToOne
     @JoinColumn(name = "category_id", insertable = false, updatable = false, nullable = true)
