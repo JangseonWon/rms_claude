@@ -36,9 +36,19 @@ export default function UploadExcelButton({ onFileUpload }: UploadExcelButtonPro
         setFile(null);
     };
 
+    const validateFile = (selectedFile: File) => {
+        const validExtensions = ['xlsx', 'xls'];
+        const fileExtension = selectedFile.name.split('.').pop()?.toLowerCase();
+        if (!fileExtension || !validExtensions.includes(fileExtension)) {
+            alert("Invalid file format. Please upload your Excel file.");
+            return false;
+        }
+        return true;
+    };
+
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0];
-        if (selectedFile) {
+        if (selectedFile && validateFile(selectedFile)) {
             setFile(selectedFile);
         }
         e.target.value = '';
@@ -61,7 +71,7 @@ export default function UploadExcelButton({ onFileUpload }: UploadExcelButtonPro
         e.stopPropagation();
         setDragging(false);
         const droppedFile = e.dataTransfer.files?.[0];
-        if (droppedFile) {
+        if (droppedFile && validateFile(droppedFile)) {
             setFile(droppedFile);
         }
     };
@@ -108,7 +118,7 @@ export default function UploadExcelButton({ onFileUpload }: UploadExcelButtonPro
                         <section className={style.modalTop}>
                             <div>Upload files</div>
                             <div className={style.modalClose} onClick={closeModal}>
-                                <FontAwesomeIcon icon={faXmark} />
+                                <FontAwesomeIcon icon={faXmark}/>
                             </div>
                         </section>
                         <div
@@ -119,7 +129,7 @@ export default function UploadExcelButton({ onFileUpload }: UploadExcelButtonPro
                         >
                             {!file ? (
                                 <>
-                                    <FontAwesomeIcon style={{ fontSize: '40px' }} icon={faArrowUpFromBracket} />
+                                    <FontAwesomeIcon style={{fontSize: '40px'}} icon={faArrowUpFromBracket}/>
                                     <div className={style.word}>Drag and drop</div>
                                     <div className={style.selectLink}>
                                         <div>or&nbsp;</div>
@@ -128,7 +138,7 @@ export default function UploadExcelButton({ onFileUpload }: UploadExcelButtonPro
                                                 type="file"
                                                 id="excelFileInput"
                                                 accept=".xlsx, .xls"
-                                                style={{ display: 'none' }}
+                                                style={{display: 'none'}}
                                                 onChange={handleFileChange}
                                             />
                                             <div className={style.link} onClick={handleUploadClick}>Select file</div>
@@ -137,14 +147,15 @@ export default function UploadExcelButton({ onFileUpload }: UploadExcelButtonPro
                                 </>
                             ) : (
                                 <>
-                                    <FontAwesomeIcon style={{ fontSize: '40px', marginBottom: '10px' }} icon={faFileExcel} />
+                                    <FontAwesomeIcon style={{fontSize: '40px', marginBottom: '10px'}}
+                                                     icon={faFileExcel}/>
                                     <div>{file.name}</div>
                                 </>
                             )}
                         </div>
-                        <section className={style.modalBottom}>
-                            <button className={style.button} onClick={processFile}>Confirm</button>
-                            <button className={style.button} onClick={closeModal}>Cancel</button>
+                        <section className={style.buttonContainer}>
+                            <button className={style.addButton} onClick={processFile}>Confirm</button>
+                            <button className={style.cancelButton} onClick={closeModal}>Cancel</button>
                         </section>
                     </div>
                 </div>

@@ -7,12 +7,12 @@
     border: 1px solid #182847;
     transition: all 150ms ease;
     cursor: pointer;
-    background: linear-gradient(135deg, #182847, #354e6d);
+    background: linear-gradient(to right, #023a60, #5676a2);
     color: #ffffff;
     margin: 5px 6px;
 }
 .blueButton:hover {
-    background: linear-gradient(135deg, #3c6699, #9ebce6);
+    background: linear-gradient(90deg, #3c6699, #9ebce6);
     border: 1px solid #9ebce6;
 }
 .blueButton.disable {

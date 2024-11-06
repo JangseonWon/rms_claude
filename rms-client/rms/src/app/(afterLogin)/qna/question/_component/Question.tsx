@@ -5,8 +5,23 @@ import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
 import {putPost} from "@/app/(afterLogin)/qna/_api/putPost";
 import {Post} from "@/model/Post";
-import React, {ChangeEvent, useState} from "react";
+import React, {ChangeEvent, DragEvent, useState} from "react";
 import QnaLoading from "@/app/(afterLogin)/qna/_component/QnaLoading";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {
+    faArrowLeft,
+    faArrowUpFromBracket,
+    faFile,
+    faFileAlt,
+    faFileExcel,
+    faFileImage,
+    faFilePdf,
+    faFilePowerpoint,
+    faFileWord,
+    faFileZipper,
+    faTimes
+} from "@fortawesome/free-solid-svg-icons";
+import BlueButton from "@/app/_component/BlueButton";
 
 export default function Question() {
     const route = useRouter();
@@ -15,7 +30,7 @@ export default function Question() {
     const [content, setContent] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-    const [categoryId, setCategoryId] = useState('f9476263-f8b2-4ff9-b5f9-ed680715401e');
+    const [dragging, setDragging] = useState(false);
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -39,7 +54,7 @@ export default function Question() {
                 const postData: Post = {
                     title: title,
                     post_category: {
-                        id: categoryId
+                        id: 'adfe53d3-a816-44ed-a318-7f33d7965614'
                     },
                     content: content
                 };
@@ -54,66 +69,96 @@ export default function Question() {
         }
     };
 
-    const cancelButtonClick = () => {
-        const confirmed = window.confirm('Are you sure you want to cancel?');
-        if (confirmed) {
-            route.push('/qna');
-        }
-    }
-
-    const handleCategoryIdChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const selectedValue = JSON.parse(event.target.value);
-        setCategoryId(selectedValue.uuid);
+    const removeFile = (index: number) => {
+        setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
     };
 
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            setSelectedFiles(Array.from(e.target.files));
+        const files = e.target.files;
+        if (files && files.length > 0) {
+            setSelectedFiles((prevFiles) => [...prevFiles, ...Array.from(files)]);
+        }
+    };
+
+    const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragging(true);
+    };
+
+    const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragging(false);
+    };
+
+    const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragging(false);
+        const droppedFiles = e.dataTransfer.files;
+        if (droppedFiles && droppedFiles.length > 0) {
+            setSelectedFiles((prevFiles) => [...prevFiles, ...Array.from(droppedFiles)]);
+        }
+    };
+
+    const handleUploadClick = () => {
+        document.getElementById('fileInput')?.click();
+    };
+
+    const getFileIcon = (fileName: string) => {
+        const extension = fileName.split('.').pop()?.toLowerCase();
+        switch (extension) {
+            case 'pdf':
+                return <FontAwesomeIcon icon={faFilePdf} className={style.filePdfIcon}/>;
+            case 'jpg':
+            case 'jpeg':
+            case 'png':
+            case 'gif':
+                return <FontAwesomeIcon icon={faFileImage} className={style.fileIcon}/>;
+            case 'xls':
+            case 'xlsx':
+                return <FontAwesomeIcon icon={faFileExcel} className={style.fileExcelIcon}/>;
+            case 'doc':
+            case 'docx':
+                return <FontAwesomeIcon icon={faFileWord} className={style.fileWordIcon}/>;
+            case 'ppt':
+            case 'pptx':
+                return <FontAwesomeIcon icon={faFilePowerpoint} className={style.filePowerPointIcon}/>;
+            case 'txt':
+            case 'md':
+                return <FontAwesomeIcon icon={faFileAlt} className={style.fileTextIcon}/>;
+            case 'zip':
+                return <FontAwesomeIcon icon={faFileZipper} className={style.fileZipIcon}/>;
+            default:
+                return <FontAwesomeIcon icon={faFile} className={style.fileIcon}/>;
         }
     };
 
     return (
         <div className={style.container}>
             {isLoading && <QnaLoading/>}
-            <section className={style.userAndCategoryContainer}>
+            <section className={style.headerContainer}>
+                <h1 className={style.headTitle}>Q&A</h1>
+                <FontAwesomeIcon className={style.backButton} icon={faArrowLeft} onClick={() => route.back()}/>
+            </section>
+            <section className={style.buttonContainer}>
+                <BlueButton name={"POST"} onClick={addButtonClick}/>
+            </section>
+            <section className={style.userAndTitleContainer}>
                 <div className={style.userContainer}>
                     <label className={style.userLabel}>User</label>
                     <label className={style.inputUser}>{session?.user?.name}</label>
                 </div>
-                <div className={style.select}>
-                    <label className={style.categoryLabel}>Category</label>
-                    <select className={style.selectCategory} onChange={handleCategoryIdChange}>
-                        <option value={JSON.stringify({
-                            category: 'service',
-                            uuid: 'f9476263-f8b2-4ff9-b5f9-ed680715401e'
-                        })}>Service
-                        </option>
-                        <option value={JSON.stringify({
-                            category: 'result',
-                            uuid: 'f1d0a814-8c90-4103-bbd5-6c0e54d37808'
-                        })}>Result
-                        </option>
-                        <option value={JSON.stringify({
-                            category: 'bug',
-                            uuid: '7cefa58c-d85b-4f9e-82ff-dc46ba953e27'
-                        })}>Bug
-                        </option>
-                        <option value={JSON.stringify({
-                            category: 'others',
-                            uuid: 'f86a9106-e431-4649-a4f9-c61e73ec7bab'
-                        })}>Others
-                        </option>
-                    </select>
+                <div className={style.titleContainer}>
+                    <label className={style.titleLabel}>Title</label>
+                    <input
+                        className={style.inputTitle}
+                        name='title'
+                        value={title}
+                        onChange={handleInputChange}
+                    />
                 </div>
-            </section>
-            <section className={style.titleContainer}>
-                <label className={style.titleLabel}>Title</label>
-                <input
-                    className={style.inputTitle}
-                    name='title'
-                    value={title}
-                    onChange={handleInputChange}
-                />
             </section>
             <section className={style.contentContainer}>
                 <label className={style.contentLabel}>Content</label>
@@ -127,22 +172,46 @@ export default function Question() {
             </section>
             <section className={style.fileContainer}>
                 <label className={style.fileLabel}>Upload File</label>
-                <div className={style.fileInput}>
-                    <input type="file" multiple onChange={handleFileChange} />
-                    {selectedFiles.length > 0 && (
+                <div
+                    className={`${style.fileUploadBody} ${dragging ? style.dragging : ''}`}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                >
+                    {selectedFiles.length === 0 ? (
+                        <>
+                            <FontAwesomeIcon style={{fontSize: '40px'}} icon={faArrowUpFromBracket}/>
+                            <div className={style.word}>Drag and drop</div>
+                            <div className={style.selectLink}>
+                                <div>or&nbsp;</div>
+                                <>
+                                    <input
+                                        type="file"
+                                        id="fileInput"
+                                        multiple
+                                        style={{display: 'none'}}
+                                        onChange={handleFileChange}
+                                    />
+                                    <div className={style.link} onClick={handleUploadClick}>Select file</div>
+                                </>
+                            </div>
+                        </>
+                    ) : (
                         <ul className={style.fileList}>
                             {selectedFiles.map((file, index) => (
-                                <span key={index} className={style.fileItem}>
-                                    {file.name}
-                                </span>
+                                <li key={index} className={style.fileItem}>
+                                    <FontAwesomeIcon
+                                        icon={faTimes}
+                                        className={style.deleteIcon}
+                                        onClick={() => removeFile(index)}
+                                    />
+                                    {getFileIcon(file.name)}
+                                    <div className={style.fileName}>{file.name}</div>
+                                </li>
                             ))}
                         </ul>
                     )}
                 </div>
-            </section>
-            <section className={style.buttonContainer}>
-                <button className={style.addButton} onClick={addButtonClick}>Add</button>
-                <button className={style.cancelButton} onClick={cancelButtonClick}>Cancel</button>
             </section>
         </div>
     )

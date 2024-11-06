@@ -1,46 +1,117 @@
 .container {
     display: grid;
     gap: 20px;
-    margin: 30px 30px;
-    padding: 20px 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    background-color: #f9f9f9;
+    margin: 50px 60px;
 }
-.userAndCategoryContainer {
+.userAndTitleContainer {
     justify-content: space-between;
     display: flex;
     gap: 20px;
 }
-.userContainer, .titleContainer, .contentContainer, .fileContainer, .select {
+.headerContainer {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 40px;
+    gap: 10px;
+}
+.buttonContainer {
+    margin: 0 40px;
+    display: flex;
+    justify-content: flex-end;
+}
+.userContainer, .titleContainer, .contentContainer, .fileContainer {
     display: grid;
     margin: 10px 40px;
     gap: 10px;
 }
-.userLabel, .titleLabel, .contentLabel, .fileLabel, .categoryLabel {
+.userLabel, .titleLabel, .contentLabel, .fileLabel {
     font-weight: 700;
     font-size: 12pt;
     color: #333;
 }
-.inputUser, .inputTitle, .textareaContent, .fileInput, .selectCategory {
+.inputUser, .inputTitle, .textareaContent, .fileInput {
     padding: 10px 20px;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 25px;
     font-size: 10pt;
     background-color: #fff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    outline: none;
 }
 .fileList {
+    margin: 20px;
+    list-style: none;
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
     max-width: 100%;
+    padding: 0;
 }
-.fileItem {
 
+.fileItem {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 170px;
+}
+
+.fileIcon, .filePdfIcon, .fileExcelIcon, .fileWordIcon, .filePowerPointIcon, .fileZipIcon, .fileTextIcon {
+    margin-left: 10px;
+    font-size: 30px;
+    margin-bottom: 5px;
+    color: lightgrey;
+}
+.deleteIcon {
+    padding-left: 30px;
+    cursor: pointer;
+    font-size: 10px;
+}
+.deleteIcon:hover {
+    color: #90BA2D;
+}
+.filePdfIcon {
+    color: #C33236;
+}
+.fileExcelIcon {
+    color: #5EA53A;
+}
+.fileWordIcon {
+    color: #323C9D;
+}
+.filePowerPointIcon {
+    color: #C14429;
+}
+.fileZipIcon {
+    color: #F3DDAF;
+}
+.fileTextIcon {
+    color: dimgrey;
+}
+.fileName {
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 14px;
+    text-align: left;
 }
 .inputUser {
     width: 300px;
+}
+.inputTitle {
+    width: 500px;
+}
+.headTitle {
+    font-size: 32pt;
+}
+.backButton {
+    font-size: 22pt;
+}
+.backButton:hover {
+    cursor: pointer;
+}
+.backButton:active {
+    color: #90BA2D;
 }
 .select select {
     display: grid;
@@ -61,23 +132,33 @@
 .textareaContent {
     resize: none;
 }
-.buttonContainer {
-    margin-top: 30px;
+.fileUploadBody {
+    margin-top: 20px;
+    min-height: 200px;
+    background-color: #fff;
+    border: 1px solid #ccc;
     display: flex;
-    justify-content: flex-end;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 25px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-.addButton, .cancelButton {
-    width: 100px;
+.fileUploadBody.dragging {
+    background-color: #d3d3d3;
+}
+.word {
+    margin: 10px 0;
+}
+.selectLink {
+    display: flex;
+    font-size: 14px;
+}
+.link {
+    color: #859fbf;
     cursor: pointer;
-    padding: 8px 20px;
-    border: 1px solid #bbb9b7;
-    background-color: #ffffff;
-    font-size: 10pt;
-    color: #88837E;
 }
-.addButton {
-    border-right: none;
-}
-.cancelButton {
-
+.link:active {
+    color: #7a93b2;
 }

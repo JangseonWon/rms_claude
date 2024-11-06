@@ -79,6 +79,20 @@
 .link:active {
     color: #7a93b2;
 }
-.modalBottom {
-
+.buttonContainer {
+    margin-top: 30px;
+    display: flex;
+    justify-content: flex-end;
+}
+.addButton, .cancelButton {
+    width: 100px;
+    cursor: pointer;
+    padding: 8px 20px;
+    border: 1px solid #bbb9b7;
+    background-color: #ffffff;
+    font-size: 10pt;
+    color: #88837E;
+}
+.addButton {
+    border-right: none;
 }
