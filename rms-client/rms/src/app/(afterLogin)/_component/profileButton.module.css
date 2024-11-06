@@ -3,7 +3,7 @@
     display: flex;
 }
 .profileContainer {
-
+    position: relative;
 }
 .profile {
     padding: 0 0 5px 0;
@@ -42,11 +42,10 @@
     border-right: 1px solid #ffffff;
 }
 .profileDropdown {
-    margin-right: 160px;
     position: absolute;
     width: 110px;
-    top: 2%;
-    right: 5%;
+    top: -30%;
+    left: 20%;
     transform: translate(-20%, 40%);
     background-color: #fff;
     padding: 10px 20px;

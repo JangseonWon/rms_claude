@@ -1,7 +1,7 @@
 "use client"
 
 import style from "./profileButton.module.css"
-import React, {useRef, useState} from "react";
+import React, {useState} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBell, faUser} from "@fortawesome/free-regular-svg-icons";
 import {faChevronDown} from "@fortawesome/free-solid-svg-icons";
@@ -12,7 +12,6 @@ export default function ProfileButton() {
     const { data: session } = useSession();
     const [showDropdown, setShowDropdown] = useState(false);
     const router = useRouter()
-    const dropdownRef = useRef<HTMLDivElement>(null);
 
     const onLogout = () =>{
         signOut({redirect: false})
@@ -46,7 +45,7 @@ export default function ProfileButton() {
                     <FontAwesomeIcon className={style.ChevronDown} icon={faChevronDown}/>
                 </div>
                 {showDropdown && (
-                    <div className={style.profileDropdown} ref={dropdownRef}>
+                    <div className={style.profileDropdown} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
                         <ul>
                             <li onClick={onProfile}>My profile</li>
                             <li onClick={onLogout}>Logout</li>

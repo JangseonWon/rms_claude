@@ -37,7 +37,7 @@
     justify-content: space-between;
     padding: 25px 20px;
     width: 200px;
-    height: 110px;
+    height: 90px;
     background-color: #fff;
     color:#002b49;
     margin: 10px;
@@ -54,12 +54,12 @@
     background: linear-gradient(to right, #023a60, #5676a2);
 }
 .cardLabel{
-    font-size: 13pt;
+    font-size: 12pt;
     font-weight: 600;
     text-align: left;
 }
 .cardValue{
-    font-size: 20pt;
+    font-size: 18pt;
     font-weight: 600;
     text-align: right;
 }
