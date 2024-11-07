@@ -22,8 +22,8 @@ class CommentRouter (
 ) {
     @Bean("CommentRouter")
     fun route() = router {
-        PUT("/w-api/post-service/posts/{post-id}/comments", ::insertPostComment)
-        DELETE("/w-api/post-service/comments/{comment-id}", ::deletePostComment)
+        PUT("/w-api/post-service/post/{post-id}/comment", ::insertPostComment)
+        DELETE("/w-api/post-service/comment/{comment-id}", ::deletePostComment)
     }
 
     private fun insertPostComment(request: ServerRequest): Mono<ServerResponse> {
