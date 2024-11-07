@@ -1,15 +1,26 @@
 'use client';
 
-import style from './answer.module.css';
+import answerStyle from './answer.module.css';
+import style from "@/css/qnaPost.module.css";
 import {usePathname, useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import React, {ChangeEvent, useCallback, useEffect, useState} from "react";
-import {faFile, faFilePdf, faImage} from "@fortawesome/free-regular-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Post} from "@/model/Post";
 import {getPostByPostId} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/getPostByPostId";
 import {putComment} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/putComment";
-import {faXmark} from "@fortawesome/free-solid-svg-icons";
+import {
+    faArrowLeft,
+    faFile,
+    faFileAlt,
+    faFileExcel,
+    faFileImage,
+    faFilePdf,
+    faFilePowerpoint,
+    faFileWord,
+    faFileZipper,
+    faXmark
+} from "@fortawesome/free-solid-svg-icons";
 import {deleteCommentById} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/deleteCommentById";
 import {deletePostById} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/deletePostById";
 import {getPostFile} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/getPostFile";
@@ -19,6 +30,9 @@ import QnaLoading from "@/app/(afterLogin)/qna/_component/QnaLoading";
 import {PostFile} from "@/model/PostFile";
 import {Role} from "@/model/Role";
 import {Comment} from "@/model/Comment";
+import BlueButton from "@/app/_component/BlueButton";
+import {renderAnswerFileIcon} from "@/app/(afterLogin)/qna/_component/QnaUtils";
+import GreenButton from "@/app/_component/GreenButton";
 
 export default function Answer() {
     const [postData, setPostData] = useState<Post>();
@@ -33,22 +47,7 @@ export default function Answer() {
     const pathSegments = pathname.split('/');
     const postId = decodeURIComponent(pathSegments.pop() || '');
 
-    const renderFileIcon = (fileName: string) => {
-        const fileExtension = fileName.split('.').pop()?.toLowerCase();
-
-        switch (fileExtension) {
-            case 'img':
-            case 'jpg':
-            case 'jpeg':
-            case 'png':
-            case 'gif':
-                return <FontAwesomeIcon className={style.fileIcon} icon={faImage}/>;
-            case 'pdf':
-                return <FontAwesomeIcon className={style.fileIcon} icon={faFilePdf}/>;
-            default:
-                return <FontAwesomeIcon className={style.fileIcon} icon={faFile}/>;
-        }
-    }
+    const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
     const formatDate = (date: Date) => {
         const options: Intl.DateTimeFormatOptions = {
@@ -161,7 +160,6 @@ export default function Answer() {
 
     const handleCommentClick = async () => {
         if (commentData) {
-            alert(commentData.content)
             await putComment(postId, commentData);
             /*if (session?.user.role !== "USER") {
                 await fetchPostId(postId, true);
@@ -177,7 +175,15 @@ export default function Answer() {
 
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
-            setSelectedFiles(Array.from(e.target.files));
+            const selectedFiles = Array.from(e.target.files);
+            const validFiles = selectedFiles.filter(file => {
+                if (file.size > MAX_FILE_SIZE) {
+                    alert(`${file.name} size exceeds 50 MB.`);
+                    return false;
+                }
+                return true;
+            });
+            setSelectedFiles(validFiles);
         }
     };
 
@@ -205,19 +211,31 @@ export default function Answer() {
     return (
         <div className={style.container}>
             {isLoading && <QnaLoading/>}
-            <section className={style.userContainer}>
-                <label className={style.userLabel}>User</label>
-                <label className={style.inputUser}>{postData?.user?.name}</label>
+            <section className={style.headerContainer}>
+                <h1 className={style.headTitle}>Q&A</h1>
+                <FontAwesomeIcon className={style.backButton} icon={faArrowLeft} onClick={() => route.back()}/>
             </section>
-            <section className={style.titleContainer}>
-                <label className={style.titleLabel}>Title</label>
-                <input
-                    className={style.inputTitle}
-                    name={'title'}
-                    value={postData?.title || ''}
-                    onChange={handleInputChange}
-                    readOnly={!writerCheck}
-                />
+                {writerCheck && (
+                    <section className={style.buttonContainer}>
+                        <BlueButton name={"EDIT"} onClick={editButtonClick}/>
+                        <GreenButton name={"DELETE"} onClick={() => deleteButtonClick(postData?.id!)}/>
+                    </section>
+                )}
+                    <section className={style.userAndTitleContainer}>
+                <div className={style.userContainer}>
+                    <label className={style.userLabel}>User</label>
+                    <label className={style.inputUser}>{postData?.user?.name}</label>
+                </div>
+                <div className={style.titleContainer}>
+                    <label className={style.titleLabel}>Title</label>
+                    <input
+                        className={style.inputTitle}
+                        name={'title'}
+                        value={postData?.title || ''}
+                        onChange={handleInputChange}
+                        readOnly={!writerCheck}
+                    />
+                </div>
             </section>
             <section className={style.contentContainer}>
                 <label className={style.contentLabel}>Content</label>
@@ -233,17 +251,22 @@ export default function Answer() {
             <section className={style.fileContainer}>
                 <label className={style.fileLabel}>Upload File</label>
                 {writerCheck && (
-                    <div className={style.fileInput}>
-                        <input type="file" className={style.inputButton} multiple onChange={handleFileChange}/>
+                    <div className={answerStyle.fileInput}>
+                        <label htmlFor={'file'}>
+                            <div className={answerStyle.fileUploadLabel}>File Upload</div>
+                        </label>
+                        <input name="file" id="file" type="file" className={answerStyle.inputButton}
+                               multiple onChange={handleFileChange}
+                        />
                         {selectedFiles.length > 0 && (
                             <ul className={style.fileList}>
                                 {selectedFiles.map((file, index) => (
                                     <span key={index}>
                                     {file.name}
                                         <FontAwesomeIcon
-                                            className={style.fileDelete}
+                                            className={answerStyle.fileDelete}
                                             icon={faXmark}
-                                            onClick={()=> handleFileCancelClick(index)}
+                                            onClick={() => handleFileCancelClick(index)}
                                         />
                                 </span>
                                 ))}
@@ -253,68 +276,60 @@ export default function Answer() {
                 )}
                 <ul className={style.fileInput}>
                     {postData?.post_files?.map((file, index) => (
-                        <div className={style.fileItem} key={index}>
+                        <div className={answerStyle.fileItem} key={index}>
                             <span
                                 key={index}
-                                className={style.fileName}
+                                className={answerStyle.fileName}
                                 onClick={() => handleFileNameClick(file)}
                             >
-                            {renderFileIcon(file.name!)}{file.name}
+                            {renderAnswerFileIcon(file.name!)}{file.name}
                             </span>
-                            {session?.user?.role === 'USER' && (<FontAwesomeIcon
-                                className={style.fileDelete}
+                            {session?.user?.id === postData.user!!.id && (<FontAwesomeIcon
+                                className={answerStyle.fileDelete}
                                 icon={faXmark}
-                                onClick={()=> handleFileDeleteClick(file.id!)}
+                                onClick={() => handleFileDeleteClick(file.id!)}
                             />)}
                         </div>
                     ))}
                 </ul>
             </section>
-            <section className={style.commentContainer}>
-                <label className={style.commentLabel}>Comment</label>
-                <div className={style.comment}>
+            <section className={answerStyle.commentContainer}>
+                <label className={answerStyle.commentLabel}>Comment</label>
+                <div className={answerStyle.comment}>
                     {postData?.comments?.map((comment, index) => (
-                        <div key={index} className={style.commentUser}>
-                            <div className={style.commentNameAndDelete}>
-                                <p className={comment.user?.role === Role.MANAGER ? style.commentManagerName : style.commentUserName}>
+                        <div key={index} className={answerStyle.commentUser}>
+                            <div className={answerStyle.commentNameAndDelete}>
+                                <p className={comment.user?.role === Role.MANAGER ? answerStyle.commentManagerName : answerStyle.commentUserName}>
                                     {comment.user?.id}
                                 </p>
                                 {comment.user?.id === session?.user?.id && (
                                     <FontAwesomeIcon
-                                        className={style.commentDelete}
+                                        className={answerStyle.commentDelete}
                                         icon={faXmark}
-                                        onClick={()=> handleCommentDeleteClick(comment.id!)}
+                                        onClick={() => handleCommentDeleteClick(comment.id!)}
                                     />
                                 )}
                             </div>
-                            <pre className={style.commentContent}>{comment.content}</pre>
-                            <p className={style.commentDate}>{formatDate(comment.create_at!)}</p>
+                            <pre className={answerStyle.commentContent}>{comment.content}</pre>
+                            <p className={answerStyle.commentDate}>{formatDate(comment.create_at!)}</p>
                         </div>
                     ))}
-                    <div className={style.firstCommentContainer}>
-                        <div className={style.secondCommentContainer}>
-                            <p className={style.inputCommentUser}>{session?.user.id}</p>
+                    <div className={answerStyle.firstCommentContainer}>
+                        <div className={answerStyle.secondCommentContainer}>
+                            <p className={answerStyle.inputCommentUser}>{session?.user.id}</p>
                             <textarea
                                 value={commentData?.content || ''}
                                 rows={5}
-                                className={style.inputComment}
+                                className={answerStyle.inputComment}
                                 name={'comment'}
                                 onChange={e => setCommentData({content: e.target.value})}
                             />
                         </div>
-                        <button className={style.inputCommendButton} onClick={handleCommentClick}>
+                        <button className={answerStyle.inputCommentButton} onClick={handleCommentClick}>
                             Comment
                         </button>
                     </div>
                 </div>
-            </section>
-            <section className={style.buttonContainer}>
-                {writerCheck && (
-                    <button onClick={editButtonClick}>
-                        Edit Post
-                    </button>
-                )}
-                <button className={style.cancelButton} onClick={()=> deleteButtonClick(postData?.id!)}>Delete</button>
             </section>
         </div>
     )

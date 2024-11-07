@@ -1,0 +1,31 @@
+.fileIcon, .filePdfIcon, .fileExcelIcon, .fileWordIcon, .filePowerPointIcon, .fileZipIcon, .fileTextIcon {
+    margin-left: 10px;
+    font-size: 30px;
+    margin-bottom: 5px;
+    color: lightgrey;
+}
+/*answer 아이콘 css*/
+.answerIcon, .answerPdfIcon, .answerExcelIcon, .answerWordIcon, .answerPowerPointIcon, .answerZipIcon, .answerTextIcon {
+    margin-top: 3px;
+    margin-right: 4px;
+    color: lightgrey;
+}
+
+.filePdfIcon, .answerPdfIcon {
+    color: #C33236;
+}
+.fileExcelIcon, .answerExcelIcon {
+    color: #5EA53A;
+}
+.fileWordIcon, .answerWordIcon {
+    color: #323C9D;
+}
+.filePowerPointIcon, .answerPowerPointIcon {
+    color: #C14429;
+}
+.fileZipIcon, .answerZipIcon {
+    color: #F3DDAF;
+}
+.fileTextIcon, .answerTextIcon {
+    color: dimgrey;
+}

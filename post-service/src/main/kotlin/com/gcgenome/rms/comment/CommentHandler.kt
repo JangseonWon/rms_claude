@@ -1,4 +1,4 @@
-package com.gcgenome.rms.service
+package com.gcgenome.rms.comment
 
 import com.gcgenome.rms.dao.CommentDao
 import com.gcgenome.rms.data.CommentDTO

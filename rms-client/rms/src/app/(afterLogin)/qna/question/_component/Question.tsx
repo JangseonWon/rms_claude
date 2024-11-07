@@ -1,27 +1,24 @@
 'use client';
 
-import style from './question.module.css';
+import style from '@/css/qnaPost.module.css';
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
 import {putPost} from "@/app/(afterLogin)/qna/_api/putPost";
 import {Post} from "@/model/Post";
-import React, {ChangeEvent, DragEvent, useState} from "react";
+import React, {ChangeEvent, useState} from "react";
 import QnaLoading from "@/app/(afterLogin)/qna/_component/QnaLoading";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {
-    faArrowLeft,
-    faArrowUpFromBracket,
-    faFile,
-    faFileAlt,
-    faFileExcel,
-    faFileImage,
-    faFilePdf,
-    faFilePowerpoint,
-    faFileWord,
-    faFileZipper,
-    faTimes
-} from "@fortawesome/free-solid-svg-icons";
+import {faArrowLeft, faArrowUpFromBracket, faTimes} from "@fortawesome/free-solid-svg-icons";
 import BlueButton from "@/app/_component/BlueButton";
+import {
+    handleDragLeave,
+    handleDragOver,
+    handleDrop,
+    handleFileChange,
+    handleUploadClick,
+    removeFile,
+    renderFileIcon
+} from "@/app/(afterLogin)/qna/_component/QnaUtils";
 
 export default function Question() {
     const route = useRouter();
@@ -69,72 +66,6 @@ export default function Question() {
         }
     };
 
-    const removeFile = (index: number) => {
-        setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
-    };
-
-    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const files = e.target.files;
-        if (files && files.length > 0) {
-            setSelectedFiles((prevFiles) => [...prevFiles, ...Array.from(files)]);
-        }
-    };
-
-    const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setDragging(true);
-    };
-
-    const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setDragging(false);
-    };
-
-    const handleDrop = (e: DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setDragging(false);
-        const droppedFiles = e.dataTransfer.files;
-        if (droppedFiles && droppedFiles.length > 0) {
-            setSelectedFiles((prevFiles) => [...prevFiles, ...Array.from(droppedFiles)]);
-        }
-    };
-
-    const handleUploadClick = () => {
-        document.getElementById('fileInput')?.click();
-    };
-
-    const getFileIcon = (fileName: string) => {
-        const extension = fileName.split('.').pop()?.toLowerCase();
-        switch (extension) {
-            case 'pdf':
-                return <FontAwesomeIcon icon={faFilePdf} className={style.filePdfIcon}/>;
-            case 'jpg':
-            case 'jpeg':
-            case 'png':
-            case 'gif':
-                return <FontAwesomeIcon icon={faFileImage} className={style.fileIcon}/>;
-            case 'xls':
-            case 'xlsx':
-                return <FontAwesomeIcon icon={faFileExcel} className={style.fileExcelIcon}/>;
-            case 'doc':
-            case 'docx':
-                return <FontAwesomeIcon icon={faFileWord} className={style.fileWordIcon}/>;
-            case 'ppt':
-            case 'pptx':
-                return <FontAwesomeIcon icon={faFilePowerpoint} className={style.filePowerPointIcon}/>;
-            case 'txt':
-            case 'md':
-                return <FontAwesomeIcon icon={faFileAlt} className={style.fileTextIcon}/>;
-            case 'zip':
-                return <FontAwesomeIcon icon={faFileZipper} className={style.fileZipIcon}/>;
-            default:
-                return <FontAwesomeIcon icon={faFile} className={style.fileIcon}/>;
-        }
-    };
-
     return (
         <div className={style.container}>
             {isLoading && <QnaLoading/>}
@@ -174,9 +105,9 @@ export default function Question() {
                 <label className={style.fileLabel}>Upload File</label>
                 <div
                     className={`${style.fileUploadBody} ${dragging ? style.dragging : ''}`}
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
-                    onDrop={handleDrop}
+                    onDragOver={(e) => handleDragOver(e, setDragging)}
+                    onDragLeave={(e) => handleDragLeave(e, setDragging)}
+                    onDrop={(e) => handleDrop(e, setDragging, setSelectedFiles)}
                 >
                     {selectedFiles.length === 0 ? (
                         <>
@@ -190,7 +121,7 @@ export default function Question() {
                                         id="fileInput"
                                         multiple
                                         style={{display: 'none'}}
-                                        onChange={handleFileChange}
+                                        onChange={(e) => handleFileChange(e, setSelectedFiles)}
                                     />
                                     <div className={style.link} onClick={handleUploadClick}>Select file</div>
                                 </>
@@ -203,9 +134,9 @@ export default function Question() {
                                     <FontAwesomeIcon
                                         icon={faTimes}
                                         className={style.deleteIcon}
-                                        onClick={() => removeFile(index)}
+                                        onClick={() => removeFile(index, setSelectedFiles)}
                                     />
-                                    {getFileIcon(file.name)}
+                                    {renderFileIcon(file.name)}
                                     <div className={style.fileName}>{file.name}</div>
                                 </li>
                             ))}

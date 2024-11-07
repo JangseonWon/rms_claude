@@ -5,7 +5,6 @@ import com.gcgenome.rms.data.CommentDTO
 import com.gcgenome.rms.data.PostDTO
 import com.gcgenome.rms.data.UserDTO
 import com.gcgenome.rms.exception.AuthenticationNotFoundException
-import com.gcgenome.rms.service.CommentHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
