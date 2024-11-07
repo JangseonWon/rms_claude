@@ -19,6 +19,7 @@ import software.amazon.awssdk.core.async.AsyncRequestBody
 import software.amazon.awssdk.services.s3.S3AsyncClient
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
+import java.nio.ByteBuffer
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -94,10 +95,16 @@ class PostHandler(
                     .build()
 
                 filePart.content()
-                    .flatMap { dataBuffer ->
-                        val byteBuffer = dataBuffer.asByteBuffer()
+                    .collectList()
+                    .map { dataBuffers ->
+                        val totalBuffer = ByteBuffer.allocate(dataBuffers.sumOf { it.readableByteCount() })
+                        dataBuffers.forEach { buffer -> totalBuffer.put(buffer.asByteBuffer()) }
+                        totalBuffer.flip()
+                        totalBuffer
+                    }
+                    .flatMap { byteBuffer ->
                         Mono.fromFuture {
-                            s3Client.putObject(putObjectRequest, AsyncRequestBody.fromByteBuffers(byteBuffer))
+                            s3Client.putObject(putObjectRequest, AsyncRequestBody.fromByteBuffer(byteBuffer))
                         }.then(
                             dslContext.insertPostFile(PostFileDTO(path = path, name = filePart.filename(), post = PostDTO(id = postId)))
                         )
