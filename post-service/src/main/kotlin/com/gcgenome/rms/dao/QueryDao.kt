@@ -8,6 +8,9 @@ import org.jooq.impl.DSL.field
 import org.jooq.impl.DSL.noCondition
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 
 interface QueryDao {
     enum class JoinType {
@@ -143,8 +146,12 @@ interface QueryDao {
                     "!=" -> field.ne(filter.value)
                     ">" -> field.gt(filter.value)
                     "<" -> field.lt(filter.value)
-                    ">=" -> field.ge(filter.value)
-                    "<=" -> field.le(filter.value)
+                    ">=" -> if (isTimestampColumn(column)) {
+                        field.ge(parseTimestamp(filter.value))
+                    } else field.ge(filter.value)
+                    "<=" -> if (isTimestampColumn(column)) {
+                        field.le(parseEndOfDayTimestamp(filter.value))
+                    } else field.le(filter.value)
                     "LIKE" -> field.likeIgnoreCase("%${filter.value}%")
                     else -> null
                 }
@@ -172,5 +179,14 @@ interface QueryDao {
             sortFields.add(sortField)
         }
         return sortFields
+    }
+    private fun isTimestampColumn(column: String): Boolean {
+        return column.contains("_at", ignoreCase = true)
+    }
+    private fun parseTimestamp(value: String): LocalDateTime {
+        return LocalDate.parse(value).atStartOfDay()
+    }
+    private fun parseEndOfDayTimestamp(date: String): LocalDateTime {
+        return LocalDate.parse(date).atTime(LocalTime.MAX)
     }
 }
