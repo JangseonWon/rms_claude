@@ -1,18 +1,18 @@
 'use client';
 
-import style from './noticePage.module.css';
+import style from './faqPage.module.css';
 import {usePathname, useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import React, {useCallback, useEffect, useState} from "react";
 import {faFile, faFilePdf, faImage} from "@fortawesome/free-regular-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Post} from "@/model/Post";
-import {getPostByPostId} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/getPostByPostId";
-import {getPostFile} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/getPostFile";
+import {getPostByPostId} from "@/app/(afterLogin)/qna/[id]/_api/getPostByPostId";
+import {getPostFile} from "@/app/(afterLogin)/qna/[id]/_api/getPostFile";
 import {PostFile} from "@/model/PostFile";
 import {faArrowLeft} from "@fortawesome/free-solid-svg-icons";
 
-export default function NoticePage() {
+export default function FaqPage() {
     const [postData, setPostData] = useState<Post>();
     const route = useRouter();
     const {data: session} = useSession();
@@ -92,7 +92,7 @@ export default function NoticePage() {
     return (
         <div className={style.container}>
             <section className={style.titleContainer}>
-                <h1 className={style.headTitle}>Notice</h1>
+                <h1 className={style.headTitle}>FAQ</h1>
                 <FontAwesomeIcon className={style.backButton} icon={faArrowLeft} onClick={() => route.back()}/>
             </section>
             <section className={style.titleContainer}>

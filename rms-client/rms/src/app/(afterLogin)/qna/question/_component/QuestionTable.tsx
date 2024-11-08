@@ -1,7 +1,7 @@
 "use client"
 
 import React, {useCallback, useEffect, useState} from "react";
-import style from "@/css/qnaTable.module.css";
+import style from "@/css/qna/qnaTable.module.css";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
@@ -96,8 +96,8 @@ export default function QuestionTable() {
         });
     };
 
-    const handleRowClick = async (post: Post, userId: string) => {
-        router.push(`/qna/${userId}/${post.id}`);
+    const handleRowClick = async (post: Post) => {
+        router.push(`/qna/${post.id}`);
     };
 
     const qnaButtonClick = () => {
@@ -171,7 +171,7 @@ export default function QuestionTable() {
                     </thead>
                     <tbody>
                     {postData && postData.length > 0 && postData.map((row, rowIndex) => (
-                        <tr key={rowIndex} onClick={() => handleRowClick(row, row.user?.id!)}>
+                        <tr key={rowIndex} onClick={() => handleRowClick(row)}>
                             <td>
                                 {rowIndex + 1}
                             </td>

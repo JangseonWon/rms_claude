@@ -1,13 +1,13 @@
-import style from '@/css/qna/qnaPage.module.css';
+import style from './page.module.css';
 import React from "react";
-import QnaWritingPage from "@/app/(afterLogin)/qna/_component/QnaWritingPage";
+import NoticePage from "@/app/(afterLogin)/qna/notice/[id]/_component/NoticePage";
 
 export default async function Page() {
 
     return(
         <div className={style.container}>
             <div className={style.innerBody}>
-                <QnaWritingPage category={'Q&A'}/>
+                <NoticePage/>
             </div>
         </div>
     )

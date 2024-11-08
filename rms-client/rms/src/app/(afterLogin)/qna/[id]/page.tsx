@@ -1,13 +1,12 @@
 import style from './page.module.css';
 import React from "react";
-import FaqPage from "@/app/(afterLogin)/qna/faq/[userId]/[id]/_component/FaqPage";
+import Answer from "@/app/(afterLogin)/qna/[id]/_component/Answer";
 
 export default async function Page() {
-
     return(
         <div className={style.container}>
             <div className={style.innerBody}>
-                <FaqPage/>
+                <Answer/>
             </div>
         </div>
     )

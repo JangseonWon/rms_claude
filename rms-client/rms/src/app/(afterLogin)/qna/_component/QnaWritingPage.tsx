@@ -20,7 +20,11 @@ import {
     renderFileIcon
 } from "@/app/(afterLogin)/qna/_component/QnaUtils";
 
-export default function Question() {
+interface QnaWritingPageProps {
+    category: string;
+}
+
+export default function QnaWritingPage({ category }: QnaWritingPageProps) {
     const route = useRouter();
     const { data: session } = useSession();
     const [title, setTitle] = useState('');
@@ -28,6 +32,19 @@ export default function Question() {
     const [isLoading, setIsLoading] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [dragging, setDragging] = useState(false);
+
+    const categoryUUID = (category: string) => {
+        switch (category) {
+            case 'Notice':
+                return 'ee5ad4e1-0314-408e-ab2d-f426a89f06ce';
+            case 'FAQ':
+                return 'ba2dbeb5-dc7d-470b-ad88-2e5b68ca4432';
+            case 'Q&A':
+                return 'adfe53d3-a816-44ed-a318-7f33d7965614';
+            default :
+                return 'adfe53d3-a816-44ed-a318-7f33d7965614';
+        }
+    };
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -51,7 +68,7 @@ export default function Question() {
                 const postData: Post = {
                     title: title,
                     post_category: {
-                        id: 'adfe53d3-a816-44ed-a318-7f33d7965614'
+                        id: categoryUUID(category)
                     },
                     content: content
                 };
@@ -70,7 +87,7 @@ export default function Question() {
         <div className={style.container}>
             {isLoading && <QnaLoading/>}
             <section className={style.headerContainer}>
-                <h1 className={style.headTitle}>Q&A</h1>
+                <h1 className={style.headTitle}>{category}</h1>
                 <FontAwesomeIcon className={style.backButton} icon={faArrowLeft} onClick={() => route.back()}/>
             </section>
             <section className={style.buttonContainer}>

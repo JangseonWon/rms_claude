@@ -1,31 +1,20 @@
 'use client';
 
 import answerStyle from './answer.module.css';
-import style from "@/css/qnaPost.module.css";
+import style from "@/css/qna/qnaPost.module.css";
 import {usePathname, useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import React, {ChangeEvent, useCallback, useEffect, useState} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Post} from "@/model/Post";
-import {getPostByPostId} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/getPostByPostId";
-import {putComment} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/putComment";
-import {
-    faArrowLeft,
-    faFile,
-    faFileAlt,
-    faFileExcel,
-    faFileImage,
-    faFilePdf,
-    faFilePowerpoint,
-    faFileWord,
-    faFileZipper,
-    faXmark
-} from "@fortawesome/free-solid-svg-icons";
-import {deleteCommentById} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/deleteCommentById";
-import {deletePostById} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/deletePostById";
-import {getPostFile} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/getPostFile";
-import {updatePost} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/updatePost";
-import {deletePostFileById} from "@/app/(afterLogin)/qna/[userId]/[id]/_api/deletePostFileById";
+import {getPostByPostId} from "@/app/(afterLogin)/qna/[id]/_api/getPostByPostId";
+import {putComment} from "@/app/(afterLogin)/qna/[id]/_api/putComment";
+import {faArrowLeft, faXmark} from "@fortawesome/free-solid-svg-icons";
+import {deleteCommentById} from "@/app/(afterLogin)/qna/[id]/_api/deleteCommentById";
+import {deletePostById} from "@/app/(afterLogin)/qna/[id]/_api/deletePostById";
+import {getPostFile} from "@/app/(afterLogin)/qna/[id]/_api/getPostFile";
+import {updatePost} from "@/app/(afterLogin)/qna/[id]/_api/updatePost";
+import {deletePostFileById} from "@/app/(afterLogin)/qna/[id]/_api/deletePostFileById";
 import QnaLoading from "@/app/(afterLogin)/qna/_component/QnaLoading";
 import {PostFile} from "@/model/PostFile";
 import {Role} from "@/model/Role";
