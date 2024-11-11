@@ -42,5 +42,7 @@ data class User(
     @OneToMany(mappedBy = "userId")
     val posts: List<Post>,
     @OneToMany(mappedBy = "userId")
-    val comments: List<Comment>
+    val comments: List<Comment>,
+    @OneToMany(mappedBy = "userId")
+    val postRead: List<PostRead>
     )

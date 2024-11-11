@@ -8,8 +8,9 @@ import java.util.*
 @Table(schema = "rms_dev", name = "post")
 data class Post(
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    val id: UUID,
+    val id: Long,
     @Column(name = "title", length = 255, nullable = false)
     val title: String,
     @Column(name = "content", columnDefinition = "TEXT")
@@ -18,8 +19,6 @@ data class Post(
     val createAt: LocalDateTime,
     @Column(name = "last_modify_at", nullable = false)
     val lastModifyAt: LocalDateTime,
-    @Column(name = "read", nullable = false)
-    val read: Boolean,
 
     @ManyToOne
     @JoinColumn(name = "user_id", insertable = false, updatable = false, nullable = false)
@@ -31,5 +30,7 @@ data class Post(
     @OneToMany(mappedBy = "postId")
     val postFile: List<PostFile>,
     @OneToMany(mappedBy = "postId")
-    val comments: List<Comment>
+    val comments: List<Comment>,
+    @OneToMany(mappedBy = "postId")
+    val postRead: List<PostRead>
 )
