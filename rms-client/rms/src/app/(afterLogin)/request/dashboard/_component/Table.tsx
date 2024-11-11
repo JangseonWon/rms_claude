@@ -187,6 +187,9 @@ export default function Table() {
 
     return (
         <div className={style.container}>
+            <div style={{float: "right"}}>
+                <DownloadExcelButton requestData={requestData} status={status} />
+            </div>
             <div className={style.filterContainer}>
                 <div className={style.filterContainerRight}>
                     <DatePickerRangeBox
@@ -195,7 +198,7 @@ export default function Table() {
                             addDateFilter(from, to);
                         }}/>
                     <SelectBox
-                        width={"7vw"}
+                        width={"10vw"}
                         value={status}
                         options={statusList}
                         label={"status"}
@@ -208,7 +211,6 @@ export default function Table() {
                         onClick={handleReset}/>
                 </div>
                 <div className={style.filterContainerLeft}>
-                    <DownloadExcelButton requestData={requestData} status={status} />
                     <SelectBox
                         width={'155px'}
                         value={selectOption.name}

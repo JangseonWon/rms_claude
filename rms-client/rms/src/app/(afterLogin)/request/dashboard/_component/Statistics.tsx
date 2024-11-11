@@ -7,10 +7,12 @@ import type {Statistics} from "@/model/Statistics";
 import Loading from "@/app/(afterLogin)/_component/Loading";
 import {useSetStatus} from "@/app/(afterLogin)/request/dashboard/store/useStatusStore";
 import {Status} from "@/model/Status";
+import {useRouter} from "next/navigation";
 
 export default function Statistics() {
     const [statisticsData, setStatisticsData] = useState<Statistics>()
     const setStatus = useSetStatus();
+    const router = useRouter();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -38,6 +40,10 @@ export default function Statistics() {
         { label: "Completed", value: statisticsData?.completed, status: Status.COMPLETED },
     ];
 
+    const handleLearnMoreClick = (status: Status) => {
+        // router.push(`/dashboard/${status}`);
+    };
+
     return (
         <div className={style.container}>
             <div className={style.titleContainer}>
@@ -54,6 +60,15 @@ export default function Statistics() {
                         <div className={style.cardLabel}>{card.label}</div>
                         <div className={style.cardValue}>
                             {card.value !== undefined ? card.value : <Loading/>}
+                        </div>
+                        <div
+                            className={style.learnMoreBox}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleLearnMoreClick(card.status);
+                            }}
+                        >
+                            <span className={style.learnMore}>Learn more</span>
                         </div>
                     </div>
                 ))}
