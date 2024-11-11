@@ -13,5 +13,6 @@ export interface Post {
     user?: User;
     post_category?: PostCategory;
     post_files?: PostFile[];
-    comments?: Comment[]
+    comments?: Comment[];
+    comment_count?: number;
 }

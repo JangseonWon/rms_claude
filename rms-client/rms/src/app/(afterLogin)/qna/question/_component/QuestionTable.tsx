@@ -180,6 +180,7 @@ export default function QuestionTable() {
                             </td>
                             <td className={style.newAndComment}>
                                 <FontAwesomeIcon className={style.commentIcon} icon={faComment}/>
+                                {row.comment_count}
                             </td>
                             <td>{row.user?.name}</td>
                             <td>{row.create_at ? format(new Date(row.create_at), "dd-MMM-yyyy") : '-'}</td>
