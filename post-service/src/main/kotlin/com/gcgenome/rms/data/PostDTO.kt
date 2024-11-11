@@ -32,5 +32,7 @@ data class PostDTO(
     @JsonProperty("comments")
     var comments: List<CommentDTO>? = null,
     @JsonProperty("post_files")
-    var postFiles: List<PostFileDTO>? = null
+    var postFiles: List<PostFileDTO>? = null,
+    @JsonProperty("comment_count")
+    var commentCount: Int? = null,
 )

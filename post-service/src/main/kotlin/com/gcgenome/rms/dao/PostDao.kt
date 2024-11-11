@@ -47,6 +47,10 @@ interface PostDao: QueryDao{
                     key("create_at").value(USER.CREATE_AT)
                 )
             ).`as`("user"),
+            selectCount()
+                .from(COMMENT)
+                .where(COMMENT.POST_ID.eq(POST.ID))
+                .asField("comment_count")
         )
         val where = POST_CATEGORY.NAME.eq(category)
 
