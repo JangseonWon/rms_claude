@@ -19,28 +19,30 @@ import {putAlisServices} from "@/app/(afterLogin)/request/management/service/_ap
 interface ServiceWithSelected extends Service {
     isSelected?: boolean;
 }
+const selectBoxOptions: SelectBoxOption[] = [
+    { table: "service", column: "id", name: "Code" },
+    { table: "service", column: "name_kr", name: "Name(KR)" },
+    { table: "service", column: "name", name: "Name(EN)" },
+    { table: "category", column: "name", name: "Category Name" },
+];
 
 export default function ServiceManageTable() {
     const [services, setServices] = useState<ServiceWithSelected[]>([]);
     const [totalPage, setTotalPage] = useState<number>(0);
     const [search, setSearch] = useState<Query>({sort_by:"id", asc: true, size:10, page:1});
-    const [selectOption, setSelectOption] = useState<SelectBoxOption>({ table: "service", column: "id", name: "Service Id" });
+    const [selectOption, setSelectOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
     const [serviceModalOpen, setServiceModalOpen] = useState<boolean>(false);
     const [selectedService, setSelectedService] = useState<Service>();
-
-    const selectBoxOptions: SelectBoxOption[] = [
-        { table: "service", column: "id", name: "Service Id" },
-        { table: "service", column: "name", name: "Service Name" },
-        { table: "category", column: "name", name: "Category Name" },
-    ];
 
     const handleServiceEditClick = (service: Service) => {
         setSelectedService(service);
         setServiceModalOpen(true);
+        document.body.style.overflow = 'hidden';
     }
     const closeModal = () => {
         setSelectedService(undefined);
         setServiceModalOpen(false);
+        document.body.style.overflow = 'auto';
     }
     const refreshData = () => {
         fetchData(search);
@@ -66,7 +68,6 @@ export default function ServiceManageTable() {
             ...prevSearch,
             filter_groups:[
                 {
-                    condition_type: "OR",
                     filters: [
                         {
                             table: option.table!,
@@ -145,20 +146,22 @@ export default function ServiceManageTable() {
                 <table className={style.table}>
                     <thead>
                     <tr>
-                        <th>Id</th>
-                        <th>Name</th>
+                        <th>Code</th>
+                        <th>Name(KR)</th>
+                        <th>Name(EN)</th>
                         <th>Category Name</th>
                         <th>Edit</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {services && services.length > 0 && services.map((row, rowIndex) => (
+                    {services && services.length > 0 && services.map((service, rowIndex) => (
                         <tr key={rowIndex}>
-                            <td>{row.id}</td>
-                            <td>{row.name}</td>
-                            <td>{row.category?.name}</td>
+                            <td>{service.id}</td>
+                            <td>{service.name_kr}</td>
+                            <td>{service.name}</td>
+                            <td>{service.category?.name}</td>
                             <td>
-                                <RectangleButton name={'Edit'} onClick={() => handleServiceEditClick(row)}/>
+                                <RectangleButton name={'Edit'} onClick={() => handleServiceEditClick(service)}/>
                             </td>
                         </tr>
                     ))}

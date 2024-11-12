@@ -33,7 +33,7 @@ export default function InputBox({label, value, disabled=false, onChange, requir
 
     return (
         <div className={`${style.inputBox} ${hasError ? style.error : ""}`}>
-            <p className={style.label}>{label}</p>
+            <p>{label}</p>
             <input
                 type={type}
                 value={inputValue}

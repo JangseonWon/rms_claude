@@ -3,139 +3,114 @@
     background-color: rgba(128, 128, 128, 0.16);
     justify-content: center;
     position: absolute;
-    top: 8vh;
+    top: 0;
     left: 0;
     right: 0;
     bottom: 0;
+    overflow-y: auto;
 }
 .modal {
+    display: flex;
     background: rgb(255, 255, 255);
-    border: solid #f0f0f0 2px;
     position: relative;
-    top: 10%;
-    height: 70vh;
-    min-width: 50vw;
+    top: 130px;
+    height: 600px;
     border-radius: 16px;
-    display: flex;
     flex-direction: column;
+    padding: 20px 40px;
 }
-.modalTop {
-    padding: 1vh 2vw;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+.modalTitle {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #1e2c5b;
 }
-.modalClose {
-    padding-top: 1vh;
-    padding-right: 1vw;
-    float: right;
-}
-.modalClose:hover {
+.modalCloseButton {
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    top: 15px;
+    right: 15px;
     cursor: pointer;
-}
-.modalHeader {
-    border-radius: 16px 16px 0 0;
-    position: sticky;
-    top: 0;
-    background-color: white;
-    z-index: 10;
-    border-bottom: solid #C8C9CB 2px;
 }
 .modalBody {
     display: flex;
     flex-direction: column;
     margin-bottom: 3vh;
 }
-.topBody {
-    margin: 3vh 4vw;
+.formGroup {
     display: flex;
-    gap: 5%;
+    gap: 20px;
+    padding: 10px 0;
 }
-.bottomBody {
+.buttonGroup {
     display: flex;
-    margin: 0 4vw 1vh 4vw;
-    gap: 5%;
+    padding: 10px 0;
+    justify-content: flex-end
 }
-.leftBody {
+.contentGroup {
+    display: flex;
+    gap: 20px;
+}
+.content {
     border: solid #C8C9CB 1px;
     border-radius: 15px;
-    min-width: 20vw;
-    min-height: 46vh;
-    max-height: 46vh;
+    width: 460px;
+    height: 400px;
+    padding: 10px;
     overflow-y: auto;
 }
-.rightBody {
-    border: solid #C8C9CB 1px;
-    border-radius: 15px;
-    min-width: 30vw;
-    min-height: 46vh;
-    max-height: 46vh;
-    overflow: hidden;
+.contentTitle {
+    font-size: 20px;
+    font-weight: bold;
 }
-.innerBody {
-    max-height: 100%;
-    margin-right: 0.3vw;
-    overflow-y: auto;
-}
-.categoryBox {
-    width: 10vw;
-}
-.typeAndExtension {
-    margin: 3vh 3vw;
-}
-.AddContainer {
+.contentFormGroup {
     display: flex;
-    gap: 10%;
+    gap: 20px;
+    justify-content: flex-end
 }
 .required {
     width: 5vw !important;
 }
-.innerBody::-webkit-scrollbar {
-    width: 5px;
-}
-.innerBody::-webkit-scrollbar-thumb {
-    background-color: #859fbf;
-    border-radius: 15px;
-}
-.innerBody::-webkit-scrollbar-track {
-    background-color: #ffffff;
-    border: solid grey thin;
-    border-radius: 15px;
-}
-.title {
-    font-size: 1.5vw;
-}
 .table {
-    background-color: #f8f8f8;
     width: 100%;
     border-collapse: collapse;
 }
 .table thead {
-    background-color: #002b49;
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    font-size: 12px;
     color: #ffffff;
-    font-size: 0.7vw;
-    font-weight: 600;
 }
-.table thead tr th:first-child {
-    border-radius: 20px 0 0 20px;
+.table thead th{
+    background-color: #002b49;
 }
-.table thead tr th:last-child {
-    border-radius: 0 20px 20px 0;
+.table thead th:first-child {
+    border-top-left-radius: 15px;
+}
+.table thead th:last-child {
+    border-top-right-radius: 15px;
 }
 .table tbody {
-    font-weight: 300;
+    display: block;
+    height: 250px;
+    overflow-y: auto;
 }
 .table tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
     border-bottom: 1px solid #838689;
 }
 .table tbody tr td {
     color: #666666;
-    font-size: 0.7vw;
-    padding: 10px;
+    font-size: 12px;
 }
 .table th,
 .table td {
-    padding: 0.6vh 0.6vw;
+    padding: 8px;
     text-align: center;
 }
 .addButton {

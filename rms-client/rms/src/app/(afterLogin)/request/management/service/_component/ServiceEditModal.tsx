@@ -10,13 +10,11 @@ import {Categories} from "@/model/Categories";
 import {getCategories} from "@/app/(afterLogin)/request/management/service/_api/getCategories";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import SelectSearchBox from "@/app/(afterLogin)/request/management/_component/SelectSearchBox";
-import {postSampleType} from "@/app/(afterLogin)/request/management/service/_api/postSampleType";
-import {putExtensions} from "@/app/(afterLogin)/request/management/service/_api/putExtensions";
-import {deleteSampleType} from "@/app/(afterLogin)/request/management/service/_api/deleteSampleType";
-import {deleteExtension} from "@/app/(afterLogin)/request/management/service/_api/deleteExtension";
-import {patchService} from "@/app/(afterLogin)/request/management/service/_api/patchService";
 import {Service} from "@/model/Service";
 import {getService} from "@/app/(afterLogin)/_api/getService";
+import GreenButton from "@/app/_component/GreenButton";
+import BlueButton from "@/app/_component/BlueButton";
+import {patchService} from "@/app/(afterLogin)/request/management/service/_api/patchService";
 
 
 type Props = {
@@ -24,20 +22,18 @@ type Props = {
     closeModal: () => void;
     refreshData: () => void;
 }
+const requiredOption = [
+    {name: "False", value: false},
+    {name: "True", value: true}
+]
 
 export default function ServiceEditModal({serviceId, closeModal, refreshData}: Props) {
-    const [selectedCategoryName, setSelectedCategoryName] = useState<string>();
-    const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
     const [service, setService] = useState<Service>();
     const [categories, setCategories] = useState<SelectBoxOption[]>([]);
-    const [required, setRequired] = useState<boolean>(false);
+    const [required, setRequired] = useState<SelectBoxOption>(requiredOption[0]);
     const [selectedSampleType, setSelectedSampleType] = useState<SelectBoxOption | null>(null);
     const [selectedExtension, setSelectedExtension] = useState<SelectBoxOption | null>(null);
 
-    const requiredOption = [
-        {name: "True", value: true},
-        {name: "False", value: false}
-    ]
 
     const transformCategoryToOptions = (data: Categories[]): SelectBoxOption[] => {
         return data.map(value => ({
@@ -58,183 +54,219 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
         const data = await response.json();
         setCategories(transformCategoryToOptions(data as Categories[]));
     }
+    const updateService = async () => {
+        const response = await patchService(service!);
+        if (response.ok) {
+            alert("Update successful")
+            closeModal()
+            refreshData()
+        }
+        else alert("Fail update")
+    }
     useEffect(() => {
         fetchCategoryData();
-        fetchServiceData(serviceId)
-            .then((service) => setSelectedCategoryName(service.category?.name)
-        )
+        fetchServiceData(serviceId);
     }, []);
-    const handleServiceCategoryChangeClick = async () => {
-        if (service && selectedCategoryId) {
-            const serviceData : Service = {id: service.id, category_id: selectedCategoryId};
-            await patchService(serviceData);
-            refreshData();
-        }
-    }
 
     const handleSampleTypeAddClick = async () => {
-        if (selectedSampleType && service) {
-            const sampleTypeData = {service_id : service.id, sample_type_id: selectedSampleType?.value};
-            await postSampleType(sampleTypeData);
-        }
+        setService((prev) => {
+            const isAlreadyAdded = prev?.sample_types?.some(
+                (sampleType) => sampleType.id === selectedSampleType?.value
+            );
+            if (isAlreadyAdded) {
+                alert("이미 등록되었습니다.")
+                return prev;
+            }
+            return {
+                ...prev,
+                sample_types: [
+                    ...(prev?.sample_types || []),
+                    {
+                        id: selectedSampleType?.value,
+                        name: selectedSampleType?.name
+                    }
+                ]
+            };
+        });
     }
 
     const handleSampleTypeDeleteClick = async (sampleTypeId: string) => {
-        if (service) {
-            await deleteSampleType(service.id, sampleTypeId);
-        }
-    }
+        setService((prev) => {
+            return {
+                ...prev,
+                sample_types: (prev?.sample_types || []).filter(
+                    (sampleType) => sampleType.id !== sampleTypeId
+                )
+            };
+        });
+    };
 
     const handleExtensionAddClick = async () => {
-        if (selectedExtension && service) {
-            const extensionData = {service_id : service.id, extension_id: selectedExtension?.value, required: required};
-            await putExtensions(extensionData);
-        }
+        setService((prev) => {
+            const isAlreadyAdded = prev?.extensions?.some(
+                (extension) => extension.id === selectedExtension?.value
+            );
+            if (isAlreadyAdded) {
+                alert("이미 등록되었습니다.")
+                return prev;
+            }
+            return {
+                ...prev,
+                extensions: [
+                    ...(prev?.extensions || [] ),
+                    {
+                        id: selectedExtension?.value,
+                        name: selectedExtension?.name,
+                        required: required.value
+                    }
+                ]
+            };
+        });
     }
 
     const handleExtensionDeleteClick = async (extensionId: string) => {
-        if (service) {
-            await deleteExtension(service.id, extensionId);
-        }
-    }
-
-    const handleSelectRequiredChange = (value: boolean) => {
-        setRequired(value);
+        setService((prev) => {
+            return {
+                ...prev,
+                extensions: (prev?.extensions || []).filter(
+                    (extension) => extension.id !== extensionId
+                )
+            };
+        });
     }
 
     return (
         <div className={style.modalBackground}>
             <div className={style.modal}>
-                <section className={style.modalHeader}>
-                    <div className={style.modalClose} onClick={closeModal}>
-                        <FontAwesomeIcon icon={faXmark}/>
-                    </div>
-                    <div className={style.modalTop}>
-                        <div className={style.title}>
-                            Edit Service
-                        </div>
-                    </div>
-                </section>
-                <section className={style.modalBody}>
-                    <section className={style.topBody}>
-                        <InputBox
-                            label={"Service Id"}
-                            value={service?.id}
-                            disabled={true}
-                            type="categoryName"
-                        />
-                        <InputBox
-                            label={"Service Name"}
-                            value={service?.name}
-                            disabled={true}
-                            type="categoryName"
-                        />
-                        <div className={style.categoryBox}>
-                            <SelectBox
-                                label={"Category Name"}
-                                value={selectedCategoryName}
-                                options={categories}
-                                onChange={(value) => {
-                                    setSelectedCategoryName(value.name!);
-                                    setSelectedCategoryId(value.value);
-                                }}
+                <FontAwesomeIcon icon={faXmark} onClick={closeModal} className={style.modalCloseButton}/>
+                <div className={style.modalTitle}>Service Management</div>
+                <div className={style.formGroup}>
+                    <InputBox
+                        label={"Code"}
+                        value={service?.id}
+                        disabled={true}
+                    />
+                    <InputBox
+                        label={"Name(KR)"}
+                        value={service?.name_kr}
+                        disabled={true}
+                    />
+                    <InputBox
+                        label={"Name(EN)"}
+                        value={service?.name}
+                        disabled={false}
+                        onChange={(value) => {
+                            setService((prev) => ({
+                                ...prev,
+                                name: value
+                            }))
+                        }}
+                    />
+                    <SelectBox
+                        width={'200px'}
+                        label={"Category Name"}
+                        value={service?.category?.name}
+                        options={categories}
+                        onChange={(value) => {
+                            setService((prev) => ({
+                                ...prev,
+                                category: {
+                                    id: value.value,
+                                    name: value.name
+                                }
+                            }))
+                        }}
+                    />
+                </div>
+                <div className={style.contentGroup}>
+                    <div className={style.content}>
+                        <div className={style.contentTitle}>Sample Type</div>
+                        <div className={style.contentFormGroup}>
+                            <SelectSearchBox
+                                type={'sampleType'}
+                                onSelect={setSelectedSampleType}
+                                width={'11vw'}
                             />
+                            <button className={style.addButton} onClick={() => handleSampleTypeAddClick()}>Add</button>
                         </div>
-                        <button className={style.addButton}
-                                onClick={() => handleServiceCategoryChangeClick()}
-                        >
-                            Category Change
-                        </button>
-                    </section>
-                    <section className={style.bottomBody}>
-                        <div className={style.leftBody}>
-                            <div className={style.innerBody}>
-                                <div className={style.typeAndExtension}>
-                                    <div className={style.AddContainer}>
-                                        <SelectSearchBox type={'sampleType'} onSelect={setSelectedSampleType} width={'11vw'}/>
-                                        <button className={style.addButton}
-                                                onClick={()=> handleSampleTypeAddClick()}
-                                        >
-                                            Add
-                                        </button>
-                                    </div>
-                                    <h2>Sample Type</h2>
-                                    <table className={style.table}>
-                                        <thead>
-                                        <tr>
-                                            <th>Code</th>
-                                            <th>Name</th>
-                                            <th>Delete</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        {service?.sample_types?.map((sampleType, index) => (
-                                            <tr key={index}>
-                                                <td>{sampleType.id}</td>
-                                                <td>{sampleType.name}</td>
-                                                <td>
-                                                    <FontAwesomeIcon
-                                                        className={style.deleteButton}
-                                                        icon={faTrash}
-                                                        onClick={() => handleSampleTypeDeleteClick(sampleType.id)}
-                                                    />
-                                                </td>
-                                            </tr>
-                                        ))}
-                                        </tbody>
-                                    </table>
-                                </div>
+                        <table className={style.table}>
+                            <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>Delete</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {service?.sample_types?.map((sampleType, index) => (
+                                <tr key={index}>
+                                    <td>{sampleType.id}</td>
+                                    <td>{sampleType.name}</td>
+                                    <td>
+                                        <FontAwesomeIcon
+                                            className={style.deleteButton}
+                                            icon={faTrash}
+                                            onClick={() => handleSampleTypeDeleteClick(sampleType.id)}
+                                        />
+                                    </td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div className={style.content}>
+                        <div className={style.contentTitle}>Extension</div>
+                        <div className={style.contentFormGroup}>
+                            <SelectSearchBox type={'extension'} onSelect={setSelectedExtension} width={'11vw'}/>
+                            <div>
+                                <SelectBox
+                                    value={required.name}
+                                    options={requiredOption}
+                                    label={"required"}
+                                    onChange={(selectedOption) => {
+                                        setRequired(
+                                            {
+                                                name: selectedOption.name,
+                                                value: selectedOption.value
+                                            } as SelectBoxOption
+                                        )
+                                    }}
+                                />
                             </div>
+                            <button className={style.addButton} onClick={() => handleExtensionAddClick()}>Add</button>
                         </div>
-                        <div className={style.rightBody}>
-                            <div className={style.innerBody}>
-                                <div className={style.typeAndExtension}>
-                                    <div className={style.AddContainer}>
-                                        <SelectSearchBox type={'extension'} onSelect={setSelectedExtension} width={'11vw'}/>
-                                        <div className={style.required}>
-                                            <SelectBox value={required ? "True" : "False"} options={requiredOption} label={"required"} onChange={(selectedOption) => {
-                                                handleSelectRequiredChange(selectedOption.value);
-                                            }}/>
-                                        </div>
-                                        <button
-                                            className={style.addButton}
-                                            onClick={()=> handleExtensionAddClick()}
-                                        >
-                                            Add
-                                        </button>
-                                    </div>
-                                    <h2>Extension</h2>
-                                    <table className={style.table}>
-                                        <thead>
-                                        <tr>
-                                            <th>Code</th>
-                                            <th>Name</th>
-                                            <th>Required</th>
-                                            <th>Delete</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        {service?.extensions?.map((extension, index) => (
-                                            <tr key={index}>
-                                                <td>{extension.id}</td>
-                                                <td>{extension.name}</td>
-                                                <td>{extension.required ? "Yes" : "No"}</td>
-                                                <td>
-                                                    <FontAwesomeIcon
-                                                        className={style.deleteButton}
-                                                        icon={faTrash}
-                                                        onClick={() => handleExtensionDeleteClick(extension.id!)}
-                                                    />
-                                                </td>
-                                            </tr>
-                                        ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                </section>
+                        <table className={style.table}>
+                            <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>Required</th>
+                                <th>Delete</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {service?.extensions?.map((extension, index) => (
+                                <tr key={index}>
+                                    <td>{extension.id}</td>
+                                    <td>{extension.name}</td>
+                                    <td>{extension.required ? "Yes" : "No"}</td>
+                                    <td>
+                                        <FontAwesomeIcon
+                                            className={style.deleteButton}
+                                            icon={faTrash}
+                                            onClick={() => handleExtensionDeleteClick(extension.id!)}
+                                        />
+                                    </td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div className={style.buttonGroup}>
+                    <GreenButton name={"Cancel"} onClick={closeModal}/>
+                    <BlueButton name={'Confirm'} onClick={() => updateService()}/>
+                </div>
             </div>
         </div>
     )
