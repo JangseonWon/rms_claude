@@ -7,7 +7,7 @@ import reactor.core.publisher.Mono
 
 
 interface ServiceExtensionDao{
-    fun DSLContext.insertServiceExtensionByService(serviceExtension: ServiceExtensionDTO): Mono<ServiceExtensionDTO> {
+    fun DSLContext.insertServiceExtension(serviceExtension: ServiceExtensionDTO): Mono<ServiceExtensionDTO> {
         return Mono.from(
             insertInto(SERVICE_EXTENSION)
                 .set(SERVICE_EXTENSION.SERVICE_ID, serviceExtension.serviceId)
@@ -17,12 +17,10 @@ interface ServiceExtensionDao{
                 .returning()
         ).map { it.into(ServiceExtensionDTO::class.java) }
     }
-
-    fun DSLContext.deleteServiceExtensionById(serviceExtension: ServiceExtensionDTO): Mono<ServiceExtensionDTO> {
+    fun DSLContext.deleteServiceExtensionByServiceId(serviceId: String): Mono<ServiceExtensionDTO> {
         return Mono.from(
             deleteFrom(SERVICE_EXTENSION)
-                .where(SERVICE_EXTENSION.SERVICE_ID.eq(serviceExtension.serviceId)
-                    .and(SERVICE_EXTENSION.EXTENSION_ID.eq(serviceExtension.extensionId)))
+                .where(SERVICE_EXTENSION.SERVICE_ID.eq(serviceId))
                 .returning()
         ).map { it.into(ServiceExtensionDTO::class.java) }
     }

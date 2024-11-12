@@ -15,11 +15,10 @@ interface ServiceSampleTypeDao {
                 .returning()
         ).map { it.into(ServiceSampleTypeDTO::class.java) }
     }
-    fun DSLContext.deleteServiceSampleTypeById(serviceSampleType: ServiceSampleTypeDTO): Mono<ServiceSampleTypeDTO> {
+    fun DSLContext.deleteServiceSampleTypeByServiceId(serviceId: String): Mono<ServiceSampleTypeDTO> {
         return Mono.from(
             deleteFrom(SERVICE_SAMPLE_TYPE)
-                .where(SERVICE_SAMPLE_TYPE.SERVICE_ID.eq(serviceSampleType.serviceId)
-                    .and(SERVICE_SAMPLE_TYPE.SAMPLE_TYPE_ID.eq(serviceSampleType.sampleTypeId)))
+                .where(SERVICE_SAMPLE_TYPE.SERVICE_ID.eq(serviceId))
                 .returning()
         ).map { it.into(ServiceSampleTypeDTO::class.java) }
     }

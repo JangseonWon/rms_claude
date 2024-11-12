@@ -22,6 +22,7 @@ interface ServiceDao : QueryDao{
         val fields = listOf(
             SERVICE.ID.`as`("id"),
             SERVICE.NAME.`as`("name"),
+            SERVICE.NAME_KR.`as`("name_kr"),
             `when`(CATEGORY.ID.isNotNull,
                 jsonObject(
                     key("id").value(CATEGORY.ID),
@@ -59,6 +60,7 @@ interface ServiceDao : QueryDao{
             select(
                 SERVICE.ID.`as`("id"),
                 SERVICE.NAME.`as`("name"),
+                SERVICE.NAME_KR.`as`("name_kr"),
                 `when`(CATEGORY.ID.isNotNull,
                     jsonObject(
                         key("id").value(CATEGORY.ID),
@@ -98,7 +100,8 @@ interface ServiceDao : QueryDao{
     fun DSLContext.updateServiceById(service: ServiceDTO): Mono<ServiceDTO> {
         return Mono.from(
             update(SERVICE)
-                .set(SERVICE.CATEGORY_ID, service.category!!.id)
+                .set(SERVICE.CATEGORY_ID, service.category?.id)
+                .set(SERVICE.NAME, service.name)
                 .where(SERVICE.ID.eq(service.id))
                 .returning()
         ).map { it.into(ServiceDTO::class.java) }
