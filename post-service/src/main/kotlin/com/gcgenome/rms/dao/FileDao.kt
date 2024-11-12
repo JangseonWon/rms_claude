@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 interface FileDao {
-    fun DSLContext.getFileByPostId(postId: UUID): Mono<PostFile> {
+    fun DSLContext.getFileByPostId(postId: Long): Mono<PostFile> {
         return Mono.from(
             selectFrom(POST_FILE)
                 .where(POST_FILE.POST_ID.eq(postId))
@@ -35,7 +35,7 @@ interface FileDao {
         ).map { it.into(PostFile::class.java) }
     }
 
-    fun DSLContext.deleteFileByPostId(postId: UUID): Mono<PostFile> {
+    fun DSLContext.deleteFileByPostId(postId: Long): Mono<PostFile> {
         return Mono.from(
             deleteFrom(POST_FILE)
                 .where(POST_FILE.POST_ID.eq(postId))

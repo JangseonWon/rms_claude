@@ -4,15 +4,15 @@ import {PostFile} from "@/model/PostFile";
 import {Comment} from "@/model/Comment"
 
 export interface Post {
-    id?: string;
+    id?: number;
     title?: string;
     content?: string;
     create_at?: string;
     last_modify_at?: string;
-    read?: boolean;
     user?: User;
     post_category?: PostCategory;
     post_files?: PostFile[];
     comments?: Comment[];
     comment_count?: number;
+    read_at?: string;
 }

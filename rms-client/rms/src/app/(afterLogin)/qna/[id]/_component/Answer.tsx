@@ -74,7 +74,7 @@ export default function Answer() {
         }
     }
 
-    const deleteButtonClick = async (postId: string) => {
+    const deleteButtonClick = async (postId: number) => {
         const confirmed = window.confirm('Are you sure you want to delete it?');
         if (confirmed) {
             setIsLoading(true);
@@ -202,7 +202,7 @@ export default function Answer() {
             {isLoading && <QnaLoading/>}
             <section className={style.headerContainer}>
                 <h1 className={style.headTitle}>Q&A</h1>
-                <FontAwesomeIcon className={style.backButton} icon={faArrowLeft} onClick={() => route.back()}/>
+                <FontAwesomeIcon className={style.backButton} icon={faArrowLeft} onClick={() => route.push('/qna')}/>
             </section>
                 {writerCheck && (
                     <section className={style.buttonContainer}>

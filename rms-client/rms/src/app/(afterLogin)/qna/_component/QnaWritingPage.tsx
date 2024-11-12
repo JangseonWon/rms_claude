@@ -36,13 +36,13 @@ export default function QnaWritingPage({ category }: QnaWritingPageProps) {
     const categoryUUID = (category: string) => {
         switch (category) {
             case 'Notice':
-                return 'ee5ad4e1-0314-408e-ab2d-f426a89f06ce';
+                return '00a1b411-aa82-4b42-99b2-08ae520ea02c';
             case 'FAQ':
-                return 'ba2dbeb5-dc7d-470b-ad88-2e5b68ca4432';
+                return '99091154-51d9-45bd-8ab9-a04000fc7086';
             case 'Q&A':
-                return 'adfe53d3-a816-44ed-a318-7f33d7965614';
+                return '7a753daa-8cf1-46f5-ba08-54e6cbee10eb';
             default :
-                return 'adfe53d3-a816-44ed-a318-7f33d7965614';
+                return '7a753daa-8cf1-46f5-ba08-54e6cbee10eb';
         }
     };
 
@@ -88,7 +88,7 @@ export default function QnaWritingPage({ category }: QnaWritingPageProps) {
             {isLoading && <QnaLoading/>}
             <section className={style.headerContainer}>
                 <h1 className={style.headTitle}>{category}</h1>
-                <FontAwesomeIcon className={style.backButton} icon={faArrowLeft} onClick={() => route.back()}/>
+                <FontAwesomeIcon className={style.backButton} icon={faArrowLeft} onClick={() => route.push('/qna')}/>
             </section>
             <section className={style.buttonContainer}>
                 <BlueButton name={"POST"} onClick={addButtonClick}/>

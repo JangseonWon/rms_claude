@@ -26,7 +26,7 @@ class CommentRouter (
     }
 
     private fun insertPostComment(request: ServerRequest): Mono<ServerResponse> {
-        val postId = UUID.fromString(request.pathVariable("post-id"))
+        val postId = request.pathVariable("post-id").toLong()
         return Mono.zip(authenticationHandler.principal(request), request.bodyToMono(CommentDTO::class.java))
             .flatMap { serviceHandler.insertComment(it.t2.apply {
                 post = PostDTO(id = postId)

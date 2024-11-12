@@ -6,11 +6,10 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
 import java.time.LocalDateTime
-import java.util.*
 
 data class PostDTO(
     @JsonProperty("id")
-    var id: UUID? = null,
+    var id: Long? = null,
     @JsonProperty("title")
     var title: String? = null,
     @JsonProperty("content")
@@ -35,4 +34,6 @@ data class PostDTO(
     var postFiles: List<PostFileDTO>? = null,
     @JsonProperty("comment_count")
     var commentCount: Int? = null,
+    @JsonProperty("read_at")
+    var readAt: LocalDateTime? = null,
 )

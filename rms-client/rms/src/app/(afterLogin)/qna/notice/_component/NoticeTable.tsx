@@ -172,22 +172,29 @@ export default function NoticeTable() {
                     </tr>
                     </thead>
                     <tbody>
-                    {postData && postData.length > 0 && postData.map((row, rowIndex) => (
-                        <tr key={rowIndex} onClick={() => handleRowClick(row)}>
-                            <td>
-                                {rowIndex + 1}
-                            </td>
-                            <td className={style.titleTd}>
-                                {row.title}
-                            </td>
-                            <td className={style.newAndComment}>
-                                <FontAwesomeIcon className={style.commentIcon} icon={faComment}/>
-                                {row.comment_count}
-                            </td>
-                            <td>{row.user?.name}</td>
-                            <td>{row.create_at ? format(new Date(row.create_at), "dd-MMM-yyyy") : '-'}</td>
-                        </tr>
-                    ))}
+                    {postData && postData.length > 0 && postData.map((row, rowIndex) => {
+                        const isNew = row.create_at && (new Date().getTime() - new Date(row.create_at).getTime()) <= 7 * 24 * 60 * 60 * 1000;
+
+                        return (
+                            <tr key={rowIndex} onClick={() => handleRowClick(row)}>
+                                <td>
+                                    {row.id}
+                                </td>
+                                <td className={style.titleTd}>
+                                    <div className={style.titleText}>
+                                        {row.title}
+                                    </div>
+                                    {isNew && <span className={style.newBadge}>N</span>}
+                                </td>
+                                <td className={style.newAndComment}>
+                                    <FontAwesomeIcon className={style.commentIcon} icon={faComment}/>
+                                    {row.comment_count}
+                                </td>
+                                <td>{row.user?.name}</td>
+                                <td>{row.create_at ? format(new Date(row.create_at), "dd-MMM-yyyy") : '-'}</td>
+                            </tr>
+                        );
+                    })}
                     </tbody>
                 </table>
                 {session?.user.role !== 'USER' && (

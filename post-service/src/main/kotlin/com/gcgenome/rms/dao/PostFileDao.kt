@@ -33,7 +33,7 @@ interface PostFileDao {
                 .returning()
         ).map { it.into(PostFileDTO::class.java) }
     }
-    fun DSLContext.deletePostFileByPostId(postId: UUID): Flux<PostFileDTO> {
+    fun DSLContext.deletePostFileByPostId(postId: Long): Flux<PostFileDTO> {
         return Flux.from(
             deleteFrom(POST_FILE)
                 .where(POST_FILE.POST_ID.eq(postId))

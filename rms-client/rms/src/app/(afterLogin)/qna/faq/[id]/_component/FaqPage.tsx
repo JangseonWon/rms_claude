@@ -93,7 +93,7 @@ export default function FaqPage() {
         <div className={style.container}>
             <section className={style.titleContainer}>
                 <h1 className={style.headTitle}>FAQ</h1>
-                <FontAwesomeIcon className={style.backButton} icon={faArrowLeft} onClick={() => route.back()}/>
+                <FontAwesomeIcon className={style.backButton} icon={faArrowLeft} onClick={() => route.push('/qna')}/>
             </section>
             <section className={style.titleContainer}>
                 <div className={style.category}>

@@ -14,6 +14,7 @@ import SelectBox from "@/app/_component/SelectBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import {format} from "date-fns";
+import {putPostReadByUserId} from "@/app/(afterLogin)/qna/_api/putPostReadByUserId";
 
 export default function QuestionTable() {
     const router = useRouter();
@@ -97,6 +98,7 @@ export default function QuestionTable() {
     };
 
     const handleRowClick = async (post: Post) => {
+        await fetchPostRead(post.id!);
         router.push(`/qna/${post.id}`);
     };
 
@@ -127,6 +129,10 @@ export default function QuestionTable() {
         setPostData(responseData as Post[]);
         setTotalPage(totalPage);
     }, []);
+
+    const fetchPostRead = async (post_id: number) => {
+        await putPostReadByUserId(post_id);
+    }
 
     useEffect(() => {
         fetchData(search)
@@ -170,22 +176,28 @@ export default function QuestionTable() {
                     </tr>
                     </thead>
                     <tbody>
-                    {postData && postData.length > 0 && postData.map((row, rowIndex) => (
-                        <tr key={rowIndex} onClick={() => handleRowClick(row)}>
-                            <td>
-                                {rowIndex + 1}
-                            </td>
-                            <td className={style.titleTd}>
-                                {row.title}
-                            </td>
-                            <td className={style.newAndComment}>
-                                <FontAwesomeIcon className={style.commentIcon} icon={faComment}/>
-                                {row.comment_count}
-                            </td>
-                            <td>{row.user?.name}</td>
-                            <td>{row.create_at ? format(new Date(row.create_at), "dd-MMM-yyyy") : '-'}</td>
-                        </tr>
-                    ))}
+                    {postData && postData.length > 0 && postData.map((row, rowIndex) => {
+                        const isNew = !row.read_at;
+                        return (
+                            <tr key={rowIndex} onClick={() => handleRowClick(row)}>
+                                <td>
+                                    {row.id}
+                                </td>
+                                <td className={style.titleTd}>
+                                    <div className={style.titleText}>
+                                        {row.title}
+                                    </div>
+                                    {isNew && <span className={style.newBadge}>N</span>}
+                                </td>
+                                <td className={style.newAndComment}>
+                                    <FontAwesomeIcon className={style.commentIcon} icon={faComment}/>
+                                    {row.comment_count}
+                                </td>
+                                <td>{row.user?.name}</td>
+                                <td>{row.create_at ? format(new Date(row.create_at), "dd-MMM-yyyy") : '-'}</td>
+                            </tr>
+                        );
+                    })}
                     </tbody>
                 </table>
                 <button className={style.addButton} onClick={qnaButtonClick}>

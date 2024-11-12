@@ -17,7 +17,6 @@ import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.router
 import reactor.core.publisher.Mono
-import java.util.*
 
 @Configuration
 class PostRouter (
@@ -32,8 +31,8 @@ class PostRouter (
         PUT("/w-api/post-service/posts", ::insertPost)
         DELETE("/w-api/post-service/post/{post-id}", ::deletePost)
         PATCH("/w-api/post-service/post/{post-id}", ::updatePost)
-        /*PUT("/w-api/post-service/post/{post_id}", ::postIdCheckSwitch)
-        POST("/w-api/post-service/post/{post_id}/message/{category}", ::jandiWebHook)*/
+        PUT("/w-api/post-service/post/{post-id}", ::postReadByUser)
+        /*POST("/w-api/post-service/post/{post_id}/message/{category}", ::jandiWebHook)*/
     }
 
     private fun selectPosts(request: ServerRequest): Mono<ServerResponse> {
@@ -52,7 +51,7 @@ class PostRouter (
     }
 
     private fun selectPostById(request: ServerRequest): Mono<ServerResponse> {
-        val postId = UUID.fromString(request.pathVariable("post-id"))
+        val postId = request.pathVariable("post-id").toLong()
         return authenticationHandler.principal(request)
             .flatMap { serviceHandler.selectPost(postId, it) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), PostDTO::class.java) }
@@ -86,7 +85,7 @@ class PostRouter (
     }
 
     private fun updatePost(request: ServerRequest): Mono<ServerResponse> {
-        val postId = UUID.fromString(request.pathVariable("post-id"))
+        val postId = request.pathVariable("post-id").toLong()
         return request.multipartData()
             .flatMap { parts ->
                 val fileParts = parts["file"]?.filterIsInstance<FilePart>() ?: emptyList()
@@ -111,7 +110,7 @@ class PostRouter (
     }
 
     private fun deletePost(request: ServerRequest): Mono<ServerResponse> {
-        val postId = UUID.fromString(request.pathVariable("post-id"))
+        val postId = request.pathVariable("post-id").toLong()
         return authenticationHandler.principal(request)
             .flatMap { serviceHandler.deletePost(postId) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
@@ -120,19 +119,18 @@ class PostRouter (
             .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error: ${it.cause}") }
     }
 
-    private fun postIdCheckSwitch(request: ServerRequest): Mono<ServerResponse> {
-        val postId = UUID.fromString(request.pathVariable("post_id"))
+    private fun postReadByUser(request: ServerRequest): Mono<ServerResponse> {
+        val postId = request.pathVariable("post-id").toLong()
         return authenticationHandler.principal(request)
-            .flatMap { request.bodyToMono(Boolean::class.java) }
-            .flatMap { serviceHandler.postIdCheckSwitch(postId, it) }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(it) }
+            .flatMap { serviceHandler.postReadByUser(postId, it.user.id!!) }
+            .flatMap { ServerResponse.ok().build() }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
             .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
     }
 
     private fun jandiWebHook(request: ServerRequest): Mono<ServerResponse> {
-        val postId = UUID.fromString(request.pathVariable("post_id"))
+        val postId = request.pathVariable("post-id").toLong()
         val category = request.pathVariable("category")
         return authenticationHandler.principal(request)
             .flatMap { request.bodyToMono(JandiRequest::class.java) }

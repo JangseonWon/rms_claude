@@ -10,15 +10,15 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL.*
 import reactor.core.publisher.Mono
 import java.time.LocalDateTime
-import java.util.*
 
 
 interface PostDao: QueryDao{
 
-    fun DSLContext.selectPostsWithPage(query: Query, category: String): Mono<Page<PostDTO>> {
+    fun DSLContext.selectPostsWithPage(query: Query, category: String, userId: String): Mono<Page<PostDTO>> {
         val joins = listOf(
             QueryDao.JoinInfo(POST_CATEGORY, POST.POST_CATEGORY_ID.eq(POST_CATEGORY.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(USER, POST.USER_ID.eq(USER.ID), QueryDao.JoinType.LEFT),
+            QueryDao.JoinInfo(POST_READ, POST.ID.eq(POST_READ.POST_ID).and(POST_READ.USER_ID.eq(userId)), QueryDao.JoinType.LEFT),
         )
         val fields = listOf(
             POST.ID.`as`("id"),
@@ -26,7 +26,10 @@ interface PostDao: QueryDao{
             POST.CONTENT.`as`("content"),
             POST.CREATE_AT.`as`("create_at"),
             POST.LAST_MODIFY_AT.`as`("last_modify_at"),
-            POST.READ.`as`("read"),
+            POST_READ.READ_AT.`as`("read_at"),selectCount()
+                .from(COMMENT)
+                .where(COMMENT.POST_ID.eq(POST.ID))
+                .asField("comment_count"),
             `when`(POST_CATEGORY.ID.isNotNull,
                 jsonObject(
                     key("id").value(POST_CATEGORY.ID),
@@ -46,11 +49,7 @@ interface PostDao: QueryDao{
                     key("branch_name").value(USER.BRANCH_NAME),
                     key("create_at").value(USER.CREATE_AT)
                 )
-            ).`as`("user"),
-            selectCount()
-                .from(COMMENT)
-                .where(COMMENT.POST_ID.eq(POST.ID))
-                .asField("comment_count")
+            ).`as`("user")
         )
         val where = POST_CATEGORY.NAME.eq(category)
 
@@ -59,7 +58,7 @@ interface PostDao: QueryDao{
         }
     }
 
-    fun DSLContext.selectPostById(postId: UUID): Mono<PostDTO> {
+    fun DSLContext.selectPostById(postId: Long): Mono<PostDTO> {
         return Mono.from(
             select(
                 POST.ID,
@@ -67,7 +66,6 @@ interface PostDao: QueryDao{
                 POST.CONTENT,
                 POST.CREATE_AT,
                 POST.LAST_MODIFY_AT,
-                POST.READ,
                 field(
                     select(
                         jsonObject(
@@ -134,14 +132,12 @@ interface PostDao: QueryDao{
     fun DSLContext.insertPost(post: PostDTO): Mono<PostDTO> {
         return Mono.from(
             insertInto(POST)
-                .set(POST.ID, UUID.randomUUID())
                 .set(POST.TITLE, post.title)
                 .set(POST.CONTENT, post.content)
                 .set(POST.CREATE_AT, LocalDateTime.now())
                 .set(POST.LAST_MODIFY_AT, LocalDateTime.now())
                 .set(POST.POST_CATEGORY_ID, post.postCategory!!.id)
                 .set(POST.USER_ID, post.user!!.id)
-                .set(POST.READ, false)
                 .returning()
         ).map { it.into(PostDTO::class.java) }
     }
@@ -152,24 +148,14 @@ interface PostDao: QueryDao{
                 .set(POST.TITLE, post.title)
                 .set(POST.CONTENT, post.content)
                 .set(POST.LAST_MODIFY_AT, LocalDateTime.now())
-                .set(POST.READ, false)
                 .where(POST.ID.eq(post.id))
                 .returning()
         ).map { it.into(PostDTO::class.java) }
     }
 
-    fun DSLContext.deletePostByPostId(postId: UUID): Mono<Post> {
+    fun DSLContext.deletePostByPostId(postId: Long): Mono<Post> {
         return Mono.from(
             deleteFrom(POST).where(POST.ID.eq(postId))
-                .returning()
-        ).map { it.into(Post::class.java) }
-    }
-
-    fun DSLContext.readChangeByPostId(postId: UUID, new: Boolean): Mono<Post> {
-        return Mono.from(
-            update(POST)
-                .set(POST.READ, new)
-                .where(POST.ID.eq(postId))
                 .returning()
         ).map { it.into(Post::class.java) }
     }

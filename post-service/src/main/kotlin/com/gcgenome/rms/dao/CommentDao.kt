@@ -29,7 +29,7 @@ interface CommentDao {
         ).map { it.into(CommentDTO::class.java) }
     }
 
-    fun DSLContext.deleteCommentByPostId(postId: UUID): Mono<CommentDTO> {
+    fun DSLContext.deleteCommentByPostId(postId: Long): Mono<CommentDTO> {
         return Mono.from(
             deleteFrom(COMMENT)
                 .where(COMMENT.POST_ID.eq(postId))

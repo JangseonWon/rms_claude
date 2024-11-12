@@ -1,7 +1,8 @@
 .container {
     display: grid;
-    gap: 20px;
-    margin: 50px 60px;
+    gap: 10px;
+    margin: 30px 30px;
+    border-radius: 10px;
 }
 .userAndTitleContainer {
     justify-content: space-between;
