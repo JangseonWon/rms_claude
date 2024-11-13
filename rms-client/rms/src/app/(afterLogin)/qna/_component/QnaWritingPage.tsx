@@ -19,6 +19,7 @@ import {
     removeFile,
     renderFileIcon
 } from "@/app/(afterLogin)/qna/_component/QnaUtils";
+import {fetchSendToJandi} from "@/app/(afterLogin)/qna/_api/fetchSendToJandi";
 
 interface QnaWritingPageProps {
     category: string;
@@ -74,7 +75,7 @@ export default function QnaWritingPage({ category }: QnaWritingPageProps) {
                 };
 
                 await putPost(postData, selectedFiles)
-                //await fetchSendToJandi(session?.user.name!, postId, categoryName, postData);
+                await fetchSendToJandi(session?.user.name!,0 , 'qna', postData);
             } finally {
                 alert('Registered successfully.');
                 setIsLoading(false);

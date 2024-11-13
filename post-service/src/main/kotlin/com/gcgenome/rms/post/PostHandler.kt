@@ -144,17 +144,19 @@ class PostHandler(
 
     fun sendToJandi(postId: Long, category: String, jandiRequest: JandiRequest): Mono<Post> {
         val (connectColor, postCategory, comment) = when (category.lowercase()) {
-            "bug" -> Triple("#cd4855", "새로운 질문이 등록 되었습니다.", "")
-            "result" -> Triple("#007bff", "새로운 질문이 등록 되었습니다.", "")
-            "service" -> Triple("#28a745", "새로운 질문이 등록 되었습니다.", "")
-            "others" -> Triple("#a75928", "새로운 질문이 등록 되었습니다.", "")
+            "qna" -> Triple("#000000", "새로운 질문이 등록 되었습니다.", "")
             "update" -> Triple("#800080", "질문이 수정 되었습니다.", "")
             "comment" -> Triple("#FFFA99", "새로운 댓글이 등록 되었습니다.", "\n댓글: ${jandiRequest.comment?.content}")
             else -> Triple("#000000", "새로운 질문이 등록 되었습니다.", "")
         }
 
+        val body = if (postId < 1) { "body" to "[$postCategory](https://rms-test.gcgenome.com/qna)" }
+            else {
+                "body" to "[$postCategory](https://rms-test.gcgenome.com/qna/${jandiRequest.post.userId}/${postId})"
+            }
+
         val requestBody = mapOf(
-            "body" to "[$postCategory](https://rms-test.gcgenome.com/qna/${jandiRequest.post.userId}/${postId})",
+            body,
             "connectColor" to connectColor,
             "connectInfo" to listOf(
                 mapOf("title" to "세부내용", "description" to "제목: ${jandiRequest.post.title}\n작성자: ${jandiRequest.userName}$comment")

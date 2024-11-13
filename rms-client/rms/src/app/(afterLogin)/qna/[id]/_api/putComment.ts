@@ -1,6 +1,6 @@
 import {Comment} from "@/model/Comment";
 
-export async function putComment(postId: string, comment: Comment) {
+export async function putComment(postId: number, comment: Comment) {
     return await fetch(`/w-api/post-service/post/${postId}/comment`, {
         method: 'PUT',
         headers: {

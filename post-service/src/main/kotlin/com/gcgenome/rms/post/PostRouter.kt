@@ -32,7 +32,7 @@ class PostRouter (
         DELETE("/w-api/post-service/post/{post-id}", ::deletePost)
         PATCH("/w-api/post-service/post/{post-id}", ::updatePost)
         PUT("/w-api/post-service/post/{post-id}", ::postReadByUser)
-        /*POST("/w-api/post-service/post/{post_id}/message/{category}", ::jandiWebHook)*/
+        POST("/w-api/post-service/post/{post-id}/message/{category}", ::jandiWebHook)
     }
 
     private fun selectPosts(request: ServerRequest): Mono<ServerResponse> {

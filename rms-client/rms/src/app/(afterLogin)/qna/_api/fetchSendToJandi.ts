@@ -1,7 +1,7 @@
 import {Post} from "@/model/Post";
 import {PostComment} from "@/model/PostComment";
 
-export async function fetchSendToJandi(userName: string, postId: string, category: string, post: Post, comment?: PostComment) {
+export async function fetchSendToJandi(userName: string, postId: number, category: string, post: Post, comment?: PostComment) {
     return await fetch(`/w-api/post-service/post/${postId}/message/${category}`, {
         method: 'POST',
         headers: {

@@ -22,6 +22,9 @@ import {Comment} from "@/model/Comment";
 import BlueButton from "@/app/_component/BlueButton";
 import {renderAnswerFileIcon} from "@/app/(afterLogin)/qna/_component/QnaUtils";
 import GreenButton from "@/app/_component/GreenButton";
+import {putPostReadByUserId} from "@/app/(afterLogin)/qna/_api/putPostReadByUserId";
+import {fetchSendToJandi} from "@/app/(afterLogin)/qna/_api/fetchSendToJandi";
+import {PostComment} from "@/model/PostComment";
 
 export default function Answer() {
     const [postData, setPostData] = useState<Post>();
@@ -34,7 +37,7 @@ export default function Answer() {
 
     const pathname = usePathname();
     const pathSegments = pathname.split('/');
-    const postId = decodeURIComponent(pathSegments.pop() || '');
+    const postId = parseInt(decodeURIComponent(pathSegments.pop() || "0"), 10);
 
     const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
@@ -62,7 +65,7 @@ export default function Answer() {
                 setIsLoading(true);
                 try {
                     await updatePost(postData!, selectedFiles);
-                    //await fetchSendToJandi(session?.user?.name!, postId, "update", postData!);
+                    await fetchSendToJandi(session?.user?.name!, postId, "update", postData!);
                     alert('It has been corrected properly.');
                     route.push('/qna');
                 } finally {
@@ -149,12 +152,14 @@ export default function Answer() {
 
     const handleCommentClick = async () => {
         if (commentData) {
+            const comment : PostComment = {
+                post_id: postId,
+                content: commentData.content,
+                user_id: session?.user.id
+            }
             await putComment(postId, commentData);
-            /*if (session?.user.role !== "USER") {
-                await fetchPostId(postId, true);
-            } else {
-                await fetchSendToJandi(session?.user.name!, postId, "comment", postData!, comment);
-            }*/
+            await putPostReadByUserId(postId);
+            await fetchSendToJandi(session?.user.name!, postId, "comment", postData!, comment);
             fetchData();
             setCommentData(undefined);
         } else {

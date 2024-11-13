@@ -19,7 +19,7 @@ export default function NoticePage() {
 
     const pathname = usePathname();
     const pathSegments = pathname.split('/');
-    const postId = decodeURIComponent(pathSegments.pop() || '');
+    const postId = parseInt(decodeURIComponent(pathSegments.pop() || "0"), 10);
 
     const renderFileIcon = (fileName: string) => {
         const fileExtension = fileName.split('.').pop()?.toLowerCase();
