@@ -2,6 +2,7 @@ export interface Extension {
     id?: string
     value?: string
     name?: string
+    name_kr?: string
     required?: boolean
     regex?: string
     type?: ExtensionType

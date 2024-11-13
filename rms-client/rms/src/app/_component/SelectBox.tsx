@@ -17,7 +17,7 @@ export default function SelectBox({ label, value, options, onChange, required=fa
     const [selectedValue, setSelectedValue] = useState<string>('');
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const [hasError, setHasError] = useState<boolean | undefined>(false);
-    const selectBoxRef = useRef<HTMLDivElement>(null);
+    const selectBoxRef = useRef<HTMLDivElement | null>(null);
 
     const handleOptionClick = (option: SelectBoxOption) => {
         setSelectedValue(option.name!);
@@ -28,12 +28,12 @@ export default function SelectBox({ label, value, options, onChange, required=fa
         setIsOpen(!isOpen)
     }
     const handleClickOutside = (event: MouseEvent) => {
-        if (selectBoxRef.current && !selectBoxRef.current.contains(event.target as Node)) {
+        if (selectBoxRef.current && !selectBoxRef.current!.contains(event.target as Node)) {
             setIsOpen(false);
         }
     };
     useEffect(() => {
-        setHasError(!selectedValue && required);
+        setHasError(!selectedValue && required && !value);
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
@@ -42,7 +42,7 @@ export default function SelectBox({ label, value, options, onChange, required=fa
 
     return (
         <div ref={selectBoxRef} className={style.selectContainer} style={{ width }}>
-            <section className={`${style.selectSection} ${hasError ? style.error : ""}`}>
+            <section className={`${style.selectSection} ${hasError ? style.error : null}`}>
                 <p className={style.label}>{label}</p>
                 <button className={`${style.btnSelect} ${isOpen ? style.open : ''}`} onClick={toggleList}>
                     <div>{value || '-'}</div>

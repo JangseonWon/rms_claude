@@ -10,25 +10,27 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {Query} from "@/model/Query";
 import InputBox from "@/app/_component/InputBox";
-import {postExtensionsPage} from "@/app/(afterLogin)/request/management/additional-info/_api/postExtensionsPage";
+import {postExtensions} from "@/app/(afterLogin)/request/management/additional-info/_api/postExtensions";
 import BlueButton from "@/app/_component/BlueButton";
 import SelectBox from "@/app/_component/SelectBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import {putAlisExtensions} from "@/app/(afterLogin)/request/management/additional-info/_api/putAlisExtensions";
 
+const selectBoxOptions: SelectBoxOption[] = [
+    { table: "extension", column: "id", name: "Code" },
+    { table: "extension", column: "name_kr", name: "Name(KR)" },
+    { table: "extension", column: "name", name: "Name(EN)" },
+    { table: "extension", column: "type", name: "Type" },
+];
+
 export default function ExtensionTable() {
     const [extensions, setExtensions] = useState<Extension[]>([]);
-    const [selectExtensionData, setSelectExtensionData] = useState<Extension>();
+    const [selectExtension, setSelectExtension] = useState<Extension>();
     const [extensionEditModalOpen, setExtensionEditModalOpen] = useState<boolean>(false);
     const [search, setSearch] = useState<Query>({sort_by:"id", asc: true, size:10, page:1});
     const [totalPage, setTotalPage] = useState<number>();
-    const [selectOption, setSelectOption] = useState<SelectBoxOption>({ table: "extension", column: "id", name: "Code" });
+    const [selectOption, setSelectOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
 
-    const selectBoxOptions: SelectBoxOption[] = [
-        { table: "extension", column: "id", name: "Code" },
-        { table: "extension", column: "name", name: "Name" },
-        { table: "extension", column: "type", name: "Type" },
-    ];
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage =>({
@@ -50,7 +52,6 @@ export default function ExtensionTable() {
             ...prevSearch,
             filter_groups:[
                 {
-                    condition_type: "OR",
                     filters: [
                         {
                             table: option.table!,
@@ -67,7 +68,7 @@ export default function ExtensionTable() {
 
     const fetchData = async (search: Query) => {
         try {
-            const response = await postExtensionsPage(search);
+            const response = await postExtensions(search);
             const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
             const responseData = await response.json();
             setExtensions(responseData as Extension[]);
@@ -80,12 +81,14 @@ export default function ExtensionTable() {
     }
 
     const handleEditExtensionClick = (extension: Extension) => {
-        setSelectExtensionData(extension)
+        setSelectExtension(extension)
         setExtensionEditModalOpen(true)
+        document.body.style.overflow = 'hidden';
     }
 
     const closeModal = () => {
         setExtensionEditModalOpen(false);
+        document.body.style.overflow = 'auto';
     }
 
     const handleAlisSyncButtonClick = async(search: Query) => {
@@ -138,9 +141,9 @@ export default function ExtensionTable() {
                     <thead>
                     <tr>
                         <th>Code</th>
-                        <th>Name</th>
+                        <th>Name(KR)</th>
+                        <th>Name(EN)</th>
                         <th>Type</th>
-                        <th>Regex</th>
                         <th>Edit</th>
                     </tr>
                     </thead>
@@ -148,9 +151,9 @@ export default function ExtensionTable() {
                     {extensions && extensions.length > 0 && extensions.map((row, rowIndex) => (
                         <tr key={rowIndex}>
                             <td>{row.id}</td>
+                            <td>{row.name_kr}</td>
                             <td>{row.name}</td>
                             <td>{row.type}</td>
-                            <td>{row.regex}</td>
                             <td>
                                 <RectangleButton name={'Edit'} onClick={() => handleEditExtensionClick(row)}/>
                             </td>
@@ -180,9 +183,9 @@ export default function ExtensionTable() {
                 ><FontAwesomeIcon icon={faAngleRight}/>
                 </button>
             </div>
-            {extensionEditModalOpen && selectExtensionData && (
+            {extensionEditModalOpen && selectExtension && (
                 <ExtensionModal
-                    extensionData={selectExtensionData}
+                    extensionId={selectExtension.id!!}
                     closeModal={closeModal}
                     refreshTable={() => fetchData(search)}
                 />

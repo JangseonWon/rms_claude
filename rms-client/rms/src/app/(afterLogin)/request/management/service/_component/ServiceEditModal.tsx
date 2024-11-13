@@ -60,8 +60,7 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
             alert("Update successful")
             closeModal()
             refreshData()
-        }
-        else alert("Fail update")
+        } else alert("Fail update")
     }
     useEffect(() => {
         fetchCategoryData();

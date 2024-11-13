@@ -2,39 +2,52 @@
 
 import React, {useEffect, useState} from "react";
 import style from "./extensionModal.module.css";
-import {faMinus, faPlus, faXmark} from "@fortawesome/free-solid-svg-icons";
+import {faMinus, faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
 import SelectBox from "@/app/_component/SelectBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import {Extension, ExtensionType} from "@/model/Extension";
-import {patchExtension} from "@/app/(afterLogin)/request/management/additional-info/_api/patchExtension";
 import BlueButton from "@/app/_component/BlueButton";
+import GreenButton from "@/app/_component/GreenButton";
+import {getExtension} from "@/app/(afterLogin)/request/management/additional-info/_api/getExtension";
+import {patchExtension} from "@/app/(afterLogin)/request/management/additional-info/_api/patchExtension";
 
 type Props = {
-    extensionData: Extension;
+    extensionId: string;
     closeModal: () => void;
     refreshTable: () => void;
 }
 
-export default function ExtensionModal({extensionData, closeModal, refreshTable}: Props) {
-    const [extension, setExtension] = useState<Extension>(extensionData)
+const extensionOptions: SelectBoxOption[] = [
+    {value: '\\b(?:true|false)\\b', name: ExtensionType.BOOLEAN},
+    {value: '.*', name: ExtensionType.STRING},
+    {value: '.*', name: ExtensionType.TEXT},
+    {value: '-?\\d+', name: ExtensionType.INTEGER},
+    {value: '-?\\d+(\\.\\d+)?', name: ExtensionType.FLOAT},
+    {name: ExtensionType.LIST}
+];
+export default function ExtensionModal({extensionId, closeModal, refreshTable}: Props) {
+    const [extension, setExtension] = useState<Extension>()
     const [listInputs, setListInputs] = useState<string[]>(['','']);
 
-    const extensionOptions: SelectBoxOption[] = [
-        {value: '\\b(?:true|false)\\b', name: ExtensionType.BOOLEAN},
-        {value: '.*', name: ExtensionType.STRING},
-        {value: '.*', name: ExtensionType.TEXT},
-        {value: '-?\\d+', name: ExtensionType.INTEGER},
-        {value: '-?\\d+(\\.\\d+)?', name: ExtensionType.FLOAT},
-        {name: ExtensionType.LIST}
-    ];
+    const fetchExtension = async (extensionId: string)=>{
+        const response = await getExtension(extensionId)
+        const data = await response.json()
+        const extension = data as Extension
+        setExtension(extension)
+        return extension
+    }
+
+
     useEffect(() => {
-        if (extension.type === ExtensionType.LIST && extension.regex) {
-            const splitRegex = extension.regex.replace(/\\b\(\?:|\)\\b/g, '').split('|');
-            setListInputs(splitRegex);
-        }
-    }, [extension]);
+        fetchExtension(extensionId).then( (extension) => {
+            if (extension?.type === ExtensionType.LIST && extension.regex) {
+                const splitRegex = extension.regex.replace(/\\b\(\?:|\)\\b/g, '').split('|');
+                setListInputs(splitRegex);
+            }
+        })
+    }, []);
 
 
     const handleAddInput = () => {
@@ -42,101 +55,116 @@ export default function ExtensionModal({extensionData, closeModal, refreshTable}
     };
 
     const handleRemoveInput = (index: number) => {
-        const newListInputs = listInputs.filter((_, i) => i !== index);
-        setListInputs(newListInputs);
+        setListInputs((prevListInputs) => {
+            const newListInputs = prevListInputs.filter((_, i) => i !== index);
+            setExtension((prevExtension) => ({
+                ...prevExtension,
+                regex: `\\b(?:${newListInputs.filter(input => input).join('|')})\\b`,
+            }));
+            return newListInputs;
+        });
     };
 
     const handleListInputChange = (index: number, value: string) => {
-        const newListInputs = [...listInputs];
-        newListInputs[index] = value;
-        setListInputs(newListInputs);
+        setListInputs((prevListInputs) => {
+            const newListInputs = [...prevListInputs];
+            newListInputs[index] = value;
+            setExtension((prevExtension) => ({
+                ...prevExtension,
+                regex: `\\b(?:${newListInputs.filter(input => input).join('|')})\\b`,
+            }));
+            return newListInputs;
+        });
     };
 
     const handleUpdateButtonClick = async () => {
-        try {
-            if(extension.type === ExtensionType.LIST) {
-                extension.regex = `\\b(?:${listInputs.filter(input => input).join('|')})\\b`
-            }
-            await patchExtension(extension);
-            alert('Update Complete');
-            closeModal();
-            refreshTable();
-        } catch (error) {
-            console.error("Error updating extension:", error);
-            alert('An error occurred during update.');
+        const response = await patchExtension(extension!)
+        if(response.ok){
+            alert("Update successful")
+            closeModal()
+            refreshTable()
+        } else {
+            alert("Fail update")
         }
+
     };
 
     return (
         <div className={style.modalBackground}>
             <div className={style.modal}>
-                <section className={style.modalHeader}>
-                    <div className={style.modalClose} onClick={closeModal}>
-                        <FontAwesomeIcon icon={faXmark}/>
-                    </div>
-                    <div className={style.modalTop}>
-                        <div className={style.title}>
-                            Edit Extension
-                        </div>
-                    </div>
-                </section>
-                <section className={style.modalBody}>
-                    <div className={style.leftBody}>
-                        <div className={style.categoryName}>
-                            <InputBox
-                                label={"Extension Name"}
-                                value={extension.name}
-                                disabled={true}
-                                required={false}
-                            />
-                            <SelectBox
-                                label={"Extension Type"}
-                                value={extension.type}
-                                options={extensionOptions}
-                                width={'11vw'}
-                                required={true}
-                                onChange={(selectedOption) => {
-                                    setExtension({
-                                        ...extension,
-                                        type: selectedOption.name,
-                                        regex: selectedOption.value
-                                    })
-                                }}
-                            />
-                            <BlueButton
-                                name={"Save"}
-                                onClick={handleUpdateButtonClick}
-                            />
-                        </div>
-                    </div>
-                    <div className={style.rightBody}>
-                        {extension.type === ExtensionType.LIST && (
-                            <>
+                <FontAwesomeIcon icon={faXmark} onClick={closeModal} className={style.modalCloseButton}/>
+                <div className={style.modalTitle}>Edit Extension</div>
+                <div className={style.formGroup}>
+                    <InputBox
+                        label={"Code"}
+                        value={extension?.id}
+                        disabled={true}
+                        required={false}
+                    />
+                    <InputBox
+                        label={"Name(KR)"}
+                        value={extension?.name_kr}
+                        disabled={true}
+                        required={false}
+                    />
+                </div>
+                <div className={style.formGroup}>
+                    <SelectBox
+                        label={"Extension Type"}
+                        value={extension?.type}
+                        options={extensionOptions}
+                        width={'200px'}
+                        required={true}
+                        onChange={(selectedOption) => {
+                            setExtension({
+                                ...extension,
+                                type: selectedOption.name,
+                                regex: selectedOption.value
+                            })
+                        }}
+                    />
+                    <InputBox
+                        label={"Name(EN)"}
+                        value={extension?.name}
+                        disabled={false}
+                        required={false}
+                        onChange={(value) => {
+                            setExtension((prev) => ({
+                                ...prev,
+                                name: value
+                            }))
+                        }}
+                    />
+                </div>
+                    {extension?.type === ExtensionType.LIST && (
+                        <div className={style.content}>
+                            <div className={style.contentTitle}>
+                                <div>Extension Values</div>
+                                <GreenButton name={"+Add Value"} onClick={handleAddInput}/>
+                            </div>
                             {listInputs.map((input, index) => (
-                                    <div key={index} style={{display: 'flex', marginBottom: '2vh'}}>
-                                        <InputBox
-                                            key={index}
-                                            label={`List Value ${index + 1}`}
-                                            value={input}
-                                            required={true}
-                                            onChange={(value) => handleListInputChange(index, value)}
+                                <div key={index} className={style.formGroup}>
+                                    <InputBox
+                                        key={index}
+                                        label={`List Value ${index + 1}`}
+                                        value={input}
+                                        required={true}
+                                        onChange={(value) => handleListInputChange(index, value)}
+                                    />
+                                    {listInputs.length > 2 && (
+                                        <FontAwesomeIcon
+                                            className={style.minusButton}
+                                            icon={faMinus}
+                                            onClick={() => handleRemoveInput(index)}
                                         />
-                                        {listInputs.length > 2 && (
-                                            <FontAwesomeIcon
-                                                className={style.minusButton}
-                                                icon={faMinus}
-                                                onClick={() => handleRemoveInput(index)}
-                                            />
-                                        )}
-                                    </div>
-                                ))}
-                                <button className={style.addButton} onClick={handleAddInput}>
-                                    <FontAwesomeIcon icon={faPlus}/> Add Value
-                                </button>
-                            </>
-                        )}
-                    </div>
-                </section>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                <div className={style.buttonGroup}>
+                    <BlueButton name={'Save'} onClick={() => handleUpdateButtonClick()}/>
+                </div>
             </div>
         </div>
     )

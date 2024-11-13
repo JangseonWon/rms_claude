@@ -6,10 +6,7 @@ export async function patchExtension(extension: Extension) {
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-            type: extension.type,
-            regex: extension.regex
-        }),
+        body: JSON.stringify(extension),
         credentials: 'include',
         cache: 'no-store'
     });
