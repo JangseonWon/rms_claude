@@ -173,7 +173,7 @@ export default function NoticeTable() {
                     </thead>
                     <tbody>
                     {postData && postData.length > 0 && postData.map((row, rowIndex) => {
-                        const isNew = row.create_at && (new Date().getTime() - new Date(row.create_at).getTime()) <= 7 * 24 * 60 * 60 * 1000;
+                        const isNew = row.last_modify_at && (new Date().getTime() - new Date(row.last_modify_at).getTime()) <= 7 * 24 * 60 * 60 * 1000;
 
                         return (
                             <tr key={rowIndex} onClick={() => handleRowClick(row)}>
