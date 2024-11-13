@@ -24,6 +24,7 @@ interface ExtensionDao : QueryDao{
     fun DSLContext.updateExtension(extension: ExtensionDTO): Mono<ExtensionDTO> {
         return Mono.from(
             update(EXTENSION)
+                .set(EXTENSION.NAME, extension.name)
                 .set(EXTENSION.REGEX, extension.regex)
                 .set(EXTENSION.TYPE, extension.type)
                 .where(EXTENSION.ID.eq(extension.id))

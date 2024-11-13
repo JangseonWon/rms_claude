@@ -25,7 +25,7 @@ class ServiceRouter (
 ) {
     @Bean("ServicesRouter")
     fun route() = router {
-        POST("/w-api/management-service/services", ::findServices)
+        POST("/w-api/management-service/services/search", ::findServices)
         GET("/w-api/management-service/services/{service-id}", ::findService)
         PATCH("/w-api/management-service/services/{service-id}", ::updateService)
     }

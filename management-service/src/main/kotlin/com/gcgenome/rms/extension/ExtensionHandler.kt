@@ -17,6 +17,9 @@ class ExtensionHandler(
     fun selectExtensionsWithPage(query: Query): Mono<Page<ExtensionDTO>> {
         return dslContext.selectExtensionsWithPage(query)
     }
+    fun selectExtension(extensionId: String): Mono<ExtensionDTO> {
+        return dslContext.selectExtensionById(extensionId)
+    }
 
     fun updateExtension(extension: ExtensionDTO): Mono<ExtensionDTO> {
         return dslContext.updateExtension(extension)

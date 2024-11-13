@@ -23,8 +23,9 @@ class ExtensionRouter (
 ) {
     @Bean("ExtensionRouter")
     fun route() = router {
-        POST("/w-api/management-service/extensions", ::findExtensions)
-        PATCH("/w-api/management-service/extensions/{extension_id}", ::updateExtension)
+        POST("/w-api/management-service/extensions/search", ::findExtensions)
+        GET("/w-api/management-service/extensions/{extension-id}", ::findExtension)
+        PATCH("/w-api/management-service/extensions/{extension-id}", ::updateExtension)
     }
 
     private fun findExtensions(request: ServerRequest): Mono<ServerResponse> {
@@ -43,9 +44,18 @@ class ExtensionRouter (
             .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
             .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error : $it") }
     }
+    private fun findExtension(request: ServerRequest): Mono<ServerResponse> {
+        val extensionId = request.pathVariable("extension-id")
+        return authenticationHandler.principal(request)
+            .flatMap { extensionHandler.selectExtension(extensionId) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), ExtensionDTO::class.java) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error : $it") }
+    }
 
     private fun updateExtension(request: ServerRequest): Mono<ServerResponse> {
-        val extensionId = request.pathVariable("extension_id")
+        val extensionId = request.pathVariable("extension-id")
         return authenticationHandler.chkManager(request)
             .flatMap { request.bodyToMono(ExtensionDTO::class.java) }
             .flatMap { extensionHandler.updateExtension(it.apply { id = extensionId }) }
