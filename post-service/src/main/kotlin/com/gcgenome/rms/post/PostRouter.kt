@@ -32,6 +32,7 @@ class PostRouter (
         DELETE("/w-api/post-service/post/{post-id}", ::deletePost)
         PATCH("/w-api/post-service/post/{post-id}", ::updatePost)
         PUT("/w-api/post-service/post/{post-id}", ::postReadByUser)
+        PUT("/w-api/post-service/post/{post-id}/new", ::postReadStatusChangeNull)
         POST("/w-api/post-service/post/{post-id}/message/{category}", ::jandiWebHook)
     }
 
@@ -123,6 +124,16 @@ class PostRouter (
         val postId = request.pathVariable("post-id").toLong()
         return authenticationHandler.principal(request)
             .flatMap { serviceHandler.postReadByUser(postId, it.user.id!!) }
+            .flatMap { ServerResponse.ok().build() }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
+    }
+
+    private fun postReadStatusChangeNull(request: ServerRequest): Mono<ServerResponse> {
+        val postId = request.pathVariable("post-id").toLong()
+        return authenticationHandler.principal(request)
+            .flatMap { serviceHandler.postReadStatusChangeNull(postId) }
             .flatMap { ServerResponse.ok().build() }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }

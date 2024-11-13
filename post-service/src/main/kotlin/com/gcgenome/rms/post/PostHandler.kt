@@ -19,7 +19,6 @@ import software.amazon.awssdk.services.s3.S3AsyncClient
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import java.nio.ByteBuffer
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Component
@@ -140,11 +139,15 @@ class PostHandler(
     }
 
     fun postReadByUser(postId: Long, userId: String): Mono<PostRead> {
-        return dslContext.selectPostRead(postId, userId)
-            .flatMap { postRead ->
-                val dateTime = if (postRead.readAt == null) LocalDateTime.now() else null
-                dslContext.updatePostRead(postId, userId, dateTime)
+        return Mono.from(dslContext.updatePostRead(postId, userId))
+    }
+
+    fun postReadStatusChangeNull(postId: Long): Mono<PostRead> {
+        return Mono.from(dslContext.run {
+            selectPostRead(postId).flatMap {
+                changeNullPostRead(postId, it.userId)
             }
+        })
     }
 
     fun sendToJandi(postId: Long, category: String, jandiRequest: JandiRequest): Mono<Post> {

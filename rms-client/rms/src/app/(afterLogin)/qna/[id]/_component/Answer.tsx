@@ -22,9 +22,9 @@ import {Comment} from "@/model/Comment";
 import BlueButton from "@/app/_component/BlueButton";
 import {renderAnswerFileIcon} from "@/app/(afterLogin)/qna/_component/QnaUtils";
 import GreenButton from "@/app/_component/GreenButton";
-import {putPostReadByUserId} from "@/app/(afterLogin)/qna/_api/putPostReadByUserId";
 import {fetchSendToJandi} from "@/app/(afterLogin)/qna/_api/fetchSendToJandi";
 import {PostComment} from "@/model/PostComment";
+import {putPostReadChangeNew} from "@/app/(afterLogin)/qna/_api/putPostReadChangeNew";
 
 export default function Answer() {
     const [postData, setPostData] = useState<Post>();
@@ -65,6 +65,7 @@ export default function Answer() {
                 setIsLoading(true);
                 try {
                     await updatePost(postData!, selectedFiles);
+                    await putPostReadChangeNew(postId);
                     await fetchSendToJandi(session?.user?.name!, postId, "update", postData!);
                     alert('It has been corrected properly.');
                     route.push('/qna');
@@ -158,7 +159,7 @@ export default function Answer() {
                 user_id: session?.user.id
             }
             await putComment(postId, commentData);
-            await putPostReadByUserId(postId);
+            await putPostReadChangeNew(postId);
             await fetchSendToJandi(session?.user.name!, postId, "comment", postData!, comment);
             fetchData();
             setCommentData(undefined);
