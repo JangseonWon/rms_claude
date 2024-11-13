@@ -19,6 +19,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import java.nio.ByteBuffer
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Component
@@ -139,7 +140,11 @@ class PostHandler(
     }
 
     fun postReadByUser(postId: Long, userId: String): Mono<PostRead> {
-        return Mono.from(dslContext.updatePostRead(postId, userId))
+        return dslContext.selectPostRead(postId, userId)
+            .flatMap { postRead ->
+                val dateTime = if (postRead.readAt == null) LocalDateTime.now() else null
+                dslContext.updatePostRead(postId, userId, dateTime)
+            }
     }
 
     fun sendToJandi(postId: Long, category: String, jandiRequest: JandiRequest): Mono<Post> {
@@ -152,7 +157,7 @@ class PostHandler(
 
         val body = if (postId < 1) { "body" to "[$postCategory](https://rms-test.gcgenome.com/qna)" }
             else {
-                "body" to "[$postCategory](https://rms-test.gcgenome.com/qna/${jandiRequest.post.userId}/${postId})"
+                "body" to "[$postCategory](https://rms-test.gcgenome.com/qna/${postId})"
             }
 
         val requestBody = mapOf(
