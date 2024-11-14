@@ -1,0 +1,132 @@
+.modalBackground {
+    display: flex;
+    background-color: rgba(128, 128, 128, 0.16);
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+}
+.modal {
+    display: flex;
+    background: rgb(255, 255, 255);
+    border-radius: 16px;
+    flex-direction: column;
+    padding: 20px 40px;
+    position: relative;
+}
+.modalTitle {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #1e2c5b;
+}
+.modalCloseButton {
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    top: 15px;
+    right: 15px;
+    cursor: pointer;
+}
+.modalBody {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 3vh;
+}
+.formGroup {
+    display: flex;
+    gap: 20px;
+    padding: 10px 0;
+    align-items: center;
+}
+.buttonGroup {
+    display: flex;
+    padding: 10px 0;
+    justify-content: flex-end
+}
+.contentGroup {
+    display: flex;
+    gap: 20px;
+}
+.content {
+    border: solid #C8C9CB 1px;
+    border-radius: 15px;
+    width: 460px;
+    height: 400px;
+    padding: 10px;
+    overflow-y: auto;
+}
+.contentTitle {
+    font-size: 20px;
+    font-weight: bold;
+}
+.contentFormGroup {
+    display: flex;
+    gap: 20px;
+    justify-content: flex-end
+}
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.table thead {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    font-size: 12px;
+    color: #ffffff;
+}
+.table thead th{
+    background-color: #002b49;
+}
+.table thead th:first-child {
+    border-top-left-radius: 15px;
+}
+.table thead th:last-child {
+    border-top-right-radius: 15px;
+}
+.table tbody {
+    display: block;
+    height: 250px;
+    overflow-y: auto;
+}
+.table tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    border-bottom: 1px solid #838689;
+}
+.table tbody tr td {
+    color: #666666;
+    font-size: 12px;
+}
+.table th,
+.table td {
+    padding: 8px;
+    text-align: center;
+}
+.addButton {
+    margin-top: 2vh;
+    cursor: pointer;
+    padding: 0.5vh 0.5vw;
+    height: 4vh;
+    width: 4vw;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, #182847, #354e6d);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.7vw;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.5);
+}
+.addButton:hover {
+    background: linear-gradient(135deg, #354e6d, #182847);
+}
+.deleteButton {
+    cursor: pointer;
+}

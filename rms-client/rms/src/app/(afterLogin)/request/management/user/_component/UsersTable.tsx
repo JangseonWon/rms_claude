@@ -1,7 +1,7 @@
 "use client"
 
 import React, {useEffect, useState} from "react";
-import style from "@/css/globalTable.module.css";
+import globalTableStyle from "@/css/globalTable.module.css";
 import managementStyle from "@/css/managementTable.module.css";
 import {faAngleLeft, faAngleRight, faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -12,38 +12,36 @@ import {postUsers} from "@/app/(afterLogin)/request/management/user/_api/postUse
 import SwitchButton from "@/app/_component/SwitchButton";
 import {fetchUserUpdate} from "@/app/(afterLogin)/_api/fetchUserUpdate";
 import InstitutionModal from "@/app/(afterLogin)/request/management/user/_component/InstitutionModal";
-import UserServiceEditModal from "@/app/(afterLogin)/request/management/user/_component/UserServiceEditModal";
+import UserEditModal from "@/app/(afterLogin)/request/management/user/_component/UserEditModal";
 import SelectBox from "@/app/_component/SelectBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import RectangleButton from "@/app/_component/RectangleButton";
 import BlueButton from "@/app/_component/BlueButton";
 import {putAlisUsers} from "@/app/(afterLogin)/request/management/user/_api/putAlisUsers";
+import LoadingFullScreen from "@/app/_component/LoadingFullScreen";
 
 interface UserWithSelected extends User {
     isSelected?: boolean;
 }
 const selectBoxOptions: SelectBoxOption[] = [
-    { value: "id", name: "ID" },
-    { value: "name", name: "Name" },
-    { value: "email", name: "Email" },
-    { value: "phone_number", name: "Phone Number" },
-    { value: "branch_name", name: "Institution" },
-    { value: "branch_serial", name: "Serial" },
-    { value: "role", name: "Role" },
+    { table: "user", column: "id", name: "ID" },
+    { table: "user", column: "name", name: "Name" },
+    { table: "user", column: "email", name: "Email" },
+    { table: "user", column: "phone_number", name: "Phone Number" },
+    { table: "user", column: "branch_serial", name: "Serial" },
+    { table: "user", column: "role", name: "Role" }
 ];
 
 export default function UsersTable() {
+    const [isLoading, setIsLoading] = useState<boolean>(false)
     const [userData, setUserData] = useState<UserWithSelected[]>([]);
     const [totalPage, setTotalPage] = useState<number>(0);
     const [search, setSearch] = useState<Query>({sort_by:"id", asc: true, size:10, page:1});
-    const [searchKey, setSearchKey] = useState<string>("id");
-    const [searchValue, setSearchValue] = useState<string>("");
-    const [serviceModalOpen, setServiceModalOpen] = useState<boolean>(false);
     const [userServiceModalOpen, setUserServiceModalOpen] = useState<boolean>(false);
     const [selectedUser, setSelectedUser] = useState<User>();
     const [institutionModalOpen, setInstitutionModalOpen] = useState<boolean>(false);
     const [selectedInstitutionUser, setSelectedInstitutionUser] = useState<{id: string; name: string} | null>(null);
-    const [selectOption, setSelectOption] = useState<string>('ID');
+    const [selectOption, setSelectOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage =>({
@@ -60,31 +58,25 @@ export default function UsersTable() {
         }));
     };
 
-    const handleSearchChange = (newFilter: { key: string; value: string }) => {
+    const handleSearchChange = (option: SelectBoxOption, value: string) => {
         setSearch((prevSearch) => ({
             ...prevSearch,
-            page: 1,
-            filter_groups: [
+            filter_groups:[
                 {
-                    condition_type: "AND",
                     filters: [
                         {
-                            table: "user",
-                            column: newFilter.key,
-                            value: newFilter.value,
+                            table: option.table!,
+                            column: option.column!,
+                            value: value,
                             operator: "LIKE"
                         }
                     ]
                 }
-            ]
+            ],
+            page:1
         }));
     };
 
-    const handleSearchKeyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const key = event.target.value;
-        setSearchKey(key);
-        handleSearchChange({key: key, value: searchValue});
-    };
 
     const fetchData = async (search: Query) => {
         try {
@@ -109,6 +101,7 @@ export default function UsersTable() {
 
     const handleAlisSyncButtonClick = async(search: Query) => {
         try {
+            setIsLoading(true)
             const response = await putAlisUsers(search)
             const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
             const responseData = await response.json();
@@ -120,6 +113,8 @@ export default function UsersTable() {
             }
         } catch(error) {
             alert(`fail: ${error}`)
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -128,13 +123,12 @@ export default function UsersTable() {
         setInstitutionModalOpen(true);
     }
 
-    const handleUserServiceEditClick = (user: User) => {
+    const handleUserEditClick = (user: User) => {
         setSelectedUser(user);
         setUserServiceModalOpen(true);
     }
 
     const closeModal = () => {
-        setServiceModalOpen(false);
         setInstitutionModalOpen(false);
         setUserServiceModalOpen(false);
         setSelectedInstitutionUser(null);
@@ -145,7 +139,8 @@ export default function UsersTable() {
     }, [search]);
 
     return (
-        <>
+        <div>
+            {isLoading && <LoadingFullScreen/>}
             <section className={managementStyle.filterContainer}>
                 <div className={managementStyle.filterContainerAlis}>
                     <div className={managementStyle.alisSyncButton}>
@@ -155,24 +150,22 @@ export default function UsersTable() {
                 <div className={managementStyle.filterContainerSearch}>
                     <SelectBox
                         width={"7vw"}
-                        value={selectOption}
+                        value={selectOption.name}
                         options={selectBoxOptions}
                         label={"status"}
                         onChange={(selectedOption) => {
-                            setSelectOption(selectedOption.value);
-                            handleSearchKeyChange({target: {value: selectedOption.value}} as React.ChangeEvent<HTMLSelectElement>);
+                            setSelectOption(selectedOption);
                         }}
                     />
                     <div className={managementStyle.search}>
                         <InputBox label={"search"} onChange={(value) => {
-                            setSearchValue(value);
-                            handleSearchChange({key: searchKey, value: value})}}>
+                            handleSearchChange(selectOption, value)}}>
                         </InputBox>
                     </div>
                 </div>
             </section>
-            <section className={style.tableContainer}>
-                <table className={style.table}>
+            <section className={globalTableStyle.tableContainer}>
+                <table className={globalTableStyle.table}>
                     <thead>
                     <tr>
                         <th>Id</th>
@@ -197,7 +190,7 @@ export default function UsersTable() {
                             <td>{row.role}</td>
                             <td>
                                 <FontAwesomeIcon
-                                    className={style.icon}
+                                    className={globalTableStyle.icon}
                                     icon={faMagnifyingGlass}
                                     onClick={() => handleInstitutionIconClick(row.id, row.name)}
                                 />
@@ -210,16 +203,16 @@ export default function UsersTable() {
                                 />
                             </td>
                             <td>
-                                <RectangleButton name={'Edit'} onClick={() => handleUserServiceEditClick(row)}/>
+                                <RectangleButton name={'Edit'} onClick={() => handleUserEditClick(row)}/>
                             </td>
                         </tr>
                     ))}
                     </tbody>
                 </table>
             </section>
-            <div className={style.pagination}>
+            <div className={globalTableStyle.pagination}>
                 <span>items per page:</span>
-                <div className={style.select}>
+                <div className={globalTableStyle.select}>
                     <select onChange={handlePageSizeChange}>
                         <option value="10">10</option>
                         <option value="20">20</option>
@@ -243,8 +236,8 @@ export default function UsersTable() {
                                   open={institutionModalOpen} closeModal={closeModal}/>
             )}
             {userServiceModalOpen && (
-                <UserServiceEditModal user={selectedUser!} open={serviceModalOpen} closeModal={closeModal}/>
+                <UserEditModal userId={selectedUser!.id} closeModal={closeModal}/>
             )}
-        </>
+        </div>
     );
 }
