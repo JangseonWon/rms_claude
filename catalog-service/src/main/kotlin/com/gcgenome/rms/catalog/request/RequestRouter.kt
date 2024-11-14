@@ -19,7 +19,7 @@ class RequestRouter (
 ) {
     @Bean("RequestRouter")
     fun route() = router {
-        POST("/w-api/catalog-service/requests", :: saveRequests)
+        PUT("/w-api/catalog-service/requests", :: saveRequests)
     }
     private fun saveRequests(request: ServerRequest): Mono<ServerResponse> {
         return authenticationHandler.principal(request)
