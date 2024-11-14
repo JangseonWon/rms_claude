@@ -29,5 +29,5 @@ data class UserDTO(
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("create_at")
     var createAt: LocalDateTime? = null,
-    var services: Array<ServiceDTO>? = emptyArray()
+    var services: Array<ServiceDTO>? = null
 )

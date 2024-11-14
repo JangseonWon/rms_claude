@@ -61,9 +61,33 @@ interface UserDao : QueryDao{
         }
     }
     fun DSLContext.selectUserById(userId: String): Mono<UserDTO> {
-        return Mono.from(select(USER.ID, USER.NAME, USER.ROLE,  USER.TYPE, USER.EMAIL, USER.PHONE_NUMBER, USER.KEY, USER.STATE, USER.BRANCH_SERIAL, USER.BRANCH_NAME, USER.CREATE_AT)
-            .from(USER).where(USER.ID.eq(userId)))
-            .map { it.into(UserDTO::class.java) }
+        return Mono.from(
+            select(
+                USER.ID,
+                USER.NAME,
+                USER.ROLE,
+                USER.TYPE,
+                USER.EMAIL,
+                USER.PHONE_NUMBER,
+                USER.KEY,
+                USER.STATE,
+                USER.BRANCH_SERIAL,
+                USER.BRANCH_NAME,
+                USER.CREATE_AT,
+                jsonArrayAgg(
+                    jsonObject(
+                        key("id").value(SERVICE.ID),
+                        key("name").value(SERVICE.NAME),
+                        key("name_kr").value(SERVICE.NAME_KR)
+                    )
+                ).`as`("services")
+            )
+            .from(USER)
+                .leftJoin(USER_SERVICE).on(USER.ID.eq(USER_SERVICE.USER_ID))
+                .leftJoin(SERVICE).on(USER_SERVICE.SERVICE_ID.eq(SERVICE.ID))
+            .where(USER.ID.eq(userId))
+            .groupBy(USER.ID)
+        ).map { it.into(UserDTO::class.java) }
     }
 
     fun DSLContext.updateUserById(user: UserDTO): Mono<UserDTO> {
