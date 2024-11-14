@@ -15,6 +15,7 @@ import RectangleButton from "@/app/_component/RectangleButton";
 import ServiceEditModal from "@/app/(afterLogin)/request/management/service/_component/ServiceEditModal";
 import {Service} from "@/model/Service";
 import {putAlisServices} from "@/app/(afterLogin)/request/management/service/_api/putAlisServices";
+import LoadingFullScreen from "@/app/_component/LoadingFullScreen";
 
 interface ServiceWithSelected extends Service {
     isSelected?: boolean;
@@ -27,6 +28,7 @@ const selectBoxOptions: SelectBoxOption[] = [
 ];
 
 export default function ServiceManageTable() {
+    const [isLoading, setIsLoading] = useState<boolean>(false)
     const [services, setServices] = useState<ServiceWithSelected[]>([]);
     const [totalPage, setTotalPage] = useState<number>(0);
     const [search, setSearch] = useState<Query>({sort_by:"id", asc: true, size:10, page:1});
@@ -98,6 +100,7 @@ export default function ServiceManageTable() {
 
     const handleAlisSyncButtonClick = async(search: Query) => {
         try {
+            setIsLoading(true)
             const response = await putAlisServices(search)
             const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
             const responseData = await response.json();
@@ -109,6 +112,8 @@ export default function ServiceManageTable() {
             }
         } catch(error) {
             alert(`fail: ${error}`)
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -117,7 +122,8 @@ export default function ServiceManageTable() {
     }, [search]);
 
     return (
-        <>
+        <div>
+            {isLoading && <LoadingFullScreen/>}
             <section className={managementStyle.filterContainer}>
                 <div className={managementStyle.filterContainerAlis}>
                     <div className={managementStyle.alisSyncButton}>
@@ -196,6 +202,6 @@ export default function ServiceManageTable() {
                     refreshData={refreshData}
                 />
             )}
-        </>
+        </div>
     );
 }

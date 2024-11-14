@@ -132,6 +132,11 @@ export default function NavMenu() {
                                 Additional info Management
                             </Link>
                         </ol>
+                        <ol>
+                            <Link href={"/request/management/sample-type"}>
+                                SampleType Management
+                            </Link>
+                        </ol>
                     </>
                 )}
             </ul>

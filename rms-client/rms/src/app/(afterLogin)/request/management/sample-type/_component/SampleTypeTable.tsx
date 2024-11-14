@@ -3,32 +3,31 @@
 import style from "@/css/globalTable.module.css";
 import managementStyle from "@/css/managementTable.module.css";
 import React, {useEffect, useState} from "react";
-import {Extension} from "@/model/Extension";
-import ExtensionModal from "@/app/(afterLogin)/request/management/additional-info/_component/ExtensionModal";
 import RectangleButton from "@/app/_component/RectangleButton";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {Query} from "@/model/Query";
 import InputBox from "@/app/_component/InputBox";
-import {postExtensions} from "@/app/(afterLogin)/request/management/additional-info/_api/postExtensions";
 import BlueButton from "@/app/_component/BlueButton";
 import SelectBox from "@/app/_component/SelectBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
-import {putAlisExtensions} from "@/app/(afterLogin)/request/management/additional-info/_api/putAlisExtensions";
+import {SampleType} from "@/model/SampleType";
+import {postSampleTypes} from "@/app/(afterLogin)/request/management/sample-type/_api/postSampleTypes";
+import SampleTypeModal from "@/app/(afterLogin)/request/management/sample-type/_component/SampleTypeModal";
 import LoadingFullScreen from "@/app/_component/LoadingFullScreen";
+import {putAlisSampleTypes} from "@/app/(afterLogin)/request/management/sample-type/_api/putAlisSampleTypes";
 
 const selectBoxOptions: SelectBoxOption[] = [
-    { table: "extension", column: "id", name: "Code" },
-    { table: "extension", column: "name_kr", name: "Name(KR)" },
-    { table: "extension", column: "name", name: "Name(EN)" },
-    { table: "extension", column: "type", name: "Type" },
+    { table: "sample_type", column: "id", name: "Code" },
+    { table: "sample_type", column: "name_kr", name: "Name(KR)" },
+    { table: "sample_type", column: "name", name: "Name(EN)" },
 ];
 
-export default function ExtensionTable() {
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [extensions, setExtensions] = useState<Extension[]>([]);
-    const [selectExtension, setSelectExtension] = useState<Extension>();
-    const [extensionEditModalOpen, setExtensionEditModalOpen] = useState<boolean>(false);
+export default function SampleTypeTable() {
+    const [isLoading, setIsLoading] = useState<boolean>(false)
+    const [sampleTypes, setSampleTypes] = useState<SampleType[]>([]);
+    const [selectSampleType, setSelectSampleType] = useState<SampleType>();
+    const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
     const [search, setSearch] = useState<Query>({sort_by:"id", asc: true, size:10, page:1});
     const [totalPage, setTotalPage] = useState<number>();
     const [selectOption, setSelectOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
@@ -70,36 +69,36 @@ export default function ExtensionTable() {
 
     const fetchData = async (search: Query) => {
         try {
-            const response = await postExtensions(search);
+            const response = await postSampleTypes(search);
             const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
             const responseData = await response.json();
-            setExtensions(responseData as Extension[]);
+            setSampleTypes(responseData as SampleType[]);
             setTotalPage(totalPage);
         } catch(error) {
             console.error("Failed to fetch data:", error);
-            setExtensions([]);
+            setSampleTypes([]);
             setTotalPage(0);
         }
     }
 
-    const handleEditExtensionClick = (extension: Extension) => {
-        setSelectExtension(extension)
-        setExtensionEditModalOpen(true)
+    const handleEditClick = (sampleType: SampleType) => {
+        setSelectSampleType(sampleType)
+        setEditModalOpen(true)
         document.body.style.overflow = 'hidden';
     }
 
     const closeModal = () => {
-        setExtensionEditModalOpen(false);
+        setEditModalOpen(false);
         document.body.style.overflow = 'auto';
     }
 
     const handleAlisSyncButtonClick = async(search: Query) => {
         try {
             setIsLoading(true)
-            const response = await putAlisExtensions(search)
+            const response = await putAlisSampleTypes(search)
             const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
             const responseData = await response.json();
-            setExtensions(responseData as Extension[]);
+            setSampleTypes(responseData as SampleType[]);
             setTotalPage(totalPage)
             if(response.ok){
                 await fetchData(search)
@@ -149,19 +148,17 @@ export default function ExtensionTable() {
                         <th>Code</th>
                         <th>Name(KR)</th>
                         <th>Name(EN)</th>
-                        <th>Type</th>
                         <th>Edit</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {extensions && extensions.length > 0 && extensions.map((row, rowIndex) => (
+                    {sampleTypes && sampleTypes.length > 0 && sampleTypes.map((row, rowIndex) => (
                         <tr key={rowIndex}>
                             <td>{row.id}</td>
                             <td>{row.name_kr}</td>
                             <td>{row.name}</td>
-                            <td>{row.type}</td>
                             <td>
-                                <RectangleButton name={'Edit'} onClick={() => handleEditExtensionClick(row)}/>
+                                <RectangleButton name={'Edit'} onClick={() => handleEditClick(row)}/>
                             </td>
                         </tr>
                     ))}
@@ -189,9 +186,9 @@ export default function ExtensionTable() {
                 ><FontAwesomeIcon icon={faAngleRight}/>
                 </button>
             </div>
-            {extensionEditModalOpen && selectExtension && (
-                <ExtensionModal
-                    extensionId={selectExtension.id!!}
+            {editModalOpen && selectSampleType && (
+                <SampleTypeModal
+                    sampleTypeId={selectSampleType.id!!}
                     closeModal={closeModal}
                     refreshTable={() => fetchData(search)}
                 />
