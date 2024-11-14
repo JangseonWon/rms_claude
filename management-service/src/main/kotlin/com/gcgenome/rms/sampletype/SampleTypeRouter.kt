@@ -4,7 +4,6 @@ import com.gcgenome.rms.auth.AuthenticationHandler
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.SampleTypeDTO
 import com.gcgenome.rms.exception.AuthenticationNotFoundException
-import com.gcgenome.rms.exception.ServiceNotFoundException
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
@@ -22,7 +21,21 @@ class SampleTypeRouter (
 ) {
     @Bean("SampleTypeRouter")
     fun route() = router {
-        POST("/w-api/management-service/sample-types", ::findSampleTypes)
+        GET("/w-api/management-service/sample-types/{sample-type-id}", ::findSampleType)
+        POST("/w-api/management-service/sample-types/search", ::findSampleTypes)
+        PATCH("/w-api/management-service/sample-types/{sample-type-id}", ::updateSampleType)
+
+    }
+    private fun findSampleType(request: ServerRequest): Mono<ServerResponse> {
+        val sampleTypeId = request.pathVariable("sample-type-id")
+        return authenticationHandler.chkManager(request)
+            .flatMap { sampleTypeHandler.selectSampleType(sampleTypeId) }
+            .flatMap { ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(it), SampleTypeDTO::class.java)
+            }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error : $it, ${it.cause}") }
     }
 
     private fun findSampleTypes(request: ServerRequest): Mono<ServerResponse> {
@@ -38,8 +51,14 @@ class SampleTypeRouter (
                 .body(Flux.fromIterable(it.data), SampleTypeDTO::class.java)
             }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume(ServiceNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
-            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error : $it, ${it.cause}") }
+    }
+    private fun updateSampleType(request: ServerRequest): Mono<ServerResponse> {
+        return authenticationHandler.chkManager(request)
+            .flatMap { request.bodyToMono(SampleTypeDTO::class.java) }
+            .flatMap { sampleType -> sampleTypeHandler.updateSampleType(sampleType) }
+            .then(ServerResponse.ok().build())
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error : $it, ${it.cause}") }
     }
 }

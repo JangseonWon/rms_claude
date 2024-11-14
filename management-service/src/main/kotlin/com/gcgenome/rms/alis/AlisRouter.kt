@@ -2,12 +2,12 @@ package com.gcgenome.rms.alis
 
 import com.gcgenome.rms.auth.AuthenticationHandler
 import com.gcgenome.rms.data.Query
+import com.gcgenome.rms.data.SampleTypeDTO
 import com.gcgenome.rms.data.ServiceDTO
 import com.gcgenome.rms.data.UserDTO
 import com.gcgenome.rms.exception.AuthenticationNotFoundException
 import com.gcgenome.rms.exception.ManagerAuthenticationException
 import com.gcgenome.rms.tables.pojos.Extension
-import com.gcgenome.rms.tables.pojos.SampleType
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
@@ -76,7 +76,7 @@ class AlisRouter (
                     .header("X-Page-Size", it.pageSize.toString())
                     .header("X-Current-Page", it.currentPage.toString())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(Flux.fromIterable(it.data), SampleType::class.java)
+                    .body(Flux.fromIterable(it.data), SampleTypeDTO::class.java)
             }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue( "${e.message}") }
             .onErrorResume(ManagerAuthenticationException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue( "${e.message}") }

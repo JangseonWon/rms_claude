@@ -35,10 +35,10 @@ interface ExtensionDao : QueryDao{
         return Mono.from(
             insertInto(EXTENSION)
                 .set(EXTENSION.ID, alisExtension.customCode)
-                .set(EXTENSION.NAME, alisExtension.customDisplayName)
+                .set(EXTENSION.NAME_KR, alisExtension.customDisplayName)
                 .onConflict(EXTENSION.ID)
                 .doUpdate()
-                .set(EXTENSION.NAME, alisExtension.customDisplayName)
+                .set(EXTENSION.NAME_KR, alisExtension.customDisplayName)
         )
     }
 }

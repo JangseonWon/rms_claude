@@ -119,10 +119,10 @@ interface ServiceDao : QueryDao{
         return Mono.from(
             insertInto(SERVICE)
                 .set(SERVICE.ID, alisService.testCode)
-                .set(SERVICE.NAME, alisService.testDisplayName)
+                .set(SERVICE.NAME_KR, alisService.testDisplayName)
                 .onConflict(SERVICE.ID)
                 .doUpdate()
-                .set(SERVICE.NAME, alisService.testDisplayName)
+                .set(SERVICE.NAME_KR, alisService.testDisplayName)
         )
     }
 }

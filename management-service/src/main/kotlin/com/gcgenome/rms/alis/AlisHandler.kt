@@ -50,7 +50,7 @@ class AlisHandler(
             .then(dslContext.selectServicesWithPage(query))
     }
 
-    fun updateSampleTypes(query: Query): Mono<Page<SampleType>> {
+    fun updateSampleTypes(query: Query): Mono<Page<SampleTypeDTO>> {
         return webClient.get()
             .uri("/w-api/alis-api/sample-types")
             .retrieve()
