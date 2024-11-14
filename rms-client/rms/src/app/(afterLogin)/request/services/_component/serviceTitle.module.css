@@ -1,5 +1,5 @@
 .title{
-    display: flex;
+    display: grid;
     justify-content: space-between;
     align-items: stretch;
 }

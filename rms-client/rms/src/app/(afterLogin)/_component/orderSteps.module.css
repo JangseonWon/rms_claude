@@ -1,0 +1,60 @@
+.container {
+    background-color: #fff;
+    height: 80px;
+    margin-bottom: 30px;
+    border-radius: 35px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    align-content: center;
+}
+.container * {
+    align-content: center;
+}
+.innerContainer {
+    margin: 10px 40px;
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+}
+.orderSteps {
+    color: #002b49;
+    font-size: 18px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+.stepContainer {
+    display: flex;
+    align-items: center;
+}
+.circleNumber {
+    border-radius: 50px;
+    width: 40px;
+    height: 40px;
+    background: #AFAFAF;
+    color: #fff;
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+}
+.textContainer {
+    margin: 0 10px;
+    display: grid;
+    font-size: 13px;
+    font-weight: 700;
+    color: #AFAFAF;
+}
+.line {
+    height: 2px;
+    width: 40px;
+    background-color: #AFAFAF;
+}
+.activeStep .circleNumber {
+    background: linear-gradient(to right, #023a60, #5676a2);
+    color: #fff;
+}
+.activeStep .textContainer {
+    color: #002b49;
+}
+.activeStep .line {
+    height: 4px;
+    background-color: #002b49;
+}

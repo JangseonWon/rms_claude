@@ -1,7 +1,7 @@
 import React, {ReactNode} from "react";
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import {config} from '@fortawesome/fontawesome-svg-core';
-import style from "@/css/requestMainPage.module.css";
+import style from "@/css/managementPage.module.css";
 import Title from "@/app/_component/Title";
 
 

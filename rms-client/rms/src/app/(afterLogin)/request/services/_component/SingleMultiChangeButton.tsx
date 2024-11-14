@@ -19,7 +19,7 @@ export default function SingleMultiChangeButton() {
     const buttonText = `${order.charAt(0).toUpperCase()}${order.slice(1)} Request`;
 
     return (
-        <button className={style.excelButton} onClick={excelRequest}>
+        <button className={style.changeButton} onClick={excelRequest}>
             {buttonText}
         </button>
     );

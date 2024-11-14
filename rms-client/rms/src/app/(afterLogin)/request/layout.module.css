@@ -5,7 +5,7 @@
     margin: 0 auto;
 }
 .leftSection {
-    margin-top: 2vh;
+    margin-top: 20px;
     display: flex;
     flex-direction: column;
     flex-grow: 0;

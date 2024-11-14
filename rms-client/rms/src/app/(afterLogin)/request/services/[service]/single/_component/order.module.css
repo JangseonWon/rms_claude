@@ -1,27 +1,27 @@
 .container {
-    padding: 0 2vw;
+    padding: 0 40px;
 }
 .buttonSection {
-    margin-top: 5vh;
+    margin-top: 50px;
     text-align: right;
     width: 100%;
     box-sizing: border-box;
 }
 .section {
-    margin-top: 1vh;
+    margin-top: 10px;
     display: flex;
 }
 .section > * {
-    padding-right: 1vw;
+    padding-right: 20px;
 }
 .memoSection {
     width: 98.5%;
 }
 .selectBox {
-    width: 11vw;
+    width: 220px;
 }
 .dateBox {
-    width: 11vw;
+    width: 220px;
 }
 .mainName {
     color: #002b49;

@@ -2,8 +2,8 @@
     display: grid;
 }
 .section > * {
-    margin-top: 2vh;
-    padding-right: 1vw;
+    margin-top: 20px;
+    padding-right: 20px;
 }
 .gridContainer {
     width: 50vw;
