@@ -11,7 +11,7 @@
 }
 
 .container {
-    margin: 5vh 2vw;
+    margin: 50px 40px;
     overflow-x: scroll;
 }
 .table {
@@ -67,22 +67,22 @@
 .pagination button {
     border: none;
     border-radius: 18px;
-    font-size: 1vw;
-    padding: 1vh 0.5vw;
-    margin: 1vh 0.5vw;
+    font-size: 10pt;
+    padding: 10px 5px;
+    margin: 10px 5px;
 }
 .pagination button:hover:not([disabled]) {
     background-color: #d3d3d3;
     cursor: pointer;
 }
 .topHeader {
-    min-width: 10vw;
+    min-width: 200px;
 }
 .extensionHeader {
-    min-width: 6vw;
+    min-width: 60px;
 }
 .notesHeader {
-    min-width: 15vw;
+    min-width: 300px;
 }
 .select {
     position: relative;

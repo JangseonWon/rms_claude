@@ -8,7 +8,7 @@
 }
 .container h1 {
     color: #002b49;
-    font-size: 20pt;
+    font-size: 27px;
 }
 .container p {
     color: #666666;
@@ -68,7 +68,7 @@
     overflow: hidden;
 }
 .cardLabel{
-    font-size: 12pt;
+    font-size: 16px;
     color:#666666;
     font-weight: 600;
     padding: 5px 20px;

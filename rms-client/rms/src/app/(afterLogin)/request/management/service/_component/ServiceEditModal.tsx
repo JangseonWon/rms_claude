@@ -184,7 +184,7 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
                             <SelectSearchBox
                                 type={'sampleType'}
                                 onSelect={setSelectedSampleType}
-                                width={'11vw'}
+                                width={'220px'}
                             />
                             <button className={style.addButton} onClick={() => handleSampleTypeAddClick()}>Add</button>
                         </div>

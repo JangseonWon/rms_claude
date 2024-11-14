@@ -22,14 +22,14 @@
     color: white;
 }
 .imageContainer .text .mainText {
-    font-size: 27pt;
+    font-size: 36px;
     font-weight: 600;
     margin:0;
     white-space: nowrap;
     overflow: hidden;
 }
 .imageContainer .text .subText {
-    font-size: 12pt;
+    font-size: 16px;
     font-weight: 500;
     margin:0;
     white-space: nowrap;

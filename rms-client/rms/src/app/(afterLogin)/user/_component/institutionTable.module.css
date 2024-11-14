@@ -3,7 +3,7 @@
     margin: 0 auto;
 }
 .filterContainer {
-    margin: 2vh 1.5vw;
+    margin: 20px 30px;
     display: flex;
 }
 .filterContainerLeft {
@@ -11,8 +11,8 @@
     margin-left: auto;
 }
 .filterContainerRight {
-    margin-left: 0.5vw;
-    width: 20vw;
+    margin-left: 10px;
+    width: 400px;
 }
 .table {
     width: 100%;
@@ -94,9 +94,9 @@
 .pagination button {
     border: none;
     border-radius: 18px;
-    font-size: 1vw;
-    padding: 1vh 0.5vw;
-    margin: 1vh 0.5vw;
+    font-size: 10pt;
+    padding: 10px 5px;
+    margin: 10px 5px;
 }
 .pagination button:hover:not([disabled]) {
     background-color: #d3d3d3;

@@ -309,7 +309,7 @@ export default function Order() {
                 <BlueButton
                     name={"Order Now"}
                     disabled={!isAllRequiredFilled()}
-                    onClick={() => publishRequest("ORDERED")}
+                    onClick={() => publishRequest("UNCONFIRMED_ORDER")}
                 />
             </div>
         </div>

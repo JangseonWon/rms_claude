@@ -6,14 +6,14 @@
 }
 .container h1 {
     color: #002b49;
-    font-size: 20pt;
+    font-size: 27px;
 }
 .container h1 span button {
     cursor: pointer;
     margin-left: 10px;
     padding: 3px 8px;
     border-radius: 15px;
-    font-size: 10pt;
+    font-size: 13px;
     color: #002b49;
     font-weight: 600;
     background-color: #fff;
@@ -54,12 +54,12 @@
     background: linear-gradient(to right, #023a60, #5676a2);
 }
 .cardLabel{
-    font-size: 12pt;
+    font-size: 16px;
     font-weight: 600;
     text-align: left;
 }
 .cardValue{
-    font-size: 18pt;
+    font-size: 24px;
     font-weight: 600;
     text-align: right;
 }
