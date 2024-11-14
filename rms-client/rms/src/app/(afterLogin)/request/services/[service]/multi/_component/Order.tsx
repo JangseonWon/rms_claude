@@ -182,7 +182,7 @@ export default function Order() {
     };
 
     const handleOrderNowClick = async () => {
-        const orderData = transformDataToFormat(requestData, "ORDERED");
+        const orderData = transformDataToFormat(requestData, "UNCONFIRMED_ORDER");
 
         try {
             const response = await putRequest(orderData);
