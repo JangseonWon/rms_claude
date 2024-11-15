@@ -109,7 +109,7 @@ interface RequestDao: QueryDao {
             baseCondition.and(ORDER.USER_ID.eq(userDto.id))
         } else {
             baseCondition
-        }.and(REQUEST.STATUS.eq("ORDERED"))
+        }.and(REQUEST.STATUS.likeIgnoreCase("%ORDER%"))
 
         return selectPage(mainTable = REQUEST, query = query,
             joinTables = joins, selectFields = fields, where = finalCondition) { record ->
