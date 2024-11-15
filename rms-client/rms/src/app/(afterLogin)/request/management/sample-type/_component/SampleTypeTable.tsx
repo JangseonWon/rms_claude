@@ -84,12 +84,10 @@ export default function SampleTypeTable() {
     const handleEditClick = (sampleType: SampleType) => {
         setSelectSampleType(sampleType)
         setEditModalOpen(true)
-        document.body.style.overflow = 'hidden';
     }
 
     const closeModal = () => {
         setEditModalOpen(false);
-        document.body.style.overflow = 'auto';
     }
 
     const handleAlisSyncButtonClick = async(search: Query) => {

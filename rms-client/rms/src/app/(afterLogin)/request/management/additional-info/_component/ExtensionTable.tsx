@@ -85,12 +85,10 @@ export default function ExtensionTable() {
     const handleEditExtensionClick = (extension: Extension) => {
         setSelectExtension(extension)
         setExtensionEditModalOpen(true)
-        document.body.style.overflow = 'hidden';
     }
 
     const closeModal = () => {
         setExtensionEditModalOpen(false);
-        document.body.style.overflow = 'auto';
     }
 
     const handleAlisSyncButtonClick = async(search: Query) => {
