@@ -2,6 +2,7 @@
 
 import React, {useState} from "react";
 import style from "@/app/(afterLogin)/user/_component/institutionAddModal.module.css";
+import globalStyle from '@/css/modal.module.css';
 import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
@@ -42,13 +43,9 @@ export default function InstitutionAddModal({open, closeModal}: Props) {
     }
 
     return (
-        <div className={style.modalBackground}>
-            <div className={style.modal}>
-                <section className={style.modalHeader}>
-                    <div className={style.modalClose} onClick={closeModal}>
-                        <FontAwesomeIcon icon={faXmark}/>
-                    </div>
-                </section>
+        <div className={globalStyle.modalBackground}>
+            <div className={globalStyle.modal}>
+                <FontAwesomeIcon icon={faXmark} onClick={closeModal} className={globalStyle.modalCloseButton}/>
                 <section className={style.modalBody}>
                     <section className={style.bottomBody}>
                             <div className={style.bodyGrid}>

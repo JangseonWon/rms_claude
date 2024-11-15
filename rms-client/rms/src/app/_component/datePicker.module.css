@@ -4,10 +4,10 @@
 .dateBox p {
     font-size: 12px;
     color: #666666;
-    margin: 0 0 0.615vh 0;
+    margin: 0 0 6px 0;
 }
 .dateBox.error p{
-    color: red;
+    color: #90BA2D;
 }
 .icon {
     position: absolute;
@@ -18,10 +18,10 @@
     pointer-events: none;
 }
 .dateBox.error input{
-    border: 1px solid red;
+    border: 1px solid #90BA2D;
 }
 .testBox input {
-    width: 180px;
+    width: 170px;
     font-size: 12px;
     min-width: 32px;
     height: 18px;

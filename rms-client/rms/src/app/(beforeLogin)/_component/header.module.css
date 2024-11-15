@@ -29,11 +29,11 @@
 }
 .needHelpActive {
     background-color: #ffffff;
-    border-radius: 2.5vh;
-    padding: 0.8vh 1.4vw;
+    border-radius: 15px;
+    padding: 8px 30px;
     color: #182847;
     font-weight: bold;
-    font-size: 12pt;
+    font-size: 16px;
     border: none;
     text-decoration: none;
 }

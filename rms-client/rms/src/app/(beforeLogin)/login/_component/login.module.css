@@ -39,12 +39,12 @@
 }
 .mainLabel {
     font-weight: 700;
-    font-size: 22pt;
+    font-size: 29px;
     color: #002B49;
 }
 .subLabel {
     font-weight: 400;
-    font-size: 16pt;
+    font-size: 21px;
     color: #002B49;
 }
 .logo {
@@ -56,7 +56,7 @@
     margin: 0 50px 20px 0;
 }
 .loginLabel {
-    font-size: 15pt;
+    font-size: 20px;
     font-weight: 300;
     margin-bottom: 5px;
 }
@@ -68,36 +68,36 @@
     background-color: #C8C9CB;
     outline: none;
     padding-left: 10px;
-    font-size: 14pt;
+    font-size: 18px;
 }
 .loginButton,
 .healthcareButton {
     height: 50px;
     width: 412px;
-    font-size: 13pt;
+    font-size: 17px;
     font-weight: 600;
     border-radius: 10px;
 }
 .loginButton {
     background: linear-gradient(135deg, #182847, #354e6d);
     color: #ffffff;
-    margin-top: 3vh;
-    margin-bottom: 3vh;
+    margin-top: 30px;
+    margin-bottom: 30px;
     border: none;
-    box-shadow: 0.1vh 0.4vh 1vh rgba(0, 0, 0, 0.5);
+    box-shadow: 1px 4px 10px rgba(0, 0, 0, 0.5);
 }
 .loginButton:hover {
     background: linear-gradient(135deg, #1b3351, #3d587e);
     cursor: pointer;
 }
 .loginButton:active {
-    box-shadow: 0.1vh 0.1vh 0 rgba(0, 0, 0, 0.5);
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
 }
 .healthcareButton {
     color: #999999;
     border: thin solid #999999;
     font-weight: 300;
-    box-shadow: 0.1vh 0.5vh 1vh rgba(0, 0, 0, 0.2);
+    box-shadow: 1px 5px 10px rgba(0, 0, 0, 0.2);
 }
 .healthcareButton:hover {
     color: #666666;
@@ -105,12 +105,12 @@
     cursor: pointer;
 }
 .healthcareButton:active {
-    box-shadow: 0.1vh 0.1vh 0 rgba(0, 0, 0, 0.5);
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
 }
 .spinner {
-    border: 0.4vh solid rgba(0, 0, 0, 0.1);
-    width: 2.4vh;
-    height: 2.4vh;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     border-left-color: #fff;
     animation: spin 1s ease infinite;
@@ -125,13 +125,13 @@
 }
 .errorMessage {
     color: red;
-    margin-top: 1vh;
+    margin-top: 10px;
 }
 .changePassword {
     margin: 20px auto 0 145px;
     color: #002b49;
     font-weight: bold;
-    font-size: 12pt;
+    font-size: 16px;
     border-bottom: solid #002b49;
     border-width: thin;
     cursor: pointer;

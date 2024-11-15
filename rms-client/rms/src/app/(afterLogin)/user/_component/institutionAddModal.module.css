@@ -12,23 +12,22 @@
     background: rgb(255, 255, 255);
     border: solid #f0f0f0 2px;
     position: relative;
-    top: 10%;
-    height: 70vh;
-    width: 31vw;
-    border-radius: 16px;
+    height: 700px;
+    width: 600px;
+    border-radius: 15px;
     display: flex;
     flex-direction: column;
 }
 .modalClose {
-    padding-top: 1vh;
-    padding-right: 1vw;
+    padding-top: 10px;
+    padding-right: 20px;
     float: right;
 }
 .modalClose:hover {
     cursor: pointer;
 }
 .modalHeader {
-    border-radius: 16px 16px 0 0;
+    border-radius: 15px 15px 0 0;
     position: sticky;
     top: 0;
     background-color: white;
@@ -39,33 +38,33 @@
 }
 .bottomBody {
     display: flex;
-    margin: 1vh 2vw;
+    margin: 10px 30px;
     border: solid #C8C9CB 1px;
     border-radius: 15px;
-    width: 27vw;
-    height: 60vh;
+    width: 540px;
+    height: 630px;
 }
 .bodyGrid {
     display: grid;
-    margin: 1vh 3vw;
+    margin: 10px 60px;
     gap: 3%;
 }
 .bodyHeader {
     display: flex;
-    width: 20vw;
+    width: 400px;
 }
 .addButton {
-    margin: 2vh 0 0 auto;
+    margin: 20px 0 0 auto;
     cursor: pointer;
-    padding: 0.5vh 0.5vw;
-    height: 4vh;
-    width: 4vw;
+    padding: 5px 10px;
+    height: 40px;
+    width: 80px;
     border-radius: 10px;
     border: none;
     background: linear-gradient(135deg, #182847, #354e6d);
     color: #ffffff;
     font-weight: 700;
-    font-size: 0.7vw;
+    font-size: 15px;
     box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.5);
 }
 .addButton:hover {

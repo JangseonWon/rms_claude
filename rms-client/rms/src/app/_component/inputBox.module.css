@@ -15,10 +15,10 @@
     box-shadow: 0 2px 2px #F3F6F9;
 }
 .inputBox.error input{
-    border: 1px solid red;
+    border: 1px solid #90BA2D;
 }
 .inputBox.error p{
-    color: red;
+    color: #90BA2D;
 }
 .inputBox input:not(:disabled):hover {
     outline: 2px solid #CCE492;

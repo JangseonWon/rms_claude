@@ -1,6 +1,7 @@
 "use client"
 
 import style from "@/app/(afterLogin)/request/order/_component/orderInfo.module.css";
+import globalStyle from '@/css/modal.module.css';
 import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useRouter, useSearchParams} from "next/navigation";
@@ -75,8 +76,8 @@ export default function OrderInfo() {
     }, [fetchRequest, router]);
 
     return (
-        <div className={style.modalBackground}>
-            <div className={style.modal}>
+        <div className={globalStyle.modalBackground}>
+            <div className={globalStyle.modal}>
                 <div className={style.modalTitle}>
                     <h1>Order Details</h1>
                     <button onClick={onClickClose}>

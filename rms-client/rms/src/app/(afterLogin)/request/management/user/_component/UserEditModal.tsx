@@ -1,7 +1,8 @@
 'use client';
 
 import React, {useEffect, useState} from "react";
-import style from './userEditModal.module.css';
+import style from '@/css/modal.module.css';
+import tableStyle from '@/css/globalTable.module.css';
 import {faTrash, faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
@@ -11,7 +12,6 @@ import {User} from "@/model/User";
 import GreenButton from "@/app/_component/GreenButton";
 import BlueButton from "@/app/_component/BlueButton";
 import {getUser} from "@/app/(afterLogin)/request/management/user/_api/getUser";
-import {patchService} from "@/app/(afterLogin)/request/management/service/_api/patchService";
 import {patchUser} from "@/app/(afterLogin)/request/management/user/_api/patchUser";
 
 
@@ -89,10 +89,10 @@ export default function UserEditModal({userId, closeModal}: Props) {
                             <SelectSearchBox
                                 type={'service'}
                                 onSelect={setSelectedAddService}
-                                width={'15vw'}/>
+                                width={'300px'}/>
                             <button className={style.addButton} onClick={handleUserServiceInsertClick}>Add</button>
                         </div>
-                        <table className={style.table}>
+                        <table className={tableStyle.table}>
                             <thead>
                             <tr>
                                 <th>Id</th>

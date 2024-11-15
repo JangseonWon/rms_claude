@@ -1,5 +1,5 @@
 .filterContainer {
-    margin: 2vh 1.5vw;
+    margin: 20px 30px;
     display: flex;
     justify-content: space-between;
 }
@@ -7,75 +7,12 @@
     display: flex;
 }
 .filterContainerRight {
-    width: 20vw;
+    width: 400px;
 }
 .reSampleButton {
     display: flex;
     float: right;
-    margin: 1vh 1vw;
-}
-.tableContainer {
-    margin: 2vh 1vw;
-}
-.table {
-    width: 100%;
-    border-collapse: collapse;
-}
-.table thead {
-    background-color: #002b49;
-    color: #ffffff;
-    font-size: 0.8vw;
-    font-weight: 600;
-}
-.table thead tr th:first-child {
-    border-radius: 20px 0 0 20px;
-}
-.table thead tr th:last-child {
-    border-radius: 0 20px 20px 0;
-}
-.table tbody {
-    font-weight: 300;
-}
-.table tbody tr {
-    border-bottom: 1px solid #838689;
-}
-.table tbody tr td {
-    color: #666666;
-    font-size: 0.8vw;
-    padding: 1vh 1vw;
-}
-.table tbody tr:nth-child(even) {
-    background-color: #ffffff;
-}
-.table th,
-.table td {
-    padding: 0.8vh 0.8vw;
-    text-align: center;
-}
-.pagination {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-}
-.pagination span {
-    padding: 1vh 1vw;
-    font-size: 0.8vw;
-    color: #1a1a1a;
-    align-items: center;
-}
-.pagination span:first-child {
-    padding: 1vh 0.3vw 1vh 0;
-}
-.pagination button {
-    border: none;
-    border-radius: 18px;
-    font-size: 10pt;
-    padding: 10px 5px;
-    margin: 10px 5px;
-}
-.pagination button:hover:not([disabled]) {
-    background-color: #d3d3d3;
-    cursor: pointer;
+    margin: 10px 20px;
 }
 .select {
     width: 50px;

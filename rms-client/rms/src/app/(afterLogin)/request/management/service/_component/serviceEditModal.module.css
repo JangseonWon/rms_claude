@@ -37,7 +37,7 @@
 .modalBody {
     display: flex;
     flex-direction: column;
-    margin-bottom: 3vh;
+    margin-bottom: 30px;
 }
 .formGroup {
     display: flex;
@@ -71,7 +71,7 @@
     justify-content: flex-end
 }
 .required {
-    width: 5vw !important;
+    width: 100px !important;
 }
 .table {
     width: 100%;
@@ -116,15 +116,15 @@
 .addButton {
     margin-top: 20px;
     cursor: pointer;
-    padding: 0.5vh 0.5vw;
-    height: 4vh;
-    width: 4vw;
+    padding: 5px 10px;
+    height: 40px;
+    width: 80px;
     border-radius: 10px;
     border: none;
     background: linear-gradient(135deg, #182847, #354e6d);
     color: #ffffff;
     font-weight: 700;
-    font-size: 0.7vw;
+    font-size: 13px;
     box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.5);
 }
 .addButton:hover {

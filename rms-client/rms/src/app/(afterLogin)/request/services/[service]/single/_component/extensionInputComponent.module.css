@@ -6,16 +6,16 @@
     padding-right: 20px;
 }
 .gridContainer {
-    width: 50vw;
+    width: 1000px;
     display: flex;
     flex-wrap: wrap;
     gap: 2%;
-    margin-bottom: 1vh;
+    margin-bottom: 10px;
 }
 .gridItem {
-    width: 11vw;
-    margin-bottom: 2vh;
+    width: 200px;
+    margin-bottom: 20px;
 }
 .textContainer {
-    margin-bottom: 1vh;
+    margin-bottom: 10px;
 }

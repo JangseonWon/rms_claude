@@ -35,10 +35,10 @@
     cursor: pointer;
 }
 .selectSection.error .btnSelect {
-    border: 1px solid red;
+    border: 1px solid #90BA2D;
 }
 .selectSection.error p{
-    color: red;
+    color: #90BA2D;
 }
 .btnSelect:hover {
     outline: 2px solid #CCE492;

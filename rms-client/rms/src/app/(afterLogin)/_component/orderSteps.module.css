@@ -24,6 +24,19 @@
 .stepContainer {
     display: flex;
     align-items: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.stepContainer:hover .circleNumber {
+    background: #5676a2;
+}
+
+.stepContainer:hover .textContainer {
+    color: #5676a2;
+}
+
+.stepContainer:hover .line {
+    background-color: #5676a2;
 }
 .circleNumber {
     border-radius: 50px;

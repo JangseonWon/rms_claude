@@ -158,7 +158,7 @@ export default function Table() {
                 </div>
                 <div className={style.topSecondSection}>
                     <SelectBox
-                        width={"10vw"}
+                        width={"200px"}
                         value={selectedOption.name}
                         options={selectBoxOptions}
                         label={"filter"}

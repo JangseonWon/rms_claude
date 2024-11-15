@@ -2,6 +2,7 @@
 
 import React, {useState} from "react";
 import style from "@/app/(afterLogin)/user/_component/institutionEditModal.module.css";
+import globalStyle from '@/css/modal.module.css';
 import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
@@ -43,18 +44,14 @@ export default function InstitutionEditModal({organization, open, closeModal}: P
     }
 
     return (
-        <div className={style.modalBackground}>
-            <div className={style.modal}>
-                <section className={style.modalHeader}>
-                    <div className={style.modalClose} onClick={closeModal}>
-                        <FontAwesomeIcon icon={faXmark}/>
-                    </div>
-                </section>
+        <div className={globalStyle.modalBackground}>
+            <div className={globalStyle.modal}>
+                <FontAwesomeIcon icon={faXmark} onClick={closeModal} className={globalStyle.modalCloseButton}/>
+                <div className={globalStyle.modalTitle}>Institution Update</div>
                 <section className={style.modalBody}>
                     <section className={style.bottomBody}>
                             <div className={style.bodyGrid}>
                                 <div className={style.bodyHeader}>
-                                    <h2>Institution Update</h2>
                                     <button className={style.addButton} onClick={handleInstitutionEdit}>
                                         Update
                                     </button>

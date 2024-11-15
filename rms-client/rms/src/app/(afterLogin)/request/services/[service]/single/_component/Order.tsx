@@ -177,7 +177,7 @@ export default function Order() {
                             handleRequestChange('sample.patient.organization.name', value.name)
                             setSelectedOrganization(value.name);
                         }}
-                        width="11vw"
+                        width="200px"
                     />
                 </div>
             </div>
@@ -230,7 +230,7 @@ export default function Order() {
                             handleRequestChange('sample.patient.sex', value.value)
                             setSelectedSex(value.name);
                         }}
-                        width="11vw"
+                        width="200px"
                     />
                 </div>
             </div>
@@ -247,7 +247,7 @@ export default function Order() {
                             handleRequestChange('sample.sample_type.name', value.name)
                             setSelectedSampleType(value.name);
                         }}
-                        width="11vw"
+                        width="200px"
                     />
                 </div>
                 <div className={style.dateBox}>

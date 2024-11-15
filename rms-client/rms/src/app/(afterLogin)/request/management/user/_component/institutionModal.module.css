@@ -5,7 +5,7 @@
     display: flex;
     justify-content: center;
     position: absolute;
-    top: 15vh;
+    top: 150px;
     left: 0;
     right: 0;
     bottom: 0;
@@ -15,23 +15,23 @@
     border: solid #f0f0f0 2px;
     position: relative;
     top: 5%;
-    max-width: 30vw;
-    max-height: 65vh;
-    min-width: 50vw;
+    max-width: 600px;
+    max-height: 650px;
+    min-width: 1000px;
     border-radius: 16px;
     display: flex;
     flex-direction: column;
     overflow: auto;
 }
 .modalTop {
-    padding: 1vh 2vw;
+    padding: 10px 40px;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
 }
 .modalClose {
-    padding-top: 1vh;
-    padding-right: 1vw;
+    padding-top: 10px;
+    padding-right: 20px;
     float: right;
 }
 .modalClose:hover {
@@ -40,7 +40,7 @@
 .bodyTitle {
     display: flex;
     justify-content: space-between;
-    margin: 0 6.5vw;
+    margin: 0 130px;
 }
 .modalHeader {
     position: sticky;
@@ -50,59 +50,24 @@
     border-bottom: solid #C8C9CB 2px;
 }
 .modalBody {
-    min-height: 40vh;
+    min-height: 400px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    margin-bottom: 3vh;
+    margin-bottom: 30px;
 }
 .rightBody {
-    min-height: 40vh;
-    margin: 0 1vw;
+    min-height: 400px;
+    margin: 0 20px;
 }
 .centerBody {
-    min-height: 40vh;
-    margin: 0 1vw;
+    min-height: 400px;
+    margin: 0 20px;
 }
 .leftBody {
-    min-width: 18vw;
-    min-height: 40vh;
-    margin: 0 1vw;
-}
-.institutionTable {
-    min-width: 44vw;
-    background-color: #f8f8f8;
-    width: 100%;
-    border-collapse: collapse;
-    margin: 3vh 1vw;
-}
-.institutionTable thead {
-    background-color: #838689;
-    color: #ffffff;
-    font-size: 0.7vw;
-    font-weight: 600;
-}
-.institutionTable thead tr th:first-child {
-    border-radius: 15px 0 0 0;
-}
-.institutionTable thead tr th:last-child {
-    border-radius: 0 20px 0 0;
-}
-.institutionTable tbody {
-    font-weight: 300;
-}
-.institutionTable tbody tr {
-    border-bottom: 1px solid #838689;
-}
-.institutionTable tbody tr td {
-    color: #666666;
-    font-size: 0.7vw;
-    padding: 10px;
-}
-.institutionTable th,
-.institutionTable td {
-    padding: 0.6vh 0.6vw;
-    text-align: center;
+    min-width: 360px;
+    min-height: 400px;
+    margin: 0 20px;
 }
 .word {
     margin: 10px 0;
@@ -117,11 +82,4 @@
 }
 .link:active {
     color: #7a93b2;
-}
-.title {
-    font-size: 2vw;
-}
-.institutionTitle {
-    margin: 2.5vh 0 2vh auto;
-    font-size: 1vw;
 }

@@ -162,7 +162,7 @@ export default function DownloadTable() {
                 </div>
                 <div className={downloadStyle.filterContainerLeft}>
                     <SelectBox
-                        width={"10vw"}
+                        width={"200px"}
                         value={selectedOption.name}
                         options={selectBoxOptions}
                         label={"filter"}

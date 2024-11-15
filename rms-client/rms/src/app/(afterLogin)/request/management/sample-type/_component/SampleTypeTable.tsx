@@ -126,7 +126,7 @@ export default function SampleTypeTable() {
                 </div>
                 <div className={managementStyle.filterContainerSearch}>
                     <SelectBox
-                        width={"7vw"}
+                        width={"140px"}
                         value={selectOption.name}
                         options={selectBoxOptions}
                         label={"status"}

@@ -1,11 +1,12 @@
 "use client"
 
-import style from "@/app/(afterLogin)/request/cart/_component/info.module.css"
+import style from "@/app/(afterLogin)/request/cart/_component/info.module.css";
+import globalStyle from '@/css/modal.module.css';
 import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useRouter, useSearchParams} from "next/navigation";
 import SelectBox from "@/app/_component/SelectBox"
-import {useCallback, useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {getRequest} from "@/app/(afterLogin)/request/cart/_api/getRequest";
 import {Request} from "@/model/Request"
 import InputBox from "@/app/_component/InputBox";
@@ -30,7 +31,7 @@ export default function Info() {
     const sampleId = searchParams!.get("sample")
     const userId = searchParams!.get("user_id")
 
-    const onClickClose = () => {
+    const closeModal = () => {
         router.back();
     };
     const handleRequestChange = (path: string, value: any) => {
@@ -107,25 +108,14 @@ export default function Info() {
         fetchRequest()
         fetchOrganizations()
         fetchSampleType()
-        const handleKeyPress = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') {router.back();}
-        };
-        document.body.style.overflow = 'hidden';
-        window.addEventListener('keydown', handleKeyPress);
-        return () => {
-            document.body.style.overflow = 'auto';
-            window.removeEventListener('keydown', handleKeyPress);
-        };
-    }, [fetchRequest, fetchOrganizations, fetchSampleType, router]);
+    }, [fetchRequest, fetchOrganizations, fetchSampleType]);
 
     return (
-        <div className={style.modalBackground}>
-            <div className={style.modal}>
+        <div className={globalStyle.modalBackground}>
+            <div className={globalStyle.modal}>
                 <div className={style.modalTitle}>
                     <h1>Cart Details</h1>
-                    <button onClick={onClickClose}>
-                        <FontAwesomeIcon icon={faXmark}/>
-                    </button>
+                    <FontAwesomeIcon icon={faXmark} onClick={closeModal} className={globalStyle.modalCloseButton}/>
                 </div>
                 {request ? (
                     <div className={style.modalContent}>

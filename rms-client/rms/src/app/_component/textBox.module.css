@@ -4,25 +4,25 @@
 }
 .content p {
     flex-basis: 100%;
-    margin: 2vh 0 0.5vh 0;
+    margin: 20px 0 10px 0;
     color: #002b49;
-    font-size: 0.8vw;
+    font-size: 15px;
     font-weight: 700;
 }
 .content > * {
-    padding-right: 1vw;
+    padding-right: 20px;
 }
 .memo {
     border: 1px solid #DAE2ED;
     background: #ffffff;
     width: 100%;
     border-radius: 15px;
-    padding: 1vh 1vw;
+    padding: 10px 20px;
     box-shadow: 0 2px 2px #F3F6F9;
 }
 .memo:focus {
     outline: none;
 }
 .content.error textarea{
-    border: 1px solid red;
+    border: 1px solid #90BA2D;
 }

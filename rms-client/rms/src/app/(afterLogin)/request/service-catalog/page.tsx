@@ -1,4 +1,4 @@
-import style from "@/app/(afterLogin)/request/services/[service]/single/page.module.css";
+import style from "./page.module.css";
 import CategoryTitle from "@/app/(afterLogin)/request/service-catalog/_component/CategoryTitle";
 import ListServicePage from "@/app/(afterLogin)/request/service-catalog/_component/ListServicePage";
 import OrderSteps from "@/app/(afterLogin)/_component/OrderSteps";

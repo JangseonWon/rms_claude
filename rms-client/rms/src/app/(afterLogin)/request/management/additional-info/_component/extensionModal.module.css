@@ -1,24 +1,3 @@
-.modalBackground {
-    display: flex;
-    background-color: rgba(128, 128, 128, 0.16);
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    top: 8vh;
-    left: 0;
-    right: 0;
-    bottom: 0;
-}
-.modal {
-    display: flex;
-    background: rgb(255, 255, 255);
-    border: solid #f0f0f0 2px;
-    position: relative;
-    top: 0;
-    border-radius: 16px;
-    flex-direction: column;
-    padding: 20px 40px;
-}
 .modalTitle {
     font-size: 20px;
     font-weight: bold;
@@ -36,15 +15,15 @@
 }
 .modalBody {
     display: flex;
-    max-height: 45vh;
+    max-height: 450px;
     flex-direction: column;
     overflow-y: auto;
-    padding: 0 0 12vh 0;
+    padding: 0 0 120px 0;
     z-index: 10;
 }
 .modalTop {
     background-color: #fff;
-    margin: 2vh 0;
+    margin: 20px 0;
     display: flex;
     gap: 20px;
     padding: 10px 0;
@@ -52,96 +31,44 @@
 }
 .buttonGroup {
     display: flex;
-    margin: 2vh 4vw 2vh 0;
+    margin: 20px 80px 20px 0;
     float: right;
 }
 .modalClose {
-    padding-top: 1vh;
-    padding-right: 1vw;
+    padding-top: 10px;
+    padding-right: 20px;
     float: right;
 }
 .content {
     border: solid #C8C9CB 1px;
     border-radius: 15px;
-    width: 410px;
-    height: 400px;
+    margin-top: 10px;
+    max-width: 350px;
+    max-height: 350px;
     padding: 10px;
     overflow-y: auto;
 }
 .contentTitle {
     display: flex;
-    font-size: 20px;
+    font-size: 15px;
     font-weight: bold;
-    justify-content: space-between;
-    margin-bottom: 1vh;
-    gap: 10%;
+    margin-bottom: 10px;
 }
-.leftBody {
-    margin: 1vh 0 0 6vw;
+.formGroup {
     display: flex;
-    flex-direction: column;
-}
-.rightBody {
-    margin: 1vh 10vw 2vh 0;
-    display: grid;
-}
-.title {
-    font-size: 1.5vw;
-}
-.categoryName {
-    display: grid;
-    gap: 10%;
 }
 .minusButton {
-    margin: 3vh 0 0 1vw;
+    margin: 30px 0 0 20px;
     background-color: #e8e8e8;
-    padding: 0.5vh 0.3vw;
+    padding: 5px 6px;
     border-radius: 20px;
-    font-size: 0.6vw;
+    font-size: 12px;
     cursor: pointer;
 }
 .minusButton:hover {
     background-color: #cdcdcd;
 }
 .addButton {
-    margin: 2vh 0;
-    border: none;
-    padding: 0.4vh 0.4vw;
-    border-radius: 10px;
-    cursor: pointer;
-}
-.addButton:hover {
-    background-color: #dadada;
-}
-.minusButton {
     margin-top: 20px;
-    background-color: #e8e8e8;
-    padding: 8px;
-    border-radius: 20px;
-    font-size: 12px;
-    cursor: pointer;
+    float: right;
 }
-/*
-.categoryName {
-    display: grid;
-    gap: 10%;
-}
-.minusButton:hover {
-    background-color: #cdcdcd;
-}
-.editButton {
-    font-size: 0.8vw;
-    padding: 0.7vh 0.5vw;
-    min-width: 4vw;
-    border-radius: 5px;
-    border: none;
-    transition: all 150ms ease;
-    cursor: pointer;
-    background: linear-gradient(135deg, #a2a3a9, #7a92af);
-    color: #ffffff;
-    margin: 2vh 0;
-}
-.editButton:hover {
-    background: linear-gradient(135deg, #3c6699, #9ebce6);
-    border: none;
-}*/

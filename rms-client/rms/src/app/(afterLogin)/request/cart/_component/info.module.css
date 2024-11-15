@@ -13,9 +13,9 @@
     background: #ffffff;
     position: absolute;
     top: 10%;
-    max-width: 80vw;
-    max-height: 80vh;
-    min-width: 50vw;
+    max-width: 1600px;
+    max-height: 800px;
+    min-width: 1000px;
     border-radius: 16px;
     display: flex;
     flex-direction: column;

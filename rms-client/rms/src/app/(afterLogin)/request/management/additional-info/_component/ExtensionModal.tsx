@@ -2,6 +2,7 @@
 
 import React, {useEffect, useState} from "react";
 import style from "./extensionModal.module.css";
+import globalStyle from '@/css/modal.module.css';
 import {faMinus, faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
@@ -90,11 +91,11 @@ export default function ExtensionModal({extensionId, closeModal, refreshTable}: 
     };
 
     return (
-        <div className={style.modalBackground}>
-            <div className={style.modal}>
+        <div className={globalStyle.modalBackground}>
+            <div className={globalStyle.modal}>
                 <FontAwesomeIcon icon={faXmark} onClick={closeModal} className={style.modalCloseButton}/>
                 <div className={style.modalTitle}>Edit Extension</div>
-                <div className={style.formGroup}>
+                <div>
                     <InputBox
                         label={"Code"}
                         value={extension?.id}
@@ -108,12 +109,11 @@ export default function ExtensionModal({extensionId, closeModal, refreshTable}: 
                         required={false}
                     />
                 </div>
-                <div className={style.formGroup}>
+                <div>
                     <SelectBox
                         label={"Extension Type"}
                         value={extension?.type}
                         options={extensionOptions}
-                        width={'200px'}
                         required={true}
                         onChange={(selectedOption) => {
                             setExtension({
@@ -140,7 +140,6 @@ export default function ExtensionModal({extensionId, closeModal, refreshTable}: 
                         <div className={style.content}>
                             <div className={style.contentTitle}>
                                 <div>Extension Values</div>
-                                <GreenButton name={"+Add Value"} onClick={handleAddInput}/>
                             </div>
                             {listInputs.map((input, index) => (
                                 <div key={index} className={style.formGroup}>
@@ -160,6 +159,9 @@ export default function ExtensionModal({extensionId, closeModal, refreshTable}: 
                                     )}
                                 </div>
                             ))}
+                            <div className={style.addButton}>
+                                <GreenButton name={"+Add Value"} onClick={handleAddInput}/>
+                            </div>
                         </div>
                     )}
                 <div className={style.buttonGroup}>

@@ -46,7 +46,7 @@ export default function SelectBox({ label, value, options, onChange, required=fa
                 <p className={style.label}>{label}</p>
                 <button className={`${style.btnSelect} ${isOpen ? style.open : ''}`} onClick={toggleList}>
                     <div>{value || '-'}</div>
-                    <FontAwesomeIcon style={{paddingLeft: '1vw'}} icon={faChevronDown} />
+                    <FontAwesomeIcon style={{paddingLeft: '20px'}} icon={faChevronDown} />
                 </button>
                 <ul className={`${style.listMember} ${isOpen ? style.open : ''}`} style={{ width }}>
                     {options.map((option) => (

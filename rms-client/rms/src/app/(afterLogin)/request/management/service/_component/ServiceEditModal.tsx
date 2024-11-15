@@ -2,6 +2,7 @@
 
 import React, {useEffect, useState} from "react";
 import style from "@/app/(afterLogin)/request/management/service/_component/serviceEditModal.module.css";
+import globalStyle from '@/css/modal.module.css';
 import {faTrash, faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
@@ -135,9 +136,9 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
     }
 
     return (
-        <div className={style.modalBackground}>
-            <div className={style.modal}>
-                <FontAwesomeIcon icon={faXmark} onClick={closeModal} className={style.modalCloseButton}/>
+        <div className={globalStyle.modalBackground}>
+            <div className={globalStyle.modal}>
+                <FontAwesomeIcon icon={faXmark} onClick={closeModal} className={globalStyle.modalCloseButton}/>
                 <div className={style.modalTitle}>Service Management</div>
                 <div className={style.formGroup}>
                     <InputBox
@@ -216,7 +217,7 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
                     <div className={style.content}>
                         <div className={style.contentTitle}>Extension</div>
                         <div className={style.contentFormGroup}>
-                            <SelectSearchBox type={'extension'} onSelect={setSelectedExtension} width={'11vw'}/>
+                            <SelectSearchBox type={'extension'} onSelect={setSelectedExtension} width={'220px'}/>
                             <div>
                                 <SelectBox
                                     value={required.name}

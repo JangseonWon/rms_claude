@@ -39,12 +39,10 @@ export default function ServiceManageTable() {
     const handleServiceEditClick = (service: Service) => {
         setSelectedService(service);
         setServiceModalOpen(true);
-        document.body.style.overflow = 'hidden';
     }
     const closeModal = () => {
         setSelectedService(undefined);
         setServiceModalOpen(false);
-        document.body.style.overflow = 'auto';
     }
     const refreshData = () => {
         fetchData(search);
@@ -132,7 +130,7 @@ export default function ServiceManageTable() {
                 </div>
                 <div className={managementStyle.filterContainerSearch}>
                     <SelectBox
-                        width={"7vw"}
+                        width={"140px"}
                         value={selectOption.name}
                         options={selectBoxOptions}
                         label={"status"}

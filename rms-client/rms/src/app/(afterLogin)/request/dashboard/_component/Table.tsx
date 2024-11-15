@@ -198,7 +198,7 @@ export default function Table() {
                             addDateFilter(from, to);
                         }}/>
                     <SelectBox
-                        width={"10vw"}
+                        width={"200px"}
                         value={status}
                         options={statusList}
                         label={"status"}

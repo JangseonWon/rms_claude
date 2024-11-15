@@ -1,7 +1,8 @@
 "use client"
 
 import React, {useCallback, useEffect, useState} from "react";
-import style from "@/app/(afterLogin)/user/_component/institutionTable.module.css";
+import institutionStyle from "@/app/(afterLogin)/user/_component/institutionTable.module.css";
+import style from "@/css/globalTable.module.css";
 import type {Organization} from "@/model/Organization";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -107,11 +108,11 @@ export default function InstitutionTable() {
 
     return (
         <div className={style.container}>
-            <section className={style.filterContainer}>
-                <div className={style.filterContainerLeft}>
-                    <div className={style.institutionAddButton}>
-                        <BlueButton name={"Institution Add"} onClick={openInstitutionAddModal}/>
-                    </div>
+            <section className={institutionStyle.filterContainer}>
+                <div className={institutionStyle.filterContainerLeft}>
+                </div>
+                <div className={institutionStyle.filterContainerRight}>
+                    <BlueButton name={"Institution Add"} onClick={openInstitutionAddModal}/>
                     <SelectBox
                         value={selectOption.name}
                         options={selectBoxOptions}
@@ -120,8 +121,6 @@ export default function InstitutionTable() {
                             setSelectOption(selectedOption);
                         }}
                     />
-                </div>
-                <div className={style.filterContainerRight}>
                     <InputBox
                         label={" "}
                         onChange={(value) => {

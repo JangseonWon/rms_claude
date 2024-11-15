@@ -22,7 +22,7 @@ export default function SelectSearchBox({ type, onSelect, width }: Props) {
     const selectBoxRef = useRef<HTMLDivElement>(null);
 
     const transformDataToOptions = (data: SampleType[]): SelectBoxOption[] => {
-        if (!data) {
+        if (!data || !Array.isArray(data)) {
             return [];
         }
         return data.map(value => ({
@@ -159,7 +159,7 @@ export default function SelectSearchBox({ type, onSelect, width }: Props) {
                     />
                     <FontAwesomeIcon icon={faChevronDown}/>
                 </div>
-                <div className={`${style.searchList} ${isOpen ? style.open : ''}`} style={{width: `calc(${width} + 2vw)`}}>
+                <div className={`${style.searchList} ${isOpen ? style.open : ''}`} style={{width: `calc(${width} + 40px)`}}>
                     <ul className={style.listMember}>
                         {options.map((option) => (
                             <li key={option.name}>

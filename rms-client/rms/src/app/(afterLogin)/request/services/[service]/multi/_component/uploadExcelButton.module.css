@@ -1,7 +1,7 @@
 .upload {
-    font-size: 0.875rem;
+    font-size: 14px;
     padding: 6px 10px;
-    min-width: 3vw;
+    min-width: 60px;
     border-radius: 5px;
     border: 1px solid #a1b86a;
     transition: all 150ms ease;
@@ -21,7 +21,7 @@
     display: flex;
     justify-content: center;
     position: absolute;
-    top: 15vh;
+    top: 150px;
     left: 0;
     right: 0;
     bottom: 0;
@@ -31,9 +31,9 @@
     border: solid #f0f0f0 2px;
     position: relative;
     top: 5%;
-    max-width: 50vw;
-    max-height: 35vh;
-    min-width: 30vw;
+    max-width: 1000px;
+    max-height: 350px;
+    min-width: 600px;
     border-radius: 16px;
     display: flex;
     flex-direction: column;
@@ -52,8 +52,8 @@
 }
 .modalBody {
     margin-top: 20px;
-    min-width: 20vw;
-    min-height: 20vh;
+    min-width: 400px;
+    min-height: 200px;
     background-color: #eff0f3;
     border: solid #e3e4e6 2px;
     display: flex;
@@ -90,7 +90,7 @@
     padding: 8px 20px;
     border: 1px solid #bbb9b7;
     background-color: #ffffff;
-    font-size: 10pt;
+    font-size: 13px;
     color: #88837E;
 }
 .addButton {

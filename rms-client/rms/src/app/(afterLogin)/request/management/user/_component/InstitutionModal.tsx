@@ -1,5 +1,7 @@
 import React, {useEffect, useState} from "react";
-import style from "@/app/(afterLogin)/request/management/user/_component/institutionModal.module.css";
+// import style from "@/app/(afterLogin)/request/management/user/_component/institutionModal.module.css";
+import style from '@/css/modal.module.css';
+import tableStyle from '@/css/globalTable.module.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import {Organization} from "@/model/Organization";
@@ -34,20 +36,14 @@ export default function InstitutionModal({id, name, open, closeModal}: Props) {
     return (
         <div className={style.modalBackground}>
             <div className={style.modal}>
-                <section className={style.modalHeader}>
-                    <div className={style.modalClose} onClick={closeModal}>
-                        <FontAwesomeIcon icon={faXmark}/>
-                    </div>
-                    <div className={style.modalTop}>
-                        <div className={style.title}>Institution Details</div>
-                        <div className={style.institutionTitle}>
-                            User Id : {id} / Name : {name}
-                        </div>
-                    </div>
-                </section>
+                <FontAwesomeIcon icon={faXmark} onClick={closeModal} className={style.modalCloseButton}/>
+                <div className={style.modalTitle}>Institution Details</div>
+                <div className={style.modalSubTitle}>
+                    User Id : {id} / Name : {name}
+                </div>
                 <section className={style.modalBody}>
                     <div className={style.leftBody}>
-                        <table className={style.institutionTable}>
+                        <table className={tableStyle.table}>
                             <thead>
                             <tr>
                                 <th>Id</th>

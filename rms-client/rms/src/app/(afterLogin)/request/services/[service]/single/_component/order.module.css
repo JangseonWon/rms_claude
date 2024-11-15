@@ -18,13 +18,13 @@
     width: 98.5%;
 }
 .selectBox {
-    width: 220px;
+    width: 200px;
 }
 .dateBox {
-    width: 220px;
+    width: 200px;
 }
 .mainName {
     color: #002b49;
     font-weight: 800;
-    font-size: 0.8vw;
+    font-size: 15px;
 }

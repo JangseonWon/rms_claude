@@ -26,7 +26,7 @@ export default function AlertDialog({ message }: Props) {
     return (
         <div className={style.alertDialogContainer}>
             <div className={style.alertDialog}>
-                <p>Notice</p>
+                <p>Warning</p>
                 <hr />
                 <p className={style.message}>{formattedMessage}</p>
                 <button onClick={handleCloseDialog}>OK</button>

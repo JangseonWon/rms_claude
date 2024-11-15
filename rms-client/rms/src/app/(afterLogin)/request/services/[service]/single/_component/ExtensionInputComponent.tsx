@@ -64,7 +64,7 @@ export default function ExtensionInputComponent({ onChange }: ExtensionInputComp
                     options={selectList}
                     required={extension.required}
                     onChange={(selectedOption) => handleSelectChange(extension.id!, selectedOption)}
-                    width="11vw"
+                    width="200px"
                 />;
             case ExtensionType.BOOLEAN:
                 const booleanList = [
@@ -78,7 +78,7 @@ export default function ExtensionInputComponent({ onChange }: ExtensionInputComp
                     options={booleanList}
                     required={extension.required}
                     onChange={(selectedOption) => handleSelectChange(extension.id!, selectedOption)}
-                    width="11vw"
+                    width="200px"
                 />;
             case ExtensionType.INTEGER:
             case ExtensionType.FLOAT:

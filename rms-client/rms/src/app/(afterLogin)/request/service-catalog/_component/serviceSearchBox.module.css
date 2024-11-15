@@ -32,15 +32,15 @@
     box-shadow: 0 2px 4px #F3F6F9;
 }
 .selectSection.error .btnSelect {
-    border: 1px solid red;
+    border: 1px solid #90BA2D;
 }
 .selectSection.error p{
-    color: red;
+    color: #90BA2D;
 }
 .label {
     font-size: 9pt;
     color: #666666;
-    margin: 0 0 0.5vh 0.5vw;
+    margin: 0 0 5px 10px;
 }
 .btnSelect:hover {
     outline: 1px solid #CCE492;
@@ -69,7 +69,7 @@
     display: block;
 }
 .searchInput {
-    border: solid #C4C4C4 0.1vw;
+    border: solid #C4C4C4 1px;
     width: 90%;
     border-radius: 5px;
     margin: 5px 4px;

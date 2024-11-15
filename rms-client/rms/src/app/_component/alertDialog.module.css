@@ -20,8 +20,8 @@
     color: #002b49;
     font-weight: 600;
     font-size: 20px;
-    width: 20vw;
-    max-width: 30vw;
+    width: 400px;
+    max-width: 600px;
 }
 
 .alertDialog hr {
