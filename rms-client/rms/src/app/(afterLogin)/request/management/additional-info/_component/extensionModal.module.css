@@ -40,13 +40,8 @@
     float: right;
 }
 .content {
-    border: solid #C8C9CB 1px;
-    border-radius: 15px;
-    margin-top: 10px;
-    max-width: 350px;
+    width: 300px;
     max-height: 350px;
-    padding: 10px;
-    overflow-y: auto;
 }
 .contentTitle {
     display: flex;

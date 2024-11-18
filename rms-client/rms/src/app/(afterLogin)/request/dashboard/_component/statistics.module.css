@@ -42,7 +42,7 @@
     width: 110px;
 }
 .card:hover {
-    background: linear-gradient(135deg, #002C4B, #004A88);
+    background: linear-gradient(135deg, #005899, #309fff);
     box-shadow: 0 15px 15px rgba(0, 0, 0.2, 0.3);
     cursor: pointer;
 }
@@ -53,6 +53,16 @@
 .card img {
     width: 25%;
     height: auto;
+}
+.activeCard {
+    background: linear-gradient(135deg, #002C4B, #005fad);
+    box-shadow: 0 15px 15px rgba(0, 0, 0.2, 0.3);
+    cursor: pointer;
+}
+
+.activeCard .cardLabel,
+.activeCard .cardValue {
+    color: #ffffff;
 }
 .cardLabel{
     font-size: 15px;

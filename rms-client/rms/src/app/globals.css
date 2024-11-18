@@ -3,21 +3,6 @@ body{
     background-color: #EBECEE;
     overflow-y: scroll;
 }
-/*scroll*/
-/*::-webkit-scrollbar {
-    width: 16px !important;
-    height: 10px !important;
-}
-
-::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-    background-color: #888;
-    border-radius: 0.5rem;
-    border: 0.25rem solid #f1f1f1;
-}*/
 
 /*react-datepicker*/
 .react-datepicker{

@@ -26,14 +26,6 @@ export default function Table() {
     const [selectOption, setSelectOption] = useState<SelectBoxOption>({ table: "sample", column: "id", name: "Registration ID" });
     const status = useStatus();
     const setStatus = useSetStatus();
-    const statusList = [
-        {name: "TOTAL", value: Status.TOTAL},
-        {name: "COMPLETED_ORDER", value: Status.COMPLETED_ORDER},
-        {name: "IN_PROGRESS", value: Status.IN_PROGRESS},
-        {name: "TESTFAILED", value: Status.TEST_FAILED},
-        {name: "DELIVERED", value: Status.DELIVERED},
-        {name: "COMPLETED", value: Status.COMPLETED}
-    ]
     const selectBoxOptions: SelectBoxOption[] = [
         { table: "sample", column: "barcode", name: "Registration ID" },
         { table: "organization", column: "id", name: "Institution" },
@@ -118,10 +110,6 @@ export default function Table() {
         });
     };
 
-    const handleSelectStatusChange = (status: Status) => {
-        setStatus(status);
-    };
-
     const handleSearchValueChange = (value: string) => {
         setSearchValue(value);
     };
@@ -197,15 +185,6 @@ export default function Table() {
                         onChange={(from, to) =>{
                             addDateFilter(from, to);
                         }}/>
-                    <SelectBox
-                        width={"200px"}
-                        value={status}
-                        options={statusList}
-                        label={"status"}
-                        onChange={(selectedOption) =>{
-                            handleSelectStatusChange(selectedOption.value);
-                        }}
-                    />
                     <GrPowerReset
                         className={style.resetButton}
                         onClick={handleReset}/>

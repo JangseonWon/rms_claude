@@ -12,7 +12,8 @@ import {useRouter} from "next/navigation";
 export default function Statistics() {
     const [statisticsData, setStatisticsData] = useState<Statistics>()
     const setStatus = useSetStatus();
-    const router = useRouter();
+    const [activeStatus, setActiveStatus] = useState<Status | null>(null);
+    // const router = useRouter();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -25,6 +26,7 @@ export default function Statistics() {
 
     const handleCardOnClick = (status: Status) => {
         setStatus(status);
+        setActiveStatus(status);
     };
 
     const statisticsCards: {
@@ -42,6 +44,7 @@ export default function Statistics() {
 
     const handleLearnMoreClick = (status: Status) => {
         // router.push(`/dashboard/${status}`);
+        alert(`${status} Learn More`);
     };
 
     return (
@@ -53,7 +56,10 @@ export default function Statistics() {
             </div>
             <div className={style.cardContainer}>
                 {statisticsCards.map((card) => (
-                    <div className={style.card}
+                    <div
+                        className={`${style.card} ${
+                            activeStatus === card.status ? style.activeCard : ""
+                        }`}
                          key={card.label}
                          onClick={() => handleCardOnClick(card.status)}
                     >

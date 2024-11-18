@@ -2,6 +2,7 @@
 
 import React, {useEffect, useState} from "react";
 import style from "./sampleTypeModal.module.css";
+import globalStyle from '@/css/modal.module.css';
 import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
@@ -46,8 +47,8 @@ export default function SampleTypeModal({sampleTypeId, closeModal, refreshTable}
     };
 
     return (
-        <div className={style.modalBackground}>
-            <div className={style.modal}>
+        <div className={globalStyle.modalBackground}>
+            <div className={globalStyle.modal}>
                 <FontAwesomeIcon icon={faXmark} onClick={closeModal} className={style.modalCloseButton}/>
                 <div className={style.modalTitle}>Edit SampleType</div>
                 <div className={style.formGroup}>

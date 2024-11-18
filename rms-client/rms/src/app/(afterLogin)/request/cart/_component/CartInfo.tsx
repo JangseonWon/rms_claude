@@ -1,10 +1,9 @@
 "use client"
 
-import style from "@/app/(afterLogin)/request/cart/_component/info.module.css";
+import style from "@/app/(afterLogin)/request/cart/_component/cartInfo.module.css";
 import globalStyle from '@/css/modal.module.css';
 import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {useRouter, useSearchParams} from "next/navigation";
 import SelectBox from "@/app/_component/SelectBox"
 import React, {useCallback, useEffect, useState} from "react";
 import {getRequest} from "@/app/(afterLogin)/request/cart/_api/getRequest";
@@ -20,20 +19,18 @@ import {getSampleType} from "@/app/(afterLogin)/request/cart/_api/getSampleType"
 import {SampleType} from "@/model/SampleType";
 import DatePickerBox from "@/app/_component/DatePickerBox";
 
+type Props = {
+    serviceId: string;
+    sampleId: string;
+    userId: string;
+    closeModal: () => void;
+}
 
-export default function Info() {
+export default function CartInfo({serviceId, sampleId, userId, closeModal}: Props) {
     const [request, setRequest] = useState<Request>()
     const [organizationOptions, setOrganizationOptions] = useState<SelectBoxOption[]>([])
     const [sampleTypeOptions, setSampleTypeOptions] = useState<SelectBoxOption[]>([])
-    const router = useRouter();
-    const searchParams = useSearchParams()
-    const serviceId = searchParams!.get("service")
-    const sampleId = searchParams!.get("sample")
-    const userId = searchParams!.get("user_id")
 
-    const closeModal = () => {
-        router.back();
-    };
     const handleRequestChange = (path: string, value: any) => {
         setRequest(prevState => ({
             ...prevState,

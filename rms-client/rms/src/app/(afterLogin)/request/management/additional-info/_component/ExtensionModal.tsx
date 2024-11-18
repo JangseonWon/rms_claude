@@ -2,6 +2,7 @@
 
 import React, {useEffect, useState} from "react";
 import style from "./extensionModal.module.css";
+import scrollbar from '@/css/scrollBar.module.css';
 import globalStyle from '@/css/modal.module.css';
 import {faMinus, faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -13,6 +14,7 @@ import BlueButton from "@/app/_component/BlueButton";
 import GreenButton from "@/app/_component/GreenButton";
 import {getExtension} from "@/app/(afterLogin)/request/management/additional-info/_api/getExtension";
 import {patchExtension} from "@/app/(afterLogin)/request/management/additional-info/_api/patchExtension";
+import classNames from "classnames";
 
 type Props = {
     extensionId: string;
@@ -137,30 +139,32 @@ export default function ExtensionModal({extensionId, closeModal, refreshTable}: 
                     />
                 </div>
                     {extension?.type === ExtensionType.LIST && (
-                        <div className={style.content}>
-                            <div className={style.contentTitle}>
-                                <div>Extension Values</div>
-                            </div>
-                            {listInputs.map((input, index) => (
-                                <div key={index} className={style.formGroup}>
-                                    <InputBox
-                                        key={index}
-                                        label={`List Value ${index + 1}`}
-                                        value={input}
-                                        required={true}
-                                        onChange={(value) => handleListInputChange(index, value)}
-                                    />
-                                    {listInputs.length > 2 && (
-                                        <FontAwesomeIcon
-                                            className={style.minusButton}
-                                            icon={faMinus}
-                                            onClick={() => handleRemoveInput(index)}
-                                        />
-                                    )}
+                        <div className={scrollbar.wrapper}>
+                            <div className={classNames(style.content, scrollbar.default)}>
+                                <div className={style.contentTitle}>
+                                    <div>Extension Values</div>
                                 </div>
-                            ))}
-                            <div className={style.addButton}>
-                                <GreenButton name={"+Add Value"} onClick={handleAddInput}/>
+                                {listInputs.map((input, index) => (
+                                    <div key={index} className={style.formGroup}>
+                                        <InputBox
+                                            key={index}
+                                            label={`List Value ${index + 1}`}
+                                            value={input}
+                                            required={true}
+                                            onChange={(value) => handleListInputChange(index, value)}
+                                        />
+                                        {listInputs.length > 2 && (
+                                            <FontAwesomeIcon
+                                                className={style.minusButton}
+                                                icon={faMinus}
+                                                onClick={() => handleRemoveInput(index)}
+                                            />
+                                        )}
+                                    </div>
+                                ))}
+                                <div className={style.addButton}>
+                                    <GreenButton name={"+Add Value"} onClick={handleAddInput}/>
+                                </div>
                             </div>
                         </div>
                     )}

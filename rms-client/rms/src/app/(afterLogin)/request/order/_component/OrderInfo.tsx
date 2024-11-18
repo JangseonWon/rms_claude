@@ -4,24 +4,20 @@ import style from "@/app/(afterLogin)/request/order/_component/orderInfo.module.
 import globalStyle from '@/css/modal.module.css';
 import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {useRouter, useSearchParams} from "next/navigation";
 import {useCallback, useEffect, useState} from "react";
 import {Request} from "@/model/Request"
 import InputBox from "@/app/_component/InputBox";
 import Loading from "@/app/(afterLogin)/_component/Loading";
 import {getRequestOrderInfo} from "@/app/(afterLogin)/request/order/_api/getRequestOrderInfo";
 
+type Props = {
+    serviceId: string;
+    sampleId: string;
+    closeModal: () => void;
+}
 
-export default function OrderInfo() {
-    const [request, setRequest] = useState<Request>()
-    const router = useRouter();
-    const searchParams = useSearchParams()
-    const serviceId = searchParams!.get("service")
-    const sampleId = searchParams!.get("sample")
-
-    const onClickClose = () => {
-        router.back();
-    };
+export default function OrderInfo({serviceId, sampleId, closeModal}: Props) {
+    const [request, setRequest] = useState<Request>();
 
     const handleRequestChange = (path: string, value: any) => {
         setRequest(prevState => ({
@@ -64,23 +60,14 @@ export default function OrderInfo() {
     };
     useEffect(() => {
         fetchRequest()
-        const handleKeyPress = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') {router.back();}
-        };
-        document.body.style.overflow = 'hidden';
-        window.addEventListener('keydown', handleKeyPress);
-        return () => {
-            document.body.style.overflow = 'auto';
-            window.removeEventListener('keydown', handleKeyPress);
-        };
-    }, [fetchRequest, router]);
+    }, []);
 
     return (
         <div className={globalStyle.modalBackground}>
             <div className={globalStyle.modal}>
                 <div className={style.modalTitle}>
                     <h1>Order Details</h1>
-                    <button onClick={onClickClose}>
+                    <button onClick={closeModal}>
                         <FontAwesomeIcon icon={faXmark}/>
                     </button>
                 </div>

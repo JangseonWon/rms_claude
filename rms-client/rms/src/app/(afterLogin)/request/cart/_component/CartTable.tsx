@@ -18,6 +18,7 @@ import {searchRequests} from "@/app/(afterLogin)/request/cart/_api/searchRequest
 import {Filter} from "@/model/Filter";
 import SelectBox from "@/app/_component/SelectBox";
 import InputBox from "@/app/_component/InputBox";
+import CartInfo from "@/app/(afterLogin)/request/cart/_component/CartInfo";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -33,14 +34,15 @@ const selectBoxOptions: SelectBoxOption[] = [
     { table: "request", column: "report_at", name: "Report Date" }
 ];
 
-export default function Table() {
+export default function CartTable() {
     const [requestData, setRequestData] = useState<RequestWithSelected[]>([])
-    const router = useRouter();
     const [search, setSearch] = useState<Query>({asc: false, size:10, page:1});
     const [totalPage, setTotalPage] = useState<number>();
     const [pageRange, setPageRange] = useState<{ start: number, end: number }>({ start: 1, end: 5 });
     const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
     const isSelectedAll = requestData.length > 0 && requestData.every((row) => row.isSelected);
+    const [modalOpen, setModalOpen] = useState<boolean>(false);
+    const [infoRequest, setInfoRequest] = useState<Request>();
     const [filter, setFilter] = useState<Filter>({
         table: selectBoxOptions[0].table!,
         column: selectBoxOptions[0].column!,
@@ -111,9 +113,17 @@ export default function Table() {
             prevData.map((row) => ({ ...row, isSelected }))
         );
     };
+
     const handleInfoClick = (row: RequestWithSelected) => {
-        router.push(`/request/cart/info?order=${row.order_id}&service=${row.service!.id}&sample=${row.sample!.id}&user_id=${row.sample!.patient!.organization!.user!.id}`);
+        setInfoRequest(row);
+        setModalOpen(true);
     };
+
+    const closeModal = () => {
+        setInfoRequest(undefined);
+        setModalOpen(false);
+    }
+
     const handleDeleteCart = async () => {
         const selectedRequests = requestData.filter(request => request.isSelected);
         if( selectedRequests.length === 0) {
@@ -125,6 +135,7 @@ export default function Table() {
         else alert("fail");
         fetchData(search);
     };
+
     const handleCartToOrder = async () => {
         const selectedRequests = requestData.filter(request => request.isSelected);
         const response = await putRequest(selectedRequests)
@@ -264,6 +275,14 @@ export default function Table() {
                 ><FontAwesomeIcon icon={faAngleRight}/>
                 </button>
             </div>
+            {modalOpen && (
+                <CartInfo
+                    serviceId={infoRequest?.service!.id!}
+                    sampleId={infoRequest?.sample!.id!}
+                    userId={infoRequest?.sample!.patient!.organization!.user!.id!}
+                    closeModal={closeModal}
+                />
+            )}
         </div>
     )
 }

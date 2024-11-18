@@ -1,0 +1,21 @@
+.wrapper {
+    border: solid #C8C9CB 1px;
+    border-radius: 15px;
+    margin-top: 10px;
+    padding: 10px;
+}
+.default {
+    overflow-y: auto;
+}
+.default::-webkit-scrollbar {
+    width: 5px !important;
+    height: 10px !important;
+}
+.default::-webkit-scrollbar-track {
+    background: none;
+}
+.default::-webkit-scrollbar-thumb {
+    background-color: #002b49;
+    border-radius: 15px;
+    border: none;
+}

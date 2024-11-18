@@ -5,7 +5,6 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import React, {useEffect, useState} from "react";
 import type {Request} from "@/model/Request";
-import {useRouter} from "next/navigation";
 import {faFileLines} from "@fortawesome/free-regular-svg-icons/faFileLines";
 import {postRequestOrders} from "@/app/(afterLogin)/request/order/_api/postRequestOrders";
 import BarcodeButton from "@/app/(afterLogin)/request/order/_component/BarcodeButton";
@@ -14,6 +13,7 @@ import {SelectBoxOption} from "@/model/SelectBoxOption";
 import SelectBox from "@/app/_component/SelectBox";
 import InputBox from "@/app/_component/InputBox";
 import {Filter} from "@/model/Filter";
+import OrderInfo from "@/app/(afterLogin)/request/order/_component/OrderInfo";
 
 export interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -36,8 +36,9 @@ export default function OrderTable() {
     const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
     const [totalPage, setTotalPage] = useState<number>(0);
     const [search, setSearch] = useState<Query>({asc: true, size:10, page:1});
-    const router = useRouter();
     const isSelectedAll = requestData.every((row) => row.isSelected);
+    const [modalOpen, setModalOpen] = useState<boolean>(false);
+    const [infoRequest, setInfoRequest] = useState<Request>();
     const [filter, setFilter] = useState<Filter>({
         table: selectBoxOptions[0].table!,
         column: selectBoxOptions[0].column!,
@@ -89,8 +90,14 @@ export default function OrderTable() {
 
 
     const handleInfoClick = (row: RequestWithSelected) => {
-        router.push(`/request/order/info?service=${row.service!.id}&sample=${row.sample!.id}&user_id=${row.sample!.patient!.organization!.user!.id}`);
+        setInfoRequest(row);
+        setModalOpen(true);
     };
+
+    const closeModal = () => {
+        setInfoRequest(undefined);
+        setModalOpen(false);
+    }
 
     const selectedRequest = requestData.filter((row) => row.isSelected);
 
@@ -228,6 +235,13 @@ export default function OrderTable() {
                 ><FontAwesomeIcon icon={faAngleRight}/>
                 </button>
             </div>
+            {modalOpen && (
+                <OrderInfo
+                    serviceId={infoRequest?.service!.id!}
+                    sampleId={infoRequest?.sample!.id!}
+                    closeModal={closeModal}
+                />
+            )}
         </div>
     )
 }
