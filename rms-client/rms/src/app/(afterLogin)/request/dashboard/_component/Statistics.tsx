@@ -16,6 +16,7 @@ export default function Statistics() {
     // const router = useRouter();
 
     useEffect(() => {
+        setActiveStatus(Status.TOTAL);
         const fetchData = async () => {
             const response = await getStatisticsRequest();
             const data = await response.json();
