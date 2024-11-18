@@ -176,7 +176,7 @@ export default function Table() {
     return (
         <div className={style.container}>
             <div style={{float: "right"}}>
-                <DownloadExcelButton requestData={requestData} status={status} />
+                <DownloadExcelButton search={{ ...search, page: 0, size: 0 }} status={status} />
             </div>
             <div className={style.filterContainer}>
                 <div className={style.filterContainerRight}>

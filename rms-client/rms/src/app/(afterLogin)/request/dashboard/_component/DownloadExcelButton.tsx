@@ -6,9 +6,12 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React from "react";
 import * as XLSX from 'xlsx';
 import {format} from "date-fns";
+import {Query} from "@/model/Query";
+import {postRequests} from "@/app/(afterLogin)/request/dashboard/_api/postRequests";
+import type {Request} from "@/model/Request";
 
 interface DownloadExcelButtonProps {
-    requestData: any[];
+    search: Query;
     status: string;
 }
 
@@ -24,8 +27,21 @@ interface ExcelRow {
     "Order Date": string;
 }
 
-export default function DownloadExcelButton({ requestData, status }: DownloadExcelButtonProps) {
-    const downloadExcel = () => {
+export default function DownloadExcelButton({ search, status }: DownloadExcelButtonProps) {
+    const fetchData = async (search: Query) => {
+        const response = await postRequests(search)
+        const responseData = await response.json();
+        return responseData as Request[];
+    };
+
+    const downloadExcel = async () => {
+        const requestData = await fetchData(search);
+
+        if (requestData.length === 0) {
+            alert("No data available for download");
+            return;
+        }
+
         const headers = [
             "Registration ID",
             "User Name",
@@ -58,7 +74,7 @@ export default function DownloadExcelButton({ requestData, status }: DownloadExc
         worksheet['!cols'] = headers.map(header => {
             const maxLength = Math.max(
                 header.length,
-                ...data.map(row => row[header as keyof ExcelRow].toString().length)
+                ...data.map(row => row[header as keyof ExcelRow]?.toString().length || 0)
             );
             return {wch: maxLength + 2};
         });
