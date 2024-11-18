@@ -6,7 +6,6 @@ import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import React, {useEffect, useState} from "react";
 import type {Request} from "@/model/Request";
 import {format} from "date-fns";
-import {useRouter} from "next/navigation";
 import GreenButton from "@/app/_component/GreenButton";
 import BlueButton from "@/app/_component/BlueButton";
 import {deleteRequest} from "@/app/(afterLogin)/request/cart/_api/deleteRequest";

@@ -8,8 +8,12 @@ import {useAlertDialogB, useMessageAlertDialogB} from "@/store/useBeforeLoginAle
 import NoticeDialog from "@/app/_component/NoticeDialog";
 import {useMessageNoticeDialog, useNoticeDialog} from "@/store/useNoticeDialogStore";
 
-type Props = { children: ReactNode, modal: ReactNode }
-export default function Layout({ children, modal }: Props) {
+type Props = {
+    children: ReactNode;
+    // modal?: ReactNode;
+};
+
+export default function Layout({ children}: Props) {
     const showAlertDialog = useAlertDialogB();
     const alertMessage = useMessageAlertDialogB();
     const showNoticeDialog = useNoticeDialog();
@@ -23,7 +27,6 @@ export default function Layout({ children, modal }: Props) {
                 <NavMenu/>
             </div>
             <div className={style.rightSection}>
-                {modal}
                 {children}
             </div>
         </div>
