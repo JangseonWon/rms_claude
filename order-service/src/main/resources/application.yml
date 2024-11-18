@@ -29,4 +29,4 @@ aws:
     endpoint: ${S3_ENDPOINT}
     bucket: ${S3_BUCKET_NAME}
 server:
-  port: 9886
+  port: 9887
