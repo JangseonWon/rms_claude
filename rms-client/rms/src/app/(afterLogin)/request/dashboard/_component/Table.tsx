@@ -93,7 +93,7 @@ export default function Table() {
                                     table: 'request',
                                     column: 'status',
                                     value: status,
-                                    operator: "LIKE"
+                                    operator: "="
                                 }]
                                 : [{
                                     table: 'request',
