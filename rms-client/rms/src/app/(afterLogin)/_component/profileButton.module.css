@@ -1,6 +1,7 @@
 .container {
     margin: 15px 0 10px;
     display: flex;
+    position: relative;
 }
 .profileContainer {
     position: relative;
@@ -28,6 +29,9 @@
     border-right: 1px solid #ffffff;
     margin-top: 5px;
     padding: 5px 10px;
+}
+.bellActive {
+    color: #ff6b6b;
 }
 .user {
     margin-top: 5px;
@@ -59,7 +63,23 @@
     z-index: 100;
 }
 
-.profileDropdown.active {
+.profileAlarm {
+    position: absolute;
+    top: 150%;
+    right: -5%;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
+    color: #4d4d4d;
+    font-size: 12px;
+    font-weight: 300;
+    font-style: normal;
+    cursor: pointer;
+    z-index: 100;
+}
+
+.profileDropdown.active,
+.profileAlarm.active {
     display: block;
 }
 

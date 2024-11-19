@@ -1,0 +1,68 @@
+.container {
+    display: grid;
+}
+.menuContainer {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    padding: 10px;
+    background-color: #F0F2F2;
+    border-radius: 10px 10px 0 0;
+}
+.menu {
+    font-size: 15px;
+    font-weight: 700;
+    color: #002b49;
+    align-content: center;
+    width: 100px;
+    height: 40px;
+    display: grid;
+    background-color: #ffffff;
+    border: lightgrey 1px solid;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.menu:hover {
+    background: linear-gradient(to right, #023a60, #5676a2);
+    color: #fff;
+}
+.menu span{
+    font-size: 12px;
+    font-weight: 700;
+    color: inherit;
+}
+.contentContainer {
+    margin: 10px;
+    padding: 10px;
+    display: grid;
+    max-height: 350px;
+}
+.content {
+    font-size: 13px;
+    display: flex;
+    margin: 5px 0;
+    justify-content: space-between;
+    align-items: center;
+}
+.titleWrapper {
+    display: grid;
+}
+.titleContainer {
+    display: flex;
+    text-align: center;
+    font-size: 15px;
+}
+.title {
+    color: #002b49;
+    font-weight: 700;
+}
+.new {
+    margin-left: 10px;
+    color: red;
+    font-weight: 700;
+}
+.titleContent {
+    font-weight: 600;
+    font-size: 14px;
+}
