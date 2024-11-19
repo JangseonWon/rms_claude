@@ -1,5 +1,8 @@
 .container {
-    padding: 0 40px;
+    position: relative;
+    padding: 20px;
+    margin: 0 60px;
+    overflow-x: hidden;
 }
 .buttonSection {
     margin-top: 50px;

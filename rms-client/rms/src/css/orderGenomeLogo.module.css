@@ -1,0 +1,10 @@
+.genomeImg {
+    filter: opacity(0.8) drop-shadow(0 0 0 #dbdbdb);
+    position: absolute;
+    top: -80px;
+    right: -900px;
+    z-index: 0;
+    width: 1400px;
+    height: auto;
+    pointer-events: none;
+}

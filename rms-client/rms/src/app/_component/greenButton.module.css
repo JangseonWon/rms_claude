@@ -1,4 +1,6 @@
 .greenButton {
+    position: relative;
+    z-index: 1;
     background: white;
     font-weight: 700;
     font-size: 15px;

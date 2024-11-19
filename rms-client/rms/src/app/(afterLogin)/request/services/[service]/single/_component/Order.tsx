@@ -19,6 +19,9 @@ import {usePathname} from "next/navigation";
 import ExtensionInputComponent
     from "@/app/(afterLogin)/request/services/[service]/single/_component/ExtensionInputComponent";
 import TextBox from "@/app/_component/TextBox";
+import genomeImg from "@/../public/GCgenome_white.png";
+import logo from "@/css/orderGenomeLogo.module.css";
+import Image from "next/image";
 
 export default function Order() {
     const [organizationOptions, setOrganizationOptions] = useState<SelectBoxOption[]>([])
@@ -164,6 +167,19 @@ export default function Order() {
 
     return (
         <div className={style.container}>
+            <Image className={logo.genomeImg} src={genomeImg} alt={"genome"}/>
+            <div className={style.buttonSection}>
+                <GreenButton
+                    name={"Add to Cart"}
+                    disabled={!isAllRequiredFilled()}
+                    onClick={() => publishRequest("CART")}
+                />
+                <BlueButton
+                    name={"Order Now"}
+                    disabled={!isAllRequiredFilled()}
+                    onClick={() => publishRequest("UNCONFIRMED_ORDER")}
+                />
+            </div>
             <p className={style.mainName}>Institution name *</p>
             <div className={style.section}>
                 <div className={style.selectBox}>
@@ -193,6 +209,11 @@ export default function Order() {
                     required={true}
                     onChange={(value) => handleRequestChange('sample.patient.serial', value)}
                 />
+                <InputBox
+                    label={"Age"}
+                    disabled={true}
+                    value={request.sample?.age}
+                />
                 <div className={style.dateBox}>
                     <DatePickerBox
                         label={"Date of Birth"}
@@ -213,11 +234,6 @@ export default function Order() {
                         }}
                     />
                 </div>
-                <InputBox
-                    label={"Age"}
-                    disabled={true}
-                    value={request.sample?.age}
-                />
             </div>
             <div className={style.section}>
                 <div className={style.selectBox}>
@@ -298,18 +314,6 @@ export default function Order() {
                     value={request.memo}
                     required={true}
                     onChange={(value) => handleRequestChange('memo', value)}
-                />
-            </div>
-            <div className={style.buttonSection}>
-                <GreenButton
-                    name={"Add to Cart"}
-                    disabled={!isAllRequiredFilled()}
-                    onClick={() => publishRequest("CART")}
-                />
-                <BlueButton
-                    name={"Order Now"}
-                    disabled={!isAllRequiredFilled()}
-                    onClick={() => publishRequest("UNCONFIRMED_ORDER")}
                 />
             </div>
         </div>

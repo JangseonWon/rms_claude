@@ -1,5 +1,6 @@
 .dateBox {
     position: relative;
+    z-index: 10;
 }
 .dateBox p {
     font-size: 12px;

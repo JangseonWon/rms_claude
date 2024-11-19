@@ -12,10 +12,8 @@ export default async function Page() {
                 <ServiceTitle/>
                 <SingleMultiChangeButton/>
             </section>
-            <section className={style.orderContainerWrapper}>
-                <div className={style.orderContainer}>
-                    <Order/>
-                </div>
+            <section className={style.orderContainer}>
+                <Order/>
             </section>
         </div>
     )

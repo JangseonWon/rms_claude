@@ -1,3 +1,7 @@
+.inputBox {
+    position: relative;
+    z-index: 1;
+}
 .inputBox p {
     font-size: 9pt;
     color: #666666;
@@ -27,4 +31,7 @@
 .inputBox input:focus {
     outline: 2px solid #CCE492;
     border: 1px solid #90BA2D;
+}
+.inputBox .input:disabled {
+    background-color: rgba(239, 239, 239, 1) !important;
 }
