@@ -35,17 +35,8 @@ interface QueryDao {
             .map { tuple ->
                 val totalElements = tuple.t1
                 val content = tuple.t2
-                val totalPages = if (query.size == 0 || query.page == 0) { 1
-                    } else {
-                        query.size?.let { size -> (totalElements + size - 1) / size }
-                }
-                Page(
-                    totalCount = totalElements,
-                    totalPage = totalPages,
-                    pageSize = if (query.size == 0) totalElements else query.size,
-                    currentPage = if (query.page == 0) 1 else query.page,
-                    data = content
-                )
+                val totalPages = query.size?.let { size -> (totalElements + size - 1) / size }
+                Page(totalCount = totalElements, totalPage = totalPages, pageSize = query.size, currentPage = query.page, data = content)
             }
     }
     fun <T> DSLContext.selectQuery(
@@ -115,12 +106,10 @@ interface QueryDao {
             }
             .orderBy(orderBy(query))
             .apply {
-                if (query.page != 0 && query.size != 0) {
-                    query.page?.let { page ->
-                        query.size?.let { size ->
-                            offset((page - 1) * size)
-                            limit(size)
-                        }
+                query.page?.let { page ->
+                    query.size?.let { size ->
+                        offset((page - 1) * size)
+                        limit(size)
                     }
                 }
             }
