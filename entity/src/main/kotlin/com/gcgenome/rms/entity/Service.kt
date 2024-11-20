@@ -12,6 +12,11 @@ data class Service(
     val name: String,
     @Column(name = "name_kr", length = 128, nullable = false)
     val nameKr: String,
+    @Column(name = "type", length = 128, nullable = false)
+    val type: String,
+    @Column(name = "group_name", length = 128, nullable = true)
+    val groupName: String,
+
 
     @ManyToOne
     @JoinColumn(name = "category_id", insertable = false, updatable = false, nullable = true)

@@ -14,15 +14,10 @@ data class Order(
     @Column(name = "id")
     val id: UUID,
 
-    @Column(name = "serial", nullable = true, unique = true)
-    val serial: String,
-    @Column(name = "create_at", nullable = true)
-    val createAt: LocalDateTime,
-
     @ManyToOne
     @JoinColumn(name = "user_id", insertable = false, updatable = false, nullable = false)
     val userId: User,
 
     @OneToMany(mappedBy = "orderId")
-    val item: List<Request>
+    val requests: List<Request>
 )
