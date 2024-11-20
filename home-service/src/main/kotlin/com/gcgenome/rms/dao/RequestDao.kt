@@ -63,8 +63,6 @@ interface RequestDao: QueryDao {
             ).`as`("service"),
             DSL.jsonObject(
                 DSL.key("id").value(ORDER.ID),
-                DSL.key("serial").value(ORDER.SERIAL),
-                DSL.key("create_at").value(ORDER.CREATE_AT),
                 DSL.key("user").value(
                     DSL.jsonObject(
                         DSL.key("id").value(USER.ID),
