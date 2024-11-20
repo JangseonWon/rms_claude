@@ -1,7 +1,7 @@
+import RequestTable from "@/app/(afterLogin)/request/order/barcode/_component/RequestTable";
 import style from "@/css/requestMainPage.module.css";
-import OrderTable from "@/app/(afterLogin)/request/order/_component/OrderTable";
-import Title from "@/app/_component/Title";
 import OrderSteps from "@/app/(afterLogin)/_component/OrderSteps";
+import Title from "@/app/_component/Title";
 
 export default async function Page() {
     return(
@@ -11,7 +11,7 @@ export default async function Page() {
                 <Title/>
             </div>
             <div className={style.contents}>
-                <OrderTable/>
+                <RequestTable/>
             </div>
         </div>
     )

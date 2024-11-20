@@ -5,5 +5,6 @@ export enum Status {
     IN_PROGRESS = "IN_PROGRESS",
     TEST_FAILED = "TEST_FAILED",
     DELIVERED = "DELIVERED",
-    COMPLETED = "COMPLETED"
+    COMPLETED = "COMPLETED",
+    CART = "CART"
 }

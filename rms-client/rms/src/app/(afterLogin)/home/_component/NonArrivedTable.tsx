@@ -123,13 +123,13 @@ export default function NonArrivedTable() {
                                         {
                                             table: "request",
                                             column: "specified_at",
-                                            value: from.toISOString().split('T')[0],
+                                            value: from.toLocaleDateString('en-CA'),
                                             operator: ">="
                                         },
                                         {
                                             table: "request",
                                             column: "specified_at",
-                                            value: to.toISOString().split('T')[0],
+                                            value: to.toLocaleDateString('en-CA'),
                                             operator: "<="
                                         }
                                     ]

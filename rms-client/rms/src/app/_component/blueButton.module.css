@@ -11,7 +11,6 @@
     cursor: pointer;
     background: linear-gradient(to right, #023a60, #5676a2);
     color: #ffffff;
-    margin: 5px 6px;
 }
 .blueButton:hover {
     background: linear-gradient(90deg, #3c6699, #9ebce6);

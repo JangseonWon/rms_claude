@@ -1,50 +1,51 @@
 "use client"
 
-import style from "@/css/globalTable.module.css";
+import globalTableStyle from "@/css/globalTable.module.css";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import React, {useEffect, useState} from "react";
 import type {Request} from "@/model/Request";
 import {faFileLines} from "@fortawesome/free-regular-svg-icons/faFileLines";
-import {postRequestOrders} from "@/app/(afterLogin)/request/order/_api/postRequestOrders";
-import BarcodeButton from "@/app/(afterLogin)/request/order/_component/BarcodeButton";
-import {Query} from "@/model/Query";
+import {postRequests} from "@/app/(afterLogin)/request/order/_api/postRequests";
+import {FilterGroup, Query} from "@/model/Query";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import SelectBox from "@/app/_component/SelectBox";
 import InputBox from "@/app/_component/InputBox";
 import {Filter} from "@/model/Filter";
-import OrderInfo from "@/app/(afterLogin)/request/order/_component/OrderInfo";
+import {Status} from "@/model/Status";
+import BlueButton from "@/app/_component/BlueButton";
+import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
+import RequestInfo from "@/app/(afterLogin)/request/order/barcode/_component/RequestInfo";
 
 export interface RequestWithSelected extends Request {
     isSelected?: boolean;
 }
 
 const selectBoxOptions: SelectBoxOption[] = [
-    { table: "sample", column: "barcode", name: "Global courier" },
-    { table: "organization", column: "id", name: "AirWaybill no" },
-    { table: "patient", column: "name", name: "Institution" },
-    { table: "patient", column: "name", name: "Registration ID" },
-    { table: "service", column: "name", name: "Service" },
+    { table: "organization", column: "name", name: "Institution" },
     { table: "patient", column: "name", name: "Patient(s) Name" },
-    { table: "patient", column: "birth_year", name: "Patient BOD" },
+    { table: "service", column: "name", name: "Service" },
     { table: "patient", column: "sex", name: "Gender" },
     { table: "patient", column: "serial", name: "MRN" },
 ];
+const defaultSearch: Query = {size:10, page:1}
+const defaultFilter: Filter = {
+    table: "request",
+    column: "status",
+    operator: "!=",
+    value: Status.CART.valueOf()
+}
 
-export default function OrderTable() {
+export default function RequestTable() {
     const [requestData, setRequestData] = useState<RequestWithSelected[]>([]);
     const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
     const [totalPage, setTotalPage] = useState<number>(0);
-    const [search, setSearch] = useState<Query>({asc: true, size:10, page:1});
+    const [search, setSearch] = useState<Query>(defaultSearch);
     const isSelectedAll = requestData.every((row) => row.isSelected);
     const [modalOpen, setModalOpen] = useState<boolean>(false);
     const [infoRequest, setInfoRequest] = useState<Request>();
-    const [filter, setFilter] = useState<Filter>({
-        table: selectBoxOptions[0].table!,
-        column: selectBoxOptions[0].column!,
-        operator: "LIKE",
-        value: ""
-    })
+    const [searchFilter, setSearchFilter] = useState<Filter>()
+    const [orderDateFilter, setOrderDateFilter] = useState<FilterGroup>()
 
     const handleSelectChange = (rowIndex: number, isSelected: boolean) => {
         setRequestData((prevData) => {
@@ -77,7 +78,7 @@ export default function OrderTable() {
 
     const fetchData = async (search: Query) => {
         try {
-            const response = await postRequestOrders(search);
+            const response = await postRequests(search);
             const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
             const data = await response.json();
             setRequestData(data as Request[]);
@@ -102,30 +103,52 @@ export default function OrderTable() {
     const selectedRequest = requestData.filter((row) => row.isSelected);
 
     useEffect(() => {
-        setSearch((prevSearch) => ({
-            ...prevSearch,
+        const updatedSearch = {
+            ...search,
             filter_groups: [
+                ...(orderDateFilter ? [orderDateFilter] : []),
                 {
-                    ...prevSearch?.filter_groups?.[0] || {},
                     filters: [
-                        filter,
+                        defaultFilter,
+                        ...(searchFilter ? [searchFilter] : []),
                     ],
                 },
             ],
-        }));
-    }, [filter]);
-
-    useEffect(() => {
-        fetchData(search)
-    }, [search]);
+        };
+        fetchData(updatedSearch);
+    }, [search,searchFilter,orderDateFilter]);
 
     return (
-        <div className={style.container}>
-            <section>
-                <div className={style.buttonSection}>
-                    <BarcodeButton selectRequest={selectedRequest}/>
+        <div className={globalTableStyle.container}>
+            <div className={globalTableStyle.formGroupRight}>
+                <BlueButton name={'Print Barcode'}/>
+            </div>
+            <div className={globalTableStyle.formGroupBetween}>
+                <div>
+                    <DatePickerRangeBox
+                        label={"from-to"}
+                        onChange={(from, to) => {
+                            setOrderDateFilter(
+                                from && to ? {
+                                    filters: [
+                                        {
+                                            table: "request",
+                                            column: "create_at",
+                                            value: from?.toLocaleDateString('en-CA'),
+                                            operator: ">="
+                                        },
+                                        {
+                                            table: "request",
+                                            column: "create_at",
+                                            value: to.toLocaleDateString('en-CA'),
+                                            operator: "<="
+                                        }
+                                    ]
+                                } as FilterGroup : undefined
+                            )
+                        }}/>
                 </div>
-                <div className={style.topSecondSection}>
+                <div>
                     <SelectBox
                         width={"200px"}
                         value={selectedOption.name}
@@ -133,78 +156,77 @@ export default function OrderTable() {
                         label={"filter"}
                         onChange={(option) => {
                             setSelectedOption(option);
-                            setFilter(prev => ({
-                                ...prev,
+                            setSearchFilter({
                                 table: option.table!,
                                 column: option.column!
-                            }))
+                            } as Filter)
                         }}
                     />
                     <InputBox label={"search"} onChange={(value) => {
-                        setFilter(prev => ({
-                            ...prev,
+                        setSearchFilter({
+                            table: selectedOption.table,
+                            column: selectedOption.column,
+                            operator: "LIKE",
                             value: value
-                        }))
+                        } as Filter)
                     }}></InputBox>
                 </div>
-            </section>
-            <div className={style.tableContainer}>
-                <table className={style.table}>
+            </div>
+            <div className={globalTableStyle.tableContainer}>
+                <table className={globalTableStyle.table}>
                     <thead>
                     <tr>
                         <th>
-                            <label form="agree" className={style.checkbox}>
+                            <label form="agree" className={globalTableStyle.checkbox}>
                                 <input
                                     type="checkbox"
                                     checked={isSelectedAll}
                                     onChange={() => handleSelectAll(!isSelectedAll)}
-                                    className={style.checkbox}
+                                    className={globalTableStyle.checkbox}
                                 />
-                                <span className={style.checkmark}></span>
+                                <span className={globalTableStyle.checkmark}></span>
                             </label>
                         </th>
-                        <th className={style.shortColumn}>Global courier</th>
-                        <th className={style.shortColumn}>AirWaybill no.</th>
-                        <th className={style.shortColumn}>Institution</th>
+                        <th>Order Date<br/>(DD-MM-YYYY)</th>
+                        <th>User Name</th>
+                        <th>Institution</th>
                         <th>Registration ID</th>
-                        <th className={style.longColumn}>Service</th>
                         <th>Patient(s) Name</th>
-                        <th className={style.dateColumn}>Patient BOD<br/>(DD/MM/YYYY)</th>
-                        <th>Gender</th>
-                        <th className={style.longColumn}>MRN</th>
+                        <th>Service</th>
+                        <th>Patient(s) DOB<br/>(DD-MM-YYYY)</th>
+                        <th>MRN</th>
                         <th>Info</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {requestData && requestData.length > 0 && requestData.map((row, rowIndex) => (
-                        <tr key={row.order_id! + row.service!.id + row.sample!.id}>
+                    {requestData && requestData.length > 0 && requestData.map((request, rowIndex) => (
+                        <tr key={request.order_id! + request.service!.id + request.sample!.id}>
                             <td onClick={(e) => e.stopPropagation()}>
-                                <label form="agree" className={style.checkbox}>
+                                <label form="agree" className={globalTableStyle.checkbox}>
                                     <input
                                         type="checkbox"
-                                        checked={row.isSelected || false}
-                                        onChange={() => handleSelectChange(rowIndex, !row.isSelected)}
-                                        className={style.checkbox}
+                                        checked={request.isSelected || false}
+                                        onChange={() => handleSelectChange(rowIndex, !request.isSelected)}
+                                        className={globalTableStyle.checkbox}
                                     />
-                                    <span className={style.checkmark}></span>
+                                    <span className={globalTableStyle.checkmark}></span>
                                 </label>
                             </td>
-                            <td>Global courier</td>
-                            <td>AirWaybill no.</td>
-                            <td>{row.sample!.patient!.organization!.id}</td>
-                            <td>{row.sample?.barcode}</td>
-                            <td>{row.service?.name}</td>
-                            <td>{row.sample?.patient?.name}</td>
-                            <td>{row.sample?.patient?.birth_day}-{row.sample?.patient?.birth_month}-{row.sample?.patient?.birth_year}</td>
-                            <td>{row.sample?.patient?.sex}</td>
-                            <td>{row.sample?.patient?.serial}</td>
+                            <td>{request.create_at ? new Date(request.create_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
+                            <td>userName</td>
+                            <td>{request.sample?.patient?.organization?.name}</td>
+                            <td>{request.sample?.barcode}</td>
+                            <td>{request.sample?.patient?.name}</td>
+                            <td>{request.service?.name}</td>
+                            <td>{request.sample?.patient?.birth_day}-{request.sample?.patient?.birth_month}-{request.sample?.patient?.birth_year}</td>
+                            <td>{request.sample?.patient?.serial}</td>
                             <td>
                                 <FontAwesomeIcon
                                     icon={faFileLines}
-                                    className={style.info}
+                                    className={globalTableStyle.info}
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        handleInfoClick(row);
+                                        handleInfoClick(request);
                                     }}/>
                             </td>
                         </tr>
@@ -212,9 +234,9 @@ export default function OrderTable() {
                     </tbody>
                 </table>
             </div>
-            <div className={style.pagination}>
+            <div className={globalTableStyle.pagination}>
                 <span>items per page:</span>
-                <div className={style.select}>
+                <div className={globalTableStyle.select}>
                     <select onChange={handlePageSizeChange}>
                         <option value="10">10</option>
                         <option value="20">20</option>
@@ -223,20 +245,20 @@ export default function OrderTable() {
                 </div>
                 <span> 1-{totalPage} of {search.page} </span>
                 <button
-                    className={style.pageButton}
+                    className={globalTableStyle.pageButton}
                     disabled={search.page === 1}
                     onClick={() => handlePageChange((search.page ?? 1) - 1)}
                 ><FontAwesomeIcon icon={faAngleLeft}/>
                 </button>
                 <button
-                    className={style.pageButton}
+                    className={globalTableStyle.pageButton}
                     disabled={search.page === totalPage}
                     onClick={() => handlePageChange((search.page ?? 1) + 1)}
                 ><FontAwesomeIcon icon={faAngleRight}/>
                 </button>
             </div>
             {modalOpen && (
-                <OrderInfo
+                <RequestInfo
                     serviceId={infoRequest?.service!.id!}
                     sampleId={infoRequest?.sample!.id!}
                     closeModal={closeModal}

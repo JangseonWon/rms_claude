@@ -1,6 +1,6 @@
 "use client"
 
-import style from "@/app/(afterLogin)/request/order/_component/orderInfo.module.css";
+import style from "@/app/(afterLogin)/request/order/barcode/_component/requestInfo.module.css";
 import globalStyle from '@/css/modal.module.css';
 import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -16,7 +16,7 @@ type Props = {
     closeModal: () => void;
 }
 
-export default function OrderInfo({serviceId, sampleId, closeModal}: Props) {
+export default function RequestInfo({serviceId, sampleId, closeModal}: Props) {
     const [request, setRequest] = useState<Request>();
 
     const handleRequestChange = (path: string, value: any) => {

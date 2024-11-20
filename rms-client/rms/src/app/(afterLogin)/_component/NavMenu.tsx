@@ -20,6 +20,7 @@ export default function NavMenu() {
     const segment = useSelectedLayoutSegment();
     const [showResultDropdown, setShowResultDropdown] = useState(false);
     const [showManagementDropdown, setShowManagementDropdown] = useState(false);
+    const [showRequestOrder, setShowRequestOrder] = useState(false);
     const { data: session } = useSession();
 
     const toggleResultDropdown = () => {
@@ -28,6 +29,9 @@ export default function NavMenu() {
 
     const toggleManagementDropdown = () => {
         setShowManagementDropdown(!showManagementDropdown);
+    }
+    const toggleRequestOrderDropdown = () => {
+        setShowRequestOrder(!showRequestOrder)
     }
 
     return (
@@ -73,16 +77,33 @@ export default function NavMenu() {
                         </div>
                     </Link>
                 </li>
-                <li>
-                    <Link href={"/request/order"}>
-                        <div className={style.navItem}>
-                            <FontAwesomeIcon
-                                className={segment === 'order' ? style.clickIcon : style.icon}
-                                icon={faGripLines}/>
-                            <span className={segment === 'order' ? style.clickSpan : ''}>Request Order</span>
-                        </div>
-                    </Link>
+                <li onClick={toggleRequestOrderDropdown}>
+                    <div className={style.navItem}>
+                        <FontAwesomeIcon
+                            className={segment === 'order' ? style.clickIcon : style.icon}
+                            icon={faGripLines}/>
+                        <span className={segment === 'order' ? style.clickSpan : ''}>Request Order</span>
+                    </div>
                 </li>
+                {showRequestOrder && (
+                    <>
+                        <ol>
+                            <Link href={"/request/order/barcode"}>
+                                Print Barcode
+                            </Link>
+                        </ol>
+                        <ol>
+                            <Link href={"/request/order/confirm"}>
+                                Confirm Order
+                            </Link>
+                        </ol>
+                        <ol>
+                            <Link href={"/request/order/complete"}>
+                                Complete Order
+                            </Link>
+                        </ol>
+                    </>
+                )}
                 <li onClick={toggleResultDropdown}>
                     <div className={style.navItem}>
                         <FontAwesomeIcon

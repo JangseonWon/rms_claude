@@ -22,8 +22,10 @@ export default function OrderSteps() {
                 return router.push('/request/service-catalog');
             case 'cart' :
                 return router.push('/request/cart');
-            case 'order' :
-                return router.push('/request/order');
+            case 'barcode' :
+                return router.push('/request/order/barcode')
+            case 'confirm' :
+                return router.push('/request/order/confirm');
         }
     }
 
@@ -72,7 +74,7 @@ export default function OrderSteps() {
                     </div>
                     <div className={style.line}/>
                 </div>
-                <div className={`${style.stepContainer} ${styleByStep('barcode')}`}>
+                <div className={`${style.stepContainer} ${styleByStep('barcode')}`} onClick={() => stepClick('barcode')}>
                     <div className={style.circleNumber}>
                         4
                     </div>
@@ -86,8 +88,7 @@ export default function OrderSteps() {
                     </div>
                     <div className={style.line}/>
                 </div>
-                <div className={`${style.stepContainer} ${styleByStep('order')}`}
-                     onClick={() => stepClick('order')}>
+                <div className={`${style.stepContainer} ${styleByStep('confirm')}`} onClick={() => stepClick('confirm')}>
                     <div className={style.circleNumber}>
                         5
                     </div>
