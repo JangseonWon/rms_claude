@@ -3,11 +3,13 @@ package com.gcgenome.rms.dao
 import com.gcgenome.rms.data.Page
 import com.gcgenome.rms.data.Query
 import org.jooq.*
+import org.jooq.Record
 import org.jooq.impl.DSL
-import org.jooq.impl.DSL.field
-import org.jooq.impl.DSL.noCondition
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 
 interface QueryDao {
     enum class JoinType {
@@ -21,7 +23,7 @@ interface QueryDao {
         query: Query,
         joinTables: List<JoinInfo> = emptyList(),
         selectFields: List<Field<*>> = listOf(),
-        where: Condition = noCondition(),
+        where: Condition = DSL.noCondition(),
         groupByFields: List<Field<*>> = emptyList(),
         mapper: (Record) -> T
     ): Mono<Page<T>> {
@@ -41,7 +43,7 @@ interface QueryDao {
         query: Query,
         joinTables: List<JoinInfo> = emptyList(),
         selectFields: List<Field<*>> = listOf(),
-        where: Condition = noCondition(),
+        where: Condition = DSL.noCondition(),
         groupByFields: List<Field<*>> = emptyList(),
         mapper: (Record) -> T
     ): Mono<T> {
@@ -130,21 +132,25 @@ interface QueryDao {
     }
 
     private fun condition(query: Query): Condition {
-        var finalCondition = noCondition()
+        var finalCondition = DSL.noCondition()
         query.filterGroups?.forEach { filterGroup ->
-            var groupCondition = noCondition()
+            var groupCondition = DSL.noCondition()
             filterGroup.filters.forEach { filter ->
                 val table = filter.table
                 val column = filter.column
-                val field = field(DSL.name(table, column))
+                val field = DSL.field(DSL.name(table, column))
 
                 val filterCondition = when (filter.operator) {
                     "=" -> field.eq(filter.value)
                     "!=" -> field.ne(filter.value)
                     ">" -> field.gt(filter.value)
                     "<" -> field.lt(filter.value)
-                    ">=" -> field.ge(filter.value)
-                    "<=" -> field.le(filter.value)
+                    ">=" -> if (isTimestampColumn(column)) {
+                        field.ge(parseTimestamp(filter.value))
+                    } else field.ge(filter.value)
+                    "<=" -> if (isTimestampColumn(column)) {
+                        field.le(parseEndOfDayTimestamp(filter.value))
+                    } else field.le(filter.value)
                     "LIKE" -> field.likeIgnoreCase("%${filter.value}%")
                     else -> null
                 }
@@ -163,7 +169,7 @@ interface QueryDao {
     private fun orderBy(query: Query): List<SortField<*>> {
         val sortFields = mutableListOf<SortField<*>>()
         query.sortBy?.let { sortBy ->
-            val field = field(sortBy)
+            val field = DSL.field(sortBy)
             val sortField = if (query.asc == true) {
                 field.asc()
             } else {
@@ -172,5 +178,14 @@ interface QueryDao {
             sortFields.add(sortField)
         }
         return sortFields
+    }
+    private fun isTimestampColumn(column: String): Boolean {
+        return column.contains("_at", ignoreCase = true)
+    }
+    private fun parseTimestamp(value: String): LocalDateTime {
+        return LocalDate.parse(value).atStartOfDay()
+    }
+    private fun parseEndOfDayTimestamp(date: String): LocalDateTime {
+        return LocalDate.parse(date).atTime(LocalTime.MAX)
     }
 }
