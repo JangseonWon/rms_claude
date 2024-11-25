@@ -17,6 +17,7 @@ interface RequestDao: QueryDao {
             QueryDao.JoinInfo(SERVICE, REQUEST.SERVICE_ID.eq(SERVICE.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(USER, ORDER.USER_ID.eq(USER.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(SAMPLE, REQUEST.SAMPLE_ID.eq(SAMPLE.ID), QueryDao.JoinType.LEFT),
+            QueryDao.JoinInfo(SAMPLE_TYPE, SAMPLE.SAMPLE_TYPE_ID.eq(SAMPLE_TYPE.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(
                 PATIENT,
                 SAMPLE.PATIENT_SERIAL.eq(PATIENT.SERIAL)
@@ -54,6 +55,13 @@ interface RequestDao: QueryDao {
             jsonObject(
                 key("id").value(SAMPLE.ID),
                 key("barcode").value(SAMPLE.BARCODE),
+                key("sample_type").value(
+                    jsonObject(
+                        key("id").value(SAMPLE_TYPE.ID),
+                        key("name").value(SAMPLE_TYPE.NAME),
+                        key("name_kr").value(SAMPLE_TYPE.NAME_KR)
+                    )
+                ),
                 key("patient").value(
                     jsonObject(
                         key("serial").value(PATIENT.SERIAL),
@@ -84,7 +92,7 @@ interface RequestDao: QueryDao {
             ORDER.ID,
             SERVICE.ID,
             USER.ID,
-            SAMPLE.ID,
+            SAMPLE.ID, SAMPLE_TYPE.ID,
             PATIENT.SERIAL, PATIENT.NAME, PATIENT.SEX, PATIENT.BIRTH_YEAR, PATIENT.BIRTH_MONTH, PATIENT.BIRTH_DAY,
             ORGANIZATION.ID, ORGANIZATION.NAME, ORGANIZATION.REGISTRATION_NUMBER, ORGANIZATION.TYPE, ORGANIZATION.NURSING_NUMBER
         )

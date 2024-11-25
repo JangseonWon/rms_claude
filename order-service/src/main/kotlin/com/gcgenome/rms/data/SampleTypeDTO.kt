@@ -3,8 +3,8 @@ package com.gcgenome.rms.data
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class SampleTypeDTO(
-    val id: String,
-    val name: String?,
+    var id: String? = null,
+    var name: String? = null,
     @JsonProperty("name_kr")
-    val nameKr: String?
+    var nameKr: String? = null,
 )
