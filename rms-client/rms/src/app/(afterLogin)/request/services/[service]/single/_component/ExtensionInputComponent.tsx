@@ -1,6 +1,5 @@
 'use client';
 
-import {usePathname} from "next/navigation";
 import {useEffect, useState} from "react";
 import style from './extensionInputComponent.module.css';
 import {fetchServiceExtensions} from "@/app/(afterLogin)/request/services/_api/fetchServiceExtensions";
@@ -12,12 +11,10 @@ import {SelectBoxOption} from "@/model/SelectBoxOption";
 
 interface ExtensionInputComponentProps {
     onChange: (path: string, value: any) => void;
+    serviceId: string;
 }
 
-export default function ExtensionInputComponent({ onChange }: ExtensionInputComponentProps) {
-    const pathname = usePathname();
-    const pathSegments = pathname.split('/');
-    const serviceId = decodeURIComponent(pathSegments[pathSegments.length - 2]);
+export default function ExtensionInputComponent({ serviceId, onChange }: ExtensionInputComponentProps) {
     const [extensions, setExtensions] = useState<Extension[]>([]);
     const [values, setValues] = useState<{ [key: string]: any }>({});
 

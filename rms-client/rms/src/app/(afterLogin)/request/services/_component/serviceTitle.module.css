@@ -1,3 +1,8 @@
+.titleContainer{
+    display: flex;
+    padding: 20px 40px;
+    justify-content: space-between;
+}
 .title{
     display: grid;
     justify-content: space-between;
@@ -16,4 +21,7 @@
 }
 .subTitle span {
     color: #002b49;
+}
+.changeButton {
+    display: flex;
 }

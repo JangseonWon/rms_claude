@@ -15,7 +15,9 @@ interface ServiceDao  {
         return Flux.from(
             selectDistinct(
                 SERVICE.ID,
-                SERVICE.NAME
+                SERVICE.NAME,
+                SERVICE.GROUP_NAME,
+                SERVICE.TYPE
             ).from(SERVICE)
                 .leftJoin(USER_SERVICE).on(SERVICE.ID.eq(USER_SERVICE.SERVICE_ID))
                 .where(SERVICE.CATEGORY_ID.eq(categoryId).and(andWhere))

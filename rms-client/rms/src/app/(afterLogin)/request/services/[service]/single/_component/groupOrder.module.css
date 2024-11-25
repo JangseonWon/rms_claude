@@ -1,0 +1,60 @@
+.container {
+    position: relative;
+    padding: 20px;
+    margin: 0 60px;
+    min-height: 600px;
+    overflow-x: hidden;
+}
+.buttonSection {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 50px;
+    margin-left: auto;
+    text-align: right;
+    width: 100%;
+    box-sizing: border-box;
+}
+.section {
+    margin: 0 20px 20px 20px;
+    display: flex;
+}
+.section > * {
+    padding-right: 20px;
+}
+.memoSection {
+    margin: 0 10px 10px 10px;
+    padding: 0 10px 10px 10px;
+}
+.selectBox {
+    width: 200px;
+}
+.dateBox {
+    width: 200px;
+}
+.title {
+    color: #002b49;
+    margin: 10px 10px;
+    padding: 5px;
+    border-bottom: 1px solid #C8C9CB;
+    font-weight: 800;
+    font-size: 16px;
+}
+.mainName {
+    color: #002b49;
+    margin: 20px 20px 0 20px;
+    font-weight: 800;
+    font-size: 15px;
+}
+.groupContainer {
+    margin: 10px;
+    padding: 10px;
+    position: relative;
+    z-index: 10;
+    border: 1px solid #C8C9CB;
+    border-radius: 10px;
+}
+.extensionSection {
+    margin: 0 10px;
+    padding: 0 10px;
+}

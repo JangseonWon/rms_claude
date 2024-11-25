@@ -18,7 +18,7 @@
     transform: translateY(-50%);
     pointer-events: none;
 }
-.dateBox.error input{
+.dateBox.error input:not(:disabled) {
     border: 1px solid #90BA2D;
 }
 .testBox input {
@@ -43,4 +43,14 @@
 }
 .selectBox:focus {
     outline: none;
+}
+
+.testBox input:disabled {
+    background-color: #f5f5f5;
+}
+
+.testBox input:disabled:hover {
+    outline: none;
+    border: 1px solid #DAE2ED !important;
+    background-color: #f5f5f5;
 }

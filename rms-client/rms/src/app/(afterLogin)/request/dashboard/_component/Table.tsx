@@ -176,7 +176,10 @@ export default function Table() {
     return (
         <div className={style.container}>
             <div style={{float: "right"}}>
-                <DownloadExcelButton search={{ ...search, page: 0, size: 0 }} status={status} />
+                <DownloadExcelButton
+                    search={Object.fromEntries(Object.entries(search).filter(([key]) => !['page', 'size'].includes(key)))}
+                    status={status}
+                />
             </div>
             <div className={style.filterContainer}>
                 <div className={style.filterContainerRight}>

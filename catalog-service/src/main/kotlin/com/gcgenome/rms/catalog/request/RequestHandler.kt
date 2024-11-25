@@ -15,10 +15,10 @@ class RequestHandler(val dslContext: DSLContext):
         return Flux.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
                 Flux.fromArray(requests).flatMap { request ->
-                    insertOrder(user.id!!, request.status!!)
+                    insertOrder(user.id!!)
                         .flatMap { order ->
                             insertPatient(user.id!!, request.sample!!.patient!!)
-                                .then(insertSample(user, request.sample, request.status))
+                                .then(insertSample(user, request.sample, request.status!!))
                                 .flatMap { sampleRecord ->
                                     val extensions = request.sample.extensions ?: emptyList()
                                     Flux.fromIterable(extensions)

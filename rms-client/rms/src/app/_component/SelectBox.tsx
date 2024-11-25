@@ -5,7 +5,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 
 type Props = {
-    options: SelectBoxOption[]
+    options?: SelectBoxOption[]
     label: string
     value?: any
     onChange?: (selectedValue: SelectBoxOption) => void;
@@ -13,7 +13,7 @@ type Props = {
     width?: string;
 }
 
-export default function SelectBox({ label, value, options, onChange, required=false, width }: Props) {
+export default function SelectBox({ label, value, options = [], onChange, required=false, width }: Props) {
     const [selectedValue, setSelectedValue] = useState<string>('');
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const [hasError, setHasError] = useState<boolean | undefined>(false);

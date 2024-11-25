@@ -3,6 +3,7 @@ package com.gcgenome.rms.request
 import com.gcgenome.rms.auth.AuthenticationHandler
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.RequestDTO
+import com.gcgenome.rms.data.ServiceDTO
 import com.gcgenome.rms.exception.AuthenticationNotFoundException
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -21,6 +22,7 @@ class RequestRouter(
     @Bean("RequestRouter")
     fun route() = router {
         POST("/w-api/order-service/requests/search", ::selectRequests)
+        GET("/w-api/order-service/services/{service-id}", ::findService)
     }
     private fun selectRequests(request: ServerRequest) : Mono<ServerResponse> {
         return authenticationHandler.principal(request).zipWith(request.bodyToMono(Query::class.java))
@@ -33,6 +35,18 @@ class RequestRouter(
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(it.data), RequestDTO::class.java ) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
+    }
+    private fun findService(request: ServerRequest): Mono<ServerResponse> {
+        val serviceId = request.pathVariable("service-id")
+        return authenticationHandler.principal(request)
+            .flatMap { requestHandler.selectService(serviceId).collectList() }
+            .flatMap { ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(it), ServiceDTO::class.java)
+            }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
             .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
     }
 }

@@ -1,9 +1,11 @@
 package com.gcgenome.rms.dao
 
-import com.gcgenome.rms.data.*
+import com.gcgenome.rms.data.AlisService
+import com.gcgenome.rms.data.Page
+import com.gcgenome.rms.data.Query
+import com.gcgenome.rms.data.ServiceDTO
 import com.gcgenome.rms.tables.references.*
 import org.jooq.DSLContext
-import org.jooq.JSON
 import org.jooq.impl.DSL.*
 import reactor.core.publisher.Mono
 import java.util.*
@@ -23,6 +25,8 @@ interface ServiceDao : QueryDao{
             SERVICE.ID.`as`("id"),
             SERVICE.NAME.`as`("name"),
             SERVICE.NAME_KR.`as`("name_kr"),
+            SERVICE.GROUP_NAME.`as`("group_name"),
+            SERVICE.TYPE.`as`("type"),
             `when`(CATEGORY.ID.isNotNull,
                 jsonObject(
                     key("id").value(CATEGORY.ID),
@@ -61,6 +65,8 @@ interface ServiceDao : QueryDao{
                 SERVICE.ID.`as`("id"),
                 SERVICE.NAME.`as`("name"),
                 SERVICE.NAME_KR.`as`("name_kr"),
+                SERVICE.GROUP_NAME.`as`("group_name"),
+                SERVICE.TYPE.`as`("type"),
                 `when`(CATEGORY.ID.isNotNull,
                     jsonObject(
                         key("id").value(CATEGORY.ID),

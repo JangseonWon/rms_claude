@@ -15,15 +15,17 @@ type Props = {
     value?: Date
     onChange?: (date: Date) =>void
     required?: boolean;
+    disable?: boolean;
 }
 interface CustomInputProps extends Omit<ReactDatePickerProps, 'onChange'> {
     onClick?(): void;
     onChange?(): void;
 }
 const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(
-    ({ value, onClick, onChange }, ref) => (
+    ({ value, onClick, onChange, disabled }, ref) => (
         <div className={style.testBox}>
             <input
+                disabled={disabled}
                 type="text"
                 value={value}
                 onClick={onClick}
@@ -46,7 +48,7 @@ const range = (start: number, end: number, step: number) => {
     return output;
 };
 
-export default function DatePickerBox({label, value, onChange, required=false}: Props) {
+export default function DatePickerBox({label, value, onChange, disable=false, required=false}: Props) {
     const years = range(1900, getYear(new Date()) + 1, 1);
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(value);
     const [hasError, setHasError] = useState(false);
@@ -78,11 +80,12 @@ export default function DatePickerBox({label, value, onChange, required=false}: 
         <div className={`${style.dateBox} ${hasError ? style.error : ""}`}>
             <p>{label}</p>
             <DatePicker
+                disabled={disable}
                 selected={selectedDate}
                 onChange={handleDateChange}
                 dateFormat={"dd-MM-yyyy"}
                 showPopperArrow={false}
-                customInput={<CustomInput />}
+                customInput={<CustomInput disabled={disable}/>}
                 renderCustomHeader={({
                                          date,
                                          changeYear,

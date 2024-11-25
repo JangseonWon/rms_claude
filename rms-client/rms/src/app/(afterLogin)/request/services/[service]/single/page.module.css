@@ -2,11 +2,6 @@
     margin: 50px 20px;
     height: 100%;
 }
-.titleContainer{
-    display: flex;
-    padding: 20px 40px;
-    justify-content: space-between;
-}
 .orderContainer{
     border-radius: 15px;
     margin: 20px auto;
