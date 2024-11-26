@@ -51,6 +51,7 @@
     align-items: center;
 }
 .buttonGroup {
+    gap: 10px;
     display: flex;
     padding: 10px 0;
     justify-content: flex-end
@@ -95,4 +96,7 @@
 }
 .deleteButton {
     cursor: pointer;
+}
+.spaceDiv {
+    margin: 10px 0;
 }

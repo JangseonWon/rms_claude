@@ -17,11 +17,16 @@ import {putRequest} from "@/app/(afterLogin)/request/services/[service]/single/_
 import {format} from "date-fns";
 import {usePathname} from "next/navigation";
 import ExtensionInputComponent
-    from "@/app/(afterLogin)/request/services/[service]/single/_component/ExtensionInputComponent";
+    from "@/app/(afterLogin)/request/services/[service]/single/_component/extension/ExtensionInputComponent";
 import TextBox from "@/app/_component/TextBox";
 import genomeImg from "@/../public/GCgenome_white.png";
 import logo from "@/css/orderGenomeLogo.module.css";
 import Image from "next/image";
+import SearchProbandModal from "@/app/(afterLogin)/request/services/[service]/single/_component/extension/SearchProbandModal";
+import {
+    useProbandModalOpen,
+    useSetProbandModalOpen
+} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
 
 export default function Order() {
     const [organizationOptions, setOrganizationOptions] = useState<SelectBoxOption[]>([])
@@ -33,6 +38,8 @@ export default function Order() {
     const pathname = usePathname();
     const pathSegments = pathname.split('/');
     const serviceId = decodeURIComponent(pathSegments[pathSegments.length - 2]);
+    const probandModal = useProbandModalOpen();
+    const setProbandModal = useSetProbandModalOpen();
     const sexOption: SelectBoxOption[] = [
         { value: "M", name: "Male" },
         { value: "F", name: "Female" }
@@ -164,6 +171,10 @@ export default function Order() {
         return request?.sample?.quantity;
 
     };
+
+    const Close = () => {
+        setProbandModal(false);
+    }
 
     return (
         <div className={style.container}>
@@ -316,6 +327,9 @@ export default function Order() {
                     onChange={(value) => handleRequestChange('memo', value)}
                 />
             </div>
+            {probandModal && (
+                <SearchProbandModal closeModal={Close}/>
+            ) }
         </div>
     )
 }

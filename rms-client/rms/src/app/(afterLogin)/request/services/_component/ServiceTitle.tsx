@@ -20,7 +20,7 @@ export default function ServiceTitle({serviceData}: Props) {
                 </div>
             </div>
             <div className={style.changeButton}>
-                {serviceData?.type === "GENERAL" && <SingleMultiChangeButton />}
+                {serviceData?.group_name === null && <SingleMultiChangeButton />}
             </div>
         </div>
     )

@@ -166,3 +166,12 @@
 .pageButton, .pageButton:hover {
     background: none;
 }
+.selectRow {
+    cursor: pointer;
+}
+.selectRow:hover {
+    background-color: #f0f8ff !important;
+}
+.selected {
+    background-color: #f0f8ff !important;
+}

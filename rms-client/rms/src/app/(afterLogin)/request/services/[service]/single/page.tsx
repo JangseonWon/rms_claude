@@ -5,7 +5,7 @@ import style from "@/app/(afterLogin)/request/services/[service]/single/page.mod
 import ServiceTitle from "@/app/(afterLogin)/request/services/_component/ServiceTitle";
 import OrderSteps from "@/app/(afterLogin)/_component/OrderSteps";
 import {usePathname} from "next/navigation";
-import GroupOrder from "@/app/(afterLogin)/request/services/[service]/single/_component/GroupOrder";
+import GroupOrder from "@/app/(afterLogin)/request/services/[service]/single/_component/set/GroupOrder";
 import {useEffect, useState} from "react";
 import {getService} from "@/app/(afterLogin)/_api/getService";
 import {Service} from "@/model/Service";

@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import style from './extensionInputComponent.module.css';
 import {fetchServiceExtensions} from "@/app/(afterLogin)/request/services/_api/fetchServiceExtensions";
 import {Extension, ExtensionType} from "@/model/Extension";
@@ -8,6 +8,8 @@ import InputBox from "@/app/_component/InputBox";
 import SelectBox from "@/app/_component/SelectBox";
 import TextBox from "@/app/_component/TextBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
+import {useProband, useRelationship} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
+import {ProbandComponent} from './ProbandComponenet';
 
 interface ExtensionInputComponentProps {
     onChange: (path: string, value: any) => void;
@@ -15,6 +17,8 @@ interface ExtensionInputComponentProps {
 }
 
 export default function ExtensionInputComponent({ serviceId, onChange }: ExtensionInputComponentProps) {
+    const probandValue = useProband();
+    const relationship = useRelationship();
     const [extensions, setExtensions] = useState<Extension[]>([]);
     const [values, setValues] = useState<{ [key: string]: any }>({});
 
@@ -97,12 +101,21 @@ export default function ExtensionInputComponent({ serviceId, onChange }: Extensi
         }
     };
 
+    useEffect(() => {
+        handleInputChange('TEST01', probandValue);
+    }, [probandValue]);
+
+    useEffect(() => {
+        handleInputChange('TEST02', relationship);
+    }, [relationship]);
+
     useEffect(()=> {
         fetchExtensions();
     }, []);
 
     const textComponents = extensions.filter(extension => extension.type === ExtensionType.TEXT);
     const otherComponents = extensions.filter(extension => extension.type !== ExtensionType.TEXT);
+    const probandComponent = extensions.filter(extension => extension.type === ExtensionType.PROBAND);
 
     return (
         <div className={style.section}>
@@ -126,6 +139,9 @@ export default function ExtensionInputComponent({ serviceId, onChange }: Extensi
                         </div>
                     ))}
                 </div>
+            )}
+            {probandComponent.length > 0 && (
+                <ProbandComponent/>
             )}
         </div>
     );

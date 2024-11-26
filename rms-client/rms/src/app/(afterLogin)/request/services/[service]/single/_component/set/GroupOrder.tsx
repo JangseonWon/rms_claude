@@ -1,6 +1,6 @@
 'use client';
 
-import style from "@/app/(afterLogin)/request/services/[service]/single/_component/groupOrder.module.css";
+import style from "@/app/(afterLogin)/request/services/[service]/single/_component/set/groupOrder.module.css";
 import SelectBox from "@/app/_component/SelectBox";
 import InputBox from "@/app/_component/InputBox";
 import React, {useCallback, useEffect, useState} from "react";
@@ -17,9 +17,9 @@ import {putRequest} from "@/app/(afterLogin)/request/services/[service]/single/_
 import {format} from "date-fns";
 import {usePathname} from "next/navigation";
 import ExtensionInputComponent
-    from "@/app/(afterLogin)/request/services/[service]/single/_component/ExtensionInputComponent";
+    from "@/app/(afterLogin)/request/services/[service]/single/_component/extension/ExtensionInputComponent";
 import TextBox from "@/app/_component/TextBox";
-import genomeImg from "@/../public/GCgenome_white.png";
+import genomeImg from "../../../../../../../../../public/GCgenome_white.png";
 import logo from "@/css/orderGenomeLogo.module.css";
 import Image from "next/image";
 import {Service} from "@/model/Service";
