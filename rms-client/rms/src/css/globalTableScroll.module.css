@@ -1,0 +1,100 @@
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.table thead {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    font-size: 12px;
+    color: #ffffff;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    background: linear-gradient(to right, #023a60, #5676a2);
+}
+.table tbody {
+    display: block;
+    height: 250px;
+    overflow-y: auto;
+}
+.table tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    border-bottom: 1px solid #838689;
+}
+.table tbody tr td {
+    color: #666666;
+    font-size: 12px;
+}
+.table th,
+.table td {
+    padding: 8px;
+    text-align: center;
+}
+.checkbox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+}
+.checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+.checkmark {
+    width: 20px;
+    height: 20px;
+    background-color: #faf7f7;
+    border: 1px solid #DAE2ED;
+    border-radius: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.checkbox input:checked + .checkmark {
+    background-color: #90BA2D;
+}
+.checkmark:after {
+    content: "";
+    display: none;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    margin-bottom: 3px;
+}
+.checkbox input:checked + .checkmark:after {
+    display: block;
+}
+
+.formGroupBetween {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 10px;
+    padding: 10px;
+}
+.formGroupBetween > div{
+    display: flex;
+    gap: 10px;
+}
+.formGroupRight {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    gap: 10px;
+    padding: 10px;
+}
+.formGroupLeft {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
+    gap: 10px;
+    padding: 10px;
+}

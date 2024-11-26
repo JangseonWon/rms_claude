@@ -14,7 +14,9 @@ type Props = {
     label?: string
     value?: Date
     onChange: (from: Date, to: Date) => void
-    required?: boolean;
+    required?: boolean
+    fromDate?: Date | null
+    toDate?: Date | null
 }
 interface CustomInputProps extends Omit<ReactDatePickerProps, 'onChange'> {
     onClick?(): void;
@@ -46,9 +48,9 @@ const range = (start: number, end: number, step: number) => {
     return output;
 };
 
-export default function DatePickerRangeBox({label, value, onChange, required = false}: Props) {
+export default function DatePickerRangeBox({label, value, onChange, required = false, fromDate, toDate}: Props) {
     const years = range(1900, getYear(new Date()) + 1, 1);
-    const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
+    const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([fromDate || null, toDate || null]);
     const [startDate, endDate] = dateRange;
     const months = [
         "January",
@@ -130,7 +132,7 @@ export default function DatePickerRangeBox({label, value, onChange, required = f
                     setDateRange(selectedDates);
 
                     if (selectedDates[0] && selectedDates[1]) {
-                        onChange(selectedDates[0], selectedDates[1]);
+                        onChange(selectedDates[0] as Date, selectedDates[1] as Date);
                     }
                 }}
                 customInput={<CustomInput/>}

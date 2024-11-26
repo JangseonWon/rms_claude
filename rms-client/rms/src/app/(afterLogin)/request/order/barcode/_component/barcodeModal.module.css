@@ -1,0 +1,124 @@
+.modalTitle {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #1e2c5b;
+}
+.modalCloseButton {
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    top: 15px;
+    right: 15px;
+    cursor: pointer;
+}
+.modalBody {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 30px;
+}
+.formGroup {
+    display: flex;
+    gap: 20px;
+    padding: 10px 0;
+}
+.buttonGroup {
+    display: flex;
+    padding: 10px 0;
+    justify-content: flex-end
+}
+.contentGroup {
+    display: flex;
+    gap: 20px;
+}
+.content {
+    width: 1000px;
+    height: 400px;
+    overflow-y: auto;
+}
+.required {
+    width: 100px !important;
+}
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.table thead {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    font-size: 12px;
+    color: #ffffff;
+}
+.table thead th{
+    background-color: #002b49;
+}
+.table thead th:first-child {
+    border-top-left-radius: 15px;
+}
+.table thead th:last-child {
+    border-top-right-radius: 15px;
+}
+.table tbody {
+    display: block;
+    height: 250px;
+    overflow-y: auto;
+}
+.table tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    border-bottom: 1px solid #838689;
+}
+.table tbody tr td {
+    color: #666666;
+    font-size: 12px;
+}
+.table th,
+.table td {
+    padding: 8px;
+    text-align: center;
+}
+.addButton {
+    margin-top: 20px;
+    cursor: pointer;
+    padding: 5px 10px;
+    height: 40px;
+    width: 80px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, #182847, #354e6d);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 13px;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.5);
+}
+.addButton:hover {
+    background: linear-gradient(135deg, #354e6d, #182847);
+}
+.deleteButton {
+    cursor: pointer;
+}
+.roundButtonContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* optional: center buttons vertically */
+}
+.roundButton {
+    width: 26px;
+    border-radius: 50%;
+    cursor: pointer;
+    background-color: transparent;
+    border: 0;
+    font-size: 20px;
+}
+.roundButton:hover {
+    background-color: rgba(0, 0, 0, 0.1); /* hover 시 배경 색 변화 */
+    border-color: rgba(0, 0, 0, 0.8); /* hover 시 테두리 색 변화 */
+    color: rgba(0, 0, 0, 0.9); /* hover 시 텍스트 색 변화 */
+    transform: scale(1.1); /* 살짝 커지는 효과 */
+}
+.countText {
+
+}
