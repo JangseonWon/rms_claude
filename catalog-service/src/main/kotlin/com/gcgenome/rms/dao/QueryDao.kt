@@ -60,6 +60,30 @@ interface QueryDao {
         return Mono.from(queryBuilder).map(mapper)
     }
 
+    fun <T> DSLContext.selectQueryFlux(
+        mainTable: Table<*>,
+        query: Query,
+        joinTables: List<JoinInfo> = emptyList(),
+        selectFields: List<Field<*>> = listOf(),
+        where: Condition = noCondition(),
+        groupByFields: List<Field<*>> = emptyList(),
+        mapper: (Record) -> T
+    ): Flux<T> {
+        val fields = selectFields.takeIf { it.isNotEmpty() } ?: mainTable.fields().toList()
+
+        val queryBuilder = select(*fields.toTypedArray())
+            .from(from(mainTable, joinTables))
+            .where(condition(query).and(where))
+            .apply {
+                if (groupByFields.isNotEmpty()) {
+                    groupBy(*groupByFields.toTypedArray())
+                }
+            }
+            .orderBy(orderBy(query))
+
+        return Flux.from(queryBuilder).map(mapper)
+    }
+
     private fun DSLContext.getTotalElementsMono(
         mainTable: Table<*>,
         query: Query,

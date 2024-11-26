@@ -3,6 +3,7 @@ package com.gcgenome.rms.catalog.service
 import com.gcgenome.rms.auth.AuthenticationHandler
 import com.gcgenome.rms.data.*
 import com.gcgenome.rms.exceptions.AuthenticationNotFoundException
+import com.gcgenome.rms.tables.pojos.Service
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
@@ -39,10 +40,10 @@ class ServiceRouter (
     private fun findUserWithServices(request: ServerRequest): Mono<ServerResponse> {
         return Mono.zip(authenticationHandler.principal(request),
             request.bodyToMono(Query::class.java).defaultIfEmpty(Query()))
-            .flatMap { serviceHandler.selectUserWithServices(it.t1.user.id!!, it.t2) }
+            .flatMap { serviceHandler.selectUserWithServices(it.t1, it.t2).collectList() }
             .flatMap { ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(Mono.just(it), UserDTO::class.java) }
+                .body(Mono.just(it), Service::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error : $it, ${it.cause}") }
     }

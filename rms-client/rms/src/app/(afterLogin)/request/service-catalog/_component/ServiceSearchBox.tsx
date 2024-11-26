@@ -6,7 +6,7 @@ import {SelectBoxOption} from "@/model/SelectBoxOption";
 import {useRouter} from "next/navigation";
 import {Query} from "@/model/Query";
 import {postServiceByUser} from "@/app/(afterLogin)/request/service-catalog/_api/postServiceByUser";
-import {User} from "@/model/User";
+import {Service} from "@/model/Service";
 
 export default function ServiceSearchBox() {
     const router = useRouter();
@@ -15,11 +15,11 @@ export default function ServiceSearchBox() {
     const [search, setSearch] = useState<string>('');
     const selectBoxRef = useRef<HTMLDivElement>(null);
 
-    const transformDataToOptions = (user: User): SelectBoxOption[] => {
-        if (!user.services) {
+    const transformDataToOptions = (service: Service[]): SelectBoxOption[] => {
+        if (!service) {
             return [];
         }
-        return user.services.map(value => ({
+        return service.map(value => ({
             value: value.id,
             name: value.name
         }));

@@ -6,6 +6,7 @@ import com.gcgenome.rms.dao.SampleTypeDao
 import com.gcgenome.rms.dao.ServiceDao
 import com.gcgenome.rms.dao.UserDao
 import com.gcgenome.rms.data.*
+import com.gcgenome.rms.tables.pojos.Service
 import com.gcgenome.rms.tables.references.USER_SERVICE
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
@@ -23,8 +24,8 @@ class ServiceHandler(val dslContext: DSLContext): ServiceDao, SampleTypeDao, Use
         return dslContext.selectServiceByUserIdAndCategoryId(andWhere, categoryId)
     }
 
-    fun selectUserWithServices(userId: String, query: Query): Mono<UserDTO> {
-        return dslContext.selectUserWithServicesQuery(userId, query)
+    fun selectUserWithServices(user: UserAuthentication, query: Query): Flux<Service> {
+        return dslContext.selectUserWithServicesQuery(user, query)
     }
 
     fun getSampleTypes(serviceId: String): Flux<SampleTypeDTO> {
