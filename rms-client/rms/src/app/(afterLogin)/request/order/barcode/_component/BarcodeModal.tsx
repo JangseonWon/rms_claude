@@ -79,7 +79,7 @@ export default function BarcodeModal({requests, closeModal}: Props) {
                     y: currentY-8,
                     fontSize: 35,
                     textColor: "black"
-                }).then();
+                });
                 doc.restoreGraphicsState();
                 doc.saveGraphicsState();
                 doc.setFontSize(7)
@@ -93,7 +93,7 @@ export default function BarcodeModal({requests, closeModal}: Props) {
                     y: currentY + yGap - 8,
                     fontSize: 35,
                     textColor: "black"
-                }).then();
+                });
                 doc.restoreGraphicsState();
                 currentX += xGap;
                 printCount++;
