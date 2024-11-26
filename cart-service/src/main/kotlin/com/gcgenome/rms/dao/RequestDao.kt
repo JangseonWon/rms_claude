@@ -31,7 +31,6 @@ interface RequestDao: QueryDao {
                 SERVICE.CATEGORY_ID
             ).`as`("service"),
             ORDER.ID.`as`("order_id"),
-            ORDER.SERIAL.`as`("serial"),
             REQUEST.USER_SERVICE_ID,
             REQUEST.STATUS,
             REQUEST.MEMO,

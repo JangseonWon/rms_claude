@@ -47,8 +47,7 @@ class Handler(val dslContext: DSLContext ) :
         return Flux.from(dslContext.transactionPublisher{trx ->
             trx.dsl().run {
                 Flux.fromArray(requests).flatMap { request ->
-                    updateOrderSerialAndCreatedAtById(request.orderId!!, request.sample!!.patient!!.organization!!.user!!.id!!)
-                        .then(updateRequestStatusAndCreateAtById(request.orderId!!, request.sample!!.id!!, request.service!!.id!!))
+                    updateRequestStatusAndCreateAtById(request.orderId!!, request.sample!!.id!!, request.service!!.id!!)
                         .then(updateSampleBarcodeAndCreateAtById(request.sample!!.id!!, request.sample!!.patient!!.organization!!.user!!.branchSerial!!))
                         .then(selectRequestById(request.sample!!.id!!, request.service!!.id!!))
                 }
