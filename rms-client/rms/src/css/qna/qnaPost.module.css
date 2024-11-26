@@ -27,14 +27,14 @@
 }
 .userLabel, .titleLabel, .contentLabel, .fileLabel {
     font-weight: 700;
-    font-size: 12pt;
+    font-size: 16px;
     color: #333;
 }
 .inputUser, .inputTitle, .textareaContent, .fileInput {
     padding: 10px 20px;
     border: 1px solid #ccc;
     border-radius: 25px;
-    font-size: 10pt;
+    font-size: 13px;
     background-color: #fff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     outline: none;
@@ -78,10 +78,10 @@
     width: 500px;
 }
 .headTitle {
-    font-size: 32pt;
+    font-size: 42px;
 }
 .backButton {
-    font-size: 22pt;
+    font-size: 29px;
 }
 .backButton:hover {
     cursor: pointer;
@@ -103,7 +103,7 @@
     outline: none;
 }
 .select option {
-    font-size: 10pt;
+    font-size: 13px;
 }
 .textareaContent {
     resize: none;

@@ -14,7 +14,7 @@
 }
 .navPill ul ol {
     margin: 15px 0 0 20px;
-    font-size: 10pt;
+    font-size: 13px;
     font-optical-sizing: auto;
     font-weight: 400;
     padding: 3px 0 3px 12px;
@@ -44,7 +44,7 @@
 .navPill li span {
     margin: 0 10px;
     color: #666666;
-    font-size: 12pt;
+    font-size: 16px;
     font-optical-sizing: auto;
     font-weight: 400;
 }

@@ -1,6 +1,7 @@
 "use client"
 
 import globalTableStyle from "@/css/globalTable.module.css";
+import requestStyle from '@/css/order/requestTable.module.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import React, {useEffect, useState} from "react";
@@ -139,18 +140,18 @@ export default function RequestTable() {
                 </div>
             </div>
             <div className={globalTableStyle.tableContainer}>
-                <table className={globalTableStyle.table}>
+                <table className={requestStyle.table}>
                     <thead>
                     <tr>
-                        <th>Order Date<br/>(DD-MM-YYYY)</th>
+                        <th className={requestStyle.longColumn}>Order Date<br/>(DD-MM-YYYY)</th>
                         <th>Global courier</th>
-                        <th>AirWaybill no.</th>
+                        <th className={requestStyle.middleColumn}>AirWaybill no.</th>
                         <th>User Name</th>
                         <th>Institution</th>
                         <th>Registration ID</th>
                         <th>Service</th>
                         <th>Patient(s) Name</th>
-                        <th>Patient(s) DOB<br/>(DD-MM-YYYY)</th>
+                        <th className={requestStyle.longColumn}>Patient(s) DOB<br/>(DD-MM-YYYY)</th>
                         <th>MRN</th>
                         <th>Info</th>
                     </tr>

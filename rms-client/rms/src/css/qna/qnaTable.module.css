@@ -30,7 +30,7 @@
     height: 40px;
     background: linear-gradient(to right, #023a60, #5676a2);
     color: #ffffff;
-    font-size: 10pt;
+    font-size: 13px;
     font-weight: 600;
 }
 .table thead tr th:first-child {
@@ -51,7 +51,7 @@
 }
 .table tbody tr td {
     color: #666666;
-    font-size: 10pt;
+    font-size: 13px;
     padding: 10px;
 }
 .table tbody tr:nth-child(even) {
@@ -119,19 +119,19 @@
 }
 .paginationAngle {
     margin: 0 6px;
-    font-size: 13pt;
+    font-size: 17px;
     background: none;
     border: none;
 }
 .activePage {
     margin: 0 6px;
-    font-size: 13pt;
+    font-size: 17px;
     background: none;
     border: none;
 }
 .deActivePage {
     margin: 0 6px;
-    font-size: 8pt;
+    font-size: 10px;
     background: none;
     border: none;
 }

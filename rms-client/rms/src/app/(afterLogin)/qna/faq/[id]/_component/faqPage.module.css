@@ -11,7 +11,7 @@
 }
 .userLabel, .titleLabel, .contentLabel, .fileLabel, .commentLabel {
     font-weight: 700;
-    font-size: 12pt;
+    font-size: 16px;
     color: #333;
 }
 .inputUser, .inputTitle, .textareaContent {
@@ -19,7 +19,7 @@
     border: 1px solid #ccc;
     outline: none;
     border-radius: 25px;
-    font-size: 10pt;
+    font-size: 13px;
     background-color: #fff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -30,10 +30,10 @@
     gap: 10px;
 }
 .headTitle {
-    font-size: 32pt;
+    font-size: 42px;
 }
 .backButton {
-    font-size: 22pt;
+    font-size: 29px;
 }
 .backButton:hover {
     cursor: pointer;
@@ -51,10 +51,10 @@
 }
 .fileInput {
     padding-left: 10px !important;
-    font-size: 10pt;
+    font-size: 13px;
 }
 .inputButton {
-    font-size: 9pt;
+    font-size: 12px;
 }
 .fileList {
     display: flex;
@@ -78,7 +78,7 @@
 }
 .fileDelete {
     margin: 0 0 5px 4px;
-    font-size: 9pt;
+    font-size: 12px;
     cursor: pointer;
 }
 .textareaContent {
@@ -94,7 +94,7 @@
     padding: 8px 20px;
     border: 1px solid #bbb9b7;
     background-color: #ffffff;
-    font-size: 10pt;
+    font-size: 13px;
     color: #88837E;
 }
 .comment {
@@ -113,13 +113,13 @@
     justify-content: space-between;
 }
 .commentDelete {
-    font-size: 9pt;
+    font-size: 12px;
     margin-top: 5px;
     cursor: pointer;
 }
 .commentUserName, .commentManagerName {
     margin: 5px 0 !important;
-    font-size: 9pt;
+    font-size: 12px;
 }
 .commentManagerName {
     color: #cf5757;
@@ -128,13 +128,13 @@
 .commentContent {
     max-width: 1100px;
     margin: 5px 0 !important;
-    font-size: 10pt;
+    font-size: 13px;
     white-space: pre-wrap;
     word-wrap: break-word;
 }
 .commentDate {
     margin: 5px 0 !important;
-    font-size: 7pt;
+    font-size: 9px;
 }
 .firstCommentContainer {
     display: flex;
@@ -147,18 +147,18 @@
     display: grid;
 }
 .inputCommentUser {
-    font-size: 10pt;
+    font-size: 13px;
     margin: 5px 0 !important;
 }
 .inputComment {
     border: none;
     width: 1120px;
-    font-size: 9pt;
+    font-size: 12px;
     background-color: #fff;
     margin-bottom: 10px;
 }
 .inputCommendButton {
-    font-size: 9pt;
+    font-size: 12px;
     width: 80px;
     margin: 0 0 0 20px !important;
     border-left: solid 1px #ccc;

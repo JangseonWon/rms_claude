@@ -1,0 +1,84 @@
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.table thead {
+    background: linear-gradient(to right, #023a60, #5676a2);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 600;
+}
+.table thead tr th:first-child {
+    border-radius: 20px 0 0 0;
+}
+.table thead tr th:last-child {
+    border-radius: 0 20px 0 0;
+}
+.table tbody {
+
+}
+.table tbody tr {
+    border-bottom: 1px solid #838689;
+}
+.table tbody tr:nth-child(even) {
+    background-color: #ffffff;
+}
+.table tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+.table tbody tr td {
+    color: #666666;
+    font-size: 11px;
+    padding: 8px 20px;
+}
+.table th,
+.table td {
+    padding: 7px 10px;
+    text-align: center;
+}
+.checkbox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+}
+.checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+.checkmark {
+    width: 15px;
+    height: 15px;
+    background-color: #faf7f7;
+    border: 1px solid #DAE2ED;
+    border-radius: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.checkbox input:checked + .checkmark {
+    background-color: #90BA2D;
+}
+.checkmark:after {
+    content: "";
+    display: none;
+    width: 4px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    margin-bottom: 3px;
+}
+.checkbox input:checked + .checkmark:after {
+    display: block;
+}
+.longColumn {
+    width: 90px;
+}
+.middleColumn {
+    width: 75px;
+}

@@ -30,7 +30,7 @@
 }
 .headerMenu {
     flex-grow: 1;
-    font-size: 16pt;
+    font-size: 21px;
     font-weight: normal;
     color: #fff;
     text-decoration: none;
@@ -39,7 +39,7 @@
     transition: background-color 0.3s ease;
 }
 .headerMenuActive{
-    font-size: 16pt;
+    font-size: 21px;
     font-weight: normal;
     color: #fff;
     text-decoration: none;
