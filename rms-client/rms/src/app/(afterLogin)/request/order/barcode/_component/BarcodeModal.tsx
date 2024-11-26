@@ -10,6 +10,7 @@ import BlueButton from "@/app/_component/BlueButton";
 import {RequestWithSelected} from "@/app/(afterLogin)/request/order/barcode/_component/RequestTable";
 import JsPDF from "jspdf";
 import "jspdf-barcode";
+import {nanumGothicBase64} from "@/app/(afterLogin)/request/order/barcode/_component/nanumGothicBase64";
 
 type Props = {
     requests: RequestWithSelected[]
@@ -57,6 +58,9 @@ export default function BarcodeModal({requests, closeModal}: Props) {
         let currentX = xStart;
         let currentY = yStart;
         let printCount = 0;
+        doc.addFileToVFS("NanumGothic.ttf", nanumGothicBase64);
+        doc.addFont('NanumGothic.ttf', 'NanumGothic', 'normal');
+        doc.setFont('NanumGothic');
 
         requests.forEach((request, index) => {
             const requestKey = `${request.sample!.id}:${request.service!.id}`
