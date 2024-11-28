@@ -15,6 +15,7 @@ import {SelectBoxOption} from "@/model/SelectBoxOption";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import {format} from "date-fns";
 import {useSession} from "next-auth/react";
+import {putPostReadByUserId} from "@/app/(afterLogin)/qna/_api/putPostReadByUserId";
 
 export default function NoticeTable() {
     const router = useRouter();
@@ -99,6 +100,7 @@ export default function NoticeTable() {
     };
 
     const handleRowClick = async (post: Post) => {
+        await fetchPostRead(post.id!);
         router.push(`/qna/notice/${post.id}`);
     };
 
@@ -121,6 +123,10 @@ export default function NoticeTable() {
         }
         return pageNumbers;
     };
+
+    const fetchPostRead = async (post_id: number) => {
+        await putPostReadByUserId(post_id);
+    }
 
     const fetchData = useCallback(async (search: Query) => {
         const response = await postSearchPosts(search, 'notice');
