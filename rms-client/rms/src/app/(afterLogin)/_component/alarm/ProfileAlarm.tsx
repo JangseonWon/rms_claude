@@ -5,7 +5,7 @@ import scroll from "@/css/scrollBar.module.css";
 import React, {useEffect, useState} from "react";
 import classNames from "classnames";
 import {Alarm} from "@/model/Alarm";
-import {getAlarmByUser} from "@/app/(afterLogin)/_component/alarm/getAlarmByUser";
+import {getAlarmByUser} from "@/app/(afterLogin)/_component/alarm/_api/getAlarmByUser";
 import {useRouter} from "next/navigation";
 
 
@@ -13,20 +13,13 @@ export default function ProfileAlarm() {
     const [alarmData, setAlarmData] = useState<Alarm[]>();
     const route = useRouter();
 
-    const fetchAlarmData = async () => {
-        const response = await getAlarmByUser();
-        const data = await response.json();
-        setAlarmData(data as Alarm[]);
-    };
-
     useEffect(() => {
-        fetchAlarmData();
-
-        const interval = setInterval(() => {
-            fetchAlarmData();
-        }, 60000);
-
-        return () => clearInterval(interval);
+        const fetchData = async () => {
+            const response = await getAlarmByUser();
+            const data = await response.json();
+            setAlarmData(data as Alarm[]);
+        };
+        fetchData()
     }, []);
 
     function isNew(lastModifyDate: string): boolean {

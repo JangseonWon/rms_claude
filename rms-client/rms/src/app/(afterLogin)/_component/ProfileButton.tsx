@@ -9,12 +9,14 @@ import {useRouter} from "next/navigation";
 import {signOut, useSession} from "next-auth/react";
 import ProfileAlarm from "@/app/(afterLogin)/_component/alarm/ProfileAlarm";
 import {getAlarmCountByUser} from "@/app/(afterLogin)/_api/getAlarmCountByUser";
+import {useAlarmCount, useSetAlarmCount} from "@/app/(afterLogin)/_component/alarm/store/useAlarmCountStore";
 
 export default function ProfileButton() {
     const { data: session } = useSession();
     const [profileOpen, setProfileOpen] = useState(false);
     const [alarmOpen, setAlarmOpen] = useState(false);
-    const [alarmCount, setAlarmCount] = useState(0);
+    const alarmCount = useAlarmCount();
+    const setAlarmCount = useSetAlarmCount();
     const router = useRouter()
     const alarmRef = useRef<HTMLDivElement>(null);
 
@@ -53,15 +55,21 @@ export default function ProfileButton() {
         };
     }, []);
 
+    const fetchAlarmCount = async () => {
+        const response = await getAlarmCountByUser();
+        const data = await response.json();
+        setAlarmCount(data as number);
+    };
 
     useEffect(() => {
-        const fetchData = async () => {
-            const response = await getAlarmCountByUser();
-            const data = await response.json();
-            setAlarmCount(data as number);
-        };
-        fetchData()
-    }, []);
+        fetchAlarmCount();
+
+        const interval = setInterval(() => {
+            fetchAlarmCount();
+        }, 60000);
+
+        return () => clearInterval(interval);
+    }, [alarmOpen]);
 
     return(
         <div className={style.container}>
