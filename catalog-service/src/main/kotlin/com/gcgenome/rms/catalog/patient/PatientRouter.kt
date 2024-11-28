@@ -18,7 +18,7 @@ class PatientRouter (
     private val authenticationHandler: AuthenticationHandler,
     private val patientHandler: PatientHandler
 ) {
-    @Bean("ServiceRouter")
+    @Bean("PatientRouter")
     fun route() = router {
         POST("/w-api/catalog-service/patients/search", ::findPatient)
     }
