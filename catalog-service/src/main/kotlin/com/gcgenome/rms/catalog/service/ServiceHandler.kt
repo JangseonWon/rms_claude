@@ -39,4 +39,19 @@ class ServiceHandler(val dslContext: DSLContext): ServiceDao, SampleTypeDao, Use
                 .flatMapMany {selectExtensionByService(serviceId)}
         }
     }
+
+    fun selectService(serviceId: String): Flux<ServiceDTO> {
+        return Flux.from(
+            dslContext.selectServiceById(serviceId)
+                .flatMapMany { service ->
+                    if (service.type == "GENERAL") {
+                        Flux.empty()
+                    } else {
+                        dslContext.selectServiceForGroupServiceId(service.groupName!!)
+                    }
+                }.flatMapSequential { relatedService ->
+                    dslContext.selectServiceInfoById(relatedService.id!!)
+                }
+        )
+    }
 }

@@ -26,6 +26,7 @@ class ServiceRouter (
         POST("/w-api/catalog-service/search", :: findUserWithServices)
         GET("/w-api/catalog-service/sample_types", :: getSampleTypeByServiceId)
         GET("/w-api/catalog-service/services/{serviceId}/extensions", ::serviceExtensions)
+        GET("/w-api/catalog-service/services/{service-id}", ::findService)
     }
 
     private fun getServices(request: ServerRequest): Mono<ServerResponse> {
@@ -64,6 +65,19 @@ class ServiceRouter (
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), ServiceExtensionDTO::class.java)}
             .onErrorResume (AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume (ServiceNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
+    }
+
+    private fun findService(request: ServerRequest): Mono<ServerResponse> {
+        val serviceId = request.pathVariable("service-id")
+        return authenticationHandler.principal(request)
+            .flatMap { serviceHandler.selectService(serviceId).collectList() }
+            .flatMap { ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(it), ServiceDTO::class.java)
+            }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
     }
 }
 
