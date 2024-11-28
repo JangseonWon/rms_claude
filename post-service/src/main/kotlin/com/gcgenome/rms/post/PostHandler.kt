@@ -20,6 +20,7 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import java.nio.ByteBuffer
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 @Component
 class PostHandler(
@@ -58,6 +59,14 @@ class PostHandler(
         return Mono.from(dslContext.selectPostById(postId))
     }
 
+    fun selectPostReadByUserId(user: UserAuthentication): Flux<PostReadDTO> {
+        return Flux.from(dslContext.selectPostReadByUserId(user.user.id!!))
+    }
+
+    fun getAlarmCountByUserId(user: UserAuthentication): Mono<Int> {
+        return Mono.from(dslContext.getAlarmCountByUserId(user.user.id!!))
+    }
+
     fun insertPost(post: PostDTO, fileParts: List<FilePart>?): Mono<PostDTO> {
         return dslContext.insertPost(post)
             .flatMap { savedPost ->
@@ -74,10 +83,14 @@ class PostHandler(
     }
 
     fun insertPostRead(userId: String, post: PostDTO): Flux<PostRead> {
+        val users = if (post.postCategoryId == UUID.fromString("00a1b411-aa82-4b42-99b2-08ae520ea02c")) {
+            dslContext.userPermissionSelectAllUser(userId)
+        } else {
+            dslContext.selectManagerAndUser(userId)
+        }
         return Flux.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
-                userPermissionsSelectUser(userId)
-                    .flatMap({ insertPostRead(post.id!!, it.id!!) }, 10)
+                users.flatMap({ user -> insertPostRead(post.id!!, user.id!!) }, 10)
             }
         })
     }

@@ -6,11 +6,16 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
 import java.time.LocalDateTime
-import java.util.*
 
-data class PostDTO(
-    @JsonProperty("id")
-    var id: Long? = null,
+data class PostReadDTO(
+    @JsonProperty("post_id")
+    var postId: Long? = null,
+    @JsonProperty("user_id")
+    var userId: String? = null,
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonProperty("read_at")
+    var readAt: LocalDateTime? = null,
     @JsonProperty("title")
     var title: String? = null,
     @JsonProperty("content")
@@ -23,20 +28,6 @@ data class PostDTO(
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("last_modify_at")
     var lastModifyAt: LocalDateTime? = null,
-    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
-    @JsonSerialize(using = LocalDateTimeSerializer::class)
-    @JsonProperty("read_at")
-    var readAt: LocalDateTime? = null,
-    @JsonProperty("post_category")
-    var postCategory: PostCategoryDTO? = null,
-    @JsonProperty("user")
-    var user: UserDTO? = null,
-    @JsonProperty("comments")
-    var comments: List<CommentDTO>? = null,
-    @JsonProperty("post_files")
-    var postFiles: List<PostFileDTO>? = null,
-    @JsonProperty("comment_count")
-    var commentCount: Int? = null,
-    @JsonProperty("post_category_id")
-    var postCategoryId: UUID? = null,
+    @JsonProperty("category")
+    var category: String? = null,
 )

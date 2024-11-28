@@ -26,7 +26,8 @@ interface PostDao: QueryDao{
             POST.CONTENT.`as`("content"),
             POST.CREATE_AT.`as`("create_at"),
             POST.LAST_MODIFY_AT.`as`("last_modify_at"),
-            POST_READ.READ_AT.`as`("read_at"),selectCount()
+            POST_READ.READ_AT.`as`("read_at"),
+            selectCount()
                 .from(COMMENT)
                 .where(COMMENT.POST_ID.eq(POST.ID))
                 .asField("comment_count"),

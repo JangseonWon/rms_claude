@@ -2,10 +2,7 @@ package com.gcgenome.rms.post
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.gcgenome.rms.auth.AuthenticationHandler
-import com.gcgenome.rms.data.JandiRequest
-import com.gcgenome.rms.data.PostDTO
-import com.gcgenome.rms.data.Query
-import com.gcgenome.rms.data.UserDTO
+import com.gcgenome.rms.data.*
 import com.gcgenome.rms.exception.AuthenticationNotFoundException
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -34,6 +31,8 @@ class PostRouter (
         PUT("/w-api/post-service/post/{post-id}", ::postReadByUser)
         PUT("/w-api/post-service/post/{post-id}/new", ::postReadStatusChangeNull)
         POST("/w-api/post-service/post/{post-id}/message/{category}", ::jandiWebHook)
+        GET("/w-api/post-service/alarms/post", ::selectPostReadByUserId)
+        GET("/w-api/post-service/alarms/count", ::selectPostAlarmByUserId)
     }
 
     private fun selectPosts(request: ServerRequest): Mono<ServerResponse> {
@@ -150,6 +149,24 @@ class PostRouter (
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
             .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Request body error.") }
+    }
+
+    private fun selectPostReadByUserId(request: ServerRequest): Mono<ServerResponse> {
+        return authenticationHandler.principal(request)
+            .flatMap { serviceHandler.selectPostReadByUserId(it).collectList() }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), PostReadDTO::class.java) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error: ${it.cause}") }
+    }
+
+    private fun selectPostAlarmByUserId(request: ServerRequest): Mono<ServerResponse> {
+        return authenticationHandler.principal(request)
+            .flatMap { serviceHandler.getAlarmCountByUserId(it) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), Int::class.java) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error: ${it.cause}") }
     }
 }
 
