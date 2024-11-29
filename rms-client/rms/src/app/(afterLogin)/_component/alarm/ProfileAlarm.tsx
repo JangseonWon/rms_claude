@@ -70,7 +70,7 @@ export default function ProfileAlarm() {
     return(
         <div className={style.container}>
             <section className={classNames(style.contentContainer, scroll.default)}>
-                {alarmData && alarmData.length > 0 && alarmData.map((row, index) => {
+                {alarmData && alarmData.length > 0 ? ( alarmData.map((row, index) => {
                     const link =
                         row.category === "qna"
                             ? `/qna/${row.post_id}`
@@ -94,7 +94,12 @@ export default function ProfileAlarm() {
                             </div>
                         </div>
                     );
-                })}
+                })
+                ) : (
+                    <div className={style.title}>
+                        No Alarm
+                    </div>
+                )}
             </section>
         </div>
     )
