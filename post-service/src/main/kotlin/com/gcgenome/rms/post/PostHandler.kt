@@ -20,14 +20,13 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import java.nio.ByteBuffer
 import java.time.format.DateTimeFormatter
-import java.util.*
 
 @Component
 class PostHandler(
     val dslContext: DSLContext,
     val s3Client: S3AsyncClient,
     @Value("\${aws.s3.bucket}") private val bucketName: String
-): PostDao, PostFileDao, CommentDao, UserDao, PostReadDao {
+): PostDao, PostFileDao, CommentDao, UserDao, PostReadDao, PostCategoryDao {
     private val webClient: WebClient = WebClient.builder()
         .baseUrl("https://wh.jandi.com/connect-api/webhook")
         .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -83,14 +82,27 @@ class PostHandler(
     }
 
     fun insertPostRead(userId: String, post: PostDTO): Flux<PostRead> {
-        val users = if (post.postCategoryId == UUID.fromString("00a1b411-aa82-4b42-99b2-08ae520ea02c")) {
-            dslContext.userPermissionSelectAllUser(userId)
-        } else {
-            dslContext.selectManagerAndUser(userId)
-        }
         return Flux.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
-                users.flatMap({ user -> insertPostRead(post.id!!, user.id!!) }, 10)
+                dslContext.getCategoryById(post.postCategoryId!!)
+                    .flatMapMany { category ->
+                        when (category.name) {
+                            "notice" -> {
+                                dslContext.userPermissionSelectAllUser(userId)
+                                    .flatMap({ user -> insertPostRead(post.id!!, user.id!!) }, 10)
+                            }
+                            "qna" -> {
+                                dslContext.selectManagerAndUser(userId)
+                                    .flatMap({ user -> insertPostRead(post.id!!, user.id!!) }, 10)
+                            }
+                            "faq" -> {
+                                Flux.empty()
+                            }
+                            else -> {
+                                Flux.error(IllegalArgumentException("Unsupported category: ${category.name}"))
+                            }
+                        }
+                    }
             }
         })
     }
