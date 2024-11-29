@@ -123,3 +123,16 @@ export const removeFile = (
 ) => {
     setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
 };
+
+export const categoryUUID = (category: string) => {
+    switch (category) {
+        case 'Notice':
+            return '00a1b411-aa82-4b42-99b2-08ae520ea02c';
+        case 'FAQ':
+            return '99091154-51d9-45bd-8ab9-a04000fc7086';
+        case 'Q&A':
+            return '7a753daa-8cf1-46f5-ba08-54e6cbee10eb';
+        default :
+            return '7a753daa-8cf1-46f5-ba08-54e6cbee10eb';
+    }
+};

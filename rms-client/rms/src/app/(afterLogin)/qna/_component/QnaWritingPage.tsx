@@ -17,7 +17,8 @@ import {
     handleFileChange,
     handleUploadClick,
     removeFile,
-    renderFileIcon
+    renderFileIcon,
+    categoryUUID
 } from "@/app/(afterLogin)/qna/_component/QnaUtils";
 import {fetchSendToJandi} from "@/app/(afterLogin)/qna/_api/fetchSendToJandi";
 
@@ -33,19 +34,6 @@ export default function QnaWritingPage({ category }: QnaWritingPageProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [dragging, setDragging] = useState(false);
-
-    const categoryUUID = (category: string) => {
-        switch (category) {
-            case 'Notice':
-                return '00a1b411-aa82-4b42-99b2-08ae520ea02c';
-            case 'FAQ':
-                return '99091154-51d9-45bd-8ab9-a04000fc7086';
-            case 'Q&A':
-                return '7a753daa-8cf1-46f5-ba08-54e6cbee10eb';
-            default :
-                return '7a753daa-8cf1-46f5-ba08-54e6cbee10eb';
-        }
-    };
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -75,7 +63,9 @@ export default function QnaWritingPage({ category }: QnaWritingPageProps) {
                 };
 
                 await putPost(postData, selectedFiles)
-                await fetchSendToJandi(session?.user.name!,0 , 'qna', postData);
+                if (category === 'Q&A') {
+                    await fetchSendToJandi(session?.user.name!, 0, 'qna', postData);
+                }
             } finally {
                 alert('Registered successfully.');
                 setIsLoading(false);
