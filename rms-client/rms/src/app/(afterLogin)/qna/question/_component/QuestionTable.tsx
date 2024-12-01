@@ -14,7 +14,6 @@ import SelectBox from "@/app/_component/SelectBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import {format} from "date-fns";
-import {putPostReadByUserId} from "@/app/(afterLogin)/qna/_api/putPostReadByUserId";
 
 export default function QuestionTable() {
     const router = useRouter();
@@ -98,7 +97,6 @@ export default function QuestionTable() {
     };
 
     const handleRowClick = async (post: Post) => {
-        await fetchPostRead(post.id!);
         router.push(`/qna/${post.id}`);
     };
 
@@ -129,10 +127,6 @@ export default function QuestionTable() {
         setPostData(responseData as Post[]);
         setTotalPage(totalPage);
     }, []);
-
-    const fetchPostRead = async (post_id: number) => {
-        await putPostReadByUserId(post_id);
-    }
 
     useEffect(() => {
         fetchData(search)

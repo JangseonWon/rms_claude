@@ -28,7 +28,7 @@ interface PostReadDao {
         return Mono.from(
             update(POST_READ)
                 .set(POST_READ.READ_AT, LocalDateTime.now())
-                .where(POST_READ.POST_ID.eq(id).and(POST_READ.USER_ID.eq(userId)))
+                .where(POST_READ.POST_ID.eq(id).and(POST_READ.USER_ID.eq(userId)).and(POST_READ.READ_AT.isNull))
                 .returning()
         ).map { it.into(PostRead::class.java) }
     }

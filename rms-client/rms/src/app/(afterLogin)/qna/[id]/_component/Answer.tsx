@@ -25,6 +25,7 @@ import GreenButton from "@/app/_component/GreenButton";
 import {fetchSendToJandi} from "@/app/(afterLogin)/qna/_api/fetchSendToJandi";
 import {PostComment} from "@/model/PostComment";
 import {putPostReadChangeNew} from "@/app/(afterLogin)/qna/_api/putPostReadChangeNew";
+import {putPostReadByUserId} from "@/app/(afterLogin)/qna/_api/putPostReadByUserId";
 
 export default function Answer() {
     const [postData, setPostData] = useState<Post>();
@@ -200,6 +201,7 @@ export default function Answer() {
     }, [postId, session?.user?.id]);
 
     useEffect(() => {
+        putPostReadByUserId(postId);
         fetchData();
     }, []);
 

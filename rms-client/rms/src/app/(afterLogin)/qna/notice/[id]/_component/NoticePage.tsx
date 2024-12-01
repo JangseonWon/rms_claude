@@ -11,6 +11,7 @@ import {getPostByPostId} from "@/app/(afterLogin)/qna/[id]/_api/getPostByPostId"
 import {getPostFile} from "@/app/(afterLogin)/qna/[id]/_api/getPostFile";
 import {PostFile} from "@/model/PostFile";
 import {faArrowLeft} from "@fortawesome/free-solid-svg-icons";
+import {putPostReadByUserId} from "@/app/(afterLogin)/qna/_api/putPostReadByUserId";
 
 export default function NoticePage() {
     const [postData, setPostData] = useState<Post>();
@@ -86,6 +87,7 @@ export default function NoticePage() {
     }, [postId, session?.user?.id]);
 
     useEffect(() => {
+        putPostReadByUserId(postId);
         fetchData();
     }, []);
 
