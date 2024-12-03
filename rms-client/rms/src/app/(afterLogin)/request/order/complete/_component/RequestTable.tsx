@@ -40,7 +40,7 @@ export default function RequestTable() {
     const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
     const [totalPage, setTotalPage] = useState<number>(0);
     const [search, setSearch] = useState<Query>(defaultSearch);
-    const [searchFilter, setSearchFilter] = useState<Filter>()
+    const [searchFilter, setSearchFilter] = useState<Filter | null>(null)
     const [orderDateFilter, setOrderDateFilter] = useState<FilterGroup>()
 
     const handlePageChange = (newPageNumber: number) => {

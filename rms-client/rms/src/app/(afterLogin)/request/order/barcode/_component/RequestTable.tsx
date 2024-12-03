@@ -61,7 +61,7 @@ export default function RequestTable() {
     const [modalOpen, setModalOpen] = useState<boolean>(false);
     const [barcodeModalOpen, setBarcodeModalOpen] = useState<boolean>(false);
     const [infoRequest, setInfoRequest] = useState<Request>();
-    const [searchFilter, setSearchFilter] = useState<Filter>()
+    const [searchFilter, setSearchFilter] = useState<Filter | null>(null)
     const [orderDateFilter, setOrderDateFilter] = useState<FilterGroup>(defaultOrderDateFilter)
 
     const handleSelectChange = (rowIndex: number, isSelected: boolean) => {

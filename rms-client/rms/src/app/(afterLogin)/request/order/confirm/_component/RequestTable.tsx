@@ -45,7 +45,7 @@ export default function RequestTable() {
     const [airWaybillModal, setAirWaybillModal] = useState<boolean>(false);
     const [selectedRequests, setSelectedRequests] = useState<RequestWithSelected[]>([]);
     const isSelectedAll = requestData.every((row) => row.isSelected);
-    const [searchFilter, setSearchFilter] = useState<Filter>()
+    const [searchFilter, setSearchFilter] = useState<Filter | null>(null)
     const [orderDateFilter, setOrderDateFilter] = useState<FilterGroup>()
 
 
