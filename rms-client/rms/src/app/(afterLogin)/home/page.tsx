@@ -1,10 +1,10 @@
 import MainImage from "@/app/(afterLogin)/home/_component/MainImage";
-import Statistics from "@/app/(afterLogin)/home/_component/Statistics";
 import TestOption from "@/app/(afterLogin)/home/_component/TestOption";
 import NavMenu from "@/app/(afterLogin)/_component/NavMenu";
 import style from './page.module.css';
 import {auth} from "@/auth";
 import NonArrivedTable from "@/app/(afterLogin)/home/_component/NonArrivedTable";
+import OrderBoard from "@/app/(afterLogin)/home/_component/OrderBoard";
 
 export default async function Page() {
     const session = await auth();
@@ -16,7 +16,8 @@ export default async function Page() {
                     <NavMenu/>
                 </div>
                 <div className={style.rightSection}>
-                    <Statistics/>
+                    {/*<Statistics/>*/}
+                    <OrderBoard/>
                     <TestOption/>
                     {(session?.user.role === "ADMIN" || session?.user.role === "MANAGER") && (
                         <NonArrivedTable/>

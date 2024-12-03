@@ -32,14 +32,33 @@ class Handler(
         })
     }
 
-    fun temporaryPassword(user: User): Mono<String> {
-        val generatedPassword = generatePassword()
-        return Mono.from(dslContext.transactionPublisher { trx ->
-            trx.dsl().run { checkUserByIdAndMail(user)
-                .switchIfEmpty(Mono.error(UserNotFoundException()))
-                .flatMap { changePasswordByUserId(it.id!!, password = encoder.encode(generatedPassword)) }
-                .then(sendEmail(user.email!!, generatedPassword)) }
-        })
+    fun passwordReissue(user: User): Mono<String> {
+        val newPassword = user.password ?: temporaryPassword()
+        return if (!isPasswordValid(newPassword)) {
+            Mono.error(IllegalArgumentException("Password must be at least 10 characters long and include uppercase, lowercase, and special characters."))
+        } else {
+            Mono.from(dslContext.transactionPublisher { trx ->
+                trx.dsl().run { checkUserByIdAndMail(user)
+                    .switchIfEmpty(Mono.error(UserNotFoundException()))
+                    .flatMap { changePasswordByUserId(it.id!!, password = encoder.encode(newPassword)) }
+                    .then(
+                        if (user.password == null) {
+                            sendEmail(user.email!!, newPassword)
+                        } else {
+                            Mono.empty()
+                        }
+                    )
+                }
+            })
+        }
+    }
+
+    fun isPasswordValid(password: String): Boolean {
+        val containsUpper = password.any { it.isUpperCase() }
+        val containsLower = password.any { it.isLowerCase() }
+        val containsSpecial = password.any { "!@#$%^&*()_+-=[]{}|;:',.<>?/".contains(it) }
+        val isLongEnough = password.length >= 10
+        return containsUpper && containsLower && containsSpecial && isLongEnough
     }
 
     fun sendEmail(to: String, password: String): Mono<String> {
@@ -57,7 +76,7 @@ class Handler(
         }
     }
 
-    fun generatePassword(): String {
+    fun temporaryPassword(): String {
         val minLength = 8
         val maxLength = 20
 

@@ -20,9 +20,24 @@ class UserHandler(
     fun updateUserById(user: UserDTO): Mono<UserDTO> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
-                user.password = user.password?.takeIf { it.isNotBlank() }?.let { encoder.encode(it) }
+                if (user.password != null && user.password!!.isNotBlank()) {
+                    if (!isPasswordValid(user.password!!)) {
+                        return@run Mono.error<UserDTO>(
+                            IllegalArgumentException("Password must be at least 10 characters long and include uppercase, lowercase, and special characters.")
+                        )
+                    }
+                    user.password = encoder.encode(user.password)
+                }
                 updateUserById(user)
             }
         })
+    }
+
+    fun isPasswordValid(password: String): Boolean {
+        val containsUpper = password.any { it.isUpperCase() }
+        val containsLower = password.any { it.isLowerCase() }
+        val containsSpecial = password.any { "!@#$%^&*()_+-=[]{}|;:',.<>?/".contains(it) }
+        val isLongEnough = password.length >= 10
+        return containsUpper && containsLower && containsSpecial && isLongEnough
     }
 }

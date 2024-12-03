@@ -36,10 +36,22 @@ export default function ChangePassword() {
             password: newPassword
         };
 
-        await patchUser(updatedUser);
-        setIcon('good');
-        setMessage('Password changed successfully.');
-        setShowAlertDialog(true);
+        try {
+            const response = await patchUser(updatedUser);
+
+            if (response.status === 200) {
+                setIcon('good');
+                setMessage('Password changed successfully.');
+            } else {
+                setIcon('error');
+                setMessage('Failed to change password. Please try again.');
+            }
+        } catch (error) {
+            setIcon('error');
+            setMessage('An unexpected error occurred. Please try again later.');
+        } finally {
+            setShowAlertDialog(true);
+        }
     };
 
     return (
@@ -73,9 +85,9 @@ export default function ChangePassword() {
                 </div>
                 <section className={style.subSection}>
                     <div className={style.explanation}>
-                        {/*<p>password rules...</p>*/}
-                        {/*<p>password rules...</p>*/}
-                        {/*<p>password rules...</p>*/}
+                        <p>Password must be at least 10 characters long.</p>
+                        <p>Password must include both uppercase and lowercase letters.</p>
+                        <p>Password must contain at least one special character (e.g., !, @, #, $, etc.).</p>
                     </div>
                 </section>
             </div>

@@ -49,7 +49,7 @@ class SecurityConfig {
                     HttpMethod.POST,
                     "/w-api/login-service/login",
                     "/w-api/login-service/signup",
-                    "/w-api/login-service/temporary-password"
+                    "/w-api/login-service/password"
                 ), permitAll)
                 authorize(anyExchange, authenticated)
             }

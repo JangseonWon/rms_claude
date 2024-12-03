@@ -10,6 +10,7 @@ import BlueButton from "@/app/_component/BlueButton";
 import {RequestWithSelected} from "@/app/(afterLogin)/request/order/barcode/_component/RequestTable";
 import JsPDF from "jspdf";
 import "jspdf-barcode";
+// @ts-ignore
 import {nanumGothicBase64} from "@/app/(afterLogin)/request/order/barcode/_component/nanumGothicBase64";
 
 type Props = {

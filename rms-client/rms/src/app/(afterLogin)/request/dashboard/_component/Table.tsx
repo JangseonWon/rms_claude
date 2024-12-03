@@ -166,7 +166,6 @@ export default function Table() {
     };
 
     const handleReset = () => {
-        console.log('dsafdsfasdf');
         setSearch({ sort_by: "create_at", asc: false, size: 5, page: 1 });
         setSearchValue('');
         setStatus(Status.TOTAL);

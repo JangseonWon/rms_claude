@@ -98,7 +98,7 @@ export default function Login() {
                             {loading ? <div className={style.spinner}></div> : 'Log In'}
                         </button>
                         <button className={style.healthcareButton}>Not a Healthcare Provider?</button>
-                        <label className={style.changePassword} onClick={openModal}>Find Password</label>
+                        <label className={style.changePassword} onClick={openModal}>Password reissue</label>
                     </div>
                 </form>
                 {passwordModalOpen && (

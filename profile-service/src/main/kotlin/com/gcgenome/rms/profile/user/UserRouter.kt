@@ -38,7 +38,8 @@ class UserRouter (
             .flatMap { request.bodyToMono(UserDTO::class.java) }
             .flatMap { user -> userHandler.updateUserById(user.apply { id = userId }) }
             .flatMap { ServerResponse.ok().build() }
-            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume (AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume (IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
             .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error: ${it.cause}") }
     }
 }
