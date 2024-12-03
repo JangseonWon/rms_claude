@@ -21,5 +21,6 @@ export interface Request {
     complete_at?: Date
     resample_at?: Date
     reported_at?: Date
-    serial?: string
+    courier_company?: string
+    awb_number?: string
 }

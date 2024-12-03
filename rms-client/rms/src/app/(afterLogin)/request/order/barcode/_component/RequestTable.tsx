@@ -168,12 +168,16 @@ export default function RequestTable() {
                         }}
                     />
                     <InputBox label={"search"} onChange={(value) => {
-                        setSearchFilter({
-                            table: selectedOption.table,
-                            column: selectedOption.column,
-                            operator: "LIKE",
-                            value: value
-                        } as Filter)
+                        setSearchFilter(
+                            value && value.trim() !== ""
+                                ? {
+                                    table: selectedOption.table,
+                                    column: selectedOption.column,
+                                    operator: "LIKE",
+                                    value: value
+                                } as Filter
+                                : null
+                        );
                     }}></InputBox>
                 </div>
             </div>

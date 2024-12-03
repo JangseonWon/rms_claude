@@ -40,7 +40,6 @@ export default function RequestTable() {
     const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
     const [totalPage, setTotalPage] = useState<number>(0);
     const [search, setSearch] = useState<Query>(defaultSearch);
-    const [infoRequest, setInfoRequest] = useState<Request>();
     const [searchFilter, setSearchFilter] = useState<Filter>()
     const [orderDateFilter, setOrderDateFilter] = useState<FilterGroup>()
 
@@ -130,12 +129,16 @@ export default function RequestTable() {
                         }}
                     />
                     <InputBox label={"search"} onChange={(value) => {
-                        setSearchFilter({
-                            table: selectedOption.table,
-                            column: selectedOption.column,
-                            operator: "LIKE",
-                            value: value
-                        } as Filter)
+                        setSearchFilter(
+                            value && value.trim() !== ""
+                                ? {
+                                    table: selectedOption.table,
+                                    column: selectedOption.column,
+                                    operator: "LIKE",
+                                    value: value
+                                } as Filter
+                                : null
+                        );
                     }}></InputBox>
                 </div>
             </div>
@@ -160,9 +163,9 @@ export default function RequestTable() {
                     {requestData && requestData.length > 0 && requestData.map((request, rowIndex) => (
                         <tr key={request.order_id! + request.service!.id + request.sample!.id}>
                             <td>{request.create_at ? new Date(request.create_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
-                            <td>Global courier</td>
-                            <td>AirWaybill</td>
-                            <td>userName</td>
+                            <td>{request.courier_company}</td>
+                            <td>{request.awb_number}</td>
+                            <td>{request.order?.user?.name}</td>
                             <td>{request.sample?.patient?.organization?.name}</td>
                             <td>{request.sample?.barcode}</td>
                             <td>{request.service?.name}</td>
