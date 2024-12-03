@@ -190,7 +190,6 @@ export default function UsersTable() {
                             <td>{row.role}</td>
                             <td>
                                 <FontAwesomeIcon
-                                    className={globalTableStyle.icon}
                                     icon={faMagnifyingGlass}
                                     onClick={() => handleInstitutionIconClick(row.id, row.name)}
                                 />
@@ -236,7 +235,11 @@ export default function UsersTable() {
                                   open={institutionModalOpen} closeModal={closeModal}/>
             )}
             {userServiceModalOpen && (
-                <UserEditModal userId={selectedUser!.id} closeModal={closeModal}/>
+                <UserEditModal
+                    userId={selectedUser!.id}
+                    closeModal={closeModal}
+                    fetchData={() => fetchData(search)}
+                />
             )}
         </div>
     );
