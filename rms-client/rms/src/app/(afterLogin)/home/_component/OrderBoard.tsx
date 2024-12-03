@@ -69,8 +69,8 @@ export default function OrderBoard() {
                 <div className={style.alarmContainer}>
                     <div className={classNames(style.wrapper, scrollbar.default)}>
                         <span className={style.boardTitle}>Please Enter Global courier & AirWaybill No</span>
-                        {requests.map((request) => (
-                            <div className={style.alarm}>
+                        {requests.map((request, index) => (
+                            <div key={index} className={style.alarm}>
                                 <div>Date: {request.date}</div>
                                 <div>Patient Name: {request.patient}</div>
                                 <div>Client: {request.name}</div>

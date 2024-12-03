@@ -40,7 +40,7 @@ export default function RequestTable() {
     const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
     const [totalPage, setTotalPage] = useState<number>(0);
     const [search, setSearch] = useState<Query>(defaultSearch);
-    const [searchFilter, setSearchFilter] = useState<Filter | null>(null)
+    const [searchFilter, setSearchFilter] = useState<Filter | undefined>(undefined);
     const [orderDateFilter, setOrderDateFilter] = useState<FilterGroup>()
 
     const handlePageChange = (newPageNumber: number) => {
@@ -137,7 +137,7 @@ export default function RequestTable() {
                                     operator: "LIKE",
                                     value: value
                                 } as Filter
-                                : null
+                                : undefined
                         );
                     }}></InputBox>
                 </div>
@@ -160,7 +160,7 @@ export default function RequestTable() {
                     </tr>
                     </thead>
                     <tbody>
-                    {requestData && requestData.length > 0 && requestData.map((request, rowIndex) => (
+                    {requestData && requestData.length > 0 && requestData.map((request) => (
                         <tr key={request.order_id! + request.service!.id + request.sample!.id}>
                             <td>{request.create_at ? new Date(request.create_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
                             <td>{request.courier_company}</td>
