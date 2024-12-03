@@ -8,6 +8,7 @@ import InputBox from "@/app/_component/InputBox";
 import BlueButton from "@/app/_component/BlueButton";
 import {User} from "@/model/User";
 import {postUserPassword} from "@/app/(beforeLogin)/_api/postUserPassword";
+import LoadingFullScreen from "@/app/_component/LoadingFullScreen";
 
 
 type Props = {
@@ -15,6 +16,7 @@ type Props = {
 }
 
 export default function PasswordChangeModal({closeModal}: Props) {
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [user, setUser] = useState<User>();
     const [message, setMessage] = useState<string | null>(null);
 
@@ -32,21 +34,29 @@ export default function PasswordChangeModal({closeModal}: Props) {
     };
 
     const getMail = async () => {
-        if (!user) {
+        try {
+            setIsLoading(true);
+            if (!user) {
+                setMessage("Please correct the word");
+                return;
+            }
+            const res = await postUserPassword(user)
+            if (res.status === 200) {
+                alert("success!");
+                closeModal();
+            } else {
+                setMessage("Please correct the word");
+            }
+        } catch (error) {
             setMessage("Please correct the word");
-            return;
-        }
-        const res = await postUserPassword(user)
-        if (res.status === 200) {
-            alert("success!");
-            closeModal();
-        } else {
-            setMessage("Please correct the word");
+        } finally {
+            setIsLoading(false);
         }
     }
 
     return (
         <div className={style.modalBackground}>
+            {isLoading && <LoadingFullScreen/>}
             <div className={style.modal}>
                 <section className={style.modalHeader}>
                     <div className={style.modalClose} onClick={closeModal}>

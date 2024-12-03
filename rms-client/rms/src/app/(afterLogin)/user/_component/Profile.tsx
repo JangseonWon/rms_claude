@@ -105,7 +105,9 @@ export default function Profile() {
                     </section>
                 </div>
             ) : (
-                <Loading></Loading>
+                <div className={style.loading}>
+                    <Loading/>
+                </div>
             )}
         </>
     );

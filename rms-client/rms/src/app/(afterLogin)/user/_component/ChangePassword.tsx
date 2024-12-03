@@ -13,11 +13,13 @@ import {
     useSetMessageAlertDialogA
 } from "@/store/useAfterLoginAlertDialogStore";
 import {User} from "@/model/User";
+import LoadingFullScreen from "@/app/_component/LoadingFullScreen";
 
 export default function ChangePassword() {
     const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const { data: session } = useSession();
 
     const setShowAlertDialog = useOpenAlertDialogA();
@@ -25,18 +27,26 @@ export default function ChangePassword() {
     const setIcon = useSetIconAlertDialogA();
 
     const handleSave = async () => {
-        if (newPassword !== confirmPassword) {
-            setIcon('warning');
-            setMessage('New Password and Confirm Password do not match.');
-            setShowAlertDialog(true);
-            return;
-        }
-        const updatedUser: User = {
-            id: session?.user.id!,
-            password: newPassword
-        };
-
         try {
+            setIsLoading(true);
+            if (!newPassword || !confirmPassword) {
+                setIcon('warning');
+                setMessage('Both New Password and Confirm Password are required.');
+                setShowAlertDialog(true);
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                setIcon('warning');
+                setMessage('New Password and Confirm Password do not match.');
+                setShowAlertDialog(true);
+                return;
+            }
+            const updatedUser: User = {
+                id: session?.user.id!,
+                password: newPassword
+            };
+
             const response = await patchUser(updatedUser);
 
             if (response.status === 200) {
@@ -51,11 +61,13 @@ export default function ChangePassword() {
             setMessage('An unexpected error occurred. Please try again later.');
         } finally {
             setShowAlertDialog(true);
+            setIsLoading(false);
         }
     };
 
     return (
         <>
+            {isLoading && <LoadingFullScreen/>}
             <div className={style.container}>
                 <div className={style.header}>
                     Change Password
