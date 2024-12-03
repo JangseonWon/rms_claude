@@ -1,0 +1,85 @@
+.container {
+    margin: 30px 10px 30px 0;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+.container * {
+    transition: 0.2s ease-out;
+}
+.title {
+    padding: 20px 20px 0 20px;
+}
+.title h1 {
+    color: #002b49;
+    font-size: 27px;
+}
+.boardTitle {
+    color: #002b49;
+    font-size: 20px;
+}
+.line {
+    width: 4%;
+    height: 4px;
+    background-color: #002b49;
+}
+.middleLine {
+    width: 1px;
+    height: 100%;
+    background-color: #002b49;
+    margin: 0 16px;
+    display: inline-block;
+}
+.orderContainer {
+    display: flex;
+    justify-content: space-between;
+}
+.orderCountContainer, .alarmContainer {
+    margin: 10px;
+    padding: 5px;
+    border: solid #C4C4C4 1px;
+    border-radius: 15px;
+    align-items: center;
+    height: 200px;
+}
+.orderCountContainer {
+    width: 20%;
+    height: 200px;
+    display: grid;
+}
+.orderCount {
+    cursor: pointer;
+    display: flex;
+    margin: 2px 20px;
+    justify-content: space-between;
+}
+.orderCount:hover * {
+    font-size: 16px;
+    font-weight: 800;
+    color: #90BA2D;
+}
+.orderLabel {
+    font-size: 15px;
+    font-weight: 700;
+    color: #002b49;
+}
+.orderValue {
+    font-size: 15px;
+}
+.alarmContainer {
+    padding-left: 20px;
+    width: 80%;
+    display: flex;
+}
+.wrapper {
+    width: 100%;
+    height: 200px;
+    margin: 2px 5px;
+    overflow-y: scroll;
+    overflow-x: scroll;
+}
+.alarm {
+    font-size: 10px;
+    display: flex;
+    gap: 10px;
+}
