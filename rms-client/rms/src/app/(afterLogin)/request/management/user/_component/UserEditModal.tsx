@@ -18,9 +18,10 @@ import {patchUser} from "@/app/(afterLogin)/request/management/user/_api/patchUs
 type Props = {
     userId: string;
     closeModal: () => void;
+    fetchData: () => void;
 }
 
-export default function UserEditModal({userId, closeModal}: Props) {
+export default function UserEditModal({userId, closeModal, fetchData}: Props) {
     const [user, setUser] = useState<User>();
     const [selectedAddService, setSelectedAddService] = useState<SelectBoxOption | null>(null);
 
@@ -35,6 +36,7 @@ export default function UserEditModal({userId, closeModal}: Props) {
         const response = await patchUser(user!);
         if (response.ok) {
             alert("Update successful")
+            fetchData()
             closeModal()
         } else alert("Fail update")
     }
@@ -80,6 +82,19 @@ export default function UserEditModal({userId, closeModal}: Props) {
                         label={"Name"}
                         value={user?.name}
                         disabled={true}
+                    />
+                </div>
+                <div className={style.formGroup}>
+                    <InputBox
+                        label={"Email"}
+                        value={user?.email}
+                        disabled={false}
+                        onChange={(value) => {
+                            setUser((prev) =>({
+                                ...prev,
+                                email: value
+                            }) as User)
+                        }}
                     />
                 </div>
                 <div className={style.contentGroup}>
