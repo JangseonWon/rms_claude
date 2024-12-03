@@ -57,8 +57,8 @@ export default function OrderBoard() {
             </div>
             <div className={style.orderContainer}>
             <div className={style.orderCountContainer}>
-                    {statistics.map((order) => (
-                        <div className={style.orderCount}>
+                    {statistics.map((order, index) => (
+                        <div key={index} className={style.orderCount}>
                             <div className={style.orderLabel}>{order.label}</div>
                             <div className={style.orderValue}>
                                 {order.value !== undefined ? order.value : <Loading/>}
