@@ -6,11 +6,26 @@ import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.RequestDTO
 import com.gcgenome.rms.tables.references.*
 import org.jooq.DSLContext
-import org.jooq.impl.DSL
 import org.jooq.impl.DSL.*
 import reactor.core.publisher.Mono
 
 interface RequestDao: QueryDao {
+    fun DSLContext.updateRequest(request: RequestDTO): Mono<RequestDTO> {
+        return Mono.from(
+            update(REQUEST)
+                .set(REQUEST.COURIER_COMPANY, coalesce(`val`(request.courierCompany), REQUEST.COURIER_COMPANY))
+                .set(REQUEST.AWB_NUMBER, coalesce(`val`(request.awbNumber), REQUEST.AWB_NUMBER))
+                .apply {
+                    if (request.status != null) { set(REQUEST.STATUS, request.status!!.name) }
+                    else { set(REQUEST.STATUS, REQUEST.STATUS) }
+                }
+                .where(
+                    REQUEST.SAMPLE_ID.eq(request.sample!!.id),
+                    REQUEST.SERVICE_ID.eq(request.service!!.id)
+                )
+                .returning()
+        ).map { it.into(RequestDTO::class.java) }
+    }
     fun DSLContext.selectRequestsWithPage(query: Query, user: User): Mono<Page<RequestDTO>> {
         val joins = listOf(
             QueryDao.JoinInfo(ORDER, REQUEST.ORDER_ID.eq(ORDER.ID), QueryDao.JoinType.LEFT),
@@ -34,6 +49,8 @@ interface RequestDao: QueryDao {
         )
         val fields = listOf(
             REQUEST.USER_SERVICE_ID.`as`("user_service_id"),
+            REQUEST.AWB_NUMBER.`as`("awb_number"),
+            REQUEST.COURIER_COMPANY.`as`("courier_company"),
             REQUEST.STATUS.`as`("status"),
             REQUEST.PHYSICIAN.`as`("physician"),
             REQUEST.REPORTED_AT.`as`("reported_at"),
@@ -89,6 +106,7 @@ interface RequestDao: QueryDao {
 
         val groupByFields = listOf(
             REQUEST.USER_SERVICE_ID, REQUEST.STATUS, REQUEST.PHYSICIAN, REQUEST.REPORTED_AT, REQUEST.CREATE_AT, REQUEST.SPECIFIED_AT,
+            REQUEST.AWB_NUMBER, REQUEST.COURIER_COMPANY,
             ORDER.ID,
             SERVICE.ID,
             USER.ID,
