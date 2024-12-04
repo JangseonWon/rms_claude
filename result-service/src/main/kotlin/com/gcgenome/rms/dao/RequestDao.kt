@@ -44,8 +44,6 @@ interface RequestDao: QueryDao{
             ).`as`("service"),
             jsonObject(
                 key("id").value(ORDER.ID),
-                key("serial").value(ORDER.SERIAL),
-                key("create_at").value(ORDER.CREATE_AT),
                 key("user").value(jsonObject(
                     key("id").value(USER.ID)
                 ))
