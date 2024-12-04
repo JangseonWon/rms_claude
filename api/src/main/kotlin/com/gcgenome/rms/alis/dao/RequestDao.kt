@@ -3,6 +3,7 @@ package com.gcgenome.rms.alis.dao
 import com.gcgenome.rms.alis.data.AlisQuery
 import com.gcgenome.rms.alis.data.Body
 import com.gcgenome.rms.alis.data.RequestDTO
+import com.gcgenome.rms.alis.data.Status
 import com.gcgenome.rms.tables.references.*
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.*
@@ -15,6 +16,8 @@ interface RequestDao {
         val baseCondition = REQUEST.CREATE_AT.between(
             alisQuery.search.requestDateFrom.atStartOfDay(),
             alisQuery.search.requestDateTo.atTime(LocalTime.MAX)
+        ).and(
+            REQUEST.STATUS.notIn(Status.CART.name, Status.UNCONFIRMED_ORDER.name)
         )
         val finalCondition = if (alisQuery.search.userId != null) {
             baseCondition.and(ORGANIZATION.USER_ID.eq(alisQuery.search.userId))
