@@ -1,14 +1,15 @@
 package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.*
+import com.gcgenome.rms.tables.pojos.User
 import com.gcgenome.rms.tables.references.SERVICE
 import com.gcgenome.rms.tables.references.USER
 import com.gcgenome.rms.tables.references.USER_SERVICE
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.*
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import reactor.core.publisher.Mono
 import java.time.LocalDateTime
+import java.util.*
 
 interface UserDao : QueryDao{
     fun DSLContext.upsertUsers(alisOrganization: AlisOrganization, pwd: String): Mono<Int> {
@@ -29,8 +30,24 @@ interface UserDao : QueryDao{
                 .set(USER.BRANCH_SERIAL, alisOrganization.compMngBeginNo)
                 .set(USER.BRANCH_NAME, alisOrganization.compMngName)
         )
+    }
 
-
+    fun DSLContext.insertManager(dto: User): Mono<User> {
+        return Mono.from(
+            insertInto(USER)
+                .set(USER.ID, dto.id)
+                .set(USER.NAME, dto.name)
+                .set(USER.PASSWORD, dto.password)
+                .set(USER.ROLE, "MANAGER")
+                .set(USER.TYPE, "TRUSTEE")
+                .set(USER.EMAIL, dto.email)
+                .set(USER.KEY, UUID.randomUUID())
+                .set(USER.STATE, "ACTIVE")
+                .set(USER.BRANCH_SERIAL, dto.branchSerial)
+                .set(USER.BRANCH_NAME, dto.branchName)
+                .set(USER.CREATE_AT, LocalDateTime.now())
+                .returning()
+        ).map { it.into(User::class.java) }
     }
 
     fun DSLContext.selectUserWithServicesQuery(userId: String, query: Query): Mono<UserDTO> {

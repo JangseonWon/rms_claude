@@ -19,6 +19,7 @@ import RectangleButton from "@/app/_component/RectangleButton";
 import BlueButton from "@/app/_component/BlueButton";
 import {putAlisUsers} from "@/app/(afterLogin)/request/management/user/_api/putAlisUsers";
 import LoadingFullScreen from "@/app/_component/LoadingFullScreen";
+import ManagerAddModal from "@/app/(afterLogin)/request/management/user/_component/ManagerAddModal";
 
 interface UserWithSelected extends User {
     isSelected?: boolean;
@@ -38,6 +39,7 @@ export default function UsersTable() {
     const [totalPage, setTotalPage] = useState<number>(0);
     const [search, setSearch] = useState<Query>({sort_by:"id", asc: true, size:10, page:1});
     const [userServiceModalOpen, setUserServiceModalOpen] = useState<boolean>(false);
+    const [managerAddModalOpen, setManagerAddModalOpen] = useState<boolean>(false);
     const [selectedUser, setSelectedUser] = useState<User>();
     const [institutionModalOpen, setInstitutionModalOpen] = useState<boolean>(false);
     const [selectedInstitutionUser, setSelectedInstitutionUser] = useState<{id: string; name: string} | null>(null);
@@ -99,6 +101,10 @@ export default function UsersTable() {
         await fetchData(search);
     };
 
+    const handleManagerAddClick = () => {
+        setManagerAddModalOpen(true);
+    }
+
     const handleAlisSyncButtonClick = async(search: Query) => {
         try {
             setIsLoading(true)
@@ -129,6 +135,7 @@ export default function UsersTable() {
     }
 
     const closeModal = () => {
+        setManagerAddModalOpen(false);
         setInstitutionModalOpen(false);
         setUserServiceModalOpen(false);
         setSelectedInstitutionUser(null);
@@ -143,6 +150,9 @@ export default function UsersTable() {
             {isLoading && <LoadingFullScreen/>}
             <section className={managementStyle.filterContainer}>
                 <div className={managementStyle.filterContainerAlis}>
+                    <div className={managementStyle.alisSyncButton}>
+                        <BlueButton name={"Manager Add"} onClick={() => handleManagerAddClick()}/>
+                    </div>
                     <div className={managementStyle.alisSyncButton}>
                         <BlueButton name={"Alis-Sync"} onClick={() => handleAlisSyncButtonClick(search)}/>
                     </div>
@@ -239,6 +249,11 @@ export default function UsersTable() {
                     userId={selectedUser!.id}
                     closeModal={closeModal}
                     fetchData={() => fetchData(search)}
+                />
+            )}
+            {managerAddModalOpen && (
+                <ManagerAddModal
+                    closeModal={closeModal}
                 />
             )}
         </div>

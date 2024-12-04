@@ -169,7 +169,6 @@ export default function Order() {
         if (!request?.sample?.sample_type?.id) return false;
         if (!request?.sample?.sampling_on) return false;
         return request?.sample?.quantity;
-
     };
 
     const Close = () => {

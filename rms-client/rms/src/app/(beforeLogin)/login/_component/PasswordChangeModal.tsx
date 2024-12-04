@@ -66,12 +66,10 @@ export default function PasswordChangeModal({closeModal}: Props) {
                 <section className={style.modalBody}>
                     <InputBox
                         label={"User Id"}
-                        // value={}
                         onChange={(value) => handleChange('id', value)}
                     />
                     <InputBox
                         label={"E-Mail"}
-                        // value={}
                         onChange={(value) => handleChange('email', value)}
                     />
                     <BlueButton name={"Send Mail"} onClick={getMail}/>

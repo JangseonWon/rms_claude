@@ -1,10 +1,10 @@
 .filterContainer {
     margin-bottom: 20px;
     display: flex;
+    justify-content: space-between;
 }
 .filterContainerAlis {
     display: flex;
-    margin-left: auto;
 }
 .filterContainerSearch {
     display: flex;

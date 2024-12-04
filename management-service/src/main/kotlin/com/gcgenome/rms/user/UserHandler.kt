@@ -1,12 +1,15 @@
 package com.gcgenome.rms.user
 
-import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.dao.OrganizationDao
 import com.gcgenome.rms.dao.ServiceDao
 import com.gcgenome.rms.dao.UserDao
 import com.gcgenome.rms.dao.UserServiceDao
-import com.gcgenome.rms.data.*
-import com.gcgenome.rms.exception.*
+import com.gcgenome.rms.data.OrganizationDTO
+import com.gcgenome.rms.data.Page
+import com.gcgenome.rms.data.Query
+import com.gcgenome.rms.data.UserDTO
+import com.gcgenome.rms.exception.UserNotFoundException
+import com.gcgenome.rms.tables.pojos.User
 import org.jooq.DSLContext
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Component
@@ -16,6 +19,7 @@ import reactor.core.publisher.Mono
 @Component
 class UserHandler(
     val dslContext: DSLContext,
+    val encoder: BCryptPasswordEncoder,
 ): UserServiceDao, ServiceDao, UserDao, OrganizationDao {
     fun selectUser(userId: String): Mono<UserDTO> {
         return Mono.from(dslContext.selectUserById(userId))
@@ -46,5 +50,23 @@ class UserHandler(
 
             }
         })
+    }
+
+    fun insertManager(user: User): Mono<User>{
+        return if (!isPasswordValid(user.password!!)) {
+            Mono.error(IllegalArgumentException("Password does not meet the required criteria."))
+        } else {
+            Mono.from(dslContext.transactionPublisher { trx ->
+                trx.dsl().run { insertManager(user.apply { password = encoder.encode(user.password) }) }
+            })
+        }
+    }
+
+    fun isPasswordValid(password: String): Boolean {
+        val containsUpper = password.any { it.isUpperCase() }
+        val containsLower = password.any { it.isLowerCase() }
+        val containsSpecial = password.any { "!@#$%^&*()_+-=[]{}|;:',.<>?/".contains(it) }
+        val isLongEnough = password.length >= 10
+        return containsUpper && containsLower && containsSpecial && isLongEnough
     }
 }

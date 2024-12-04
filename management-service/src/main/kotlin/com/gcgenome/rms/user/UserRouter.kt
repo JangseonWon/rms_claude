@@ -3,10 +3,9 @@ package com.gcgenome.rms.user
 import com.gcgenome.rms.auth.AuthenticationHandler
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.UserDTO
-import com.gcgenome.rms.data.UserServiceDTO
 import com.gcgenome.rms.exception.*
+import com.gcgenome.rms.tables.pojos.User
 import org.jooq.exception.DataAccessException
-import org.jooq.exception.IntegrityConstraintViolationException
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
@@ -27,6 +26,7 @@ class UserRouter(
     fun route() = router {
         GET("/w-api/management-service/users/{user-id}", :: findUser)
         POST("/w-api/management-service/users/search", :: findUsers)
+        PUT("/w-api/management-service/user", :: insertManager)
         PATCH("/w-api/management-service/users/{user-id}", ::updateUser)
         GET("/w-api/management-service/users/{user-id}/organizations", :: findUserOrganizations)
     }
@@ -51,6 +51,17 @@ class UserRouter(
                 .header("X-Current-Page", it.currentPage.toString())
                 .body(Flux.fromIterable(it.data), UserDTO::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error : $it") }
+    }
+
+    private fun insertManager(request: ServerRequest): Mono<ServerResponse> {
+        return authenticationHandler.chkManager(request)
+            .then(request.bodyToMono(User::class.java))
+            .flatMap { user -> userHandler.insertManager(user) }
+            .flatMap { ServerResponse.ok().build() }
+            .onErrorResume (ServerWebInputException::class.java) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue(WebInputException().message.toString()) }
+            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}")}
+            .onErrorResume (DataAccessException::class.java) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("A duplicate ID exists.") }
             .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error : $it") }
     }
 
