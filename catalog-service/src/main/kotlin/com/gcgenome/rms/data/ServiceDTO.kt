@@ -11,7 +11,7 @@ data class ServiceDTO(
     var groupName: String? = null,
     var type: String? = null,
     var category: Category? = null,
-    var extensions: List<ExtensionDTO>? = null,
+    var extensions: List<ServiceExtensionDTO>? = null,
     @JsonProperty("sample_types")
     var sampleTypes: List<SampleTypeDTO>? = null
 )
