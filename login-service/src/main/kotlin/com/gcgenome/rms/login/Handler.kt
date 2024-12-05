@@ -2,14 +2,17 @@ package com.gcgenome.rms.login
 
 import com.gcgenome.rms.authenticate.TokenFactory
 import com.gcgenome.rms.dao.UserDao
+import com.gcgenome.rms.dao.UserHistoryDao
+import com.gcgenome.rms.data.UserHistoryDTO
 import com.gcgenome.rms.exceptions.UserNotFoundException
 import com.gcgenome.rms.tables.pojos.User
+import com.gcgenome.rms.tables.pojos.UserHistory
 import org.jooq.DSLContext
+import org.springframework.mail.SimpleMailMessage
+import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
-import org.springframework.mail.SimpleMailMessage
-import org.springframework.mail.javamail.JavaMailSender
 import kotlin.random.Random
 
 @Service
@@ -18,7 +21,7 @@ class Handler(
     val encoder: BCryptPasswordEncoder,
     val token: TokenFactory,
     val mailSender: JavaMailSender
-):UserDao {
+):UserDao, UserHistoryDao {
     fun login(user: User): Mono<String>{
         return dslContext.dsl().selectUserById(user.id!!)
             .filter { encoder.matches(user.password, it.password) }
@@ -34,16 +37,17 @@ class Handler(
 
     fun passwordReissue(user: User): Mono<String> {
         val newPassword = user.password ?: temporaryPassword()
+        val encodedPassword = encoder.encode(newPassword)
         return if (!isPasswordValid(newPassword)) {
             Mono.error(IllegalArgumentException("Password must be at least 10 characters long and include uppercase, lowercase, and special characters."))
         } else {
             Mono.from(dslContext.transactionPublisher { trx ->
                 trx.dsl().run { checkUserByIdAndMail(user)
                     .switchIfEmpty(Mono.error(UserNotFoundException()))
-                    .flatMap { changePasswordByUserId(it.id!!, password = encoder.encode(newPassword)) }
+                    .flatMap { changePasswordByUserId(it.id!!, password = encodedPassword) }
                     .then(
                         if (user.password == null) {
-                            sendEmail(user.email!!, newPassword)
+                            insertUserUpdateLog(user, encodedPassword).then(sendEmail(user.email!!, newPassword))
                         } else {
                             Mono.empty()
                         }
@@ -51,6 +55,22 @@ class Handler(
                 }
             })
         }
+    }
+
+    fun insertUserUpdateLog(updateUser: User, encodePassword: String): Mono<UserHistory> {
+        return Mono.from(dslContext.transactionPublisher { trx ->
+            trx.dsl().run {
+                selectUserById(updateUser.id!!).flatMap { oldUser ->
+                    val oldPassword = oldUser.password
+                    val userHistory = UserHistoryDTO(
+                        userId = updateUser.id!!,
+                        oldValue = oldPassword,
+                        newValue = encodePassword
+                    )
+                    insertUserHistoryByPasswordReissue(userHistory)
+                }
+            }
+        })
     }
 
     fun isPasswordValid(password: String): Boolean {
