@@ -34,9 +34,8 @@ class UserRouter (
 
     private fun updateUser(request: ServerRequest): Mono<ServerResponse> {
         val userId = request.pathVariable("user-id")
-        return authenticationHandler.chkUser(request, userId)
-            .flatMap { request.bodyToMono(UserDTO::class.java) }
-            .flatMap { user -> userHandler.updateUserById(user.apply { id = userId }) }
+        return authenticationHandler.chkUser(request, userId).zipWith(request.bodyToMono(UserDTO::class.java))
+            .flatMap { userHandler.updateUserById(it.t1, it.t2.apply { id = userId }) }
             .flatMap { ServerResponse.ok().build() }
             .onErrorResume (AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume (IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
