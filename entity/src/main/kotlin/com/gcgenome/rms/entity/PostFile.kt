@@ -2,13 +2,14 @@ package com.gcgenome.rms.entity
 
 import jakarta.persistence.*
 import java.time.LocalDateTime
+import java.util.*
 
 @Entity
 @Table(schema = "rms_dev", name = "post_file")
 data class PostFile(
     @Id
     @Column(name = "id")
-    val id: Long,
+    val id: UUID,
     @Column(name = "path", nullable = false)
     val path: String,
     @Column(name = "name", length = 64, nullable = false)
