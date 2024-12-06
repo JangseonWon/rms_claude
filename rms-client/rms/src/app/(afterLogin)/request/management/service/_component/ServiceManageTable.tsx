@@ -16,6 +16,7 @@ import ServiceEditModal from "@/app/(afterLogin)/request/management/service/_com
 import {Service} from "@/model/Service";
 import {putAlisServices} from "@/app/(afterLogin)/request/management/service/_api/putAlisServices";
 import LoadingFullScreen from "@/app/_component/LoadingFullScreen";
+import {Filter} from "@/model/Filter";
 
 interface ServiceWithSelected extends Service {
     isSelected?: boolean;
@@ -24,15 +25,19 @@ const selectBoxOptions: SelectBoxOption[] = [
     { table: "service", column: "id", name: "Code" },
     { table: "service", column: "name_kr", name: "Name(KR)" },
     { table: "service", column: "name", name: "Name(EN)" },
+    { table: "service", column: "group_name", name: "Group Name" },
+    { table: "service", column: "type", name: "Type" },
     { table: "category", column: "name", name: "Category Name" },
 ];
+const defaultSearch: Query = {size:10, page:1}
 
 export default function ServiceManageTable() {
     const [isLoading, setIsLoading] = useState<boolean>(false)
+    const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
     const [services, setServices] = useState<ServiceWithSelected[]>([]);
     const [totalPage, setTotalPage] = useState<number>(0);
-    const [search, setSearch] = useState<Query>({sort_by:"id", asc: true, size:10, page:1});
-    const [selectOption, setSelectOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
+    const [search, setSearch] = useState<Query>(defaultSearch);
+    const [searchFilter, setSearchFilter] = useState<Filter | undefined>(undefined);
     const [serviceModalOpen, setServiceModalOpen] = useState<boolean>(false);
     const [selectedService, setSelectedService] = useState<Service>();
 
@@ -60,25 +65,6 @@ export default function ServiceManageTable() {
             ...prevSearch,
             size: newSize,
             page: 1
-        }));
-    };
-
-    const handleSearchChange = (option: SelectBoxOption, value: string) => {
-        setSearch((prevSearch) => ({
-            ...prevSearch,
-            filter_groups:[
-                {
-                    filters: [
-                        {
-                            table: option.table!,
-                            column: option.column!,
-                            value: value,
-                            operator: "LIKE"
-                        }
-                    ]
-                }
-            ],
-            page:1
         }));
     };
 
@@ -116,8 +102,18 @@ export default function ServiceManageTable() {
     }
 
     useEffect(() => {
-        fetchData(search)
-    }, [search]);
+        const updatedSearch = {
+            ...search,
+            filter_groups: [
+                {
+                    filters: [
+                        ...(searchFilter ? [searchFilter] : []),
+                    ],
+                },
+            ],
+        };
+        fetchData(updatedSearch);
+    }, [search,searchFilter]);
 
     return (
         <div>
@@ -131,18 +127,26 @@ export default function ServiceManageTable() {
                 <div className={managementStyle.filterContainerSearch}>
                     <SelectBox
                         width={"140px"}
-                        value={selectOption.name}
+                        value={selectedOption.name}
                         options={selectBoxOptions}
                         label={"status"}
                         onChange={(selectedOption) => {
-                            setSelectOption(selectedOption);
+                            setSelectedOption(selectedOption);
                         }}
                     />
                     <div className={managementStyle.search}>
                         <InputBox label={"search"} onChange={(value) => {
-                            handleSearchChange(selectOption, value)
-                        }}>
-                        </InputBox>
+                            setSearchFilter(
+                                value && value.trim() !== ""
+                                    ? {
+                                        table: selectedOption.table,
+                                        column: selectedOption.column,
+                                        operator: "LIKE",
+                                        value: value
+                                    } as Filter
+                                    : undefined
+                            );
+                        }}/>
                     </div>
                 </div>
             </section>
@@ -154,6 +158,8 @@ export default function ServiceManageTable() {
                         <th>Name(KR)</th>
                         <th>Name(EN)</th>
                         <th>Category Name</th>
+                        <th>Group Name</th>
+                        <th>Type</th>
                         <th>Edit</th>
                     </tr>
                     </thead>
@@ -164,6 +170,8 @@ export default function ServiceManageTable() {
                             <td>{service.name_kr}</td>
                             <td>{service.name}</td>
                             <td>{service.category?.name}</td>
+                            <td>{service.group_name}</td>
+                            <td>{service.type}</td>
                             <td>
                                 <RectangleButton name={'Edit'} onClick={() => handleServiceEditClick(service)}/>
                             </td>

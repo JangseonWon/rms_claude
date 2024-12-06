@@ -27,6 +27,10 @@ const requiredOption = [
     {name: "False", value: false},
     {name: "True", value: true}
 ]
+const requestTypes = [
+    {name: "GENERAL", value: "GENERAL"},
+    {name: "SET", value: "SET"}
+]
 
 export default function ServiceEditModal({serviceId, closeModal, refreshData}: Props) {
     const [service, setService] = useState<Service>();
@@ -35,7 +39,11 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
     const [selectedSampleType, setSelectedSampleType] = useState<SelectBoxOption | null>(null);
     const [selectedExtension, setSelectedExtension] = useState<SelectBoxOption | null>(null);
 
-
+    const fetchCategoryData = async () => {
+        const response = await getCategories();
+        const data = await response.json();
+        setCategories(transformCategoryToOptions(data as Categories[]));
+    }
     const transformCategoryToOptions = (data: Categories[]): SelectBoxOption[] => {
         return data.map(value => ({
             value: value.id,
@@ -50,11 +58,6 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
         return service
     }
 
-    const fetchCategoryData = async () => {
-        const response = await getCategories();
-        const data = await response.json();
-        setCategories(transformCategoryToOptions(data as Categories[]));
-    }
     const updateService = async () => {
         const response = await patchService(service!);
         if (response.ok) {
@@ -142,15 +145,17 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
                 <div className={style.modalTitle}>Service Management</div>
                 <div className={style.formGroup}>
                     <InputBox
-                        label={"Code"}
-                        value={service?.id}
-                        disabled={true}
-                    />
-                    <InputBox
                         label={"Name(KR)"}
                         value={service?.name_kr}
                         disabled={true}
                     />
+                    <InputBox
+                        label={"Code"}
+                        value={service?.id}
+                        disabled={true}
+                    />
+                </div>
+                <div className={style.formGroup}>
                     <InputBox
                         label={"Name(EN)"}
                         value={service?.name}
@@ -174,6 +179,29 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
                                     id: value.value,
                                     name: value.name
                                 }
+                            }))
+                        }}
+                    />
+                    <InputBox
+                        label={"Group_name"}
+                        value={service?.group_name}
+                        disabled={false}
+                        onChange={(value) => {
+                            setService((prev) => ({
+                                ...prev,
+                                group_name: value && value.trim() !== "" ? value : null
+                            }))
+                        }}
+                    />
+                    <SelectBox
+                        width={'200px'}
+                        label={"Type"}
+                        value={requestTypes[0].value}
+                        options={requestTypes}
+                        onChange={(value) => {
+                            setService((prev) => ({
+                                ...prev,
+                                type: value.value
                             }))
                         }}
                     />

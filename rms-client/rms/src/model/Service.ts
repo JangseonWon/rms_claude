@@ -7,7 +7,7 @@ export interface Service {
     name?: string,
     name_kr?: string,
     type?: string,
-    group_name?: string,
+    group_name?: string | null,
     category_id?: string,
     category?: Categories,
     sample_types?: SampleType[],

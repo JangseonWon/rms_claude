@@ -198,14 +198,14 @@ export default function DownloadTable() {
                                 <span className={style.checkmark}></span>
                             </label>
                         </th>
-                        <th className={style.longColumn}>Registration Number</th>
-                        <th className={style.longColumn}>Service</th>
-                        <th className={style.shortColumn}>Patient(s) Name</th>
-                        <th className={style.longColumn}>MRN</th>
-                        <th className={style.longColumn}>Institution</th>
-                        <th className={style.dateColumn}>Report out<br/>(YYYY/MM/DD)</th>
+                        <th>Registration Number</th>
+                        <th>Service</th>
+                        <th>Patient(s) Name</th>
+                        <th>MRN</th>
+                        <th>Institution</th>
+                        <th>Report out<br/>(YYYY/MM/DD)</th>
                         <th>Status</th>
-                        <th className={style.longColumn}>Report Download</th>
+                        <th>Report Download</th>
                     </tr>
                     </thead>
                     <tbody>
