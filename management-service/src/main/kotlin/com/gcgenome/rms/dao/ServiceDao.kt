@@ -108,6 +108,8 @@ interface ServiceDao : QueryDao{
             update(SERVICE)
                 .set(SERVICE.CATEGORY_ID, service.category?.id)
                 .set(SERVICE.NAME, service.name)
+                .set(SERVICE.GROUP_NAME, service.groupName)
+                .set(SERVICE.TYPE, service.type)
                 .where(SERVICE.ID.eq(service.id))
                 .returning()
         ).map { it.into(ServiceDTO::class.java) }
