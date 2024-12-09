@@ -17,12 +17,14 @@ import {Status} from "@/model/Status";
 import {postRequests} from "@/app/(afterLogin)/request/order/_api/postRequests";
 import type {Request} from "@/model/Request";
 import BlueButton from "@/app/_component/BlueButton";
+import {deleteOrder} from "@/app/(afterLogin)/manager/_api/deleteOrder";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;
 }
 
 const selectBoxOptions: SelectBoxOption[] = [
+    { table: "sample", column: "barcode", name: "Registration ID" },
     { table: "organization", column: "name", name: "Institution" },
     { table: "patient", column: "name", name: "Patient(s) Name" },
     { table: "service", column: "name", name: "Service" },
@@ -33,8 +35,8 @@ const defaultSearch: Query = {size:10, page:1}
 const defaultFilter: Filter = {
     table: "request",
     column: "status",
-    operator: "=",
-    value: Status.COMPLETED_ORDER.valueOf()
+    operator: "!=",
+    value: Status.TOTAL.valueOf()
 }
 
 export default function OrderDeletePage() {
@@ -45,8 +47,17 @@ export default function OrderDeletePage() {
     const [searchFilter, setSearchFilter] = useState<Filter | undefined>(undefined);
     const [orderDateFilter, setOrderDateFilter] = useState<FilterGroup>()
     const isSelectedAll = requestData.length > 0 && requestData.every((row) => row.isSelected);
-    const handleOnClickOrderDelete = async () => {
 
+    const handleOnClickOrderDelete = async () => {
+        const selectedRequests = requestData.filter(request => request.isSelected);
+        if( selectedRequests.length === 0) {
+            alert("No selected.");
+            return;
+        }
+        const response = await deleteOrder(selectedRequests)
+        if(response.ok) alert("deleted!")
+        else alert("fail");
+        fetchData(search);
     }
 
     const handlePageChange = (newPageNumber: number) => {
@@ -106,7 +117,7 @@ export default function OrderDeletePage() {
                     Order Delete Page
                 </div>
                 <div className={style.buttonSection}>
-                    <BlueButton name={"DELETE"}/>
+                    <BlueButton name={"DELETE"} onClick={handleOnClickOrderDelete}/>
                 </div>
                 <section className={style.section}>
                     <div className={globalTableStyle.container}>
