@@ -84,12 +84,14 @@
 }
 .profileDropdown {
     position: absolute;
-    width: 110px;
-    top: -30%;
-    left: 20%;
-    transform: translate(-20%, 40%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    width: 130px;
+    min-height: 60px;
+    top: 30px;
     background-color: #fff;
-    padding: 10px 20px;
+    padding: 10px 10px;
     border-radius: 10px;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
     color: #4d4d4d;
@@ -98,6 +100,7 @@
     font-style: normal;
     cursor: pointer;
     z-index: 100;
+    align-items: stretch;
 }
 
 .profileAlarm {
@@ -122,6 +125,7 @@
 
 .profileDropdown ul {
     list-style: none;
+    margin: 0;
     padding: 0;
 }
 

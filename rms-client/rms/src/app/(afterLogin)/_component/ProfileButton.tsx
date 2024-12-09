@@ -30,6 +30,10 @@ export default function ProfileButton() {
         router.push('/user')
     }
 
+    const onManager = () =>{
+        router.push('/manager')
+    }
+
     const handleAlarmToggle = () => {
         setAlarmOpen(!alarmOpen);
     };
@@ -99,6 +103,7 @@ export default function ProfileButton() {
                          onMouseLeave={handleUserMouseLeave}>
                         <ul>
                             <li onClick={onProfile}>My profile</li>
+                            { session?.user.role != 'USER'&& <li onClick={onManager}>Maneging Service</li>}
                             <li onClick={onLogout}>Logout</li>
                         </ul>
                     </div>

@@ -37,7 +37,7 @@ export default function UsersTable() {
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [userData, setUserData] = useState<UserWithSelected[]>([]);
     const [totalPage, setTotalPage] = useState<number>(0);
-    const [search, setSearch] = useState<Query>({sort_by:"id", asc: true, size:10, page:1});
+    const [search, setSearch] = useState<Query>({sort_by:"state", asc: true, size:10, page:1});
     const [userServiceModalOpen, setUserServiceModalOpen] = useState<boolean>(false);
     const [managerAddModalOpen, setManagerAddModalOpen] = useState<boolean>(false);
     const [selectedUser, setSelectedUser] = useState<User>();
