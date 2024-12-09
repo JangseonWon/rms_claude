@@ -1,6 +1,7 @@
 package com.gcgenome.rms.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.gcgenome.rms.tables.pojos.User
 
 data class OrganizationDTO(
     var id:String,
@@ -11,5 +12,6 @@ data class OrganizationDTO(
     @JsonProperty("registration_number")
     var registrationNumber:String? = null,
     @JsonProperty("nursing_number")
-    var nursingNumber:String? = null
+    var nursingNumber:String? = null,
+    var user: User?,
 )

@@ -93,7 +93,8 @@ interface RequestDao: QueryDao {
                                 key("name").value(ORGANIZATION.NAME),
                                 key("registration_number").value(ORGANIZATION.REGISTRATION_NUMBER),
                                 key("type").value(ORGANIZATION.TYPE),
-                                key("nursing_number").value(ORGANIZATION.NURSING_NUMBER)
+                                key("nursing_number").value(ORGANIZATION.NURSING_NUMBER),
+                                key("user_id").value(ORGANIZATION.USER_ID),
                             )
                         )
                     )
@@ -112,7 +113,7 @@ interface RequestDao: QueryDao {
             USER.ID,
             SAMPLE.ID, SAMPLE_TYPE.ID,
             PATIENT.SERIAL, PATIENT.NAME, PATIENT.SEX, PATIENT.BIRTH_YEAR, PATIENT.BIRTH_MONTH, PATIENT.BIRTH_DAY,
-            ORGANIZATION.ID, ORGANIZATION.NAME, ORGANIZATION.REGISTRATION_NUMBER, ORGANIZATION.TYPE, ORGANIZATION.NURSING_NUMBER
+            ORGANIZATION.ID, ORGANIZATION.NAME, ORGANIZATION.REGISTRATION_NUMBER, ORGANIZATION.TYPE, ORGANIZATION.NURSING_NUMBER, ORGANIZATION.USER_ID
         )
         return selectPage(mainTable = REQUEST, query = query, joinTables = joins, selectFields = fields, where = condition, groupByFields = groupByFields) { record ->
             record.into(RequestDTO::class.java)
