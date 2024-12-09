@@ -80,10 +80,10 @@ class UserRouter(
 
     private fun updateUser(request: ServerRequest): Mono<ServerResponse> {
         val userId = request.pathVariable("user-id")
-        return authenticationHandler.chkManager(request)
-            .then(request.bodyToMono(UserDTO::class.java))
-            .flatMap { user -> userHandler.updateUserById(user.apply { id = userId }) }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), UserDTO::class.java) }
+        return authenticationHandler.chkManager(request).zipWith(request.bodyToMono(UserDTO::class.java))
+            .flatMap { userHandler.updateUserById(it.t1, it.t2.apply { id = userId }) }
+            .flatMap { ServerResponse.ok().build() }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(MatchUserException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}") }
             .onErrorResume (ServerWebInputException::class.java) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue(WebInputException().message.toString()) }
             .onErrorResume(UserNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
