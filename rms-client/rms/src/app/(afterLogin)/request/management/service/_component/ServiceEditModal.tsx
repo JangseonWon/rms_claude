@@ -196,7 +196,7 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
                     <SelectBox
                         width={'200px'}
                         label={"Type"}
-                        value={requestTypes[0].value}
+                        value={service?.type}
                         options={requestTypes}
                         onChange={(value) => {
                             setService((prev) => ({
