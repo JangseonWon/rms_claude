@@ -97,7 +97,6 @@ export default function Login() {
                         <button className={style.loginButton} disabled={!id || !password || loading}>
                             {loading ? <div className={style.spinner}></div> : 'Log In'}
                         </button>
-                        <button className={style.healthcareButton}>Not a Healthcare Provider?</button>
                         <label className={style.changePassword} onClick={openModal}>Password reissue</label>
                     </div>
                 </form>
