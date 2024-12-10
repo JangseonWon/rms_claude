@@ -11,5 +11,6 @@ data class OrganizationDTO(
     var registrationNumber: String? = null,
     var type: String? = null,
     @JsonProperty("nursing_number")
-    var nursingNumber: String? = null
+    var nursingNumber: String? = null,
+    var user: UserDTO? = null
 )

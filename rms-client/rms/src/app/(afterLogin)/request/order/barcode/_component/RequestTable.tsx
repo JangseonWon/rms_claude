@@ -14,7 +14,7 @@ import {Filter} from "@/model/Filter";
 import {Status} from "@/model/Status";
 import BlueButton from "@/app/_component/BlueButton";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
-import RequestInfo from "@/app/(afterLogin)/request/order/barcode/_component/RequestInfo";
+import RequestInfo from "@/app/(afterLogin)/request/order/_component/RequestInfo";
 import BarcodeModal from "@/app/(afterLogin)/request/order/barcode/_component/BarcodeModal";
 
 export interface RequestWithSelected extends Request {

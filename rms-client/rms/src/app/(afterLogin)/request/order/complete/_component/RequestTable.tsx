@@ -15,6 +15,7 @@ import InputBox from "@/app/_component/InputBox";
 import {Filter} from "@/model/Filter";
 import {Status} from "@/model/Status";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
+import RequestInfo from "@/app/(afterLogin)/request/order/_component/RequestInfo";
 
 export interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -42,6 +43,8 @@ export default function RequestTable() {
     const [search, setSearch] = useState<Query>(defaultSearch);
     const [searchFilter, setSearchFilter] = useState<Filter | undefined>(undefined);
     const [orderDateFilter, setOrderDateFilter] = useState<FilterGroup>()
+    const [infoModalOpen, setInfoModalOpen] = useState<boolean>(false);
+    const [infoRequest, setInfoRequest] = useState<Request>();
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage =>({
@@ -70,6 +73,15 @@ export default function RequestTable() {
             setRequestData([]);
         }
     };
+
+    const handleInfoClick = (request: RequestWithSelected) => {
+        setInfoRequest(request);
+        setInfoModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setInfoModalOpen(false);
+    }
 
     useEffect(() => {
         const updatedSearch = {
@@ -177,12 +189,20 @@ export default function RequestTable() {
                                     icon={faFileLines}
                                     className={globalTableStyle.info}
                                     onClick={(e) => {
+                                        handleInfoClick(request)
                                         e.stopPropagation();
                                     }}/>
                             </td>
                         </tr>
                     ))}
                     </tbody>
+                    {infoModalOpen && (
+                        <RequestInfo
+                            serviceId={infoRequest?.service!.id!}
+                            sampleId={infoRequest?.sample!.id!}
+                            closeModal={closeModal}
+                        />
+                    )}
                 </table>
             </div>
             <div className={globalTableStyle.pagination}>

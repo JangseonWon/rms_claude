@@ -10,5 +10,6 @@ data class ExtensionDTO(
     var nameKr: String? = null,
     var required: Boolean? = null,
     var regex: String? = null,
-    var type: String? = null
+    var type: String? = null,
+    var value: String? = null
 )

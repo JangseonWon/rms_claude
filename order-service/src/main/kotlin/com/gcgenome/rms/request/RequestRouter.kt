@@ -4,6 +4,7 @@ import com.gcgenome.rms.auth.AuthenticationHandler
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.RequestDTO
 import com.gcgenome.rms.exception.AuthenticationNotFoundException
+import com.gcgenome.rms.exception.OrderNotFoundException
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
@@ -12,6 +13,7 @@ import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.router
 import reactor.core.publisher.Mono
+import java.util.*
 
 @Configuration
 class RequestRouter(
@@ -22,6 +24,7 @@ class RequestRouter(
     fun route() = router {
         POST("/w-api/order-service/requests/search", ::selectRequests)
         PATCH("/w-api/order-service/requests",:: updateRequests)
+        GET("/w-api/order-service/services/{service_id}/samples/{sample_id}", ::orderInfo)
     }
     private fun selectRequests(request: ServerRequest) : Mono<ServerResponse> {
         return authenticationHandler.principal(request).zipWith(request.bodyToMono(Query::class.java))
@@ -44,5 +47,15 @@ class RequestRouter(
             .then(ServerResponse.ok().build())
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
+    }
+
+    private fun orderInfo(request: ServerRequest): Mono<ServerResponse> {
+        val sampleId = UUID.fromString(request.pathVariable("sample_id"))
+        val serviceId = request.pathVariable("service_id")
+        return authenticationHandler.principal(request)
+            .flatMap { requestHandler.getOrderInfo(sampleId, serviceId) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), RequestDTO::class.java) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(OrderNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
     }
 }
