@@ -67,7 +67,6 @@ class Handler(val dslContext: DSLContext ) :
                             .then(deleteSampleById(request.sample!!.id!!))
                             .then(deletePatientById(request.sample!!.patient!!))
                             .then(selectRequestById(request.sample!!.id!!, request.service!!.id!!))
-
                 }
             }
         })

@@ -228,7 +228,4 @@ interface RequestDao: QueryDao {
 
         ).map{it.into(Request::class.java)}
     }
-
-
-
 }

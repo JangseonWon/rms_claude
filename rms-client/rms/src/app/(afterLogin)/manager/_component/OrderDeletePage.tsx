@@ -38,7 +38,6 @@ export default function OrderDeletePage() {
     const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
     const [totalPage, setTotalPage] = useState<number>(0);
     const [search, setSearch] = useState<Query>(defaultSearch);
-    const [searchValue, setSearchValue] = useState<string>('');
     const isSelectedAll = requestData.length > 0 && requestData.every((row) => row.isSelected);
 
     const handleOnClickOrderDelete = async () => {
@@ -88,12 +87,12 @@ export default function OrderDeletePage() {
         });
     };
 
-    const handleSearchChange = (option: SelectBoxOption) => {
+    const handleSearchChange = (option: SelectBoxOption, value: string) => {
         setSearch((prevSearch) => {
             const newFilter = {
                 table: option.table!,
                 column: option.column!,
-                value: searchValue,
+                value: value,
                 operator: "LIKE"
             };
 
@@ -117,10 +116,6 @@ export default function OrderDeletePage() {
                 page: 1
             };
         });
-    };
-
-    const handleSearchValueChange = (value: string) => {
-        setSearchValue(value);
     };
 
     const handlePageChange = (newPageNumber: number) => {
@@ -161,10 +156,6 @@ export default function OrderDeletePage() {
         fetchData(search)
     }, [search]);
 
-    useEffect(() => {
-        handleSearchChange(selectedOption);
-    }, [searchValue]);
-
     return (
         <>
             <div className={style.container}>
@@ -196,7 +187,7 @@ export default function OrderDeletePage() {
                                     }}
                                 />
                                 <InputBox label={"search"} onChange={(value) => {
-                                    handleSearchValueChange(value);
+                                    handleSearchChange(selectedOption, value)
                                 }}></InputBox>
                             </div>
                         </div>
