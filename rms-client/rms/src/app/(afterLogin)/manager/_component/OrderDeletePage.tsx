@@ -5,9 +5,8 @@ import * as React from "react";
 import {useEffect, useState} from "react";
 import globalTableStyle from "@/css/globalTable.module.css";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
-import {FilterGroup, Query} from "@/model/Query";
+import {Query} from "@/model/Query";
 import SelectBox from "@/app/_component/SelectBox";
-import {Filter} from "@/model/Filter";
 import InputBox from "@/app/_component/InputBox";
 import requestStyle from "@/css/order/requestTable.module.css";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -18,6 +17,7 @@ import {postRequests} from "@/app/(afterLogin)/request/order/_api/postRequests";
 import type {Request} from "@/model/Request";
 import BlueButton from "@/app/_component/BlueButton";
 import {deleteOrder} from "@/app/(afterLogin)/manager/_api/deleteOrder";
+import {format} from "date-fns";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -32,20 +32,13 @@ const selectBoxOptions: SelectBoxOption[] = [
     { table: "patient", column: "serial", name: "MRN" },
 ];
 const defaultSearch: Query = {size:10, page:1}
-const defaultFilter: Filter = {
-    table: "request",
-    column: "status",
-    operator: "!=",
-    value: Status.TOTAL.valueOf()
-}
 
 export default function OrderDeletePage() {
     const [requestData, setRequestData] = useState<RequestWithSelected[]>([]);
     const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
     const [totalPage, setTotalPage] = useState<number>(0);
     const [search, setSearch] = useState<Query>(defaultSearch);
-    const [searchFilter, setSearchFilter] = useState<Filter | undefined>(undefined);
-    const [orderDateFilter, setOrderDateFilter] = useState<FilterGroup>()
+    const [searchValue, setSearchValue] = useState<string>('');
     const isSelectedAll = requestData.length > 0 && requestData.every((row) => row.isSelected);
 
     const handleOnClickOrderDelete = async () => {
@@ -59,6 +52,76 @@ export default function OrderDeletePage() {
         else alert("fail");
         fetchData(search);
     }
+
+    const addDateFilter = (from: Date | null, to: Date | null) => {
+        if (!from || !to) return;
+
+        setSearch((prevSearch) => {
+            const updatedFilters = (prevSearch.filter_groups || []).filter(group =>
+                !group.filters?.some(filter => filter.column === "create_at")
+            ) || [];
+
+            return {
+                ...prevSearch,
+                filter_groups: [
+                    ...updatedFilters,
+                    {
+                        condition_type: "AND",
+                        filters: [
+                            {
+                                table: "request",
+                                column: "create_at",
+                                value: format(from, "yyyy-MM-dd"),
+                                operator: ">="
+                            },
+                            {
+                                table: "request",
+                                column: "create_at",
+                                value: format(to, "yyyy-MM-dd"),
+                                operator: "<="
+                            }
+                        ]
+                    }
+                ],
+                page: 1
+            };
+        });
+    };
+
+    const handleSearchChange = (option: SelectBoxOption) => {
+        setSearch((prevSearch) => {
+            const newFilter = {
+                table: option.table!,
+                column: option.column!,
+                value: searchValue,
+                operator: "LIKE"
+            };
+
+            return {
+                ...prevSearch,
+                filter_groups: [
+                    {
+                        condition_type: "AND",
+                        filters: [
+                            newFilter,
+                            ...([{
+                                table: "request",
+                                column: "status",
+                                operator: "!=",
+                                value: Status.TOTAL.valueOf()
+                            }])
+                        ]
+                    },
+                    ...(prevSearch.filter_groups || []).filter(group => group.filters?.some(filter => filter.column === "create_at"))
+                ],
+                page: 1
+            };
+        });
+    };
+
+    const handleSearchValueChange = (value: string) => {
+        setSearchValue(value);
+    };
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage =>({
@@ -95,20 +158,12 @@ export default function OrderDeletePage() {
     };
 
     useEffect(() => {
-        const updatedSearch = {
-            ...search,
-            filter_groups: [
-                ...(orderDateFilter ? [orderDateFilter] : []),
-                {
-                    filters: [
-                        defaultFilter,
-                        ...(searchFilter ? [searchFilter] : []),
-                    ],
-                },
-            ],
-        };
-        fetchData(updatedSearch);
-    }, [search,searchFilter,orderDateFilter]);
+        fetchData(search)
+    }, [search]);
+
+    useEffect(() => {
+        handleSearchChange(selectedOption);
+    }, [searchValue]);
 
     return (
         <>
@@ -125,26 +180,10 @@ export default function OrderDeletePage() {
                             <div>
                                 <DatePickerRangeBox
                                     label={"from-to"}
-                                    onChange={(from, to) => {
-                                        setOrderDateFilter(
-                                            from && to ? {
-                                                filters: [
-                                                    {
-                                                        table: "request",
-                                                        column: "create_at",
-                                                        value: from?.toLocaleDateString('en-CA'),
-                                                        operator: ">="
-                                                    },
-                                                    {
-                                                        table: "request",
-                                                        column: "create_at",
-                                                        value: to.toLocaleDateString('en-CA'),
-                                                        operator: "<="
-                                                    }
-                                                ]
-                                            } as FilterGroup : undefined
-                                        )
-                                    }}/>
+                                    onChange={(from, to) =>{
+                                        addDateFilter(from, to);
+                                    }}
+                                />
                             </div>
                             <div>
                                 <SelectBox
@@ -154,23 +193,10 @@ export default function OrderDeletePage() {
                                     label={"filter"}
                                     onChange={(option) => {
                                         setSelectedOption(option);
-                                        setSearchFilter({
-                                            table: option.table!,
-                                            column: option.column!
-                                        } as Filter)
                                     }}
                                 />
                                 <InputBox label={"search"} onChange={(value) => {
-                                    setSearchFilter(
-                                        value && value.trim() !== ""
-                                            ? {
-                                                table: selectedOption.table,
-                                                column: selectedOption.column,
-                                                operator: "LIKE",
-                                                value: value
-                                            } as Filter
-                                            : undefined
-                                    );
+                                    handleSearchValueChange(value);
                                 }}></InputBox>
                             </div>
                         </div>
