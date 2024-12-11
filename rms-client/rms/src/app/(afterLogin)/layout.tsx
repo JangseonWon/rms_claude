@@ -19,15 +19,15 @@ export default function Layout({ children }: Props) {
     return (
         <div className={style.layout}>
             {showAlertDialog && (<AlertDialog message={message}/>)}
-            <div className={style.header}>
-                <Header/>
-            </div>
-            <div className={style.content}>
-                {children}
-            </div>
-            <div className={style.footer}>
-                <Footer/>
-            </div>
+                <div className={style.header}>
+                    <Header/>
+                </div>
+                <div className={style.content}>
+                    {children}
+                </div>
+                <div className={style.footer}>
+                    <Footer/>
+                </div>
         </div>
     )
 }
