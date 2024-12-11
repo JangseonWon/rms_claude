@@ -7,6 +7,7 @@ import type {Statistics} from "@/model/Statistics";
 import Loading from "@/app/(afterLogin)/_component/Loading";
 import {useSetStatus, useStatus} from "@/app/(afterLogin)/request/dashboard/store/useStatusStore";
 import {Status} from "@/model/Status";
+import type {Request} from "@/model/Request";
 
 export default function Statistics() {
     const [statisticsData, setStatisticsData] = useState<Statistics>()
@@ -16,8 +17,10 @@ export default function Statistics() {
     useEffect(() => {
         const fetchData = async () => {
             const response = await getStatisticsRequest();
-            const data = await response.json();
-            setStatisticsData(data as Statistics);
+            if (response.ok) {
+                const data = await response.json();
+                setStatisticsData(data as Statistics);
+            }
         };
         fetchData()
     }, []);

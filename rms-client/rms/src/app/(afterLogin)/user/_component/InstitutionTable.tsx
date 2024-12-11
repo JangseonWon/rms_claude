@@ -95,10 +95,12 @@ export default function InstitutionTable() {
 
     const fetchData = useCallback(async (search: Query) => {
         const response = await postOrganizations(search);
-        const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
-        const responseData = await response.json();
-        setOrganizationData(responseData as Organization[]);
-        setTotalPage(totalPage);
+        if (response.ok) {
+            const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
+            const responseData = await response.json();
+            setOrganizationData(responseData as Organization[]);
+            setTotalPage(totalPage);
+        }
     }, []);
 
     useEffect(() => {

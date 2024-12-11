@@ -10,5 +10,9 @@ export async function updateRequest(request: Request) {
         credentials: 'include',
         cache: 'no-store'
     });
-    return  res
+    if (!res.ok) {
+        const errorMessage = await res.text();
+        // alert(`Error: ${errorMessage}`);
+    }
+    return res
 }

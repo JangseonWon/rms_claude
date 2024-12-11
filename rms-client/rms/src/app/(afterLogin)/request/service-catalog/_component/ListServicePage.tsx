@@ -13,6 +13,7 @@ import {Categories} from "@/model/Categories";
 import {useRouter} from "next/navigation";
 import QnaLoading from "@/app/(afterLogin)/qna/_component/QnaLoading";
 import {getCategories} from "@/app/(afterLogin)/_api/getCategories";
+import {User} from "@/model/User";
 
 export default function ListServicePage() {
     const router = useRouter();
@@ -62,14 +63,22 @@ export default function ListServicePage() {
 
     const fetchServiceData = async (categoryId: string) => {
         const response = await getServicesByCategoryId(categoryId);
-        const data = await response.json();
-        setServiceData(data as Service[]);
+        if (response.ok) {
+            const data = await response.json();
+            setServiceData(data as Service[]);
+        } else {
+            setServiceData([]);
+        }
     }
 
     const fetchCategoryData = async () => {
-        const response = await getCategories()
-        const data = await response.json();
-        setCategoryArray(data as Categories[]);
+        const response = await getCategories();
+        if (response.ok) {
+            const data = await response.json();
+            setCategoryArray(data as Categories[]);
+        } else {
+            setCategoryArray([]);
+        }
     }
 
     useEffect(() => {

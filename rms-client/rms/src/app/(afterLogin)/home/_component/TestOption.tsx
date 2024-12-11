@@ -17,8 +17,12 @@ export default function TestOption() {
 
     const fetchData = async () => {
         const response = await getCategories()
-        const data = await response.json();
-        setCategoryData(data as Categories[]);
+        if (!response.ok) {
+            setCategoryData([]);
+        } else {
+            const data = await response.json();
+            setCategoryData(data as Categories[]);
+        }
     }
 
     useEffect(() => {

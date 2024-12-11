@@ -4,6 +4,9 @@ export async function getStatisticsRequest() {
         credentials: 'include',
         cache: 'no-store'
     });
-    if (!res.ok) throw new Error('Failed to fetch data')
+    if (!res.ok) {
+        const errorMessage = await res.text();
+        // alert(`Error: ${errorMessage}`);
+    }
     return res
 }

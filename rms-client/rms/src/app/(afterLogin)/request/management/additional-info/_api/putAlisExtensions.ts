@@ -1,7 +1,7 @@
 import {Query} from "@/model/Query";
 
 export async function putAlisExtensions(search: Query) {
-    return await fetch(`/w-api/management-service/alis/extensions`, {
+    const res = await fetch(`/w-api/management-service/alis/extensions`, {
         method: 'PUT',
         headers: {
             "Content-Type": "application/json",
@@ -10,4 +10,9 @@ export async function putAlisExtensions(search: Query) {
         credentials: 'include',
         cache: 'no-store'
     });
+    if (!res.ok) {
+        const errorMessage = await res.text();
+        // alert(`Error: ${errorMessage}`);
+    }
+    return res
 }

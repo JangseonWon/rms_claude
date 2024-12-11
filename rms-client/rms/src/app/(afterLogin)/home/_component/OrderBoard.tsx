@@ -7,6 +7,7 @@ import type {Statistics} from "@/model/Statistics";
 import {getStatisticsRequest} from "@/app/(afterLogin)/home/_api/getStatisticsRequest";
 import Loading from "@/app/(afterLogin)/_component/Loading";
 import classNames from "classnames";
+import {Alarm} from "@/model/Alarm";
 
 
 export default function OrderBoard() {
@@ -42,8 +43,10 @@ export default function OrderBoard() {
     useEffect(() => {
         const fetchData = async () => {
             const response = await getStatisticsRequest();
-            const data = await response.json();
-            setStatisticsData(data as Statistics);
+            if (response.ok) {
+                const data = await response.json();
+                setStatisticsData(data as Statistics);
+            }
         };
         fetchData()
     }, []);

@@ -15,6 +15,7 @@ import {SelectBoxOption} from "@/model/SelectBoxOption";
 import {Query} from "@/model/Query";
 import {postPatients} from "@/app/(afterLogin)/request/services/[service]/single/_api/postPatients";
 import {useSetProband} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
+import {SampleType} from "@/model/SampleType";
 
 type Props = {
     closeModal: () => void;
@@ -37,11 +38,13 @@ export default function SearchProbandModal({ closeModal }: Props) {
 
     const fetchPatient = async () => {
         const response = await postPatients(search);
-        const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
-        const data = await response.json();
-        const patient = data as Patient[];
-        setPatients(patient);
-        setTotalPage(totalPage);
+        if (response.ok) {
+            const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
+            const data = await response.json();
+            const patient = data as Patient[];
+            setPatients(patient);
+            setTotalPage(totalPage);
+        }
     }
 
     const handleSearchChange = (option: SelectBoxOption, value: string) => {

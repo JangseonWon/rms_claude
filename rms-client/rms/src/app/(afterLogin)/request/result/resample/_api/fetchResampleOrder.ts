@@ -17,7 +17,9 @@ export async function fetchResampleOrder(userId: string | undefined, page: Page)
         credentials: 'include',
         cache: 'no-store'
     });
-    if (!res.ok) throw new Error('Failed to fetch data');
-
-    return res;
+    if (!res.ok) {
+        const errorMessage = await res.text();
+        // alert(`Error: ${errorMessage}`);
+    }
+    return res
 }

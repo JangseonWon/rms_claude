@@ -1,7 +1,7 @@
 import {Request} from "@/model/Request";
 
 export async function putRequest(request: Request[]) {
-    return await fetch(`/w-api/catalog-service/requests`, {
+    const res = await fetch(`/w-api/catalog-service/requests`, {
         method: 'PUT',
         headers: {
             "Content-Type": "application/json",
@@ -10,4 +10,9 @@ export async function putRequest(request: Request[]) {
         credentials: 'include',
         cache: 'no-store'
     });
+    if (!res.ok) {
+        const errorMessage = await res.text();
+        // alert(`Error: ${errorMessage}`);
+    }
+    return res
 }

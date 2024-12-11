@@ -1,7 +1,7 @@
 import type {Request} from "@/model/Request";
 
 export async function patchRequests(requests: Request[]) {
-    return await fetch(`/w-api/order-service/requests`, {
+    const res = await fetch(`/w-api/order-service/requests`, {
         method: 'PATCH',
         headers: {
             "Content-Type": "application/json",
@@ -10,4 +10,9 @@ export async function patchRequests(requests: Request[]) {
         credentials: 'include',
         cache: 'no-store'
     });
+    if (!res.ok) {
+        const errorMessage = await res.text();
+        // alert(`Error: ${errorMessage}`);
+    }
+    return res
 }

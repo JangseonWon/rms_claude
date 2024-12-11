@@ -58,10 +58,12 @@ export default function Table() {
 
     const fetchData = useCallback(async (search: Query) => {
         const response = await postRequests(search)
-        const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
-        const responseData = await response.json();
-        setRequestData(responseData as Request[]);
-        setTotalPage(totalPage);
+        if (response.ok) {
+            const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
+            const responseData = await response.json();
+            setRequestData(responseData as Request[]);
+            setTotalPage(totalPage);
+        }
     },[]);
 
     useEffect(() => {

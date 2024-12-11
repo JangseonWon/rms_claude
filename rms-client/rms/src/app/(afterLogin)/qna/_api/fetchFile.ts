@@ -4,10 +4,15 @@ export async function fetchFile(files: File[]) {
         formData.append('file', file);
     });
 
-    return await fetch(`/w-api/post-service/post/file`, {
+    const res = await fetch(`/w-api/post-service/post/file`, {
         method: 'POST',
         body: formData,
         credentials: 'include',
         cache: 'no-store'
     });
+    if (!res.ok) {
+        const errorMessage = await res.text();
+        // alert(`Error: ${errorMessage}`);
+    }
+    return res
 }

@@ -41,8 +41,10 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
 
     const fetchCategoryData = async () => {
         const response = await getCategories();
-        const data = await response.json();
-        setCategories(transformCategoryToOptions(data as Categories[]));
+        if (response.ok) {
+            const data = await response.json();
+            setCategories(transformCategoryToOptions(data as Categories[]));
+        }
     }
     const transformCategoryToOptions = (data: Categories[]): SelectBoxOption[] => {
         return data.map(value => ({
@@ -52,10 +54,14 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
     };
     const fetchServiceData = async (serviceId: string) => {
         const response = await getService(serviceId);
-        const data = await response.json();
-        const service = data as Service
-        setService(service);
-        return service
+        if (response.ok) {
+            const data = await response.json();
+            const service = data as Service
+            setService(service);
+            return service
+        } else {
+            return []
+        }
     }
 
     const updateService = async () => {

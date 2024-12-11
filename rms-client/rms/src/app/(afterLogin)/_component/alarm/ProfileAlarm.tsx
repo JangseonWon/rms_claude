@@ -16,8 +16,12 @@ export default function ProfileAlarm() {
     useEffect(() => {
         const fetchData = async () => {
             const response = await getAlarmByUser();
-            const data = await response.json();
-            setAlarmData(data as Alarm[]);
+            if (!response.ok) {
+                setAlarmData([]);
+            } else {
+                const data = await response.json();
+                setAlarmData(data as Alarm[]);
+            }
         };
         fetchData()
     }, []);

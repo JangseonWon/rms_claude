@@ -47,15 +47,23 @@ export default function Order() {
 
     const fetchOrganizations = useCallback(async () => {
         const response = await getOrganization()
-        const data = await response.json();
-        setOrganizationOptions(transformOrganizationToOptions(data as Organization[]))
+        if (response.ok) {
+            const data = await response.json();
+            setOrganizationOptions(transformOrganizationToOptions(data as Organization[]));
+        } else {
+            setOrganizationOptions(transformOrganizationToOptions([]));
+        }
     },[]);
 
 
     const fetchSampleType = async (serviceId: string) => {
         const response = await getSampleType(serviceId)
-        const data = await response.json();
-        setSampleTypeOptions(transformSampleTypeToOptions(data as SampleType[]))
+        if (response.ok) {
+            const data = await response.json();
+            setSampleTypeOptions(transformSampleTypeToOptions(data as SampleType[]));
+        } else {
+            setSampleTypeOptions(transformSampleTypeToOptions([]));
+        }
     }
 
     useEffect(() => {

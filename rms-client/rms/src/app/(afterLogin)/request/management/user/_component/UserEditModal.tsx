@@ -13,6 +13,7 @@ import GreenButton from "@/app/_component/GreenButton";
 import BlueButton from "@/app/_component/BlueButton";
 import {getUser} from "@/app/(afterLogin)/request/management/user/_api/getUser";
 import {patchUser} from "@/app/(afterLogin)/request/management/user/_api/patchUser";
+import {Organization} from "@/model/Organization";
 
 
 type Props = {
@@ -27,10 +28,14 @@ export default function UserEditModal({userId, closeModal, fetchData}: Props) {
 
     const fetchUser = async (userId: string) => {
         const response = await getUser(userId);
-        const data = await response.json();
-        const service = data as User
-        setUser(service);
-        return service
+        if (response.ok) {
+            const data = await response.json();
+            const service = data as User
+            setUser(service);
+            return service;
+        } else {
+            return [];
+        }
     }
     const updateUser = async () => {
         const response = await patchUser(user!);

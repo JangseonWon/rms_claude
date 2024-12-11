@@ -25,6 +25,7 @@ import Image from "next/image";
 import {Service} from "@/model/Service";
 import {getServiceGroup} from "@/app/(afterLogin)/request/services/[service]/single/_api/getServiceGroup";
 import {formatExtensionValue, setNestedValue, setAge} from './GroupOrderUtils';
+import {Patient} from "@/model/Patient";
 
 export default function GroupOrder() {
     const [organizationOptions, setOrganizationOptions] = useState<SelectBoxOption[]>([])
@@ -45,9 +46,13 @@ export default function GroupOrder() {
     ];
 
     const fetchOrganizations = useCallback(async () => {
-        const response = await getOrganization()
-        const data = await response.json();
-        setOrganizationOptions(transformOrganizationToOptions(data as Organization[]))
+        const response = await getOrganization();
+        if (response.ok) {
+            const data = await response.json();
+            setOrganizationOptions(transformOrganizationToOptions(data as Organization[]));
+        } else {
+            setOrganizationOptions(transformOrganizationToOptions([]));
+        }
     },[]);
 
 
@@ -72,10 +77,13 @@ export default function GroupOrder() {
             await fetchOrganizations();
 
             const response = await getServiceGroup(serviceId);
-            const services = await response.json();
-            setServiceGroup(services);
-
-            await fetchSampleTypesForServices(services);
+            if (response.ok) {
+                const services = await response.json();
+                setServiceGroup(services);
+                await fetchSampleTypesForServices(services);
+            } else {
+                setServiceGroup([]);
+            }
         };
 
         fetchInitialData();

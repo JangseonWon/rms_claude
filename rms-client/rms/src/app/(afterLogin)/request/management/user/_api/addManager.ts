@@ -1,7 +1,7 @@
 import {User} from "@/model/User";
 
 export async function addManager(user: User | undefined) {
-    return await fetch(`/w-api/management-service/user`, {
+    const res = await fetch(`/w-api/management-service/user`, {
         method: 'PUT',
         headers: {
             "Content-Type": "application/json",
@@ -10,4 +10,9 @@ export async function addManager(user: User | undefined) {
         credentials: 'include',
         cache: 'no-store'
     });
+    if (!res.ok) {
+        const errorMessage = await res.text();
+        // alert(`Error: ${errorMessage}`);
+    }
+    return res
 }

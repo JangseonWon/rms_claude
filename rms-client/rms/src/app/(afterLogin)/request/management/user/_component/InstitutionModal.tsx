@@ -20,8 +20,12 @@ export default function InstitutionModal({id, name, open, closeModal}: Props) {
 
     const fetchInstitutionData = async (userId: string) => {
         const response = await getInstitutions(userId);
-        const data = await response.json();
-        setInstitutionData(data as Organization[]);
+        if (response.ok) {
+            const data = await response.json();
+            setInstitutionData(data as Organization[]);
+        } else {
+            setInstitutionData([]);
+        }
     }
 
     useEffect(() => {

@@ -8,6 +8,7 @@ import {SampleType} from "@/model/SampleType";
 import {postExtensions} from "@/app/(afterLogin)/request/management/service/_api/postExtensions";
 import {postServices} from "@/app/(afterLogin)/request/management/_api/postServices";
 import {Query} from "@/model/Query";
+import type {Request} from "@/model/Request";
 
 interface Props {
     type: 'sampleType' | 'extension' | 'service';
@@ -125,9 +126,10 @@ export default function SelectSearchBox({ type, onSelect, width }: Props) {
             default:
                 return;
         }
-
-        const data = await response.json();
-        setOptions(transformDataToOptions(data));
+        if (response.ok) {
+            const data = await response.json();
+            setOptions(transformDataToOptions(data));
+        }
     };
 
     const handleClickOutside = (event: MouseEvent) => {

@@ -9,6 +9,7 @@ import {format} from "date-fns";
 import {Query} from "@/model/Query";
 import {postRequests} from "@/app/(afterLogin)/request/dashboard/_api/postRequests";
 import type {Request} from "@/model/Request";
+import {Organization} from "@/model/Organization";
 
 interface DownloadExcelButtonProps {
     search: Query;
@@ -30,8 +31,12 @@ interface ExcelRow {
 export default function DownloadExcelButton({ search, status }: DownloadExcelButtonProps) {
     const fetchData = async (search: Query) => {
         const response = await postRequests(search)
-        const responseData = await response.json();
-        return responseData as Request[];
+        if (response.ok) {
+            const responseData = await response.json();
+            return responseData as Request[];
+        } else {
+            return [];
+        }
     };
 
     const downloadExcel = async () => {

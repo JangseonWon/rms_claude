@@ -18,8 +18,10 @@ export default function Page() {
     useEffect(() => {
         const fetchData = async () => {
             const response = await getService(serviceId);
-            const data = await response.json();
-            setService(data);
+            if (response.ok) {
+                const data = await response.json();
+                setService(data);
+            }
         };
         fetchData();
     }, []);

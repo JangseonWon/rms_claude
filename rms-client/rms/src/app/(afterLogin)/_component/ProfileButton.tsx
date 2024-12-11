@@ -10,6 +10,7 @@ import {signOut, useSession} from "next-auth/react";
 import ProfileAlarm from "@/app/(afterLogin)/_component/alarm/ProfileAlarm";
 import {getAlarmCountByUser} from "@/app/(afterLogin)/_api/getAlarmCountByUser";
 import {useAlarmCount, useSetAlarmCount} from "@/app/(afterLogin)/_component/alarm/store/useAlarmCountStore";
+import {Categories} from "@/model/Categories";
 
 export default function ProfileButton() {
     const { data: session } = useSession();
@@ -61,8 +62,12 @@ export default function ProfileButton() {
 
     const fetchAlarmCount = async () => {
         const response = await getAlarmCountByUser();
-        const data = await response.json();
-        setAlarmCount(data as number);
+        if (!response.ok) {
+            setAlarmCount(0);
+        } else {
+            const data = await response.json();
+            setAlarmCount(data as number);
+        }
     };
 
     useEffect(() => {
@@ -103,7 +108,7 @@ export default function ProfileButton() {
                          onMouseLeave={handleUserMouseLeave}>
                         <ul>
                             <li onClick={onProfile}>My profile</li>
-                            { session?.user.role != 'USER'&& <li onClick={onManager}>Maneging Service</li>}
+                            { session?.user.role === 'ADMIN'&& <li onClick={onManager}>Maneging Service</li>}
                             <li onClick={onLogout}>Logout</li>
                         </ul>
                     </div>

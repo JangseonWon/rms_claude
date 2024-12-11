@@ -58,8 +58,10 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
 
     const fetchOrganizations = useCallback(async () => {
         const response = await getOrganization(userId!);
-        const data = await response.json();
-        setOrganizationOptions(transformOrganizationsToOptions(data as Organization[]));
+        if (response.ok) {
+            const data = await response.json();
+            setOrganizationOptions(transformOrganizationsToOptions(data as Organization[]));
+        }
     },[userId]);
 
     const fetchSampleType = useCallback(async () => {

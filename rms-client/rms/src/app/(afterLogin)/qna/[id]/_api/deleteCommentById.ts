@@ -1,7 +1,12 @@
 export async function deleteCommentById(id: String) {
-    return await fetch(`/w-api/post-service/comment/${id}`, {
+    const res = await fetch(`/w-api/post-service/comment/${id}`, {
         method: 'DELETE',
         credentials: 'include',
         cache: 'no-store'
     });
+    if (!res.ok) {
+        const errorMessage = await res.text();
+        // alert(`Error: ${errorMessage}`);
+    }
+    return res
 }

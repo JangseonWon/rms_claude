@@ -130,10 +130,12 @@ export default function NoticeTable() {
 
     const fetchData = useCallback(async (search: Query) => {
         const response = await postSearchPosts(search, 'notice');
-        const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
-        const responseData = await response.json();
-        setPostData(responseData as Post[]);
-        setTotalPage(totalPage);
+        if (response.ok) {
+            const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
+            const responseData = await response.json();
+            setPostData(responseData as Post[]);
+            setTotalPage(totalPage);
+        }
     }, []);
 
     useEffect(() => {

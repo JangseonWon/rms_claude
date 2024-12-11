@@ -11,7 +11,7 @@ import {useSetStatus} from "@/app/(afterLogin)/request/dashboard/store/useStatus
 
 
 export default function Statistics() {
-    const [statisticsData, setStatisticsData] = useState<Statistics>()
+    const [statisticsData, setStatisticsData] = useState<Statistics | undefined>()
     const setStatus = useSetStatus();
 
     const handleCardOnClick = (status: Status) => {
@@ -21,8 +21,12 @@ export default function Statistics() {
     useEffect(() => {
         const fetchData = async () => {
             const response = await getStatisticsRequest();
-            const data = await response.json();
-            setStatisticsData(data as Statistics);
+            if (!response.ok) {
+                setStatisticsData(undefined);
+            } else {
+                const data = await response.json();
+                setStatisticsData(data as Statistics);
+            }
         };
         fetchData()
     }, []);

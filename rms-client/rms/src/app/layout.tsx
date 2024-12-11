@@ -15,11 +15,11 @@ type Props = {
 export default function RootLayout({children}:Props){
   return (
     <html lang="en">
-    <body className={manrope.className}>
-    <AuthSession>
-        {children}
-    </AuthSession>
-    </body>
+      <body className={manrope.className}>
+        <AuthSession>
+          {children}
+        </AuthSession>
+      </body>
     </html>
   );
 }

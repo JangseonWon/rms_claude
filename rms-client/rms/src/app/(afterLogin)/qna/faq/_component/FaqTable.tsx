@@ -15,6 +15,7 @@ import {SelectBoxOption} from "@/model/SelectBoxOption";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import {format} from "date-fns";
 import {useSession} from "next-auth/react";
+import type {Statistics} from "@/model/Statistics";
 
 export default function FaqTable() {
     const router = useRouter();
@@ -124,10 +125,12 @@ export default function FaqTable() {
 
     const fetchData = useCallback(async (search: Query) => {
         const response = await postSearchPosts(search, 'faq');
-        const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
-        const responseData = await response.json();
-        setPostData(responseData as Post[]);
-        setTotalPage(totalPage);
+        if (response.ok) {
+            const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
+            const responseData = await response.json();
+            setPostData(responseData as Post[]);
+            setTotalPage(totalPage);
+        }
     }, []);
 
     useEffect(() => {

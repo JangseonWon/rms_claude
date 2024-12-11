@@ -1,7 +1,7 @@
 import type {Request} from "@/model/Request";
 
 export async function deleteOrder(request: Request[]) {
-    return await fetch(`/w-api/management-service/requests`, {
+    const res = await fetch(`/w-api/management-service/requests`, {
         method: 'DELETE',
         headers: {
             "Content-Type": "application/json",
@@ -10,4 +10,9 @@ export async function deleteOrder(request: Request[]) {
         credentials: 'include',
         cache: 'no-store'
     });
+    if (!res.ok) {
+        const errorMessage = await res.text();
+        // alert(`Error: ${errorMessage}`);
+    }
+    return res
 }

@@ -4,7 +4,9 @@ export async function fetchServiceExtensions(service: string | undefined) {
         credentials: 'include',
         cache: 'no-store'
     });
-    if (!res.ok) throw new Error('Failed to fetch data');
-
-    return await res.json();
+    if (!res.ok) {
+        const errorMessage = await res.text();
+        // alert(`Error: ${errorMessage}`);
+    }
+    return res.json();
 }
