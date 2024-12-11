@@ -5,18 +5,15 @@ import {useEffect, useState} from "react";
 import {getStatisticsRequest} from "@/app/(afterLogin)/request/dashboard/_api/getStatisticsRequest";
 import type {Statistics} from "@/model/Statistics";
 import Loading from "@/app/(afterLogin)/_component/Loading";
-import {useSetStatus} from "@/app/(afterLogin)/request/dashboard/store/useStatusStore";
+import {useSetStatus, useStatus} from "@/app/(afterLogin)/request/dashboard/store/useStatusStore";
 import {Status} from "@/model/Status";
-import {useRouter} from "next/navigation";
 
 export default function Statistics() {
     const [statisticsData, setStatisticsData] = useState<Statistics>()
+    const globalStatus = useStatus();
     const setStatus = useSetStatus();
-    const [activeStatus, setActiveStatus] = useState<Status | null>(null);
-    // const router = useRouter();
 
     useEffect(() => {
-        setActiveStatus(Status.TOTAL);
         const fetchData = async () => {
             const response = await getStatisticsRequest();
             const data = await response.json();
@@ -27,7 +24,6 @@ export default function Statistics() {
 
     const handleCardOnClick = (status: Status) => {
         setStatus(status);
-        setActiveStatus(status);
     };
 
     const statisticsCards: {
@@ -59,7 +55,7 @@ export default function Statistics() {
                 {statisticsCards.map((card) => (
                     <div
                         className={`${style.card} ${
-                            activeStatus === card.status ? style.activeCard : ""
+                            globalStatus === card.status ? style.activeCard : ""
                         }`}
                          key={card.label}
                          onClick={() => handleCardOnClick(card.status)}

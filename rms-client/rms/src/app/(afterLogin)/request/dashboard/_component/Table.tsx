@@ -19,7 +19,26 @@ import {GrPowerReset} from "react-icons/gr";
 
 export default function Table() {
     const [requestData, setRequestData] = useState<Request[]>([]);
-    const [search, setSearch] = useState<Query>({sort_by:"create_at", asc: false, size:5, page:1});
+    const globalStatus = useStatus();
+    const [search, setSearch] = useState<Query>(
+        {
+            sort_by:"create_at",
+            asc: false,
+            size:5,
+            page:1,
+            filter_groups: [
+                    {
+                        condition_type: "AND",
+                        filters: [{
+                                    table: 'request',
+                                    column: 'status',
+                                    value: globalStatus,
+                                    operator: "="
+                                }
+                        ]
+                    }
+                ]
+        });
     const [searchValue, setSearchValue] = useState<string>('');
     const [totalPage, setTotalPage] = useState<number>();
     const [pageRange, setPageRange] = useState<{ start: number, end: number }>({ start: 1, end: 5 });
