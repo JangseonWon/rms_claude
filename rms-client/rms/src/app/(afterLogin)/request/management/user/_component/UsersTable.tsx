@@ -20,6 +20,7 @@ import BlueButton from "@/app/_component/BlueButton";
 import {putAlisUsers} from "@/app/(afterLogin)/request/management/user/_api/putAlisUsers";
 import LoadingFullScreen from "@/app/_component/LoadingFullScreen";
 import ManagerAddModal from "@/app/(afterLogin)/request/management/user/_component/ManagerAddModal";
+import {useSession} from "next-auth/react";
 
 interface UserWithSelected extends User {
     isSelected?: boolean;
@@ -44,6 +45,7 @@ export default function UsersTable() {
     const [institutionModalOpen, setInstitutionModalOpen] = useState<boolean>(false);
     const [selectedInstitutionUser, setSelectedInstitutionUser] = useState<{id: string; name: string} | null>(null);
     const [selectOption, setSelectOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
+    const { data: session } = useSession();
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage =>({
@@ -150,9 +152,11 @@ export default function UsersTable() {
             {isLoading && <LoadingFullScreen/>}
             <section className={managementStyle.filterContainer}>
                 <div className={managementStyle.filterContainerAlis}>
-                    <div className={managementStyle.alisSyncButton}>
-                        <BlueButton name={"Manager Add"} onClick={() => handleManagerAddClick()}/>
-                    </div>
+                    {session?.user.role === 'ADMIN' && (
+                        <div className={managementStyle.alisSyncButton}>
+                            <BlueButton name={"Manager Add"} onClick={() => handleManagerAddClick()}/>
+                        </div>
+                    )}
                     <div className={managementStyle.alisSyncButton}>
                         <BlueButton name={"Alis-Sync"} onClick={() => handleAlisSyncButtonClick(search)}/>
                     </div>

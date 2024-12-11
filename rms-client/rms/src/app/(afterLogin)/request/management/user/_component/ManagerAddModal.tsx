@@ -100,7 +100,7 @@ export default function ManagerAddModal({closeModal}: Props) {
                         value={selectOption.name}
                         options={selectBoxOptions}
                         label={"Institution"}
-                        onChange={(selectedOption) =>{
+                        onChange={(selectedOption) => {
                             setSelectOption(selectedOption);
                             handleChange("branch_name", selectedOption.name);
                             handleChange("branch_serial", selectedOption.value);
@@ -115,7 +115,15 @@ export default function ManagerAddModal({closeModal}: Props) {
                         />
                     </div>
                 </div>
-                {message && <div className={style.message} dangerouslySetInnerHTML={{ __html: message }} />}
+                <div className={style.formGroup}>
+                    <div style={{width: '100%'}}>
+                        <InputBox
+                            label={"Phone Number"}
+                            onChange={(value) => handleChange("phone_number", value)}
+                        />
+                    </div>
+                </div>
+                {message && <div className={style.message} dangerouslySetInnerHTML={{__html: message}}/>}
                 <div className={style.buttonGroup}>
                     <GreenButton name={"Cancel"} onClick={closeModal}/>
                     <BlueButton name={'Add'} onClick={() => insertManager()} disabled={!isAllRequiredFilled()}/>

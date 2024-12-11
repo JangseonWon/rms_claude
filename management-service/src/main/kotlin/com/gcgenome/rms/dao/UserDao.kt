@@ -45,6 +45,7 @@ interface UserDao : QueryDao{
                 .set(USER.STATE, "ACTIVE")
                 .set(USER.BRANCH_SERIAL, dto.branchSerial)
                 .set(USER.BRANCH_NAME, dto.branchName)
+                .set(USER.PHONE_NUMBER, dto.phoneNumber)
                 .set(USER.CREATE_AT, LocalDateTime.now())
                 .returning()
         ).map { it.into(User::class.java) }
