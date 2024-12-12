@@ -161,10 +161,6 @@ export default function RequestTable() {
                         label={"filter"}
                         onChange={(option) => {
                             setSelectedOption(option);
-                            setSearchFilter({
-                                table: option.table!,
-                                column: option.column!
-                            } as Filter)
                         }}
                     />
                     <InputBox label={"search"} onChange={(value) => {
@@ -221,7 +217,7 @@ export default function RequestTable() {
                             </label>
                         </td>
                         <td>{request.create_at ? new Date(request.create_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
-                        <td>userName</td>
+                        <td>{request.order?.user?.name}</td>
                         <td>{request.sample?.patient?.organization?.name}</td>
                         <td>{request.sample?.barcode}</td>
                         <td>{request.sample?.patient?.name}</td>

@@ -2,7 +2,7 @@
 
 import React, {useEffect, useState} from "react";
 import downloadStyle from "@/app/(afterLogin)/request/result/download/_component/downloadTable.module.css";
-import style from "@/css/globalTable.module.css";
+import globalTableStyle from "@/css/globalTable.module.css";
 import {faAngleLeft, faAngleRight, faFilePdf} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import type {Request} from "@/model/Request";
@@ -13,26 +13,36 @@ import InputBox from "@/app/_component/InputBox";
 import BlueButton from "@/app/_component/BlueButton";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import {Filter} from "@/model/Filter";
-import {Query} from "@/model/Query";
+import {FilterGroup, Query} from "@/model/Query";
 import {Report} from "@/model/Report";
 import {getReportFiles} from "@/app/(afterLogin)/request/result/download/_api/getReportFiles";
+import {Status} from "@/model/Status";
+import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;
 }
 const selectBoxOptions: SelectBoxOption[] = [
-    { table: "sample", column: "barcode", name: "Registration Number" },
-    { table: "service", column: "name", name: "Service Name" },
+    { table: "user", column: "name", name: "User Name" },
+    { table: "organization", column: "name", name: "Institution" },
+    { table: "sample", column: "barcode", name: "Registration ID" },
+    { table: "service", column: "name", name: "Service" },
     { table: "patient", column: "name", name: "Patient(s) Name" },
     { table: "patient", column: "serial", name: "MRN" },
-    { table: "organization", column: "name", name: "Institution" },
-    { table: "request", column: "status", name: "Status" },
+    { table: "request", column: "status", name: "Status" }
 ];
-const defaultFilter: Filter = {
+const defaultSearch: Query = {size:10, page:1}
+const deliveredFilter: Filter = {
     table: "request",
-    column: "reported_at",
-    operator: "IS NOT NULL",
-    value: ""
+    column: "status",
+    operator: "=",
+    value: Status.DELIVERED.valueOf()
+}
+const completedFilter: Filter = {
+    table: "request",
+    column: "status",
+    operator: "=",
+    value: Status.COMPLETED.valueOf()
 }
 
 export default function DownloadTable() {
@@ -40,13 +50,9 @@ export default function DownloadTable() {
     const isSelectedAll = requestData && requestData.length > 0 ? requestData.every((row) => row.isSelected) : false;
     const [totalPage, setTotalPage] = useState<number>(0);
     const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
-    const [filter, setFilter] = useState<Filter>({
-            table: selectBoxOptions[0].table!,
-            column: selectBoxOptions[0].column!,
-            operator: "LIKE",
-            value: ""
-    })
-    const [search, setSearch] = useState<Query>({size:10, page:1, filter_groups:[{filters:[defaultFilter]}]});
+    const [search, setSearch] = useState<Query>(defaultSearch);
+    const [searchFilter, setSearchFilter] = useState<Filter | undefined>(undefined);
+    const [orderDateFilter, setOrderDateFilter] = useState<FilterGroup>()
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage =>({
@@ -92,22 +98,26 @@ export default function DownloadTable() {
     }
 
     useEffect(() => {
-        setSearch((prevSearch) => ({
-            ...prevSearch,
+        const updatedSearch = {
+            ...search,
             filter_groups: [
+                ...(orderDateFilter ? [orderDateFilter] : []),
+                {
+                    condition_type: "OR",
+                    filters: [
+                        deliveredFilter,
+                        completedFilter,
+                    ],
+                },
                 {
                     filters: [
-                        defaultFilter,
-                        filter
+                        ...(searchFilter ? [searchFilter] : [])
                     ]
                 }
-            ]
-        }));
-    }, [filter]);
-
-    useEffect(() => {
-        fetchData(search)
-    }, [search]);
+            ],
+        };
+        fetchData(updatedSearch);
+    }, [search,searchFilter,orderDateFilter]);
 
     const handleDownloadOnClick = async (report: Report, request: Request) => {
         try {
@@ -155,10 +165,35 @@ export default function DownloadTable() {
     }
 
     return (
-        <div className={style.container}>
-            <section className={downloadStyle.filterContainer}>
-                <div className={downloadStyle.filterContainerRight}>
-                    <BlueButton name={"Batch Download"} onClick={handleBatchDownloadClick}/>
+        <div className={globalTableStyle.container}>
+            <div className={globalTableStyle.formGroupRight}>
+                <BlueButton name={"Batch Download"} onClick={handleBatchDownloadClick}/>
+            </div>
+            <div className={globalTableStyle.formGroupBetween}>
+                <div>
+                    <DatePickerRangeBox
+                        label={"from-to"}
+                        onChange={(from, to) => {
+                            setOrderDateFilter(
+                                from && to ? {
+                                    filters: [
+                                        {
+                                            table: "request",
+                                            column: "specified_at",
+                                            value: from?.toLocaleDateString('en-CA'),
+                                            operator: ">="
+                                        },
+                                        {
+                                            table: "request",
+                                            column: "specified_at",
+                                            value: to.toLocaleDateString('en-CA'),
+                                            operator: "<="
+                                        }
+                                    ]
+                                } as FilterGroup : undefined
+                            )
+                        }}
+                    />
                 </div>
                 <div className={downloadStyle.filterContainerLeft}>
                     <SelectBox
@@ -168,42 +203,45 @@ export default function DownloadTable() {
                         label={"filter"}
                         onChange={(option) => {
                             setSelectedOption(option);
-                            setFilter(prev => ({
-                                ...prev,
-                                table: option.table!,
-                                column: option.column!
-                            }))
                         }}
                     />
                     <InputBox label={"search"} onChange={(value) => {
-                        setFilter(prev => ({
-                            ...prev,
-                            value: value
-                        }))
+                        setSearchFilter(
+                            value && value.trim() !== ""
+                                ? {
+                                    table: selectedOption.table,
+                                    column: selectedOption.column,
+                                    operator: "LIKE",
+                                    value: value
+                                } as Filter
+                                : undefined
+                        );
                     }}></InputBox>
                 </div>
-            </section>
-            <section className={style.tableContainer}>
-                <table className={style.table}>
+            </div>
+            <section className={globalTableStyle.tableContainer}>
+                <table className={globalTableStyle.table}>
                     <thead>
                     <tr>
                         <th>
-                            <label form="agree" className={style.checkbox}>
+                            <label form="agree" className={globalTableStyle.checkbox}>
                                 <input
                                     type="checkbox"
                                     checked={isSelectedAll}
                                     onChange={() => handleSelectAll(!isSelectedAll)}
-                                    className={style.checkbox}
+                                    className={globalTableStyle.checkbox}
                                 />
-                                <span className={style.checkmark}></span>
+                                <span className={globalTableStyle.checkmark}></span>
                             </label>
                         </th>
-                        <th>Registration Number</th>
+                        <th>Specified At<br/>(DD-MM-YYYY)</th>
+                        <th>User Name</th>
+                        <th>Institution</th>
+                        <th>Registration ID</th>
                         <th>Service</th>
                         <th>Patient(s) Name</th>
                         <th>MRN</th>
-                        <th>Institution</th>
-                        <th>Report out<br/>(YYYY/MM/DD)</th>
+                        <th>Report Date<br/>(YYYY/MM/DD)</th>
                         <th>Status</th>
                         <th>Report Download</th>
                     </tr>
@@ -212,21 +250,23 @@ export default function DownloadTable() {
                     {requestData.map((request, rowIndex) => (
                         <tr key={request!.sample!.barcode! + request!.service!.id!}>
                             <td>
-                                <label form="agree" className={style.checkbox}>
+                                <label form="agree" className={globalTableStyle.checkbox}>
                                     <input
                                         type="checkbox"
                                         checked={request.isSelected || false}
                                         onChange={() => handleSelectChange(rowIndex, !request.isSelected)}
-                                        className={style.checkbox}
+                                        className={globalTableStyle.checkbox}
                                     />
-                                    <span className={style.checkmark}></span>
+                                    <span className={globalTableStyle.checkmark}></span>
                                 </label>
                             </td>
+                            <td>{request.specified_at ? new Date(request.specified_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
+                            <td>{request.order?.user?.name}</td>
+                            <td>{request.sample?.patient?.organization?.name}</td>
                             <td>{request.sample?.barcode}</td>
                             <td>{request.service?.name}</td>
                             <td>{request.sample?.patient?.name}</td>
                             <td>{request.sample?.patient?.serial}</td>
-                            <td>{request.sample?.patient?.organization?.name}</td>
                             <td>{request.reported_at ? new Date(request.reported_at).toLocaleDateString() : '-'}</td>
                             <td>{request.status}</td>
                             <td>
@@ -243,9 +283,9 @@ export default function DownloadTable() {
                     </tbody>
                 </table>
             </section>
-            <div className={style.pagination}>
+            <div className={globalTableStyle.pagination}>
                 <span>items per page:</span>
-                <div className={style.select}>
+                <div className={globalTableStyle.select}>
                     <select onChange={handlePageSizeChange}>
                         <option value="10">10</option>
                         <option value="20">20</option>
@@ -254,13 +294,13 @@ export default function DownloadTable() {
                 </div>
                 <span> 1-{totalPage} of {search.page} </span>
                 <button
-                    className={style.pageButton}
+                    className={globalTableStyle.pageButton}
                     disabled={search.page === 1}
                     onClick={() => handlePageChange((search.page ?? 1) - 1)}
                 ><FontAwesomeIcon icon={faAngleLeft}/>
                 </button>
                 <button
-                    className={style.pageButton}
+                    className={globalTableStyle.pageButton}
                     disabled={search.page === totalPage}
                     onClick={() => handlePageChange((search.page ?? 1) + 1)}
                 ><FontAwesomeIcon icon={faAngleRight}/>

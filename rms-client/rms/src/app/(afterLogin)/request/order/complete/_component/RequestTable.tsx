@@ -124,7 +124,8 @@ export default function RequestTable() {
                                     ]
                                 } as FilterGroup : undefined
                             )
-                        }}/>
+                        }}
+                    />
                 </div>
                 <div>
                     <SelectBox
@@ -134,10 +135,6 @@ export default function RequestTable() {
                         label={"filter"}
                         onChange={(option) => {
                             setSelectedOption(option);
-                            setSearchFilter({
-                                table: option.table!,
-                                column: option.column!
-                            } as Filter)
                         }}
                     />
                     <InputBox label={"search"} onChange={(value) => {
