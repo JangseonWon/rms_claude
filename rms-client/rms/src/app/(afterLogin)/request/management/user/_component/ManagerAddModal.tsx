@@ -19,7 +19,10 @@ type Props = {
 
 const selectBoxOptions: SelectBoxOption[] = [
     { table: "organization", column: "name", name: "LIMS", value: "123" },
-    { table: "organization", column: "name", name: "해외사업팀", value: "124" }
+    { table: "organization", column: "name", name: "해외사업팀", value: "124" },
+    { table: "organization", column: "name", name: "영업본부", value: "125" },
+    { table: "organization", column: "name", name: "분석본부", value: "126" },
+    { table: "organization", column: "name", name: "기타", value: "127" },
 ];
 
 export default function ManagerAddModal({closeModal}: Props) {
