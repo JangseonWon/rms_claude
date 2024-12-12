@@ -31,9 +31,8 @@ class AlisRouter (
         PUT("/w-api/management-service/alis/extensions", :: extensions)
     }
     private fun users(request: ServerRequest): Mono<ServerResponse> {
-        return authenticationHandler.chkManager(request)
-            .then(request.bodyToMono(Query::class.java))
-            .flatMap { alisHandler.updateUsers(it) }
+        return authenticationHandler.chkManager(request).zipWith(request.bodyToMono(Query::class.java))
+            .flatMap { alisHandler.updateUsers(it.t1.user.id!!, it.t2) }
             .flatMap {
                 ServerResponse.ok()
                     .header("X-Total-Count", it.totalCount.toString())

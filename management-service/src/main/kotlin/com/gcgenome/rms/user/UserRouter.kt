@@ -55,9 +55,8 @@ class UserRouter(
     }
 
     private fun insertManager(request: ServerRequest): Mono<ServerResponse> {
-        return authenticationHandler.chkManager(request)
-            .then(request.bodyToMono(User::class.java))
-            .flatMap { user -> userHandler.insertManager(user) }
+        return authenticationHandler.chkManager(request).zipWith(request.bodyToMono(User::class.java))
+            .flatMap { userHandler.insertManager(it.t1.user.id!!, it.t2) }
             .flatMap { ServerResponse.ok().build() }
             .onErrorResume (ServerWebInputException::class.java) { ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue(WebInputException().message.toString()) }
             .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}")}

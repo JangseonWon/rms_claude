@@ -12,7 +12,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 interface UserDao : QueryDao{
-    fun DSLContext.upsertUsers(alisOrganization: AlisOrganization, pwd: String): Mono<Int> {
+    fun DSLContext.upsertUsers(alisOrganization: AlisOrganization, pwd: String): Mono<UserDTO> {
         return Mono.from(
             insertInto(USER)
                 .set(USER.ID, alisOrganization.compCode)
@@ -29,10 +29,11 @@ interface UserDao : QueryDao{
                 .set(USER.NAME, alisOrganization.compName)
                 .set(USER.BRANCH_SERIAL, alisOrganization.compMngBeginNo)
                 .set(USER.BRANCH_NAME, alisOrganization.compMngName)
-        )
+                .returning()
+        ).map { it.into(UserDTO::class.java) }
     }
 
-    fun DSLContext.insertManager(dto: User): Mono<User> {
+    fun DSLContext.insertManager(dto: User): Mono<UserDTO> {
         return Mono.from(
             insertInto(USER)
                 .set(USER.ID, dto.id)
@@ -48,7 +49,7 @@ interface UserDao : QueryDao{
                 .set(USER.PHONE_NUMBER, dto.phoneNumber)
                 .set(USER.CREATE_AT, LocalDateTime.now())
                 .returning()
-        ).map { it.into(User::class.java) }
+        ).map { it.into(UserDTO::class.java) }
     }
 
     fun DSLContext.selectUserWithServicesQuery(userId: String, query: Query): Mono<UserDTO> {
@@ -108,7 +109,7 @@ interface UserDao : QueryDao{
         ).map { it.into(UserDTO::class.java) }
     }
 
-    fun DSLContext.updateUserById(user: UserDTO): Mono<UserDTO> {
+    fun DSLContext.updateUserById(user: UserDTO): Mono<User> {
         return Mono.from(
             update(USER)
                 .set(USER.NAME, coalesce(`val`(user.name), USER.NAME))
@@ -120,6 +121,6 @@ interface UserDao : QueryDao{
                 .set(USER.STATE, coalesce(`val`(user.state), USER.STATE))
                 .where(USER.ID.eq(user.id))
                 .returningResult(USER.ID,USER.NAME,USER.ROLE,USER.TYPE,USER.EMAIL,USER.PHONE_NUMBER,USER.STATE,USER.BRANCH_SERIAL,USER.BRANCH_NAME,USER.CREATE_AT)
-        ).map{it.into(UserDTO::class.java)}
+        ).map{it.into(User::class.java)}
     }
 }

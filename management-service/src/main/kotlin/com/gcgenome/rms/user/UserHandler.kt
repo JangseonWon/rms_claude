@@ -4,6 +4,7 @@ import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.dao.*
 import com.gcgenome.rms.data.*
 import com.gcgenome.rms.exception.UserNotFoundException
+import com.gcgenome.rms.history.UserHistoryHandler
 import com.gcgenome.rms.tables.pojos.User
 import com.gcgenome.rms.tables.pojos.UserHistory
 import org.jooq.DSLContext
@@ -16,6 +17,7 @@ import reactor.core.publisher.Mono
 class UserHandler(
     val dslContext: DSLContext,
     val encoder: BCryptPasswordEncoder,
+    val userHistoryHandler: UserHistoryHandler
 ): UserServiceDao, ServiceDao, UserDao, OrganizationDao, UserHistoryDao {
     fun selectUser(userId: String): Mono<UserDTO> {
         return Mono.from(dslContext.selectUserById(userId))
@@ -43,56 +45,24 @@ class UserHandler(
                                     .flatMap { service -> insertUserService(user.id, service.id!!) }
                                 ).then()
                             } ?: Mono.empty()
-                    ).then(insertUserUpdateLog(hostUserId, user))
+                    ).then(userHistoryHandler.logUserChanges(dsl(), hostUserId, user))
             }
         })
     }
 
-    fun insertManager(user: User): Mono<User>{
+    fun insertManager(hostId: String, user: User): Mono<UserHistory>{
         return if (!isPasswordValid(user.password!!)) {
             Mono.error(IllegalArgumentException("Password does not meet the required criteria."))
         } else {
             Mono.from(dslContext.transactionPublisher { trx ->
-                trx.dsl().run { insertManager(user.apply { password = encoder.encode(user.password) }) }
+                trx.dsl().run {
+                    insertManager(user.apply { password = encoder.encode(user.password) })
+                        .flatMap { manager ->
+                            userHistoryHandler.logUserChanges(dsl(), hostId, manager)
+                        }
+                }
             })
         }
-    }
-
-    fun insertUserUpdateLog(hostUserId: String, updateUser: UserDTO): Mono<UserHistory> {
-        return Mono.from(dslContext.transactionPublisher { trx ->
-            val userId = updateUser.id
-            trx.dsl().run {
-                selectUserById(userId).flatMap { oldUser ->
-                    val fieldsToCompare = listOf(
-                        "name" to Pair(oldUser.name, updateUser.name),
-                        "password" to Pair(oldUser.password, updateUser.password),
-                        "phone_number" to Pair(oldUser.phoneNumber, updateUser.phoneNumber),
-                        "branch_name" to Pair(oldUser.branchName, updateUser.branchName),
-                        "branch_serial" to Pair(oldUser.branchSerial, updateUser.branchSerial),
-                        "email" to Pair(oldUser.email, updateUser.email),
-                        "state" to Pair(oldUser.state, updateUser.state)
-                    )
-
-                    val userHistoryEntries = fieldsToCompare.mapNotNull { (fieldName, values) ->
-                        val (oldValue, newValue) = values
-                        if (newValue != null && oldValue != newValue) {
-                            UserHistoryDTO(
-                                userId = userId,
-                                changedBy = hostUserId,
-                                fieldName = fieldName,
-                                oldValue = oldValue,
-                                newValue = newValue
-                            )
-                        } else null
-                    }
-
-                    Flux.fromIterable(userHistoryEntries)
-                        .flatMap { insertUserHistory(it) }
-                        .collectList()
-                        .mapNotNull { it.lastOrNull() }
-                }
-            }
-        })
     }
 
     fun isPasswordValid(password: String): Boolean {

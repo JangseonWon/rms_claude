@@ -5,36 +5,53 @@ import com.gcgenome.rms.dao.SampleTypeDao
 import com.gcgenome.rms.dao.ServiceDao
 import com.gcgenome.rms.dao.UserDao
 import com.gcgenome.rms.data.*
-import com.gcgenome.rms.tables.pojos.SampleType
+import com.gcgenome.rms.history.UserHistoryHandler
 import org.jooq.DSLContext
-import org.jooq.impl.DSL
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 @Component
 class AlisHandler(
     val dslContext: DSLContext,
-    val encoder: BCryptPasswordEncoder
+    val encoder: BCryptPasswordEncoder,
+    val userHistoryHandler: UserHistoryHandler
 ):ServiceDao, SampleTypeDao,ExtensionDao, UserDao {
     private val webClient = WebClient.builder().baseUrl("https://rms-test.gcgenome.com").build()
 
-    fun updateUsers(query: Query): Mono<Page<UserDTO>> {
+    fun updateUsers(userId: String, query: Query): Mono<Page<UserDTO>> {
         return webClient.get()
             .uri("/w-api/alis-api/organizations")
             .retrieve()
             .bodyToFlux(AlisOrganization::class.java)
-            .flatMap { alisOrganization ->
+            .concatMap { alisOrganization ->
                 dslContext.transactionPublisher { trx ->
                     trx.dsl().run {
                         val pwd = encoder.encode("GCGenome00!")
-                        upsertUsers(alisOrganization, pwd)
+                        checkDeferByAlis(dsl(), alisOrganization).flatMap { isDifferent ->
+                            if (isDifferent) {
+                                upsertUsers(alisOrganization, pwd)
+                                    .flatMap { userHistoryHandler.logUserChanges(trx.dsl(), userId, it) }
+                            } else {
+                                Mono.empty()
+                            }
+                        }
                     }
                 }
             }
             .then(dslContext.selectUsersWithPage(query))
+    }
+
+    fun checkDeferByAlis(dsl: DSLContext, alisUser: AlisOrganization): Mono<Boolean> {
+        return Mono.from(
+            dsl.selectUserById(alisUser.compCode).map { user ->
+                val isDifferent = (user.name != alisUser.compName) ||
+                        (user.branchSerial != alisUser.compMngBeginNo) ||
+                        (user.branchName != alisUser.compMngName)
+                isDifferent
+            }.switchIfEmpty(Mono.just(true))
+        )
     }
 
     fun updateServices(query: Query): Mono<Page<ServiceDTO>> {
