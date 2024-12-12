@@ -30,6 +30,8 @@ data class RequestDTO(
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("reported_at")
     var reportedAt: LocalDateTime? = null,
+    @JsonProperty("specified_at")
+    var specifiedAt: LocalDateTime? = null,
     var service: ServiceDTO? = null,
     var sample: SampleDTO? = null,
     var reports: List<ReportDTO>? = null,

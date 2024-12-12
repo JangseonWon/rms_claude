@@ -38,6 +38,7 @@ interface RequestDao: QueryDao{
             REQUEST.STATUS.`as`("status"),
             REQUEST.PHYSICIAN.`as`("physician"),
             REQUEST.REPORTED_AT.`as`("reported_at"),
+            REQUEST.SPECIFIED_AT.`as`("specified_at"),
             jsonObject(
                 key("id").value(SERVICE.ID),
                 key("name").value(SERVICE.NAME)
@@ -45,7 +46,8 @@ interface RequestDao: QueryDao{
             jsonObject(
                 key("id").value(ORDER.ID),
                 key("user").value(jsonObject(
-                    key("id").value(USER.ID)
+                    key("id").value(USER.ID),
+                    key("name").value(USER.NAME)
                 ))
             ).`as`("order"),
             jsonObject(
@@ -79,7 +81,7 @@ interface RequestDao: QueryDao{
             ).`as`("reports")
         )
         val groupByFields = listOf(
-            REQUEST.USER_SERVICE_ID, REQUEST.STATUS, REQUEST.PHYSICIAN, REQUEST.REPORTED_AT,
+            REQUEST.USER_SERVICE_ID, REQUEST.STATUS, REQUEST.PHYSICIAN, REQUEST.REPORTED_AT, REQUEST.SPECIFIED_AT,
             ORDER.ID,
             SERVICE.ID,
             USER.ID,
@@ -94,7 +96,7 @@ interface RequestDao: QueryDao{
     fun DSLContext.updateRequestStatusFinish(request: RequestDTO): Mono<RequestDTO> {
         return Mono.from(
             update(REQUEST)
-                .set(REQUEST.STATUS, Status.FINISHED.toString())
+                .set(REQUEST.STATUS, Status.COMPLETED.toString())
                 .set(REQUEST.COMPLETE_AT, LocalDateTime.now())
                 .where(
                     REQUEST.ORDER_ID.eq(request.order!!.id)
