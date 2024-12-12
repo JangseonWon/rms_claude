@@ -13,7 +13,7 @@ data class UserHistory(
     val id: Long,
     @Column(name = "field_name", nullable = false, length = 64)
     val fieldName: String,
-    @Column(name = "old_value", nullable = false, length = 255)
+    @Column(name = "old_value", nullable = true, length = 255)
     val oldValue: String,
     @Column(name = "new_value", nullable = false, length = 255)
     val newValue: String,
