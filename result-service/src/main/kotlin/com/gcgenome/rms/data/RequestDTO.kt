@@ -32,6 +32,10 @@ data class RequestDTO(
     var reportedAt: LocalDateTime? = null,
     @JsonProperty("specified_at")
     var specifiedAt: LocalDateTime? = null,
+    @JsonProperty("resample_at")
+    var resampleAt: LocalDateTime? = null,
+    @JsonProperty("complete_at")
+    var completeAt: LocalDateTime? = null,
     var service: ServiceDTO? = null,
     var sample: SampleDTO? = null,
     var reports: List<ReportDTO>? = null,

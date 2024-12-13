@@ -11,7 +11,6 @@ import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.router
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.util.*
 
@@ -22,7 +21,8 @@ class RequestRouter (
 ) {
     @Bean("RequestRouter")
     fun route() = router {
-        POST("/w-api/result-service/requests", ::selectRequests)
+        POST("/w-api/result-service/requests/search", ::selectRequests)
+        PATCH("/w-api/result-service/requests", :: updateRequests)
     }
 
     private fun selectRequests(request: ServerRequest): Mono<ServerResponse> {
@@ -36,6 +36,14 @@ class RequestRouter (
                 .header("X-Current-Page", it.currentPage.toString())
                 .body(Mono.just(it.data), RequestDTO::class.java) }
             .switchIfEmpty(ServerResponse.status(HttpStatus.NO_CONTENT).build())
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}") }
+            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Error: ${e.cause}") }
+    }
+    private fun updateRequests(request: ServerRequest): Mono<ServerResponse> {
+        return authenticationHandler.principal(request)
+            .then(request.bodyToMono(Array<RequestDTO>::class.java))
+            .flatMap { requestHandler.updateRequests(it.toList()) }
+            .then(ServerResponse.ok().build())
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}") }
             .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Error: ${e.cause}") }
     }

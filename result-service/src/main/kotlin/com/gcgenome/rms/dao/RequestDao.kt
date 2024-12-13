@@ -8,6 +8,18 @@ import reactor.core.publisher.Mono
 import java.time.LocalDateTime
 
 interface RequestDao: QueryDao{
+    fun DSLContext.updateRequests(request: RequestDTO): Mono<RequestDTO> {
+        return Mono.from(
+            update(REQUEST)
+                .set(REQUEST.STATUS,coalesce(`val`(request.status?.name), REQUEST.STATUS))
+                .set(REQUEST.COMPLETE_AT,coalesce(`val`(request.completeAt), REQUEST.COMPLETE_AT))
+                .where(
+                    REQUEST.SAMPLE_ID.eq(request.sample!!.id),
+                    REQUEST.SERVICE_ID.eq(request.service!!.id)
+                )
+                .returning()
+        ).map { it.into(RequestDTO::class.java) }
+    }
 
     fun DSLContext.selectRequestsWithPage(query: Query): Mono<Page<RequestDTO>> {
         val joins = listOf(
@@ -39,6 +51,7 @@ interface RequestDao: QueryDao{
             REQUEST.PHYSICIAN.`as`("physician"),
             REQUEST.REPORTED_AT.`as`("reported_at"),
             REQUEST.SPECIFIED_AT.`as`("specified_at"),
+            REQUEST.RESAMPLE_AT.`as`("resample_at"),
             jsonObject(
                 key("id").value(SERVICE.ID),
                 key("name").value(SERVICE.NAME)
@@ -81,7 +94,7 @@ interface RequestDao: QueryDao{
             ).`as`("reports")
         )
         val groupByFields = listOf(
-            REQUEST.USER_SERVICE_ID, REQUEST.STATUS, REQUEST.PHYSICIAN, REQUEST.REPORTED_AT, REQUEST.SPECIFIED_AT,
+            REQUEST.USER_SERVICE_ID, REQUEST.STATUS, REQUEST.PHYSICIAN, REQUEST.REPORTED_AT, REQUEST.SPECIFIED_AT, REQUEST.RESAMPLE_AT,
             ORDER.ID,
             SERVICE.ID,
             USER.ID,

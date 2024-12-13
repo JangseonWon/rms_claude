@@ -2,13 +2,12 @@ package com.gcgenome.rms.request
 
 import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.dao.RequestDao
-import com.gcgenome.rms.data.Page
-import com.gcgenome.rms.data.Query
-import com.gcgenome.rms.data.RequestDTO
-import com.gcgenome.rms.data.Role
+import com.gcgenome.rms.data.*
 import org.jooq.DSLContext
 import org.springframework.stereotype.Component
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import java.time.LocalDateTime
 
 @Component
 class RequestHandler(
@@ -31,5 +30,19 @@ class RequestHandler(
             )
         }
         return dslContext.selectRequestsWithPage(query)
+    }
+
+    fun updateRequests(requests: List<RequestDTO>): Mono<Void> {
+        return Mono.from(dslContext.transactionPublisher { trx ->
+            trx.dsl().run {
+                Flux.fromIterable(requests)
+                    .flatMap { request ->
+                        if(request.status == Status.COMPLETED) {
+                            request.apply { completeAt = LocalDateTime.now() }
+                        }
+                        updateRequests(request)
+                    }.then()
+            }
+        })
     }
 }
