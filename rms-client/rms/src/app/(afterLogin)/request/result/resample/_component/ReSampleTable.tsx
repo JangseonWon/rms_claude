@@ -1,18 +1,46 @@
 "use client"
 
 import type {Request} from "@/model/Request";
+import React, {useEffect, useState} from "react";
+import {SelectBoxOption} from "@/model/SelectBoxOption";
+import {FilterGroup, Query} from "@/model/Query";
+import {Filter} from "@/model/Filter";
+import {postRequests} from "@/app/(afterLogin)/request/result/download/_api/postRequests";
+import globalTableStyle from "@/css/globalTable.module.css";
+import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
+import downloadStyle from "@/app/(afterLogin)/request/result/download/_component/downloadTable.module.css";
+import SelectBox from "@/app/_component/SelectBox";
+import InputBox from "@/app/_component/InputBox";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
+import {Status} from "@/model/Status";
+import {patchRequests} from "@/app/(afterLogin)/request/result/download/_api/patchRequests";
 
-interface RequestWithSelected extends Request {
-    isSelected?: boolean;
+const selectBoxOptions: SelectBoxOption[] = [
+    { table: "user", column: "name", name: "User Name" },
+    { table: "organization", column: "name", name: "Institution" },
+    { table: "sample", column: "barcode", name: "Registration ID" },
+    { table: "service", column: "name", name: "Service" },
+    { table: "patient", column: "name", name: "Patient(s) Name" },
+    { table: "patient", column: "serial", name: "MRN" }
+];
+
+const defaultSearch: Query = {size:10, page:1}
+const defaultFilter: Filter = {
+    table: "request",
+    column: "status",
+    operator: "=",
+    value: Status.TEST_FAILED.valueOf()
 }
 
+
 export default function ReSampleTable() {
-    return null
-    /*const [requestData, setRequestData] = useState<RequestWithSelected[]>([]);
-    const isSelectedAll = requestData && requestData.length > 0 ? requestData.every((row) => row.isSelected) : false;
-    const [search, setSearch] =
-        useState<Query>({filters: [], sort_by:"status", asc: true, size:10, page:1});
+    const [requestData, setRequestData] = useState<Request[]>([]);
     const [totalPage, setTotalPage] = useState<number>(0);
+    const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
+    const [search, setSearch] = useState<Query>(defaultSearch);
+    const [searchFilter, setSearchFilter] = useState<Filter | undefined>(undefined);
+    const [orderDateFilter, setOrderDateFilter] = useState<FilterGroup>()
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage =>({
@@ -20,7 +48,6 @@ export default function ReSampleTable() {
             page: newPageNumber
         }));
     };
-
     const handlePageSizeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const newSize = parseInt(event.target.value);
         setSearch(prevSearch => ({
@@ -29,45 +56,40 @@ export default function ReSampleTable() {
             page: 1
         }));
     };
-
-    const handleSelectChange = (rowIndex: number, isSelected: boolean) => {
-        setRequestData((prevData) => {
-            const updatedData = [...prevData];
-            updatedData[rowIndex].isSelected = isSelected;
-            return updatedData;
-        });
-    };
-
-    const handleSearchChange = (newFilter: { key: string; value: string }) => {
-        setSearch((prevSearch) => {
-            const updatedFilters = prevSearch.filters?.slice() || [];
-            const existingFilterIndex = updatedFilters.findIndex((filter) => filter.key === newFilter.key)
-            if (existingFilterIndex !== -1) updatedFilters[existingFilterIndex] = newFilter;
-            else updatedFilters.push(newFilter);
-            return { ...prevSearch, filters: updatedFilters, page:1 }
-        });
-    };
-
-    const handleSelectAll = (isSelected: boolean) => {
-        setRequestData((prevData) =>
-            prevData.map((row) => ({ ...row, isSelected }))
-        );
-    };
-
-    const handleRequestOnClick = () => {
-        alert("request");
+    const handleCancel = async (request: Request) => {
+        const result = confirm("취소하시겠습니까?")
+        const updateRequest: Request = {
+            sample: {id: request.sample?.id},
+            service: {id: request.service?.id},
+            status: Status.COMPLETED.valueOf()
+        }
+        if (result){
+            const response = await patchRequests([updateRequest])
+            if(response.ok){
+                const updatedSearch = {
+                    ...search,
+                    filter_groups: [
+                        ...(orderDateFilter ? [orderDateFilter] : []),
+                        {
+                            filters: [
+                                defaultFilter,
+                                ...(searchFilter ? [searchFilter] : []),
+                            ],
+                        }
+                    ],
+                };
+                fetchData(updatedSearch);
+            }
+        }
     }
-    const handleClosedOnClick = () => {
-        alert("closed");
-    }
+
 
     const fetchData = async (search: Query) => {
         try {
-            const response = await fetchFinishedOrder(search)
+            const response = await postRequests(search)
             const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
             const responseData = await response.json();
-            const data = responseData.data;
-            setRequestData(data as Request[]);
+            setRequestData(responseData as Request[]);
             setTotalPage(totalPage)
         } catch(error) {
             console.error("Failed to fetch data:", error);
@@ -76,107 +98,134 @@ export default function ReSampleTable() {
         }
     }
 
-    const handleResampleOnClick = () => {
-        alert('Resample Click');
-    }
-
     useEffect(() => {
-        fetchData(search)
-    }, [search]);
+        const updatedSearch = {
+            ...search,
+            filter_groups: [
+                ...(orderDateFilter ? [orderDateFilter] : []),
+                {
+                    filters: [
+                        defaultFilter,
+                        ...(searchFilter ? [searchFilter] : []),
+                    ],
+                }
+            ],
+        };
+        fetchData(updatedSearch);
+    }, [search,searchFilter,orderDateFilter]);
+
 
     return (
-        <>
-            <section className={style.filterContainer}>
-                <div className={style.filterContainerLeft}>
+        <div className={globalTableStyle.container}>
+            <div className={globalTableStyle.formGroupBetween}>
+                <div>
                     <DatePickerRangeBox
-                        label={"date-from-to"}
+                        label={"from-to"}
                         onChange={(from, to) => {
-                            handleSearchChange({key: "date_from", value: format(from, "yyyy-MM-dd")})
-                            handleSearchChange({key: "date_to", value: format(to, "yyyy-MM-dd")})
-                        }}/>
+                            setOrderDateFilter(
+                                from && to ? {
+                                    filters: [
+                                        {
+                                            table: "request",
+                                            column: "specified_at",
+                                            value: from?.toLocaleDateString('en-CA'),
+                                            operator: ">="
+                                        },
+                                        {
+                                            table: "request",
+                                            column: "specified_at",
+                                            value: to.toLocaleDateString('en-CA'),
+                                            operator: "<="
+                                        }
+                                    ]
+                                } as FilterGroup : undefined
+                            )
+                        }}
+                    />
                 </div>
-                <div className={style.filterContainerRight}>
+                <div className={downloadStyle.filterContainerLeft}>
+                    <SelectBox
+                        width={"200px"}
+                        value={selectedOption.name}
+                        options={selectBoxOptions}
+                        label={"filter"}
+                        onChange={(option) => {
+                            setSelectedOption(option);
+                        }}
+                    />
                     <InputBox label={"search"} onChange={(value) => {
-                        handleSearchChange({key: "search", value: value})
+                        setSearchFilter(
+                            value && value.trim() !== ""
+                                ? {
+                                    table: selectedOption.table,
+                                    column: selectedOption.column,
+                                    operator: "LIKE",
+                                    value: value
+                                } as Filter
+                                : undefined
+                        );
                     }}></InputBox>
                 </div>
-            </section>
-            <section>
-                <div className={style.reSampleButton}>
-                    <GreenButton name={"Re-Sample"} onClick={handleResampleOnClick}/>
-                </div>
-            </section>
-            <section className={style.tableContainer}>
-                <table className={style.table}>
+            </div>
+            <section className={globalTableStyle.tableContainer}>
+                <table className={globalTableStyle.table}>
                     <thead>
                     <tr>
-                    <th>
-                            <label form="agree" className={style.checkbox}>
-                                <input
-                                    type="checkbox"
-                                    checked={isSelectedAll}
-                                    onChange={() => handleSelectAll(!isSelectedAll)}
-                                    className={style.checkbox}
-                                />
-                                <span className={style.checkmark}></span>
-                            </label>
-                        </th>
-                        <th>Registration Number</th>
+                        <th>Specified At<br/>(DD-MM-YYYY)</th>
+                        <th>User Name</th>
+                        <th>Institution</th>
+                        <th>Registration ID</th>
+                        <th>Service</th>
                         <th>Patient(s) Name</th>
                         <th>MRN</th>
-                        <th>Resample Notice<br/>(YYYY/MM/DD)</th>
                         <th>Reason</th>
-                        <th>Resample</th>
-                        <th>Closed</th>
+                        <th>Resample Notice</th>
+                        <th>Request</th>
+                        <th>Cancel</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {requestData && requestData.length > 0 && requestData.map((row, rowIndex) => (
-                        <tr key={row.order_id! + row.service!.id + row.sample!.id}>
-                            <td>
-                                <label form="agree" className={style.checkbox}>
-                                    <input
-                                        type="checkbox"
-                                        checked={row.isSelected || false}
-                                        onChange={() => handleSelectChange(rowIndex, !row.isSelected)}
-                                        className={style.checkbox}
-                                    />
-                                    <span className={style.checkmark}></span>
-                                </label>
-                            </td>
-                            <td>{row.sample?.barcode}</td>
-                            <td>{row.sample?.patient?.name}</td>
-                            <td>{row.sample?.patient?.serial}</td>
-                            <td>{row.resample_at ? new Date(row.resample_at).toLocaleDateString() : 'N/A'}</td>
-                            <td>{row.sample?.resample_reason}</td>
-                            <td className={style.request} onClick={handleRequestOnClick}>Request</td>
-                            <td className={style.closed} onClick={handleClosedOnClick}>Closed</td>
+                    {requestData.map((request, rowIndex) => (
+                        <tr key={request!.sample!.barcode! + request!.service!.id!}>
+                            <td>{request.specified_at ? new Date(request.specified_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
+                            <td>{request.order?.user?.name}</td>
+                            <td>{request.sample?.patient?.organization?.name}</td>
+                            <td>{request.sample?.barcode}</td>
+                            <td>{request.service?.name}</td>
+                            <td>{request.sample?.patient?.name}</td>
+                            <td>{request.sample?.patient?.serial}</td>
+                            <td>Reason</td>
+                            <td>{request.resample_at ? new Date(request.resample_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
+                            <td className={globalTableStyle.underlineBlue}>Request</td>
+                            <td className={globalTableStyle.underlineRed} onClick={() => handleCancel(request)}>Cancel</td>
                         </tr>
                     ))}
                     </tbody>
                 </table>
-                <div className={style.pagination}>
-                    <span>items per page:</span>
-                    <div className={style.select}>
-                        <select onChange={handlePageSizeChange}>
-                            <option value="10">10</option>
-                            <option value="20">20</option>
-                            <option value="50">50</option>
-                        </select>
-                    </div>
-                    <span> 1-{totalPage} of {search.page} </span>
-                    <button
-                        disabled={search.page === 1}
-                        onClick={() => handlePageChange((search.page ?? 1) - 1)}
-                    ><FontAwesomeIcon icon={faAngleLeft}/>
-                    </button>
-                    <button
-                        disabled={search.page === totalPage}
-                        onClick={() => handlePageChange((search.page ?? 1) + 1)}
-                    ><FontAwesomeIcon icon={faAngleRight}/>
-                    </button>
-                </div>
             </section>
-        </>
-    );*/
+            <div className={globalTableStyle.pagination}>
+                <span>items per page:</span>
+                <div className={globalTableStyle.select}>
+                    <select onChange={handlePageSizeChange}>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
+                <span> 1-{totalPage} of {search.page} </span>
+                <button
+                    className={globalTableStyle.pageButton}
+                    disabled={search.page === 1}
+                    onClick={() => handlePageChange((search.page ?? 1) - 1)}
+                ><FontAwesomeIcon icon={faAngleLeft}/>
+                </button>
+                <button
+                    className={globalTableStyle.pageButton}
+                    disabled={search.page === totalPage}
+                    onClick={() => handlePageChange((search.page ?? 1) + 1)}
+                ><FontAwesomeIcon icon={faAngleRight}/>
+                </button>
+            </div>
+        </div>
+    );
 }

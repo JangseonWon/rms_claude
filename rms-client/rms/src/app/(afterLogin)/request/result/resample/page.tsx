@@ -1,16 +1,16 @@
 import Title from "@/app/_component/Title";
-import style from "@/app/(afterLogin)/request/result/resample/page.module.css";
+import style from "@/css/requestMainPage.module.css";
 import ReSampleTable from "@/app/(afterLogin)/request/result/resample/_component/ReSampleTable";
 
 export default async function Page() {
     return(
         <div className={style.container}>
-            <section className={style.titleContainer}>
+            <div className={style.title}>
                 <Title/>
-            </section>
-            <section className={style.mainContainer}>
+            </div>
+            <div className={style.contents}>
                 <ReSampleTable/>
-            </section>
+            </div>
         </div>
     )
 }

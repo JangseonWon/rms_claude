@@ -74,6 +74,29 @@
     padding: 8px;
     text-align: center;
 }
+.underlineRed {
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-position : under;
+    text-decoration-color: #859fbf;
+    text-decoration-thickness: 2px;
+}
+.underlineRed:hover {
+    font-weight: bold;
+    text-decoration-thickness: 3px;
+}
+.underlineBlue {
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-position : under;
+    text-decoration-color: #ddefab;
+    text-decoration-thickness: 2px;
+}
+.underlineBlue:hover {
+    font-weight: bold;
+    text-decoration-thickness: 3px;
+}
+
 .pagination {
     display: flex;
     align-items: center;

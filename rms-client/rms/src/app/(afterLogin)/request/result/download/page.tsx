@@ -1,18 +1,16 @@
 import Title from "@/app/_component/Title";
-import style from "@/app/(afterLogin)/request/result/download/page.module.css";
+import style from "@/css/requestMainPage.module.css";
 import DownloadTable from "@/app/(afterLogin)/request/result/download/_component/DownloadTable";
 
 export default async function Page() {
-
-
     return(
         <div className={style.container}>
-            <section className={style.titleContainer}>
+            <div className={style.title}>
                 <Title/>
-            </section>
-            <section className={style.mainContainer}>
+            </div>
+            <div className={style.contents}>
                 <DownloadTable/>
-            </section>
+            </div>
         </div>
     )
 }
