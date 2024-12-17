@@ -26,23 +26,18 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
 
     const handleDownload = async () => {
         const headers = [
-            "Sample Type", //List
-            "Institution", //List
-            "Registration Date", // Date
-            "Ward",
+            "Institution Name", //List
             "Patient Name",
-            "Personal ID Number", // Date
-            "Gender", // List
-            "Physician",
-            "Medical Department",
-            "Collection Date", // Date
-            "Chart Number",
-            "Gestational Age", // Integer
-            "Weight", // Decimal
-            "Fetuses", // Integer
+            "MRN",
+            "Date of Birth", // Date
+            "Sex", // List
+            "Sample Type",
+            "Date of Collection", // Date
             "Quantity", // Decimal
-            "Notes",
-            "Race (Genome Health Premium)",
+            "Medical Department",
+            "Ward",
+            "Physician Name",
+            "Memo",
             ...extensions.map(extension => extension.name),
         ];
         const today = new Date();
@@ -63,113 +58,109 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
         const sampleTypeFormulae = sampleTypeList?.map(sample => `${sample.id}/${sample.name}`).join(',') || '';
         const institutionFormulae = institutionList?.map(institution => `${institution.id}/${institution.name}`).join(',') || '';
 
-        for (let i = 2; i <= 101; i++) {
-            worksheet.getCell(i, 1).dataValidation = {
-                type: 'list',
-                allowBlank: true,
-                formulae: [`"${sampleTypeFormulae}"`],
-                showErrorMessage: true,
-                errorTitle: 'Invalid Gender',
-                error: 'Please check List.',
-            };
+        const rowIndex = 2;
+        worksheet.getCell(rowIndex, 1).dataValidation = {
+            type: 'list',
+            allowBlank: true,
+            formulae: [`"${institutionFormulae}"`],
+            showErrorMessage: true,
+            errorTitle: 'Invalid Institution',
+            error: 'Please check List.',
+        };
 
-            worksheet.getCell(i, 2).dataValidation = {
-                type: 'list',
-                allowBlank: true,
-                formulae: [`"${institutionFormulae}"`],
-                showErrorMessage: true,
-                errorTitle: 'Invalid Gender',
-                error: 'Please check List.',
-            };
+        worksheet.getCell(rowIndex, 4).dataValidation = {
+            type: 'date',
+            allowBlank: true,
+            showErrorMessage: true,
+            errorTitle: 'Invalid Date',
+            error: 'Please enter a valid date (YYYY/MM/DD).',
+            formulae: [new Date(1900, 0, 1), new Date(2100, 11, 31)]
+        };
 
-            worksheet.getCell(i, 3).dataValidation = worksheet.getCell(i, 6).dataValidation = worksheet.getCell(i, 9).dataValidation = {
-                type: 'date',
-                allowBlank: true,
-                showErrorMessage: true,
-                errorTitle: 'Invalid Date',
-                error: 'Please enter a valid date (YYYY/MM/DD).',
-                formulae: [new Date(1900, 0, 1), new Date(2100, 11, 31)]
-            };
+        worksheet.getCell(rowIndex, 5).dataValidation = {
+            type: 'list',
+            allowBlank: true,
+            formulae: ['"Male,Female"'],
+            showErrorMessage: true,
+            errorTitle: 'Invalid Sex',
+            error: 'Please select "Male" or "Female".',
+        };
 
-            worksheet.getCell(i, 7).dataValidation = {
-                type: 'list',
-                allowBlank: true,
-                formulae: ['"Male,Female"'],
-                showErrorMessage: true,
-                errorTitle: 'Invalid Gender',
-                error: 'Please select "Male" or "Female".',
-            };
+        worksheet.getCell(rowIndex, 6).dataValidation = {
+            type: 'list',
+            allowBlank: true,
+            formulae: [`"${sampleTypeFormulae}"`],
+            showErrorMessage: true,
+            errorTitle: 'Invalid SampleType',
+            error: 'Please check List.',
+        };
 
-            worksheet.getCell(i, 12).dataValidation = worksheet.getCell(i, 14).dataValidation = {
-                type: 'whole',
-                allowBlank: true,
-                operator: 'between',
-                formulae: [1, 40],
-                showErrorMessage: true,
-                errorTitle: 'Invalid Number',
-                error: 'Please enter a valid integer.',
-            };
+        worksheet.getCell(rowIndex, 7).dataValidation = {
+            type: 'date',
+            allowBlank: true,
+            showErrorMessage: true,
+            errorTitle: 'Invalid Date',
+            error: 'Please enter a valid date (YYYY/MM/DD).',
+            formulae: [new Date(1900, 0, 1), new Date(2100, 11, 31)]
+        };
 
-            worksheet.getCell(i, 13).dataValidation = worksheet.getCell(i, 13).dataValidation = {
-                type: 'decimal',
-                allowBlank: true,
-                operator: 'between',
-                formulae: [0, 200],
-                showErrorMessage: true,
-                errorTitle: 'Invalid Number',
-                error: 'Please enter a valid decimal number.',
-            };
-        }
+        worksheet.getCell(rowIndex, 8).dataValidation = worksheet.getCell(rowIndex, 8).dataValidation = {
+            type: 'decimal',
+            allowBlank: true,
+            operator: 'between',
+            formulae: [0, 200],
+            showErrorMessage: true,
+            errorTitle: 'Invalid Number',
+            error: 'Please enter a valid decimal number.',
+        };
 
         extensions.forEach((extension, index) => {
             const columnIndex = headers.indexOf(extension.name) + 1;
-            for (let i = 2; i <= 101; i++) {
-                switch (extension.type) {
-                    case ExtensionType.LIST:
-                        worksheet.getCell(i, columnIndex).dataValidation = {
-                            type: 'list',
-                            allowBlank: !extension.required,
-                            formulae: [`"${extension.regex!.replace(/\\b\(\?:|\)\\b/g, '').split('|').join(',')}"`],
-                            showErrorMessage: true,
-                            errorTitle: 'Invalid Selection',
-                            error: `Please select a valid option for ${extension.name}.`,
-                        };
-                        break;
-                    case ExtensionType.INTEGER:
-                        worksheet.getCell(i, columnIndex).dataValidation = {
-                            type: 'whole',
-                            allowBlank: !extension.required,
-                            operator: 'between',
-                            formulae: [0, 1000],
-                            showErrorMessage: true,
-                            errorTitle: 'Invalid Number',
-                            error: `Please enter a valid integer for ${extension.name}.`,
-                        };
-                        break;
-                    case ExtensionType.NUMBER:
-                        worksheet.getCell(i, columnIndex).dataValidation = {
-                            type: 'decimal',
-                            allowBlank: !extension.required,
-                            operator: 'between',
-                            formulae: [-1000, 1000],
-                            showErrorMessage: true,
-                            errorTitle: 'Invalid Decimal',
-                            error: `Please enter a valid number for ${extension.name}.`,
-                        };
-                        break;
-                    case ExtensionType.BOOLEAN:
-                        worksheet.getCell(i, columnIndex).dataValidation = {
-                            type: 'list',
-                            allowBlank: !extension.required,
-                            formulae: ['"true,false"'],
-                            showErrorMessage: true,
-                            errorTitle: 'Invalid Boolean',
-                            error: `Please select true or false for ${extension.name}.`,
-                        };
-                        break;
-                    default:
-                        break;
-                }
+            switch (extension.type) {
+                case ExtensionType.LIST:
+                    worksheet.getCell(rowIndex, columnIndex).dataValidation = {
+                        type: 'list',
+                        allowBlank: !extension.required,
+                        formulae: [`"${extension.regex!.replace(/\\b\(\?:|\)\\b/g, '').split('|').join(',')}"`],
+                        showErrorMessage: true,
+                        errorTitle: 'Invalid Selection',
+                        error: `Please select a valid option for ${extension.name}.`,
+                    };
+                    break;
+                case ExtensionType.INTEGER:
+                    worksheet.getCell(rowIndex, columnIndex).dataValidation = {
+                        type: 'whole',
+                        allowBlank: !extension.required,
+                        operator: 'between',
+                        formulae: [0, 1000],
+                        showErrorMessage: true,
+                        errorTitle: 'Invalid Number',
+                        error: `Please enter a valid integer for ${extension.name}.`,
+                    };
+                    break;
+                case ExtensionType.NUMBER:
+                    worksheet.getCell(rowIndex, columnIndex).dataValidation = {
+                        type: 'decimal',
+                        allowBlank: !extension.required,
+                        operator: 'between',
+                        formulae: [-1000, 1000],
+                        showErrorMessage: true,
+                        errorTitle: 'Invalid Decimal',
+                        error: `Please enter a valid number for ${extension.name}.`,
+                    };
+                    break;
+                case ExtensionType.BOOLEAN:
+                    worksheet.getCell(rowIndex, columnIndex).dataValidation = {
+                        type: 'list',
+                        allowBlank: !extension.required,
+                        formulae: ['"true,false"'],
+                        showErrorMessage: true,
+                        errorTitle: 'Invalid Boolean',
+                        error: `Please select true or false for ${extension.name}.`,
+                    };
+                    break;
+                default:
+                    break;
             }
         });
 

@@ -144,19 +144,11 @@ export default function CartTable() {
     };
 
     const formatDate = (year: number | undefined, month: number | undefined, day: number | undefined) => {
-        const parts = [];
-
-        if (year !== undefined) {
-            parts.push(year.toString());
+        if (year !== undefined && month !== undefined && day !== undefined) {
+            const date = new Date(year, month - 1, day);
+            return format(date, "dd-MMM-yyyy");
         }
-        if (month !== undefined) {
-            parts.push(format(new Date(year ?? 0, month - 1, 1), "MMM"));
-        }
-        if (day !== undefined) {
-            parts.push(day.toString());
-        }
-
-        return parts.length > 0 ? parts.join('-') : '-';
+        return "-";
     };
 
     return (
@@ -236,7 +228,7 @@ export default function CartTable() {
                             </td>
                             <td>{row.sample!.patient!.sex}</td>
                             <td>{row.sample!.patient!.serial}</td>
-                            <td>{row.cart_at ? format(new Date(row.cart_at), "dd-MMM-yyyy") : '-'}</td>
+                            <td>{row.sample?.sampling_on! ? format(new Date(row.sample?.sampling_on!), "dd-MMM-yyyy") : '-'}</td>
                             <td>
                                 <FontAwesomeIcon
                                     icon={faFileLines}

@@ -74,8 +74,14 @@
     background-color: #d3d3d3;
     cursor: pointer;
 }
-.topHeader {
+.header200 {
     min-width: 200px;
+}
+.header150 {
+    min-width: 150px;
+}
+.header100 {
+    min-width: 100px;
 }
 .extensionHeader {
     min-width: 60px;

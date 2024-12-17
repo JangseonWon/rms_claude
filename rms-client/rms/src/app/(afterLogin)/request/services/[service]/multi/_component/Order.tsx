@@ -21,22 +21,16 @@ import DownloadExcelButton from "@/app/(afterLogin)/request/services/[service]/m
 type RequestData = {
     sampleType: string;       // 샘플 타입
     institution: string;      // 기관
-    registrationDate: string; // 등록일자
+    birth: string;            // 생일
     ward: string;             // 병동
     patientName: string;      // 환자 이름
-    personalID: string;       // 주민등록번호
-    gender: string;           // 성별
+    sex: string;              // 성별
     physician: string;        // 의사 이름
     medicalDepartment: string;// 병원명
     collectionDate: string;   // 채취일자
-    chartNumber: string;      // 차트 번호
-    code: string;             // 코드
-    gestationalAge: string;   // 임신 기간
-    weight: string;           // 몸무게
-    fetuses: string;          // 태아 수
+    mrn: string;              // MRN
     quantity: number;         // 샘플 수
-    notes: string;            // 메모
-    race: string;             // 인종
+    memo: string;            // 메모
     extensions: Record<string, string | number | boolean>;
 };
 
@@ -59,7 +53,6 @@ export default function Order() {
     };
 
     const handleFileUpload = useCallback((data: any[]) => {
-        // 헤더를 별도로 분리하고 나머지 데이터와 매핑
         const headers = data[0];
         const bodyData = data.slice(1);
 
@@ -68,50 +61,38 @@ export default function Order() {
                 const index = headers.indexOf(header);
                 return index !== -1 ? row[index] : undefined;
             };
+            const extensionFields = headers.slice(12);
+            const extensions = extensionFields.reduce((acc: Record<string, string | number | boolean>, field: string, idx: number) => {
+                const value = row[12 + idx];
+                acc[field] = value === false || value ? value : '';
+                return acc;
+            }, {});
 
             const excelToDate = (excelDate: number) => {
                 return new Date(excelBaseDate.getTime() + excelDate * 86400000);
             };
 
-            const registrationDate = mapByHeader("Registration Date")
-                ? format(excelToDate(mapByHeader("Registration Date")), 'yyyy-MM-dd')
-                : 'Non';
-
-            const collectionDate = mapByHeader("Collection Date")
-                ? format(excelToDate(mapByHeader("Collection Date")), 'yyyy-MM-dd')
-                : 'Non';
-
-            const personalID = mapByHeader("Personal ID Number")
-                ? format(excelToDate(mapByHeader("Personal ID Number")), 'yyyy-MM-dd')
-                : 'Non';
-
-            // 확장 필드 처리
-            const extensionFields = headers.slice(14);
-            const extensions = extensionFields.reduce((acc: Record<string, string | number | boolean>, field: string, idx: number) => {
-                const value = row[14 + idx];
-                acc[field] = value === false || value ? value : '';
-                return acc;
-            }, {});
-
+            const birth = mapByHeader("Date of Birth")
+                ? format(excelToDate(mapByHeader("Date of Birth")), 'yyyy-MM-dd')
+                : 'Error';
+            const collectionDate = mapByHeader("Date of Collection")
+                ? format(excelToDate(mapByHeader("Date of Collection")), 'yyyy-MM-dd')
+                : 'Error';
             return {
                 sampleType: mapByHeader("Sample Type"),
-                institution: mapByHeader("Institution"),
-                registrationDate,
+                institution: mapByHeader("Institution Name"),
+                birth: birth,
+                sex: mapByHeader("Sex"),
+                mrn: mapByHeader("MRN"),
                 ward: mapByHeader("Ward"),
                 patientName: mapByHeader("Patient Name"),
-                personalID,
                 gender: mapByHeader("Gender"),
-                physician: mapByHeader("Physician"),
+                physician: mapByHeader("Physician Name"),
                 medicalDepartment: mapByHeader("Medical Department"),
-                collectionDate,
-                chartNumber: mapByHeader("Chart Number"),
+                collectionDate: collectionDate,
                 code: mapByHeader("Code"),
-                gestationalAge: mapByHeader("Gestational Age"),
-                weight: mapByHeader("Weight"),
-                fetuses: mapByHeader("Fetuses"),
                 quantity: mapByHeader("Quantity"),
-                notes: mapByHeader("Notes"),
-                race: mapByHeader("Race (Genome Health Premium)"),
+                memo: mapByHeader("Memo"),
                 extensions
             };
         });
@@ -120,8 +101,9 @@ export default function Order() {
     }, [extensions]);
 
     const transformDataToFormat = (data: RequestData[], status: string): any => {
-        return data.map((item) => {
-            const birthDate = new Date(item.personalID);
+        return data.filter((item) => item.institution && item.institution.includes('/'))
+            .map((item) => {
+            const birthDate = new Date(item.birth);
             const birthYear = birthDate.getFullYear();
             const birthMonth = birthDate.getMonth() + 1;
             const birthDay = birthDate.getDate();
@@ -144,13 +126,13 @@ export default function Order() {
                 value: item.extensions[extension.name!]
             }));
 
-            const sex = item.gender === "Male" ? "M" : item.gender === "Female" ? "F" : item.gender;
+            const sex = item.sex === "Male" ? "M" : item.sex === "Female" ? "F" : item.sex;
 
             return {
                 service: {
                     id: serviceId
                 },
-                memo: item.notes,
+                memo: item.memo,
                 ward: item.ward,
                 physician: item.physician,
                 status: status,
@@ -164,7 +146,7 @@ export default function Order() {
                         name: sampleTypeName
                     },
                     patient: {
-                        serial: item.chartNumber,
+                        serial: item.mrn,
                         sex: sex,
                         name: item.patientName,
                         birth_year: birthYear,
@@ -188,13 +170,11 @@ export default function Order() {
             const response = await putRequest(orderData);
             if (response.ok) {
                 alert("Order placed successfully!");
-                console.log(orderData);
+                setRequestData([]);
             } else {
-                console.log(orderData);
                 alert("Failed to place the order.");
             }
         } catch (error) {
-            console.error("Error placing order:", error);
             alert("An error occurred while placing the order.");
         }
     };
@@ -205,6 +185,7 @@ export default function Order() {
             const response = await putRequest(cartData);
             if (response.ok) {
                 alert("successfully!");
+                setRequestData([]);
             } else {
                 alert(cartData);
             }
@@ -256,48 +237,39 @@ export default function Order() {
                 <table className={style.table}>
                     <thead>
                     <tr>
-                        <th className={style.topHeader}>Sample Type</th>
-                        <th className={style.topHeader}>Institution</th>
-                        <th className={style.extensionHeader}>Registration Date</th>
-                        <th className={style.extensionHeader}>Ward</th>
-                        <th className={style.extensionHeader}>Patient Name</th>
-                        <th className={style.extensionHeader}>Personal ID Number</th>
-                        <th className={style.extensionHeader}>Gender</th>
-                        <th className={style.extensionHeader}>Physician</th>
-                        <th className={style.extensionHeader}>Medical Department</th>
-                        <th className={style.extensionHeader}>Collection Date</th>
-                        <th className={style.extensionHeader}>Chart Number</th>
-                        <th className={style.extensionHeader}>Gestational Age</th>
-                        <th className={style.extensionHeader}>Weight</th>
-                        <th className={style.extensionHeader}>Fetuses</th>
-                        <th className={style.extensionHeader}>Quantity</th>
-                        <th className={style.notesHeader}>Notes</th>
-                        <th className={style.extensionHeader}>Race<br/>(Genome Health Premium)</th>
+                        <th className={style.header200}>Institution Name</th>
+                        <th className={style.header150}>Patient Name</th>
+                        <th className={style.header100}>MRN</th>
+                        <th className={style.header150}>Date of Birth</th>
+                        <th className={style.header100}>Sex</th>
+                        <th className={style.header150}>Sample Type</th>
+                        <th className={style.header150}>Date of Collection</th>
+                        <th className={style.header100}>Quantity</th>
+                        <th className={style.header150}>Medical Department</th>
+                        <th className={style.header100}>Ward</th>
+                        <th className={style.header150}>Physician Name</th>
+                        <th className={style.notesHeader}>Memo</th>
                         {extensions.map((extension, index) => (
-                            <th className={style.extensionHeader} key={index}>{extension.name}</th>
+                            <th className={style.header100} key={index}>{extension.name}</th>
                         ))}
                     </tr>
                     </thead>
                     <tbody>
-                    {requestData.map((item, index) => (
+                    {requestData.filter((item) => item.institution && item.institution.includes('/'))
+                        .map((item, index) => (
                         <tr key={index}>
-                            <td>{item.sampleType || ''}</td>
-                            <td>{item.institution || ''}</td>
-                            <td>{item.registrationDate || ''}</td>
-                            <td>{item.ward || ''}</td>
+                            <td>{item.institution && item.institution.includes('/') ? item.institution.split('/')[1] : ''}</td>
                             <td>{item.patientName || ''}</td>
-                            <td>{item.personalID || ''}</td>
-                            <td>{item.gender || ''}</td>
-                            <td>{item.physician || ''}</td>
-                            <td>{item.medicalDepartment || ''}</td>
+                            <td>{item.mrn || ''}</td>
+                            <td>{item.birth || ''}</td>
+                            <td>{item.sex || ''}</td>
+                            <td>{item.sampleType && item.sampleType.includes('/') ? item.sampleType.split('/')[1] : ''}</td>
                             <td>{item.collectionDate || ''}</td>
-                            <td>{item.chartNumber || ''}</td>
-                            <td>{item.gestationalAge || ''}</td>
-                            <td>{item.weight || ''}</td>
-                            <td>{item.fetuses || ''}</td>
                             <td>{item.quantity || ''}</td>
-                            <td dangerouslySetInnerHTML={{__html: formatNotes(item.notes)}}/>
-                            <td>{item.race || ''}</td>
+                            <td>{item.medicalDepartment || ''}</td>
+                            <td>{item.ward || ''}</td>
+                            <td>{item.physician || ''}</td>
+                            <td dangerouslySetInnerHTML={{__html: formatNotes(item.memo)}}/>
                             {extensions.map((extension, extIndex) => (
                                 <td key={extIndex}>
                                     {item.extensions && item.extensions[extension.name!] !== undefined
