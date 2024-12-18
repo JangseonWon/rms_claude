@@ -42,7 +42,7 @@ export default function Table() {
     const [searchValue, setSearchValue] = useState<string>('');
     const [totalPage, setTotalPage] = useState<number>();
     const [pageRange, setPageRange] = useState<{ start: number, end: number }>({ start: 1, end: 5 });
-    const [selectOption, setSelectOption] = useState<SelectBoxOption>({ table: "sample", column: "id", name: "Registration ID" });
+    const [selectOption, setSelectOption] = useState<SelectBoxOption>({ table: "sample", column: "barcode", name: "Registration ID" });
     const status = useStatus();
     const setStatus = useSetStatus();
     const selectBoxOptions: SelectBoxOption[] = [
