@@ -25,9 +25,9 @@ export default function ServiceSearchBox() {
         }));
     };
 
-    const toggleList = () => {
-        setIsOpen(!isOpen)
-    }
+    const openList = () => {
+        setIsOpen(true);
+    };
 
     const handleOptionClick = (option: SelectBoxOption) => {
         setSearch(option.name!);
@@ -37,6 +37,7 @@ export default function ServiceSearchBox() {
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearch(event.target.value);
+        openList();
     };
 
     const fetchOptions = async () => {
@@ -80,7 +81,11 @@ export default function ServiceSearchBox() {
     }, []);
 
     return (
-        <div ref={selectBoxRef} className={style.container} onClick={toggleList}>
+        <div
+            ref={selectBoxRef}
+            className={style.container}
+            onMouseEnter={openList}
+        >
             <section className={style.selectSection}>
                 <p className={style.label}>Search the service</p>
                 <div className={`${style.btnSelect} ${isOpen ? style.open : ''}`}>
