@@ -2,6 +2,7 @@
 
 import style from "@/app/(afterLogin)/request/cart/_component/cartInfo.module.css";
 import globalStyle from '@/css/modal.module.css';
+import scrollbar from "@/css/scrollBar.module.css";
 import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import SelectBox from "@/app/_component/SelectBox"
@@ -18,6 +19,8 @@ import {updateRequest} from "@/app/(afterLogin)/request/cart/_api/updateRequest"
 import {getSampleType} from "@/app/(afterLogin)/request/cart/_api/getSampleType";
 import {SampleType} from "@/model/SampleType";
 import DatePickerBox from "@/app/_component/DatePickerBox";
+import TextBox from "@/app/_component/TextBox";
+import classNames from "classnames";
 
 type Props = {
     serviceId: string;
@@ -117,7 +120,7 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
                     <FontAwesomeIcon icon={faXmark} onClick={closeModal} className={globalStyle.modalCloseButton}/>
                 </div>
                 {request ? (
-                    <div className={style.modalContent}>
+                    <div className={classNames(style.modalContent, scrollbar.default)}>
                         <div className={style.content}>
                             <p className={style.title}>Institution name*</p>
                             <SelectBox
@@ -189,11 +192,6 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
                                 required={true}
                                 onChange={(value) => handleRequestChange('sample.quantity', value)}
                             />
-                            <InputBox
-                                label={"Memo"}
-                                value={request.memo}
-                                onChange={(value) => handleRequestChange('memo', value)}
-                            />
                         </div>
                         <div className={style.content}>
                             <p className={style.title}>Additional Info.</p>
@@ -211,6 +209,14 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
                                 label={"Physician Name"}
                                 value={request.physician}
                                 onChange={(value) => handleRequestChange('physician', value)}
+                            />
+                        </div>
+                        <div className={style.memoSection}>
+                            <TextBox
+                                label={'Memo'}
+                                value={request.memo}
+                                required={true}
+                                onChange={(value) => handleRequestChange('memo', value)}
                             />
                         </div>
                         <div className={style.modalBottom}>

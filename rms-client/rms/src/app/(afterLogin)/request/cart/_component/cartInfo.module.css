@@ -41,7 +41,11 @@
 .modalTitle button:hover {
     background-color: #C8C9CB;
 }
-.modalContent .content {
+.modalContent {
+    height: 600px;
+    overflow-y: scroll;
+}
+.content {
     display: flex;
     flex-wrap: wrap;
 }
@@ -55,7 +59,11 @@
 .modalContent .content > * {
     padding-right: 20px;
 }
+.memoSection {
+    width: 98.5%;
+}
 .modalBottom {
+    margin-top: 5px;
     padding: 0 20px;
     display: flex;
     justify-content: flex-end;

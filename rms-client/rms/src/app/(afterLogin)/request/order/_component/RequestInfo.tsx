@@ -9,6 +9,8 @@ import {Request} from "@/model/Request"
 import InputBox from "@/app/_component/InputBox";
 import Loading from "@/app/(afterLogin)/_component/Loading";
 import {getRequestOrderInfo} from "@/app/(afterLogin)/request/order/_api/getRequestOrderInfo";
+import classNames from "classnames";
+import scroll from "@/css/scrollBar.module.css";
 
 type Props = {
     serviceId: string;
@@ -67,99 +69,99 @@ export default function RequestInfo({serviceId, sampleId, closeModal}: Props) {
             <div className={globalStyle.modal}>
                 <div className={style.modalTitle}>
                     <h1>Order Details</h1>
-                    <button onClick={closeModal}>
-                        <FontAwesomeIcon icon={faXmark}/>
-                    </button>
+                    <FontAwesomeIcon icon={faXmark} onClick={closeModal} className={globalStyle.modalCloseButton}/>
                 </div>
                 {request ? (
-                    <div className={style.modalContent}>
-                        <div className={style.headerContent}>
-                            <div className={style.firstContent}>
-                                <p className={style.firstTitle}>Institution name</p>
+                    <div className={classNames(style.wrapper, scroll.default)}>
+                        <div className={style.modalContent}>
+                            <div className={style.headerContent}>
+                                <div className={style.firstContent}>
+                                    <p className={style.firstTitle}>Institution name</p>
+                                    <InputBox
+                                        label={"Institution"}
+                                        value={request.sample?.patient?.organization?.name}
+                                        disabled={true}
+                                    />
+                                </div>
+                                <div className={style.firstContent}>
+                                    <p className={style.firstTitle}>Service Info.</p>
+                                    <InputBox
+                                        label={"Service"}
+                                        value={request.service?.name}
+                                        disabled={true}
+                                    />
+                                </div>
+                            </div>
+                            <div className={style.content}>
+                                <p className={style.title}>Patient Info.</p>
                                 <InputBox
-                                    label={"Institution"}
-                                    value={request.sample?.patient?.organization?.name}
+                                    label={"Name*"}
+                                    value={request.sample?.patient?.name}
+                                    onChange={(value) => handleRequestChange('sample.patient.name', value)}
+                                    disabled={true}
+                                />
+                                <InputBox
+                                    label={"MRN*"}
+                                    value={request.sample?.patient?.serial}
+                                    onChange={(value) => handleRequestChange('sample.patient.serial', value)}
+                                    disabled={true}
+                                />
+                                <InputBox
+                                    label={"Date of Birth"}
+                                    value={getDateFromComponents(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}
+                                    disabled={true}
+                                />
+                                <InputBox
+                                    label={"Age"}
+                                    value={request.sample?.age}
                                     disabled={true}
                                 />
                             </div>
-                            <div className={style.firstContent}>
-                                <p className={style.firstTitle}>Service Info.</p>
+                            <div className={style.content}>
+                                <p className={style.title}>Additional Info.</p>
                                 <InputBox
-                                    label={"Service"}
-                                    value={request.service?.name}
+                                    label={"Medical Department"}
+                                    value={request.department}
+                                    disabled={true}
+                                />
+                                <InputBox
+                                    label={"Ward"}
+                                    value={request.ward}
+                                    disabled={true}
+                                />
+                                <InputBox
+                                    label={"Physician Name"}
+                                    value={request.physician}
                                     disabled={true}
                                 />
                             </div>
-                        </div>
-                        <div className={style.content}>
-                            <p className={style.title}>Patient Info.</p>
-                            <InputBox
-                                label={"Name*"}
-                                value={request.sample?.patient?.name}
-                                onChange={(value) => handleRequestChange('sample.patient.name', value)}
-                                disabled={true}
-                            />
-                            <InputBox
-                                label={"MRN*"}
-                                value={request.sample?.patient?.serial}
-                                onChange={(value) => handleRequestChange('sample.patient.serial', value)}
-                                disabled={true}
-                            />
-                            <InputBox
-                                label={"Date of Birth"}
-                                value={getDateFromComponents(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}
-                                disabled={true}
-                            />
-                            <InputBox
-                                label={"Age"}
-                                value={request.sample?.age}
-                                disabled={true}
-                            />
-                        </div>
-                        <div className={style.content}>
-                            <p className={style.title}>Additional Info.</p>
-                            <InputBox
-                                label={"Medical Department"}
-                                value={request.department}
-                                disabled={true}
-                            />
-                            <InputBox
-                                label={"Ward"}
-                                value={request.ward}
-                                disabled={true}
-                            />
-                            <InputBox
-                                label={"Physician Name"}
-                                value={request.physician}
-                                disabled={true}
-                            />
-                        </div>
-                        <div className={style.content}>
-                            <p className={style.title}>Specimen/.Sample Info.</p>
-                            <InputBox
-                                label={"Type*"}
-                                value={request.sample?.sample_type?.name}
-                                disabled={true}
-                            />
-                            <InputBox
-                                label={"Date or collection*"}
-                                value={request.sample?.sampling_on}
-                                disabled={true}
-                            />
-                            <InputBox
-                                label={"Quantity*"}
-                                value={request.sample?.quantity?.toString()}
-                                disabled={true}
-                            />
-                        </div>
-                        <div className={style.content}>
-                            <p className={style.title}>Memo</p>
-                            <textarea
-                                className={style.memo}
-                                rows={8}
-                                value={request.memo}
-                                readOnly={true}
-                            />
+                            <div className={style.content}>
+                                <p className={style.title}>Specimen/.Sample Info.</p>
+                                <InputBox
+                                    label={"Type*"}
+                                    value={request.sample?.sample_type?.name}
+                                    disabled={true}
+                                />
+                                <InputBox
+                                    label={"Date or collection*"}
+                                    value={request.sample?.sampling_on}
+                                    disabled={true}
+                                />
+                                <InputBox
+                                    label={"Quantity*"}
+                                    value={request.sample?.quantity?.toString()}
+                                    disabled={true}
+                                />
+                            </div>
+                            <div className={style.content}>
+                                <p className={style.title}>Memo</p>
+                                <textarea
+                                    className={style.memo}
+                                    rows={8}
+                                    value={request.memo}
+                                    readOnly={true}
+                                />
+                            </div>
                         </div>
                     </div>
                 ) : <Loading/>}

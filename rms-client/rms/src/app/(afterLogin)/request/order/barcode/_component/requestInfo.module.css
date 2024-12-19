@@ -16,7 +16,10 @@
 .modalTitle button:hover {
     background-color: #C8C9CB;
 }
-.modalContent .content {
+.modalContent {
+    height: 600px;
+}
+.content {
     display: flex;
     flex-wrap: wrap;
 }
@@ -56,4 +59,9 @@
 }
 .memo:focus {
     outline: none;
+}
+.wrapper {
+    margin: 10px;
+    padding: 10px;
+    overflow-y: scroll;
 }
