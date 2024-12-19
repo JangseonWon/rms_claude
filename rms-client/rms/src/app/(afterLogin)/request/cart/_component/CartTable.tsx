@@ -121,6 +121,7 @@ export default function CartTable() {
     const closeModal = () => {
         setInfoRequest(undefined);
         setModalOpen(false);
+        fetchData(search);
     }
 
     const handleDeleteCart = async () => {

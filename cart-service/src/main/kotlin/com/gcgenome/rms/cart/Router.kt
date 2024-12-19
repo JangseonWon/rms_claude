@@ -70,14 +70,12 @@ class Router (
     }
 
     private fun updateRequest(request: ServerRequest): Mono<ServerResponse> {
-        val orderIdPathVar = UUID.fromString(request.pathVariable("order_id"))
         val sampleIdPathVar = UUID.fromString(request.pathVariable("sample_id"))
         val serviceIdPathVar = request.pathVariable("service_id")
         return principal(request)
             .flatMap { request.bodyToMono(Request::class.java) }
             .flatMap { handler.updateRequest(
                 it.apply {
-                    orderId = orderIdPathVar
                     sampleId = sampleIdPathVar
                     serviceId = serviceIdPathVar
                 }

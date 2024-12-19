@@ -157,8 +157,8 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
                                 value={getDateFromComponents(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}
                                 onChange={(date) => {
                                     handleRequestChange('sample.patient.birth_year', date.getFullYear());
-                                    handleRequestChange('sample.patient.birth_month', date.getMonth());
-                                    handleRequestChange('sample.patient.birth_day', date.getDay());
+                                    handleRequestChange('sample.patient.birth_month', date.getMonth() + 1);
+                                    handleRequestChange('sample.patient.birth_day', date.getDate());
                                 }}
                             />
                             <InputBox
