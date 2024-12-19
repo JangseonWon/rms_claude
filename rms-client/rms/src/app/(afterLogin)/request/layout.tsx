@@ -10,7 +10,6 @@ import {useMessageNoticeDialog, useNoticeDialog} from "@/store/useNoticeDialogSt
 
 type Props = {
     children: ReactNode;
-    // modal?: ReactNode;
 };
 
 export default function Layout({ children}: Props) {
