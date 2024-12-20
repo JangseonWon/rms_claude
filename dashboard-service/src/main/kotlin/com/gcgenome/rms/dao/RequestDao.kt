@@ -4,7 +4,6 @@ import com.gcgenome.rms.authentication.User
 import com.gcgenome.rms.data.*
 import com.gcgenome.rms.tables.references.*
 import org.jooq.DSLContext
-import org.jooq.impl.DSL
 import org.jooq.impl.DSL.*
 import reactor.core.publisher.Mono
 
@@ -13,6 +12,9 @@ interface RequestDao: QueryDao {
         val joins = listOf(
             QueryDao.JoinInfo(ORDER, REQUEST.ORDER_ID.eq(ORDER.ID), QueryDao.JoinType.INNER),
             QueryDao.JoinInfo(SAMPLE, REQUEST.SAMPLE_ID.eq(SAMPLE.ID), QueryDao.JoinType.INNER),
+            QueryDao.JoinInfo(REPORT, REQUEST.ORDER_ID.eq(REPORT.ORDER_ID)
+                .and(REQUEST.SERVICE_ID.eq(REPORT.SERVICE_ID)
+                    .and(REQUEST.SAMPLE_ID.eq(REPORT.SAMPLE_ID))), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(PATIENT, SAMPLE.PATIENT_SERIAL.eq(PATIENT.SERIAL)
                 .and(SAMPLE.ORGANIZATION_ID.eq(PATIENT.ORGANIZATION_ID))
                 .and(SAMPLE.USER_ID.eq(PATIENT.USER_ID)), QueryDao.JoinType.INNER),
@@ -20,7 +22,7 @@ interface RequestDao: QueryDao {
             QueryDao.JoinInfo(SAMPLE_TYPE, SAMPLE.SAMPLE_TYPE_ID.eq(SAMPLE_TYPE.ID), QueryDao.JoinType.INNER),
             QueryDao.JoinInfo(ORGANIZATION, ORGANIZATION.ID.eq(PATIENT.ORGANIZATION_ID)
                 .and(ORGANIZATION.USER_ID.eq(PATIENT.USER_ID)), QueryDao.JoinType.INNER),
-            QueryDao.JoinInfo(USER, USER.ID.eq(PATIENT.USER_ID), QueryDao.JoinType.INNER)
+            QueryDao.JoinInfo(USER, USER.ID.eq(PATIENT.USER_ID), QueryDao.JoinType.INNER),
         )
 
         val fields = listOf(
@@ -94,7 +96,15 @@ interface RequestDao: QueryDao {
                         )
                     ).from(SAMPLE_EXTENSION).where(SAMPLE.ID.eq(SAMPLE_EXTENSION.SAMPLE_ID))
                 )
-            ).`as`("sample")
+            ).`as`("sample"),
+            jsonObject(
+                key("id").value(REPORT.ID),
+                key("type").value(REPORT.TYPE),
+                key("value").value(REPORT.VALUE),
+                key("create_at").value(REPORT.CREATE_AT),
+                key("download_at").value(REPORT.DOWNLOADED_AT),
+                key("is_latest").value(REPORT.IS_LATEST)
+            ).`as`("report")
         )
 
         val baseCondition = REQUEST.ORDER_ID.eq(ORDER.ID)

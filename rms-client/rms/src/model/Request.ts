@@ -14,7 +14,6 @@ export interface Request {
     ward?: string
     physician?: string
     sample?: Sample
-    reports?: Report[]
     create_at?: Date
     cart_at?: Date
     specified_at?: Date
@@ -23,4 +22,6 @@ export interface Request {
     reported_at?: Date
     courier_company?: string
     awb_number?: string
+    report?: Report
+    reports?: Report[]
 }

@@ -241,13 +241,13 @@ export default function Table() {
                     <th>MRN</th>
                     <th>Patient BOD<br/>(DD/MM/YYYY)</th>
                     <th>Current Status</th>
-                    <th>Report Date</th>
+                    <th>Report Date<br/>(DD/MM/YYYY)</th>
                 </tr>
                 </thead>
                 <tbody>
                 {requestData && requestData.length > 0 && requestData.map((row) => (
                     <tr key={`${row.order_id}${row.sample?.id}${row.service!.id}`}>
-                        <td>{row.create_at ? format(new Date(row.create_at), "yyyy-MMM-dd") : '-'}</td>
+                        <td>{row.create_at ? format(new Date(row.create_at), "dd-MM-yyyy") : '-'}</td>
                         <td>{row.sample!.barcode}</td>
                         <td>{row.sample!.patient!.organization!.user!.name}</td>
                         <td>{row.sample!.patient!.organization!.id}</td>
@@ -258,7 +258,11 @@ export default function Table() {
                             formatDate(row.sample.patient.birth_year, row.sample.patient.birth_month, row.sample.patient.birth_day) : '-'}
                         </td>
                         <td>{row.status}</td>
-                        <td>report date</td>
+                        <td>
+                            {row.report?.create_at && !isNaN(new Date(row.report.create_at).getTime())
+                                ? format(new Date(row.report.create_at), "dd-MM-yyyy")
+                                : '-'}
+                        </td>
                     </tr>
                 ))}
                 </tbody>
