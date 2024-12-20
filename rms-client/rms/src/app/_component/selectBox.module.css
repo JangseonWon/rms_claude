@@ -1,6 +1,5 @@
 .selectContainer {
     position: relative;
-    /*min-width: 180px;*/
 }
 .label{
     font-size: 12px;
@@ -65,7 +64,6 @@
 .listMember li {
     width: 100%;
 }
-
 .listMember li button {
     width: 100%;
     background-color: #fff;
@@ -75,7 +73,6 @@
     border: none;
     cursor: pointer;
 }
-
 .listMember li button:hover {
     background-color: #E5EAF2;
 }

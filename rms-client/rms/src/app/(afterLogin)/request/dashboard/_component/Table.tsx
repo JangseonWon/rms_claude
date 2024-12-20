@@ -136,19 +136,11 @@ export default function Table() {
     };
 
     const formatDate = (year: number | undefined, month: number | undefined, day: number | undefined) => {
-        const parts = [];
-
-        if (year !== undefined) {
-            parts.push(year.toString());
+        if (year !== undefined && month !== undefined && day !== undefined) {
+            const date = new Date(year, month - 1, day);
+            return format(date, "dd-MM-yyyy");
         }
-        if (month !== undefined) {
-            parts.push(format(new Date(year ?? 0, month - 1, 1), "MMM"));
-        }
-        if (day !== undefined) {
-            parts.push(day.toString());
-        }
-
-        return parts.length > 0 ? parts.join('-') : '-';
+        return "-";
     };
 
     const addDateFilter = (from: Date | null, to: Date | null) => {

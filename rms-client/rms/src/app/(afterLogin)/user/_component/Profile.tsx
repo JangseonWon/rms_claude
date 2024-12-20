@@ -10,10 +10,14 @@ import {User} from "@/model/User";
 import {useSession} from "next-auth/react";
 import Loading from "@/app/(afterLogin)/_component/Loading";
 import {patchUser} from "@/app/(afterLogin)/user/_api/patchUser";
+import {SelectBoxOption} from "@/model/SelectBoxOption";
+import SelectBox from "@/app/_component/SelectBox";
 
 export default function Profile() {
     const {data: session, status} = useSession();
     const [user, setUser] = useState<User>();
+    const [selectBoxOptions, setSelectBoxOptions] = useState<SelectBoxOption[]>([]);
+    const [selectOption, setSelectOption] = useState<SelectBoxOption>();
 
     const fetchUser = useCallback( async () => {
         if(session?.user?.id && status === "authenticated"){
@@ -24,18 +28,43 @@ export default function Profile() {
             }
             else alert("fail")
         }
-    },[session?.user.id, status])
+    },[session?.user.id, status]);
+
+    const fetchCountryCodes = useCallback(async () => {
+        const response = await fetch("https://restcountries.com/v3.1/all");
+        const json = await response.json()
+        return json
+            .map((country: any) => ({
+                name: country.name.common,
+                value: country.idd.root + (country.idd.suffixes?.[0] || "")
+            }))
+            .filter((country: any) => country.name && country.value)
+            .sort((a: any, b: any) => a.name.localeCompare(b.name));
+    },[]);
+
     const handleChange = (path: string, value: string) => {
         setUser(prevState => ({
             ...prevState,
             ...setUserKeyValue({ ...prevState }, path, value)
         }));
     };
+
+    const handlePhoneChange = (value: string) => {
+        let phoneNumber = value;
+
+        if (!phoneNumber.startsWith(selectOption?.value)) {
+            phoneNumber = `${selectOption?.value || "+1"}/${phoneNumber}`;
+        }
+
+        handleChange('phone_number', phoneNumber);
+    };
+
     const setUserKeyValue = (obj: any, path: string, value: any) => {
         const newObj = { ...obj };
         newObj[path] = value;
         return newObj;
     };
+
     const handleOnClickSave = async () => {
         if (!user) {
             alert("Please correct the word");
@@ -51,7 +80,29 @@ export default function Profile() {
 
     useEffect(() => {
         fetchUser();
-    }, [fetchUser]);
+        const loadCountries = async () => {
+            const countryData = await fetchCountryCodes();
+            setSelectBoxOptions(countryData);
+            if (countryData.length > 0) {
+                setSelectOption(countryData[0]);
+            }
+        };
+        loadCountries();
+    }, [fetchUser, fetchCountryCodes]);
+
+    useEffect(() => {
+        if (user?.phone_number) {
+            const phoneParts = user.phone_number.split('/');
+            const countryCode = phoneParts[0];
+
+            const selectedOption =
+                selectBoxOptions.find(option => option.value === countryCode);
+            if (selectedOption) {
+                setSelectOption(selectedOption);
+            }
+        }
+    }, [user?.phone_number, selectBoxOptions]);
+
 
     return (
         <>
@@ -84,16 +135,29 @@ export default function Profile() {
                                 <InputBox label={"EMAIL"} value={user?.email || ""}
                                           onChange={(value) => handleChange('email', value)}/>
                             </div>
-                            <div>
-                                <InputBox label={"PHONE-NUMBER"} value={user?.phone_number || ""}
-                                          onChange={(value) => handleChange('phone_number', value)}/>
+                            <div className={style.phone}>
+                                <SelectBox
+                                    width={"180px"}
+                                    value={selectOption ? `${selectOption.name} / ${selectOption.value}` : "Please Refresh"}
+                                    options={selectBoxOptions}
+                                    label={"PHONE-NUMBER"}
+                                    onChange={(option) => {
+                                        setSelectOption(option);
+                                        handleChange('phone_number', '');
+                                    }}
+                                />
+                                <div className={style.phoneNumber}>
+                                    <InputBox value={user?.phone_number} placeHolder={"Enter Phone-Number"}
+                                        onChange={(value) => handlePhoneChange(value)}
+                                    />
+                                </div>
                             </div>
                         </div>
                     </section>
                     <section className={style.section}>
                         <div className={style.detailSentence}>
                             <div className={style.detailFName}>
-                                To update your Personal details, including FName and LName, contact our
+                            To update your Personal details, including FName and LName, contact our
                             </div>
                             <div className={style.detailSupport}>
                                 &nbsp;support team.

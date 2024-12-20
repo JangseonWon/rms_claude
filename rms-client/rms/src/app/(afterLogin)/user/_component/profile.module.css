@@ -42,6 +42,13 @@
     margin: 0 40px 0 20px;
     width: 200px;
 }
+.phone {
+    display: flex;
+    gap: 5px;
+}
+.phoneNumber {
+    margin-top: 17px;
+}
 .saveButton {
     margin: 20px 0 0 20px;
 }

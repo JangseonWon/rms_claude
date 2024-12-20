@@ -10,8 +10,9 @@ type Props = {
     onChange?: (value: string) => void
     required?: boolean;
     type?: string;
+    placeHolder?: string;
 }
-export default function InputBox({label, value, disabled=false, onChange, required=false, type="text"}: Props) {
+export default function InputBox({label, value, disabled=false, onChange, required=false, type="text", placeHolder}: Props) {
     const [inputValue, setInputValue] = useState('');
     const [hasError, setHasError] = useState(false);
 
@@ -38,7 +39,9 @@ export default function InputBox({label, value, disabled=false, onChange, requir
                 type={type}
                 value={inputValue}
                 onChange={onChangeValue}
-                disabled={disabled}/>
+                disabled={disabled}
+                placeholder={placeHolder}
+            />
         </div>
     )
 }
