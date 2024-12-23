@@ -21,8 +21,18 @@ class RequestRouter (
 ) {
     @Bean("RequestRouter")
     fun route() = router {
+        PUT("/w-api/result-service/requests", ::saveResampleRequest)
         POST("/w-api/result-service/requests/search", ::selectRequests)
         PATCH("/w-api/result-service/requests", :: updateRequests)
+    }
+
+    private fun saveResampleRequest(request: ServerRequest): Mono<ServerResponse> {
+        return authenticationHandler.principal(request)
+            .then(request.bodyToMono(RequestDTO::class.java))
+            .flatMap { requestHandler.saveResampleRequest(it) }
+            .then(ServerResponse.ok().build())
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}") }
+            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Error: ${e.cause}") }
     }
 
     private fun selectRequests(request: ServerRequest): Mono<ServerResponse> {

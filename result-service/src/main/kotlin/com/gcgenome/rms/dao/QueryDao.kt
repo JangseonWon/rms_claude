@@ -2,14 +2,15 @@ package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.Page
 import com.gcgenome.rms.data.Query
+import com.gcgenome.rms.tables.references.SAMPLE
 import org.jooq.*
-import org.jooq.Record
 import org.jooq.impl.DSL
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.util.*
 
 interface QueryDao {
     enum class JoinType {
@@ -141,7 +142,10 @@ interface QueryDao {
                 val field = DSL.field(DSL.name(table, column))
 
                 val filterCondition = when (filter.operator) {
-                    "=" -> field.eq(filter.value)
+                    "=" -> {
+                        if (isUUID(filter.value)) field.eq(UUID.fromString(filter.value))
+                        else field.eq(filter.value)
+                    }
                     "!=" -> field.ne(filter.value)
                     ">" -> field.gt(filter.value)
                     "<" -> field.lt(filter.value)
@@ -187,5 +191,9 @@ interface QueryDao {
     }
     private fun parseEndOfDayTimestamp(date: String): LocalDateTime {
         return LocalDate.parse(date).atTime(LocalTime.MAX)
+    }
+    private fun isUUID(value: String): Boolean {
+        val uuidPattern = "^[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        return value.matches(uuidPattern.toRegex())
     }
 }

@@ -8,11 +8,30 @@ import reactor.core.publisher.Mono
 import java.time.LocalDateTime
 
 interface RequestDao: QueryDao{
-    fun DSLContext.updateRequests(request: RequestDTO): Mono<RequestDTO> {
+    fun DSLContext.insertResampleRequest(request: RequestDTO): Mono<RequestDTO> {
+        return Mono.from(
+            insertInto(REQUEST)
+                .set(REQUEST.ORDER_ID, request.order!!.id)
+                .set(REQUEST.SERVICE_ID, request.service!!.id)
+                .set(REQUEST.SAMPLE_ID, request.sample!!.id)
+                .set(REQUEST.USER_SERVICE_ID, request.userServiceId ?: request.service!!.id)
+                .set(REQUEST.STATUS, request.status!!.name)
+                .set(REQUEST.MEMO, request.memo)
+                .set(REQUEST.DEPARTMENT, request.department)
+                .set(REQUEST.WARD, request.ward)
+                .set(REQUEST.PHYSICIAN, request.physician)
+                .set(REQUEST.CREATE_AT, request.status.takeIf { it == Status.UNCONFIRMED_ORDER }?.let { LocalDateTime.now() })
+                .set(REQUEST.CART_AT, request.status.takeIf { it == Status.CART }?.let { LocalDateTime.now() })
+                .set(REQUEST.LAST_MODIFY_AT, LocalDateTime.now())
+                .returning()
+        ).map { it.into(RequestDTO::class.java) }
+    }
+
+    fun DSLContext.updateRequestStatusToComplete(request: RequestDTO): Mono<RequestDTO> {
         return Mono.from(
             update(REQUEST)
-                .set(REQUEST.STATUS,coalesce(`val`(request.status?.name), REQUEST.STATUS))
-                .set(REQUEST.COMPLETE_AT,coalesce(`val`(request.completeAt), REQUEST.COMPLETE_AT))
+                .set(REQUEST.STATUS, Status.COMPLETED.name)
+                .set(REQUEST.COMPLETE_AT, LocalDateTime.now())
                 .where(
                     REQUEST.SAMPLE_ID.eq(request.sample!!.id),
                     REQUEST.SERVICE_ID.eq(request.service!!.id)
@@ -27,6 +46,8 @@ interface RequestDao: QueryDao{
             QueryDao.JoinInfo(SERVICE, REQUEST.SERVICE_ID.eq(SERVICE.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(USER, ORDER.USER_ID.eq(USER.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(SAMPLE, REQUEST.SAMPLE_ID.eq(SAMPLE.ID), QueryDao.JoinType.LEFT),
+            QueryDao.JoinInfo(SAMPLE_TYPE, SAMPLE.SAMPLE_TYPE_ID.eq(SAMPLE_TYPE.ID), QueryDao.JoinType.LEFT),
+            QueryDao.JoinInfo(SAMPLE_EXTENSION, SAMPLE.ID.eq(SAMPLE_EXTENSION.SAMPLE_ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(PATIENT,
                 SAMPLE.PATIENT_SERIAL.eq(PATIENT.SERIAL)
                     .and(SAMPLE.ORGANIZATION_ID.eq(PATIENT.ORGANIZATION_ID))
@@ -60,7 +81,9 @@ interface RequestDao: QueryDao{
                 key("id").value(ORDER.ID),
                 key("user").value(jsonObject(
                     key("id").value(USER.ID),
-                    key("name").value(USER.NAME)
+                    key("name").value(USER.NAME),
+                    key("branch_name").value(USER.BRANCH_NAME),
+                    key("branch_serial").value(USER.BRANCH_SERIAL)
                 ))
             ).`as`("order"),
             jsonObject(
@@ -80,6 +103,16 @@ interface RequestDao: QueryDao{
                         key("type").value(ORGANIZATION.TYPE),
                         key("nursing_number").value(ORGANIZATION.NURSING_NUMBER)
                     ))
+                )),
+                key("extensions").value(jsonArrayAggDistinct(
+                    jsonbObject(
+                        key("id").value(SAMPLE_EXTENSION.EXTENSION_ID),
+                        key("value").value(SAMPLE_EXTENSION.VALUE)
+                    )
+                )),
+                key("sample_type").value(jsonObject(
+                    key("id").value(SAMPLE_TYPE.ID),
+                    key("name").value(SAMPLE_TYPE.NAME)
                 ))
             ).`as`("sample"),
             `when`(count(REPORT.ID).greaterThan(0),
@@ -99,6 +132,7 @@ interface RequestDao: QueryDao{
             SERVICE.ID,
             USER.ID,
             SAMPLE.ID,
+            SAMPLE_TYPE.ID,
             PATIENT.SERIAL, PATIENT.NAME, PATIENT.SEX, PATIENT.BIRTH_YEAR, PATIENT.BIRTH_MONTH, PATIENT.BIRTH_DAY,
             ORGANIZATION.ID, ORGANIZATION.NAME, ORGANIZATION.REGISTRATION_NUMBER, ORGANIZATION.TYPE, ORGANIZATION.NURSING_NUMBER
         )

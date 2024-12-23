@@ -2,17 +2,34 @@ package com.gcgenome.rms.request
 
 import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.dao.RequestDao
+import com.gcgenome.rms.dao.SampleDao
+import com.gcgenome.rms.dao.SampleExtensionDao
 import com.gcgenome.rms.data.*
 import org.jooq.DSLContext
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import java.time.LocalDateTime
+import java.util.*
 
 @Component
 class RequestHandler(
     val dslContext: DSLContext
-): RequestDao {
+): RequestDao, SampleDao, SampleExtensionDao {
+    fun saveResampleRequest(request: RequestDTO): Mono<Void> {
+        return Mono.from(
+            dslContext.transactionPublisher { transaction ->
+                val dsl = transaction.dsl()
+                val newRequest = request.copy(
+                    sample = request.sample?.copy(id = null),
+                    status = Status.UNCONFIRMED_ORDER
+                )
+                dsl.insertSample(newRequest.order!!.user!!, newRequest.sample!!, newRequest.status!!)
+                    .flatMap { dsl.insertResampleRequest(newRequest.apply { sample?.id = it.id}) }
+                    .flatMapMany { saveSampleExtensions(dsl, newRequest.sample!!.id!!,newRequest.sample!!.extensions!!) }
+                    .then(dsl.updateRequestStatusToComplete(request))
+                    .then()
+        })
+    }
     fun selectRequests(authentication: UserAuthentication, query: Query):  Mono<Page<RequestDTO>> {
         authentication.takeIf { it.user.role == Role.USER.toString() }?.let {
             query.filterGroups = query.filterGroups ?: mutableListOf()  // null 체크 및 초기화
@@ -33,16 +50,20 @@ class RequestHandler(
     }
 
     fun updateRequests(requests: List<RequestDTO>): Mono<Void> {
-        return Mono.from(dslContext.transactionPublisher { trx ->
-            trx.dsl().run {
+        return Mono.from(dslContext.transactionPublisher { transaction ->
+            transaction.dsl().run {
                 Flux.fromIterable(requests)
                     .flatMap { request ->
-                        if(request.status == Status.COMPLETED) {
-                            request.apply { completeAt = LocalDateTime.now() }
-                        }
-                        updateRequests(request)
+                        updateRequestStatusToComplete(request)
                     }.then()
             }
         })
+    }
+
+    fun saveSampleExtensions(dsl: DSLContext, sampleId: UUID, extensions: List<ExtensionDTO>): Flux<ExtensionDTO>{
+        return Flux.fromIterable(extensions)
+            .flatMap { extension ->
+                dsl.insertSampleExtension(SampleExtensionDTO(sampleId = sampleId, extensionId = extension.id, value = extension.value))
+            }
     }
 }

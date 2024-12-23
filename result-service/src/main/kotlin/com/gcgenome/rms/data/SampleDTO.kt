@@ -1,5 +1,6 @@
 package com.gcgenome.rms.data
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
@@ -23,5 +24,9 @@ data class SampleDTO(
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     var createAt: LocalDateTime? = null,
-    var patient: PatientDTO? = null
+    var patient: PatientDTO? = null,
+    @JsonProperty("sample_type")
+    var sampleType: SampleTypeDTO?,
+    @JsonProperty("extensions")
+    var extensions: List<ExtensionDTO>?
 )
