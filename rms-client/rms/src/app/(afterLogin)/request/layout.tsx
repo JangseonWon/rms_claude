@@ -3,9 +3,9 @@
 import {ReactNode} from "react";
 import NavMenu from "@/app/(afterLogin)/_component/NavMenu";
 import style from "@/app/(afterLogin)/request/layout.module.css"
-import AlertDialog from "@/app/_component/AlertDialog";
+import AlertDialog from "@/app/_component/dialog/AlertDialog";
 import {useAlertDialogB, useMessageAlertDialogB} from "@/store/useBeforeLoginAlertDialogStore";
-import NoticeDialog from "@/app/_component/NoticeDialog";
+import NoticeDialog from "@/app/_component/dialog/NoticeDialog";
 import {useMessageNoticeDialog, useNoticeDialog} from "@/store/useNoticeDialogStore";
 
 type Props = {

@@ -15,6 +15,7 @@ import GreenButton from "@/app/_component/GreenButton";
 import {getExtension} from "@/app/(afterLogin)/request/management/additional-info/_api/getExtension";
 import {patchExtension} from "@/app/(afterLogin)/request/management/additional-info/_api/patchExtension";
 import classNames from "classnames";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 type Props = {
     extensionId: string;
@@ -33,6 +34,7 @@ const extensionOptions: SelectBoxOption[] = [
 export default function ExtensionModal({extensionId, closeModal, refreshTable}: Props) {
     const [extension, setExtension] = useState<Extension>()
     const [listInputs, setListInputs] = useState<string[]>(['','']);
+    const showAlert = CallAlertDialog();
 
     const fetchExtension = async (extensionId: string)=>{
         const response = await getExtension(extensionId)
@@ -83,11 +85,11 @@ export default function ExtensionModal({extensionId, closeModal, refreshTable}: 
     const handleUpdateButtonClick = async () => {
         const response = await patchExtension(extension!)
         if(response.ok){
-            alert("Update successful")
+            showAlert("Update successful")
             closeModal()
             refreshTable()
         } else {
-            alert("Fail update")
+            showAlert("Fail update")
         }
 
     };

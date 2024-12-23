@@ -4,7 +4,7 @@ import React, {ReactNode, useEffect, useState} from "react";
 import style from "@/app/(beforeLogin)/layout.module.css";
 import Header from "@/app/(beforeLogin)/_component/Header";
 import Footer from "@/app/_component/Footer";
-import AlertDialog from "@/app/_component/AlertDialog";
+import AlertDialog from "@/app/_component/dialog/AlertDialog";
 import {useAlertDialogB, useMessageAlertDialogB} from "@/store/useBeforeLoginAlertDialogStore";
 import MainLoading from "@/app/_component/MainLoading";
 

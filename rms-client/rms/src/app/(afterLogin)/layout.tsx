@@ -7,7 +7,7 @@ import {config} from '@fortawesome/fontawesome-svg-core';
 import style from "@/app/(afterLogin)/layout.module.css";
 import Footer from "@/app/_component/Footer";
 import {useAlertDialogA, useMessageAlertDialogA} from "@/store/useAfterLoginAlertDialogStore";
-import AlertDialog from "@/app/_component/AlertDialog";
+import AlertDialog from "@/app/_component/dialog/AlertDialog";
 
 config.autoAddCss = false;
 

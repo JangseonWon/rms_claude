@@ -17,6 +17,7 @@ import {Extension} from "@/model/Extension";
 import {fetchServiceExtensions} from "@/app/(afterLogin)/request/services/_api/fetchServiceExtensions";
 import {usePathname} from "next/navigation";
 import DownloadExcelButton from "@/app/(afterLogin)/request/services/[service]/multi/_component/DownloadExcelButton";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 type RequestData = {
     sampleType: string;       // 샘플 타입
@@ -44,6 +45,7 @@ export default function Order() {
     const pathname = usePathname();
     const pathSegments = pathname.split('/');
     const serviceId = decodeURIComponent(pathSegments[pathSegments.length - 2]);
+    const showAlert = CallAlertDialog();
     const [requestData, setRequestData] = useState<RequestData[]>([]);
     const [extensions, setExtensions] = useState<Extension[]>([]);
 
@@ -169,10 +171,10 @@ export default function Order() {
         try {
             const response = await putRequest(orderData);
             if (response.ok) {
-                alert("Order placed successfully!");
+                showAlert("Order placed successfully!");
                 setRequestData([]);
             } else {
-                alert("Failed to place the order.");
+                showAlert("Failed to place the order.");
             }
         } catch (error) {
             alert("An error occurred while placing the order.");

@@ -9,6 +9,7 @@ import {format} from "date-fns";
 import {Query} from "@/model/Query";
 import {postRequests} from "@/app/(afterLogin)/request/dashboard/_api/postRequests";
 import type {Request} from "@/model/Request";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 interface DownloadExcelButtonProps {
     search: Query;
@@ -16,6 +17,8 @@ interface DownloadExcelButtonProps {
 }
 
 export default function DownloadExcelButton({ search, status }: DownloadExcelButtonProps) {
+    const showAlert = CallAlertDialog();
+
     const fetchData = async (search: Query) => {
         const response = await postRequests(search)
         if (response.ok) {
@@ -54,7 +57,7 @@ export default function DownloadExcelButton({ search, status }: DownloadExcelBut
         const requestData = await fetchData(search);
 
         if (requestData.length === 0) {
-            alert("No data available for download");
+            showAlert("No data available for download");
             return;
         }
 

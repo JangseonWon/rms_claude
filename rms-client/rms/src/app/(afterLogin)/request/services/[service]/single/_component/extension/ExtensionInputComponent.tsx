@@ -21,6 +21,8 @@ export default function ExtensionInputComponent({ serviceId, onChange }: Extensi
     const relationship = useRelationship();
     const [extensions, setExtensions] = useState<Extension[]>([]);
     const [values, setValues] = useState<{ [key: string]: any }>({});
+    const [prevProbandValue, setPrevProbandValue] = useState(probandValue);
+    const [prevRelationship, setPrevRelationship] = useState(relationship);
 
     const generateSelectList = (regex: string): { name: string, value: string }[] => {
         if (regex.includes("|")) {
@@ -102,12 +104,18 @@ export default function ExtensionInputComponent({ serviceId, onChange }: Extensi
     };
 
     useEffect(() => {
-        handleInputChange('TEST01', probandValue);
-    }, [probandValue]);
+        if (probandValue !== prevProbandValue) {
+            handleInputChange('TEST01', probandValue);
+            setPrevProbandValue(probandValue);
+        }
+    }, [probandValue, prevProbandValue]);
 
     useEffect(() => {
-        handleInputChange('TEST02', relationship);
-    }, [relationship]);
+        if (relationship !== prevRelationship) {
+            handleInputChange('TEST02', relationship);
+            setPrevRelationship(relationship);
+        }
+    }, [relationship, prevRelationship]);
 
     useEffect(()=> {
         fetchExtensions();

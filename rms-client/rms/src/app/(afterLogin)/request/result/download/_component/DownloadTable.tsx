@@ -18,6 +18,7 @@ import {Report} from "@/model/Report";
 import {getReportFiles} from "@/app/(afterLogin)/request/result/download/_api/getReportFiles";
 import {Status} from "@/model/Status";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -53,6 +54,7 @@ export default function DownloadTable() {
     const [search, setSearch] = useState<Query>(defaultSearch);
     const [searchFilter, setSearchFilter] = useState<Filter | undefined>(undefined);
     const [orderDateFilter, setOrderDateFilter] = useState<FilterGroup>()
+    const showAlert = CallAlertDialog();
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage =>({
@@ -91,7 +93,6 @@ export default function DownloadTable() {
             setRequestData(responseData as Request[]);
             setTotalPage(totalPage)
         } catch(error) {
-            console.error("Failed to fetch data:", error);
             setRequestData([]);
             setTotalPage(0);
         }
@@ -133,10 +134,10 @@ export default function DownloadTable() {
                 a.remove();
                 URL.revokeObjectURL(url);
             } else {
-                alert("Download failed")
+                showAlert("Download failed")
             }
         } catch (error) {
-            console.error("Failed to fetch download file:", error);
+            showAlert("error");
         }
     };
 
@@ -157,7 +158,7 @@ export default function DownloadTable() {
                 URL.revokeObjectURL(url);
                 fetchData(search);
             } else {
-                alert("Download failed")
+                showAlert("Download failed")
             }
         } catch (error) {
             console.error("Failed to fetch multi download file:", error);

@@ -21,6 +21,7 @@ import {putAlisUsers} from "@/app/(afterLogin)/request/management/user/_api/putA
 import LoadingFullScreen from "@/app/_component/LoadingFullScreen";
 import ManagerAddModal from "@/app/(afterLogin)/request/management/user/_component/ManagerAddModal";
 import {useSession} from "next-auth/react";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 interface UserWithSelected extends User {
     isSelected?: boolean;
@@ -46,6 +47,7 @@ export default function UsersTable() {
     const [selectedInstitutionUser, setSelectedInstitutionUser] = useState<{id: string; name: string} | null>(null);
     const [selectOption, setSelectOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
     const { data: session } = useSession();
+    const showAlert = CallAlertDialog();
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage =>({
@@ -117,10 +119,10 @@ export default function UsersTable() {
             setTotalPage(totalPage)
             if(response.ok){
                 await fetchData(search)
-                alert("sync success!")
+                showAlert("sync success!")
             }
         } catch(error) {
-            alert(`fail: ${error}`)
+            showAlert(`fail: ${error}`)
         } finally {
             setIsLoading(false)
         }

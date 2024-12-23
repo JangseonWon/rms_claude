@@ -16,6 +16,7 @@ import {getService} from "@/app/(afterLogin)/_api/getService";
 import GreenButton from "@/app/_component/GreenButton";
 import BlueButton from "@/app/_component/BlueButton";
 import {patchService} from "@/app/(afterLogin)/request/management/service/_api/patchService";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 
 type Props = {
@@ -38,6 +39,7 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
     const [required, setRequired] = useState<SelectBoxOption>(requiredOption[0]);
     const [selectedSampleType, setSelectedSampleType] = useState<SelectBoxOption | null>(null);
     const [selectedExtension, setSelectedExtension] = useState<SelectBoxOption | null>(null);
+    const showAlert = CallAlertDialog();
 
     const fetchCategoryData = async () => {
         const response = await getCategories();
@@ -67,10 +69,10 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
     const updateService = async () => {
         const response = await patchService(service!);
         if (response.ok) {
-            alert("Update successful")
+            showAlert("Update successful")
             closeModal()
             refreshData()
-        } else alert("Fail update")
+        } else showAlert("Fail update")
     }
     useEffect(() => {
         fetchCategoryData();
@@ -83,7 +85,7 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
                 (sampleType) => sampleType.id === selectedSampleType?.value
             );
             if (isAlreadyAdded) {
-                alert("이미 등록되었습니다.")
+                showAlert("Already registered")
                 return prev;
             }
             return {
@@ -116,7 +118,7 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
                 (extension) => extension.id === selectedExtension?.value
             );
             if (isAlreadyAdded) {
-                alert("이미 등록되었습니다.")
+                showAlert("Already registered")
                 return prev;
             }
             return {

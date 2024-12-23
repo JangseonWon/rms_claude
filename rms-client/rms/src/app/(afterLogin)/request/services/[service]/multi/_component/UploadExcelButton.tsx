@@ -5,6 +5,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React, {ChangeEvent, DragEvent, useEffect, useState} from "react";
 import * as XLSX from "xlsx";
 import {faArrowUpFromBracket, faFileExcel, faUpload, faXmark} from "@fortawesome/free-solid-svg-icons";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 type UploadExcelButtonProps = {
     onFileUpload: (data: any[][]) => void;
@@ -14,6 +15,7 @@ export default function UploadExcelButton({ onFileUpload }: UploadExcelButtonPro
     const [modalOpen, setModalOpen] = useState(false);
     const [dragging, setDragging] = useState(false);
     const [file, setFile] = useState<File | null>(null);
+    const showAlert = CallAlertDialog();
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -40,7 +42,7 @@ export default function UploadExcelButton({ onFileUpload }: UploadExcelButtonPro
         const validExtensions = ['xlsx', 'xls'];
         const fileExtension = selectedFile.name.split('.').pop()?.toLowerCase();
         if (!fileExtension || !validExtensions.includes(fileExtension)) {
-            alert("Invalid file format. Please upload your Excel file.");
+            showAlert("Invalid file format. Please upload your Excel file.");
             return false;
         }
         return true;

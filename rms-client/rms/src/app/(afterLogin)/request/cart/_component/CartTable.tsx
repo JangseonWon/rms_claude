@@ -18,6 +18,7 @@ import {Filter} from "@/model/Filter";
 import SelectBox from "@/app/_component/SelectBox";
 import InputBox from "@/app/_component/InputBox";
 import CartInfo from "@/app/(afterLogin)/request/cart/_component/CartInfo";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -34,6 +35,7 @@ const selectBoxOptions: SelectBoxOption[] = [
 ];
 
 export default function CartTable() {
+    const showAlert = CallAlertDialog();
     const [requestData, setRequestData] = useState<RequestWithSelected[]>([])
     const [search, setSearch] = useState<Query>({asc: false, size:10, page:1});
     const [totalPage, setTotalPage] = useState<number>();
@@ -127,20 +129,20 @@ export default function CartTable() {
     const handleDeleteCart = async () => {
         const selectedRequests = requestData.filter(request => request.isSelected);
         if( selectedRequests.length === 0) {
-            alert("No selected.");
+            showAlert("No selected.");
             return;
         }
         const response = await deleteRequest(selectedRequests)
-        if(response.ok) alert("deleted!")
-        else alert("fail");
+        if(response.ok) showAlert("deleted!");
+        else showAlert("fail");
         fetchData(search);
     };
 
     const handleCartToOrder = async () => {
         const selectedRequests = requestData.filter(request => request.isSelected);
         const response = await putRequest(selectedRequests)
-        if(response.ok) alert("ordered!")
-        else alert(`fail`);
+        if(response.ok) showAlert("ordered!");
+        else showAlert("fail");
         fetchData(search);
     };
 

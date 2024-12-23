@@ -7,12 +7,13 @@ import type {Statistics} from "@/model/Statistics";
 import Loading from "@/app/(afterLogin)/_component/Loading";
 import {useSetStatus, useStatus} from "@/app/(afterLogin)/request/dashboard/store/useStatusStore";
 import {Status} from "@/model/Status";
-import type {Request} from "@/model/Request";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 export default function Statistics() {
     const [statisticsData, setStatisticsData] = useState<Statistics>()
     const globalStatus = useStatus();
     const setStatus = useSetStatus();
+    const showAlert = CallAlertDialog();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -44,7 +45,7 @@ export default function Statistics() {
 
     const handleLearnMoreClick = (status: Status) => {
         // router.push(`/dashboard/${status}`);
-        alert(`${status} Learn More`);
+        showAlert(`${status} Learn More`);
     };
 
     return (

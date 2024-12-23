@@ -9,6 +9,7 @@ import InputBox from "@/app/_component/InputBox";
 import {useSession} from "next-auth/react";
 import {putOrganization} from "@/app/(afterLogin)/user/_api/putOrganization";
 import {Organization} from "@/model/Organization";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 
 type Props = {
@@ -22,6 +23,7 @@ export default function InstitutionAddModal({open, closeModal}: Props) {
     const [nursingNumber, setNursingNumber] = useState('');
     const [registrationNumber, setRegistrationNumber] = useState('');
     const [type, setType] = useState('');
+    const showAlert = CallAlertDialog();
     const { data: session } = useSession();
 
     const handleInstitutionAdd = async () => {
@@ -35,10 +37,10 @@ export default function InstitutionAddModal({open, closeModal}: Props) {
         }
         const response = await putOrganization(session?.user.id!, organization);
         if (response.ok) {
-            alert("Institution added successfully!");
+            showAlert("Institution added successfully!");
             closeModal();
         } else {
-            alert("Failed to add institution");
+            showAlert("Failed to add institution");
         }
     }
 

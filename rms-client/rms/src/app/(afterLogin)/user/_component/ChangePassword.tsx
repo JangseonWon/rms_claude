@@ -7,13 +7,9 @@ import InputBox from "@/app/_component/InputBox";
 import GreenButton from "@/app/_component/GreenButton";
 import {useSession} from "next-auth/react";
 import {patchUser} from "@/app/(afterLogin)/user/_api/patchUser";
-import {
-    useOpenAlertDialogA,
-    useSetIconAlertDialogA,
-    useSetMessageAlertDialogA
-} from "@/store/useAfterLoginAlertDialogStore";
 import {User} from "@/model/User";
 import LoadingFullScreen from "@/app/_component/LoadingFullScreen";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 export default function ChangePassword() {
     const [oldPassword, setOldPassword] = useState('');
@@ -21,25 +17,18 @@ export default function ChangePassword() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const { data: session } = useSession();
-
-    const setShowAlertDialog = useOpenAlertDialogA();
-    const setMessage = useSetMessageAlertDialogA();
-    const setIcon = useSetIconAlertDialogA();
+    const showAlert = CallAlertDialog();
 
     const handleSave = async () => {
         try {
             setIsLoading(true);
             if (!newPassword || !confirmPassword) {
-                setIcon('warning');
-                setMessage('Both New Password and Confirm Password are required.');
-                setShowAlertDialog(true);
+                showAlert('Both New Password and Confirm Password are required.');
                 return;
             }
 
             if (newPassword !== confirmPassword) {
-                setIcon('warning');
-                setMessage('New Password and Confirm Password do not match.');
-                setShowAlertDialog(true);
+                showAlert('New Password and Confirm Password do not match.');
                 return;
             }
             const updatedUser: User = {
@@ -50,17 +39,13 @@ export default function ChangePassword() {
             const response = await patchUser(updatedUser);
 
             if (response.status === 200) {
-                setIcon('good');
-                setMessage('Password changed successfully.');
+                showAlert('Password changed successfully.');
             } else {
-                setIcon('error');
-                setMessage('Failed to change password. Please try again.');
+                showAlert('Failed to change password. Please try again.');
             }
         } catch (error) {
-            setIcon('error');
-            setMessage('An unexpected error occurred. Please try again later.');
+            showAlert('An unexpected error occurred. Please try again later.');
         } finally {
-            setShowAlertDialog(true);
             setIsLoading(false);
         }
     };

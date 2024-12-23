@@ -9,6 +9,7 @@ import InputBox from "@/app/_component/InputBox";
 import {useSession} from "next-auth/react";
 import {Organization} from "@/model/Organization";
 import {patchOrganization} from "@/app/(afterLogin)/user/_api/patchOrganization";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 
 type Props = {
@@ -23,6 +24,7 @@ export default function InstitutionEditModal({organization, open, closeModal}: P
     const [nursingNumber, setNursingNumber] = useState(organization.nursing_number);
     const [registrationNumber, setRegistrationNumber] = useState(organization.registration_number);
     const [type, setType] = useState(organization.type);
+    const showAlert = CallAlertDialog();
     const { data: session } = useSession();
 
     const handleInstitutionEdit = async () => {
@@ -36,10 +38,10 @@ export default function InstitutionEditModal({organization, open, closeModal}: P
         }
         const response = await patchOrganization(session?.user.id!, organization);
         if (response.ok) {
-            alert("Institution update successfully!");
+            showAlert("Institution update successfully!");
             closeModal();
         } else {
-            alert("Failed to update institution");
+            showAlert("Failed to update institution");
         }
     }
 

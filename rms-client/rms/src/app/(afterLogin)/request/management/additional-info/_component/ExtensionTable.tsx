@@ -16,6 +16,7 @@ import SelectBox from "@/app/_component/SelectBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import {putAlisExtensions} from "@/app/(afterLogin)/request/management/additional-info/_api/putAlisExtensions";
 import LoadingFullScreen from "@/app/_component/LoadingFullScreen";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 const selectBoxOptions: SelectBoxOption[] = [
     { table: "extension", column: "id", name: "Code" },
@@ -32,7 +33,7 @@ export default function ExtensionTable() {
     const [search, setSearch] = useState<Query>({sort_by:"id", asc: true, size:10, page:1});
     const [totalPage, setTotalPage] = useState<number>();
     const [selectOption, setSelectOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
-
+    const showAlert = CallAlertDialog();
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage =>({
@@ -101,10 +102,10 @@ export default function ExtensionTable() {
             setTotalPage(totalPage)
             if(response.ok){
                 await fetchData(search)
-                alert("sync success!")
+                showAlert("sync success!")
             }
         } catch(error) {
-            alert(`fail: ${error}`)
+            showAlert(`fail: ${error}`)
         } finally {
             setIsLoading(false)
         }

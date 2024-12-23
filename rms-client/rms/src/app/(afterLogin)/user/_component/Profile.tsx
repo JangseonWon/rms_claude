@@ -12,12 +12,14 @@ import Loading from "@/app/(afterLogin)/_component/Loading";
 import {patchUser} from "@/app/(afterLogin)/user/_api/patchUser";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import SelectBox from "@/app/_component/SelectBox";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 export default function Profile() {
     const {data: session, status} = useSession();
     const [user, setUser] = useState<User>();
     const [selectBoxOptions, setSelectBoxOptions] = useState<SelectBoxOption[]>([]);
     const [selectOption, setSelectOption] = useState<SelectBoxOption>();
+    const showAlert = CallAlertDialog();
 
     const fetchUser = useCallback( async () => {
         if(session?.user?.id && status === "authenticated"){
@@ -26,7 +28,7 @@ export default function Profile() {
                 const data = await res.json()
                 setUser(data as User)
             }
-            else alert("fail")
+            else showAlert("fail")
         }
     },[session?.user.id, status]);
 
@@ -67,14 +69,14 @@ export default function Profile() {
 
     const handleOnClickSave = async () => {
         if (!user) {
-            alert("Please correct the word");
+            showAlert("Please correct the word");
             return;
         }
         const res = await patchUser(user)
         if (res.status === 200) {
-            alert("success!");
+            showAlert("success!");
         } else {
-            alert("fail!");
+            showAlert("fail!");
         }
     }
 

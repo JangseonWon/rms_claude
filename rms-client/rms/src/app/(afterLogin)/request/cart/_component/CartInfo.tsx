@@ -21,6 +21,7 @@ import {SampleType} from "@/model/SampleType";
 import DatePickerBox from "@/app/_component/DatePickerBox";
 import TextBox from "@/app/_component/TextBox";
 import classNames from "classnames";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 type Props = {
     serviceId: string;
@@ -32,7 +33,8 @@ type Props = {
 export default function CartInfo({serviceId, sampleId, userId, closeModal}: Props) {
     const [request, setRequest] = useState<Request>()
     const [organizationOptions, setOrganizationOptions] = useState<SelectBoxOption[]>([])
-    const [sampleTypeOptions, setSampleTypeOptions] = useState<SelectBoxOption[]>([])
+    const [sampleTypeOptions, setSampleTypeOptions] = useState<SelectBoxOption[]>([]);
+    const showAlert = CallAlertDialog();
 
     const handleRequestChange = (path: string, value: any) => {
         setRequest(prevState => ({
@@ -88,10 +90,10 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
     const handleEditClick = async () => {
         if (validateRequest()) {
             const response = await updateRequest(request!);
-            if (response.ok) alert("Success update")
-            else alert("Fail update")
+            if (response.ok) showAlert("Success update");
+            else showAlert("Fail update");
         } else {
-            alert("Please fill out all required fields.");
+            showAlert("Please fill out all required fields.");
         }
     };
     const validateRequest = () => {

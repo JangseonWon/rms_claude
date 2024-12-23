@@ -27,6 +27,7 @@ import {
     useProbandModalOpen,
     useSetProbandModalOpen
 } from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 export default function Order() {
     const [organizationOptions, setOrganizationOptions] = useState<SelectBoxOption[]>([])
@@ -40,6 +41,7 @@ export default function Order() {
     const serviceId = decodeURIComponent(pathSegments[pathSegments.length - 2]);
     const probandModal = useProbandModalOpen();
     const setProbandModal = useSetProbandModalOpen();
+    const showAlert = CallAlertDialog();
     const sexOption: SelectBoxOption[] = [
         { value: "M", name: "Male" },
         { value: "F", name: "Female" }
@@ -79,9 +81,10 @@ export default function Order() {
         putRequest(updateRequest)
             .then((res) =>{
                 if(res.ok) {
-                    alert("success!")
+                    showAlert("success!");
+                    window.location.reload();
                 }
-                else alert("fail")
+                else showAlert("fail");
             })
     };
 

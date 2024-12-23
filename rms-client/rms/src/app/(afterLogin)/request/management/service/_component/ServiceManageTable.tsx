@@ -17,6 +17,7 @@ import {Service} from "@/model/Service";
 import {putAlisServices} from "@/app/(afterLogin)/request/management/service/_api/putAlisServices";
 import LoadingFullScreen from "@/app/_component/LoadingFullScreen";
 import {Filter} from "@/model/Filter";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 interface ServiceWithSelected extends Service {
     isSelected?: boolean;
@@ -40,6 +41,7 @@ export default function ServiceManageTable() {
     const [searchFilter, setSearchFilter] = useState<Filter | undefined>(undefined);
     const [serviceModalOpen, setServiceModalOpen] = useState<boolean>(false);
     const [selectedService, setSelectedService] = useState<Service>();
+    const showAlert = CallAlertDialog();
 
     const handleServiceEditClick = (service: Service) => {
         setSelectedService(service);
@@ -92,10 +94,10 @@ export default function ServiceManageTable() {
             setTotalPage(totalPage)
             if(response.ok){
                 await fetchData(search)
-                alert("sync success!")
+                showAlert("sync success!")
             }
         } catch(error) {
-            alert(`fail: ${error}`)
+            showAlert(`fail: ${error}`)
         } finally {
             setIsLoading(false)
         }
