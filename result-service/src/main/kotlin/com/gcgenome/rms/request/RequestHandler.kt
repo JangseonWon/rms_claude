@@ -21,7 +21,6 @@ class RequestHandler(
                 val dsl = transaction.dsl()
                 val newRequest = request.copy(
                     sample = request.sample?.copy(id = null),
-                    status = Status.UNCONFIRMED_ORDER
                 )
                 dsl.insertSample(newRequest.order!!.user!!, newRequest.sample!!, newRequest.status!!)
                     .flatMap { dsl.insertResampleRequest(newRequest.apply { sample?.id = it.id}) }
