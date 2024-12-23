@@ -77,7 +77,8 @@ interface RequestDao: QueryDao {
                                     select(
                                         jsonObject(
                                             key("id").value(USER.ID),
-                                            key("name").value(USER.NAME)
+                                            key("name").value(USER.NAME),
+                                            key("branch_serial").value(USER.BRANCH_SERIAL)
                                         )
                                     ).from(USER).where(ORGANIZATION.USER_ID.eq(USER.ID))
                                 )
@@ -118,7 +119,7 @@ interface RequestDao: QueryDao {
         return Mono.from(
             update(REQUEST)
                 .set(REQUEST.CREATE_AT, LocalDateTime.now())
-                .set(REQUEST.STATUS, Status.ORDERED.toString())
+                .set(REQUEST.STATUS, Status.UNCONFIRMED_ORDER.toString())
                 .where(REQUEST.ORDER_ID.eq(orderId)
                     .and(REQUEST.SERVICE_ID.eq(serviceId))
                     .and(REQUEST.SAMPLE_ID.eq(sampleId))
