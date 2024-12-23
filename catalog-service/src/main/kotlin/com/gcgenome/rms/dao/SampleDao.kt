@@ -16,24 +16,27 @@ interface SampleDao {
         val currentDate = LocalDateTime.now().format(ofPattern)
         val barcodePrefix = "$currentDate${user.branchSerial}"
 
-        return Mono.from(
-                insertInto(SAMPLE)
-                    .set(SAMPLE.ID, UUID.randomUUID())
-                    .set(SAMPLE.BARCODE,
-                        select(DSL.coalesce(DSL.max(SAMPLE.BARCODE.cast(Long::class.java).plus(1).cast(String::class.java)), "${barcodePrefix}5000"))
-                        .from(SAMPLE)
-                        .where(SAMPLE.BARCODE.like("$barcodePrefix%")))
-                    .set(SAMPLE.USER_SAMPLE_ID, sample.userSampleId)
-                    .set(SAMPLE.QUANTITY, sample.quantity)
-                    .set(SAMPLE.AGE, sample.age)
-                    .set(SAMPLE.SAMPLING_ON, sample.samplingOn)
-                    .set(SAMPLE.RESAMPLE_REASON, sample.resampleReason)
-                    .set(SAMPLE.CREATE_AT, status.takeIf { it != "CART" }?.let { LocalDateTime.now() })
-                    .set(SAMPLE.SAMPLE_TYPE_ID, sample.sampleType!!.id)
-                    .set(SAMPLE.PATIENT_SERIAL, sample.patient!!.serial)
-                    .set(SAMPLE.ORGANIZATION_ID, sample.patient.organization!!.id)
-                    .set(SAMPLE.USER_ID, user.id)
-                    .returning()
-            ).map { it.into(SampleDTO::class.java) }
+        val insertQuery = insertInto(SAMPLE)
+            .set(SAMPLE.ID, UUID.randomUUID())
+            .set(SAMPLE.USER_SAMPLE_ID, sample.userSampleId)
+            .set(SAMPLE.QUANTITY, sample.quantity)
+            .set(SAMPLE.AGE, sample.age)
+            .set(SAMPLE.SAMPLING_ON, sample.samplingOn)
+            .set(SAMPLE.RESAMPLE_REASON, sample.resampleReason)
+            .set(SAMPLE.CREATE_AT, status.takeIf { it != "CART" }?.let { LocalDateTime.now() })
+            .set(SAMPLE.SAMPLE_TYPE_ID, sample.sampleType!!.id)
+            .set(SAMPLE.PATIENT_SERIAL, sample.patient!!.serial)
+            .set(SAMPLE.ORGANIZATION_ID, sample.patient.organization!!.id)
+            .set(SAMPLE.USER_ID, user.id)
+
+        if (status != "CART") {
+            insertQuery.set(SAMPLE.BARCODE,
+                select(DSL.coalesce(DSL.max(SAMPLE.BARCODE.cast(Long::class.java).plus(1).cast(String::class.java)), "${barcodePrefix}5000"))
+                    .from(SAMPLE)
+                    .where(SAMPLE.BARCODE.like("$barcodePrefix%")))
+        }
+
+        return Mono.from(insertQuery.returning())
+            .map { it.into(SampleDTO::class.java) }
     }
 }

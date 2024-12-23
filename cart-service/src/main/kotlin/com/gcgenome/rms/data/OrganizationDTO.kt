@@ -1,7 +1,6 @@
 package com.gcgenome.rms.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.gcgenome.rms.tables.pojos.User
 
 data class OrganizationDTO(
     @JsonProperty("id")
