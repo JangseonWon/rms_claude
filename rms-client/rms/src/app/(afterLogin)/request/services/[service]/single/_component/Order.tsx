@@ -82,7 +82,6 @@ export default function Order() {
             .then((res) =>{
                 if(res.ok) {
                     showAlert("success!");
-                    window.location.reload();
                 }
                 else showAlert("fail");
             })

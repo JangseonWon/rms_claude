@@ -14,6 +14,9 @@ export default function AlertDialog({ message }: Props) {
     const handleCloseDialog = () => {
         setShowDialogA(false);
         setShowDialogB(false);
+        if (message.toLowerCase().includes("success")) {
+            window.location.reload();
+        }
     }
 
     const formattedMessage = message.split('\n').map((line, index) => (
