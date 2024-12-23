@@ -1,0 +1,238 @@
+"use client"
+
+import style from "@/app/(afterLogin)/request/result/resample/_component/requestModal.module.css";
+import globalModalStyle from '@/css/modal.module.css';
+import {faXmark} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import React, {useEffect} from "react";
+import {Request} from "@/model/Request"
+import InputBox from "@/app/_component/InputBox";
+import Loading from "@/app/(afterLogin)/_component/Loading";
+import {postRequests} from "@/app/(afterLogin)/request/result/resample/_api/postRequests";
+import { useRequestStore } from '@/store/useRequestStore';
+import {Query} from "@/model/Query";
+import {format} from "date-fns";
+import DatePickerBox from "@/app/_component/DatePickerBox";
+import TextBox from "@/app/_component/TextBox";
+import BlueButton from "@/app/_component/BlueButton";
+import GreenButton from "@/app/_component/GreenButton";
+import ExtensionInputComponent from "@/app/(afterLogin)/request/result/resample/_component/ExtensionInputComponent";
+import {putRequest} from "@/app/(afterLogin)/request/result/resample/_api/putRequest";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
+import {Status} from "@/model/Status";
+
+type Props = {
+    propRequest: Request | undefined
+    closeModal: () => void;
+    refreshData: () => void;
+}
+
+export default function RequestModal({propRequest, closeModal,refreshData}: Props) {
+    const { request, setRequest } = useRequestStore();
+    const showAlert = CallAlertDialog();
+
+    const handleRequestChange = (path: string, value: any) => {
+        setRequest(prevState => ({
+            ...prevState,
+            ...setNestedValue({ ...prevState }, path, value)
+        }));
+    };
+    const handleOrderNow = async() =>{
+        const updatedRequest = { ...request, status: Status.UNCONFIRMED_ORDER };
+        const response = await putRequest(updatedRequest!)
+        if(response.ok){
+            closeModal();
+            refreshData();
+            showAlert("success!")
+        }else{
+            showAlert("fail!")
+        }
+    }
+    const handleCart = async() =>{
+        const updatedRequest = { ...request, status: Status.CART };
+        const response = await putRequest(updatedRequest!)
+        if(response.ok){
+            closeModal();
+            refreshData();
+        }else{
+            alert("fail!!")
+        }
+    }
+
+    const setNestedValue = (object: any, nestedPath: string, newValue: any): any => {
+        const [firstKey, ...remainingPathSegments] = nestedPath.split('.');
+        if (remainingPathSegments.length === 0) {
+            return { ...object, [firstKey]: newValue };
+        }
+        return {
+            ...object,
+            [firstKey]: setNestedValue(object[firstKey] || {}, remainingPathSegments.join('.'), newValue),
+        };
+    };
+    const setAge = (birthDate: Date, samplingDate: Date): number => {
+        let age = samplingDate.getFullYear() - birthDate.getFullYear();
+        const monthDifference = samplingDate.getMonth() - birthDate.getMonth()
+        if (monthDifference < 0 || (monthDifference === 0 && samplingDate.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age;
+    };
+    const fetchRequest = async () => {
+        const query: Query = {
+            filter_groups: [
+                {
+                    filters: [
+                        {
+                            table: "sample",
+                            column: "id",
+                            value: propRequest!.sample!.id,
+                            operator: "="
+                        },
+                        {
+                            table: "service",
+                            column: "id",
+                            value: propRequest!.service!.id,
+                            operator: "="
+                        }
+                    ]
+                }
+            ]
+        } as Query
+        const response = await postRequests(query)
+        const json = await response.json()
+        setRequest(json[0] as Request)
+    };
+
+    const formatDate = (date: Date): string => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    const getDateFromComponents = (year?: number, month?: number, day?: number): string | undefined => {
+        if (!year || !month || !day) return undefined;
+        const date = new Date(year, month - 1, day);
+        return formatDate(date);
+    };
+    useEffect(() => {
+        fetchRequest()
+    }, []);
+
+    return (
+        <div className={globalModalStyle.modalBackground}>
+            <div className={globalModalStyle.modal}>
+                <div className={style.modalTitle}>
+                    <h1>Re-sample Order</h1>
+                    <button onClick={closeModal}>
+                        <FontAwesomeIcon icon={faXmark}/>
+                    </button>
+                </div>
+                {request ? (
+                    <>
+                        <p className={style.contentTitle}>Institution name</p>
+                        <div className={style.flexStartContainer}>
+                            <InputBox
+                                label={"Institution"}
+                                value={request.sample?.patient?.organization?.name}
+                                disabled={true}
+                            />
+
+                        </div>
+                        <p className={style.contentTitle}>Service Info.</p>
+                        <div className={style.flexStartContainer}>
+                            <InputBox
+                                label={"Service"}
+                                value={request.service?.name}
+                                disabled={true}
+                            />
+                        </div>
+                        <p className={style.contentTitle}>Patient Info.</p>
+                        <div className={style.flexStartContainer}>
+                            <InputBox
+                                label={"Name*"}
+                                value={request.sample?.patient?.name}
+                                onChange={(value) => handleRequestChange('sample.patient.name', value)}
+                                disabled={true}
+                            />
+                            <InputBox
+                                label={"MRN*"}
+                                value={request.sample?.patient?.serial}
+                                onChange={(value) => handleRequestChange('sample.patient.serial', value)}
+                                disabled={false}
+                            />
+                            <InputBox
+                                label={"Date of Birth"}
+                                value={getDateFromComponents(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}
+                                disabled={true}
+                            />
+                            <InputBox
+                                label={"Age"}
+                                value={request.sample?.age}
+                                disabled={true}
+                            />
+                        </div>
+                        <p className={style.contentTitle}>Specimen/.Sample Info.</p>
+                        <div className={style.flexStartContainer}>
+                            <InputBox
+                                label={"Type*"}
+                                value={request.sample?.sample_type?.name}
+                                disabled={true}
+                            />
+                            <DatePickerBox
+                                label={"Date of Collection*"}
+                                required={true}
+                                onChange={(date) => {
+                                    if (date) {
+                                        handleRequestChange('sample.sampling_on', format(date, "yyyy-MM-dd"))
+                                        if (request?.sample?.patient?.birth_year
+                                            && request?.sample?.patient?.birth_month
+                                            && request?.sample?.patient?.birth_day) {
+                                            handleRequestChange('sample.age', setAge(new Date(`${request?.sample.patient.birth_year}-${request?.sample.patient.birth_month}-${request?.sample.patient.birth_day}`), date));
+                                        }
+                                    } else {
+                                        handleRequestChange('sample.sampling_on', null)
+                                        handleRequestChange('sample.age', null);
+                                    }
+                                }}
+                            />
+                            <InputBox
+                                label={"Quantity*"}
+                                required={true}
+                                onChange={(value) => handleRequestChange('sample.quantity', value)}
+                            />
+                        </div>
+                        <p className={style.contentTitle}>Additional Info.</p>
+                        <div className={style.flexStartContainer}>
+                            <InputBox
+                                label={"Medical Department"}
+                                onChange={(value) => handleRequestChange('department', value)}
+                            />
+                            <InputBox
+                                label={"Ward"}
+                                onChange={(value) => handleRequestChange('ward', value)}
+                            />
+                            <InputBox
+                                label={"Physician Name"}
+                                onChange={(value) => handleRequestChange('physician', value)}
+                            />
+                        </div>
+                        <div className={style.flexStartContainer}>
+                            <ExtensionInputComponent serviceId={request.service?.id!}/>
+                        </div>
+                        <TextBox
+                            label={'Memo'}
+                            value={request.memo}
+                            required={true}
+                            onChange={(value) => handleRequestChange('memo', value)}
+                        />
+                        <div className={style.flexEndContainer}>
+                            <GreenButton name={'Add to cart'} onClick={() => handleCart()}/>
+                            <BlueButton name={"Order now"} onClick={() => handleOrderNow()}/>
+                        </div>
+                    </>
+                ) : <Loading/>}
+            </div>
+        </div>
+    )
+}

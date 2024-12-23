@@ -1,0 +1,57 @@
+.section {
+    display: grid;
+}
+.section > * {
+    margin-top: 20px;
+    padding-right: 20px;
+}
+.gridContainer {
+    width: 1000px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2%;
+    margin-bottom: 10px;
+}
+.gridItem {
+    width: 200px;
+    margin-bottom: 20px;
+}
+.textContainer {
+    margin-bottom: 10px;
+}
+.probandContainer {
+    margin-bottom: 10px;
+}
+.title {
+    flex-basis: 100%;
+    margin: 20px 0 5px 0;
+    color: #002b49;
+    font-size: 15px;
+    font-weight: 700;
+}
+.proband {
+    display: flex;
+    gap: 30px;
+}
+.button {
+    margin-top: 25px;
+    position: relative;
+    z-index: 1;
+    font-size: 13px;
+    padding: 6px 20px;
+    min-width: 120px;
+    height: 30px;
+    border-radius: 15px;
+    border: 1px solid #182847;
+    transition: all 150ms ease;
+    cursor: pointer;
+    background: linear-gradient(to right, #023a60, #5676a2);
+    color: #ffffff;
+}
+.button:hover {
+    background: linear-gradient(90deg, #3c6699, #9ebce6);
+    border: 1px solid #9ebce6;
+}
+.probandInput {
+    width: 300px;
+}

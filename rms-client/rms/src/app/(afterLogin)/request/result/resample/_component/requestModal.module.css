@@ -1,0 +1,50 @@
+.modalTitle {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+.modalTitle h1 {
+    font-size: 32px;
+}
+.modalTitle button {
+    border: none;
+    background-color: white;
+    border-radius: 50%;
+    font-size: 25px;
+    cursor: pointer;
+}
+.modalTitle button:hover {
+    background-color: #C8C9CB;
+}
+.flexEndContainer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    gap: 10px;
+}
+.flexStartContainer {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
+    gap: 20px;
+}
+.contentTitle {
+    margin: 0;
+    padding: 5px 0;
+    flex-basis: 100%;
+    color: #002b49;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.memo {
+    border: solid 1px #EBEDF4;
+    background: #FAFAFA;
+    width: 100%;
+    border-radius: 15px;
+    padding: 10px 20px;
+    box-shadow: 0 2px 2px #F3F6F9;
+}
+.memo:focus {
+    outline: none;
+}
