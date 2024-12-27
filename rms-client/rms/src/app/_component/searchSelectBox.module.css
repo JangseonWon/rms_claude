@@ -1,0 +1,56 @@
+.searchSelectBoxContainer {
+    position: relative;
+    width: 300px;
+}
+.searchSelectBoxInput {
+    width: 100%;
+    height: 35px;
+    min-width: 200px;
+    border: 1px solid #DAE2ED;
+    border-radius: 20px;
+    padding: 6px 20px;
+    box-sizing: border-box;
+    font-size: 12px;
+    box-shadow: 0 2px 2px #F3F6F9;
+}
+
+.searchSelectBoxInput:not(:disabled):hover {
+    outline: 2px solid #CCE492;
+    border: 1px solid #90BA2D;
+}
+.searchSelectBoxInput:focus {
+    outline: 2px solid #CCE492;
+    border: 1px solid #90BA2D;
+}
+
+.searchSelectBoxDropdown {
+    position: absolute;
+    top: 40px;
+    width: 100%;
+    max-height: 250px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    z-index: 10;
+}
+
+.searchSelectBoxOption {
+    font-size: 12px;
+    padding: 8px;
+    cursor: pointer;
+    background-color: transparent;
+}
+
+.searchSelectBoxOption.highlighted {
+    background-color: #f0f0f0;
+}
+
+.searchSelectBoxNoOptions {
+    padding: 8px;
+    text-align: center;
+    color: #aaa;
+}

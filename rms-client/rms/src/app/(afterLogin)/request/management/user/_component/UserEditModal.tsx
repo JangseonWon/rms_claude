@@ -6,14 +6,15 @@ import tableStyle from '@/css/globalTable.module.css';
 import {faTrash, faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
-import {SelectBoxOption} from "@/model/SelectBoxOption";
-import SelectSearchBox from "@/app/(afterLogin)/request/management/_component/SelectSearchBox";
+import SearchSelectBox, {Option} from "@/app/_component/SearchSelectBox";
 import {User} from "@/model/User";
 import GreenButton from "@/app/_component/GreenButton";
 import BlueButton from "@/app/_component/BlueButton";
 import {getUser} from "@/app/(afterLogin)/request/management/user/_api/getUser";
 import {patchUser} from "@/app/(afterLogin)/request/management/user/_api/patchUser";
-import {Organization} from "@/model/Organization";
+import {Service} from "@/model/Service";
+import {getServices} from "@/app/(afterLogin)/request/management/user/_api/getServices";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 
 type Props = {
@@ -24,7 +25,14 @@ type Props = {
 
 export default function UserEditModal({userId, closeModal, fetchData}: Props) {
     const [user, setUser] = useState<User>();
-    const [selectedAddService, setSelectedAddService] = useState<SelectBoxOption | null>(null);
+    const [selectedOption, setSelectedOption] = useState<Option | undefined>();
+    const [serviceOptions, setServiceOptions] = useState<Option[]>([])
+    const showAlert = CallAlertDialog();
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const handleSelect = (option: any) => {
+        setSelectedOption(option);
+    };
 
     const fetchUser = async (userId: string) => {
         const response = await getUser(userId);
@@ -37,26 +45,56 @@ export default function UserEditModal({userId, closeModal, fetchData}: Props) {
             return [];
         }
     }
+    const fetchServices = async () => {
+        const response = await getServices()
+        if (response.ok) {
+            const data = await response.json();
+            const services = data as Service[]
+            const mappedOptions = services.map(mapServiceToOption)
+            setServiceOptions(mappedOptions)
+        } else {
+            return [];
+        }
+    }
+    const mapServiceToOption = (service: Service): Option => ({
+        id: service.id!,
+        label: service.name!,
+    });
     const updateUser = async () => {
         const response = await patchUser(user!);
         if (response.ok) {
-            alert("Update successful")
+            showAlert("Update successful")
             fetchData()
             closeModal()
-        } else alert("Fail update")
+        } else showAlert("Fail update")
     }
 
     const handleUserServiceInsertClick = async () => {
-        setUser((prev) =>({
-            ...prev,
-            services: [
-                ...(prev?.services ||[]),
-                {
-                    id: selectedAddService?.value,
-                    name: selectedAddService?.name
+        if(selectedOption) {
+            setUser((prev) =>{
+                const isAlreadyAdded = prev?.services?.some(
+                    (service) => service.id === selectedOption.id
+                );
+                if (isAlreadyAdded) {
+                    showAlert("Already registered")
+                    return prev;
+                }else {
+                    setSearchTerm('')
+                    return {
+                        ...prev,
+                        services: [
+                            ...(prev?.services ||[]),
+                            {
+                                id: selectedOption.id,
+                                name: selectedOption.label
+                            }
+                        ]
+                    } as User
                 }
-            ]
-        }) as User)
+            })
+        }else{
+            showAlert('No options selected.');
+        }
     }
 
     const handleUserServiceDeleteClick = async (serviceId: string) => {
@@ -70,6 +108,7 @@ export default function UserEditModal({userId, closeModal, fetchData}: Props) {
 
     useEffect(() => {
         fetchUser(userId);
+        fetchServices()
     }, []);
 
     return (
@@ -106,11 +145,17 @@ export default function UserEditModal({userId, closeModal, fetchData}: Props) {
                     <div className={style.content}>
                         <div className={style.contentTitle}>Services</div>
                         <div className={style.contentFormGroup}>
-                            <SelectSearchBox
-                                type={'service'}
-                                onSelect={setSelectedAddService}
-                                width={'300px'}/>
-                            <button className={style.addButton} onClick={handleUserServiceInsertClick}>Add</button>
+                            <SearchSelectBox
+                                options={serviceOptions}
+                                onSelect={handleSelect}
+                                placeholder={'Service name...'}
+                                value={searchTerm}
+                                onChange={setSearchTerm}
+                            />
+                            <BlueButton
+                                name={'Add'}
+                                onClick={handleUserServiceInsertClick}
+                            />
                         </div>
                         <table className={tableStyle.table}>
                             <thead>
