@@ -35,6 +35,9 @@ class ServiceHandler(
     fun selectServices(query: Query): Mono<Page<ServiceDTO>> {
         return dslContext.selectServicesWithPage(query)
     }
+    fun selectServices(): Flux<ServiceDTO> {
+        return dslContext.selectServices()
+    }
 
     fun selectService(serviceId: String): Mono<ServiceDTO> {
         return Mono.from(dslContext.selectServiceById(serviceId))

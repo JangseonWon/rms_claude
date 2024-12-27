@@ -7,11 +7,17 @@ import com.gcgenome.rms.data.ServiceDTO
 import com.gcgenome.rms.tables.references.*
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.*
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.util.*
 
 
 interface ServiceDao : QueryDao{
+    fun DSLContext.selectServices(): Flux<ServiceDTO> {
+        return Flux.from(
+            selectFrom(SERVICE).orderBy(SERVICE.NAME_KR)
+        ).map { it.into(ServiceDTO::class.java) }
+    }
 
     fun DSLContext.selectServicesWithPage(query: Query): Mono<Page<ServiceDTO>> {
         val joins = listOf(

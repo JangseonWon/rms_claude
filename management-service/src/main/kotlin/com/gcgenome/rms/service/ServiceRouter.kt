@@ -27,6 +27,7 @@ class ServiceRouter (
     fun route() = router {
         POST("/w-api/management-service/services/search", ::findServices)
         GET("/w-api/management-service/services/{service-id}", ::findService)
+        GET("/w-api/management-service/services", ::getServices)
         PATCH("/w-api/management-service/services/{service-id}", ::updateService)
     }
     private fun findServices(request: ServerRequest): Mono<ServerResponse> {
@@ -55,6 +56,14 @@ class ServiceRouter (
             .onErrorResume(AdminAuthenticationException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(ServiceNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
             .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error : ${it.cause}") }
+    }
+    private fun getServices(request: ServerRequest): Mono<ServerResponse> {
+        return authenticationHandler.chkManager(request)
+            .flatMap { serviceHandler.selectServices().collectList() }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), ServiceDTO::class.java) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(AdminAuthenticationException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error : ${it.cause}") }
     }
 
