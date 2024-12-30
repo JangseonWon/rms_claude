@@ -81,7 +81,7 @@ export default function Order() {
         putRequest(updateRequest)
             .then((res) =>{
                 if(res.ok) {
-                    showAlert("success!");
+                    showAlert("success!", true);
                 }
                 else showAlert("fail");
             })

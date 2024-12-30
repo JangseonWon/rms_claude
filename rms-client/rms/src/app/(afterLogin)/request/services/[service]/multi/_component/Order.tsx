@@ -171,7 +171,7 @@ export default function Order() {
         try {
             const response = await putRequest(orderData);
             if (response.ok) {
-                showAlert("Order placed successfully!");
+                showAlert("Order placed successfully!", true);
                 setRequestData([]);
             } else {
                 showAlert("Failed to place the order.");

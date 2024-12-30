@@ -1,7 +1,7 @@
 import style from './alertDialog.module.css';
 import React from "react";
 import {useOpenAlertDialogB} from "@/store/useBeforeLoginAlertDialogStore";
-import {useOpenAlertDialogA} from "@/store/useAfterLoginAlertDialogStore";
+import {useOpenAlertDialogA, useRefresh} from "@/store/useAfterLoginAlertDialogStore";
 
 type Props = {
     message: string;
@@ -10,11 +10,12 @@ type Props = {
 export default function AlertDialog({ message }: Props) {
     const setShowDialogA = useOpenAlertDialogA();
     const setShowDialogB = useOpenAlertDialogB();
+    const refresh = useRefresh();
 
     const handleCloseDialog = () => {
         setShowDialogA(false);
         setShowDialogB(false);
-        if (message.toLowerCase().includes("success")) {
+        if (refresh) {
             window.location.reload();
         }
     }
