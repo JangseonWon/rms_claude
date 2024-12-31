@@ -2,7 +2,6 @@
 
 import style from './listServicePage.module.css';
 import {useSelectCategory, useSetSelectCategory} from "@/store/useCategoryStore";
-import ServiceSearchBox from "@/app/(afterLogin)/request/service-catalog/_component/ServiceSearchBox";
 import React, {useEffect, useState} from "react";
 import Image from "next/image";
 import {
@@ -13,14 +12,17 @@ import {Categories} from "@/model/Categories";
 import {useRouter} from "next/navigation";
 import QnaLoading from "@/app/(afterLogin)/qna/_component/QnaLoading";
 import {getCategories} from "@/app/(afterLogin)/_api/getCategories";
-import {User} from "@/model/User";
+import SearchSelectBox, {Option} from "@/app/_component/SearchSelectBox";
+import {getServices} from "@/app/(afterLogin)/request/management/user/_api/getServices";
 
 export default function ListServicePage() {
     const router = useRouter();
     const [categoryArray, setCategoryArray] = useState<Categories[]>();
+    const [serviceOptions, setServiceOptions] = useState<Option[]>([])
     const [isLoading, setIsLoading] = useState(false);
     const [serviceData, setServiceData] = useState<Service[]>();
     const [selectedCard, setSelectedCard] = useState<string | null>(null);
+    const [searchTerm, setSearchTerm] = useState('');
     const selectCategory = useSelectCategory();
     const setSelectCategory = useSetSelectCategory();
 
@@ -51,15 +53,33 @@ export default function ListServicePage() {
         setSelectCategory(category);
     }
 
-    const serviceOnClick = async (service: Service) => {
-        setIsLoading(true);
-        try {
-            await new Promise(resolve => setTimeout(resolve, 500));
-            router.push(`/request/services/${service.id}/single`);
-        } finally {
-            setIsLoading(false);
+    const handleSelect = async (option: any) => {
+        if (option && option.id) {
+            setIsLoading(true);
+            try {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                router.push(`/request/services/${option.id}/single`);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+    };
+
+    const fetchServices = async () => {
+        const response = await getServices()
+        if (response.ok) {
+            const data = await response.json();
+            const services = data as Service[]
+            const mappedOptions = services.map(mapServiceToOption)
+            setServiceOptions(mappedOptions)
+        } else {
+            return [];
         }
     }
+    const mapServiceToOption = (service: Service): Option => ({
+        id: service.id!,
+        label: service.name!,
+    });
 
     const fetchServiceData = async (categoryId: string) => {
         const response = await getServicesByCategoryId(categoryId);
@@ -85,8 +105,8 @@ export default function ListServicePage() {
         const fetchData = async () => {
             await fetchCategoryData();
         };
-
         fetchData();
+        fetchServices();
     }, []);
 
     useEffect(() => {
@@ -110,7 +130,13 @@ export default function ListServicePage() {
             {isLoading && <QnaLoading/>}
             <section className={style.bodySection}>
                 <div className={style.search}>
-                    <ServiceSearchBox/>
+                    <SearchSelectBox
+                        options={serviceOptions}
+                        onSelect={handleSelect}
+                        placeholder={'Service name...'}
+                        value={searchTerm}
+                        onChange={setSearchTerm}
+                    />
                 </div>
                 <section className={style.categorySection}>
                     {categoryArray && categoryArray.length > 0 && categoryArray.map((category) => (
@@ -141,8 +167,7 @@ export default function ListServicePage() {
                                 <div className={`${style.cartBottomSection} ${selectedCard === category.id ? style.expanded : ''}`}>
                                     <div className={style.cartBottomSectionScroll}>
                                         {serviceData && serviceData.length > 0 ? (serviceData?.map((service) => (
-                                                <div key={service.id} className={style.serviceLink}
-                                                     onClick={() => serviceOnClick(service)}>
+                                                <div key={service.id} className={style.serviceLink}>
                                                     <span className={style.serviceCode}>{service.id}</span>
                                                     <span className={style.serviceName}>{service.name}</span>
                                                 </div>
