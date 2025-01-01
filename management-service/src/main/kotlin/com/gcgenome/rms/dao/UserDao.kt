@@ -2,6 +2,7 @@ package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.*
 import com.gcgenome.rms.tables.pojos.User
+import com.gcgenome.rms.tables.references.POST_CATEGORY
 import com.gcgenome.rms.tables.references.SERVICE
 import com.gcgenome.rms.tables.references.USER
 import com.gcgenome.rms.tables.references.USER_SERVICE
@@ -51,29 +52,6 @@ interface UserDao : QueryDao{
                 .returning()
         ).map { it.into(UserDTO::class.java) }
     }
-
-    fun DSLContext.selectUserWithServicesQuery(userId: String, query: Query): Mono<UserDTO> {
-        val joins = listOf(
-            QueryDao.JoinInfo(USER_SERVICE, USER.ID.eq(USER_SERVICE.USER_ID), QueryDao.JoinType.LEFT),
-            QueryDao.JoinInfo(SERVICE, USER_SERVICE.SERVICE_ID.eq(SERVICE.ID), QueryDao.JoinType.LEFT)
-        )
-        val fields = listOf(
-            USER.ID.`as`("id"),
-            USER.NAME.`as`("name"),
-            jsonArrayAgg(
-                jsonObject(
-                    key("id").value(SERVICE.ID),
-                    key("name").value(SERVICE.NAME)
-                )
-            ).`as`("services")
-        )
-        val where = USER.ID.eq(userId)
-        val groupByFields = listOf(USER.ID)
-
-        return selectQuery(mainTable = USER, query = query, selectFields = fields, where = where, joinTables = joins, groupByFields = groupByFields) { record ->
-            record.into(UserDTO::class.java)
-        }
-    }
     fun DSLContext.selectUsersWithPage(query: Query): Mono<Page<UserDTO>> {
         return selectPage(mainTable = USER, query = query) { record ->
             record.into(UserDTO::class.java)
@@ -93,11 +71,13 @@ interface UserDao : QueryDao{
                 USER.BRANCH_SERIAL,
                 USER.BRANCH_NAME,
                 USER.CREATE_AT,
-                jsonArrayAgg(
-                    jsonObject(
-                        key("id").value(SERVICE.ID),
-                        key("name").value(SERVICE.NAME),
-                        key("name_kr").value(SERVICE.NAME_KR)
+                `when`(SERVICE.ID.isNotNull,
+                    jsonArrayAgg(
+                        jsonObject(
+                            key("id").value(SERVICE.ID),
+                            key("name").value(SERVICE.NAME),
+                            key("name_kr").value(SERVICE.NAME_KR)
+                        )
                     )
                 ).`as`("services")
             )
@@ -105,7 +85,7 @@ interface UserDao : QueryDao{
                 .leftJoin(USER_SERVICE).on(USER.ID.eq(USER_SERVICE.USER_ID))
                 .leftJoin(SERVICE).on(USER_SERVICE.SERVICE_ID.eq(SERVICE.ID))
             .where(USER.ID.eq(userId))
-            .groupBy(USER.ID)
+            .groupBy(USER.ID, SERVICE.ID)
         ).map { it.into(UserDTO::class.java) }
     }
 

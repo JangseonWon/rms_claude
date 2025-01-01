@@ -135,7 +135,7 @@ interface QueryDao {
             filterGroup.filters.forEach { filter ->
                 val table = filter.table
                 val column = filter.column
-                val field = field(DSL.name(table, column))
+                val field = field(name(table, column))
 
                 val filterCondition = when (filter.operator) {
                     "=" -> field.eq(filter.value)
@@ -161,15 +161,17 @@ interface QueryDao {
     }
     private fun orderBy(query: Query): List<SortField<*>> {
         val sortFields = mutableListOf<SortField<*>>()
-        query.sortBy?.let { sortBy ->
-            val field = field(sortBy)
-            val sortField = if (query.asc == true) {
+
+        query.sorts?.forEach { sort ->
+            val field = field(name(sort.table, sort.column))
+            val sortField = if (sort.asc == true) {
                 field.asc()
             } else {
                 field.desc()
             }
             sortFields.add(sortField)
         }
+
         return sortFields
     }
 }
