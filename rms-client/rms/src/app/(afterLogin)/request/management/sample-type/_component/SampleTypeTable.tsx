@@ -22,13 +22,22 @@ const selectBoxOptions: SelectBoxOption[] = [
     { table: "sample_type", column: "name_kr", name: "Name(KR)" },
     { table: "sample_type", column: "name", name: "Name(EN)" },
 ];
-
+const defaultQuery: Query = {
+    sorts: [
+        {
+            table: "sample_type",
+            column: "id"
+        }
+    ],
+    size:10,
+    page:1
+}
 export default function SampleTypeTable() {
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [sampleTypes, setSampleTypes] = useState<SampleType[]>([]);
     const [selectSampleType, setSelectSampleType] = useState<SampleType>();
     const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
-    const [search, setSearch] = useState<Query>({sort_by:"id", asc: true, size:10, page:1});
+    const [search, setSearch] = useState<Query>(defaultQuery);
     const [totalPage, setTotalPage] = useState<number>();
     const [selectOption, setSelectOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
 

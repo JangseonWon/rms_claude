@@ -25,12 +25,23 @@ const selectBoxOptions: SelectBoxOption[] = [
     { table: "extension", column: "type", name: "Type" },
 ];
 
+const defaultQuery: Query = {
+    sorts: [
+        {
+            table: "extension",
+            column: "id"
+        }
+    ],
+    size:10,
+    page:1
+}
+
 export default function ExtensionTable() {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [extensions, setExtensions] = useState<Extension[]>([]);
     const [selectExtension, setSelectExtension] = useState<Extension>();
     const [extensionEditModalOpen, setExtensionEditModalOpen] = useState<boolean>(false);
-    const [search, setSearch] = useState<Query>({sort_by:"id", asc: true, size:10, page:1});
+    const [search, setSearch] = useState<Query>(defaultQuery);
     const [totalPage, setTotalPage] = useState<number>();
     const [selectOption, setSelectOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
     const showAlert = CallAlertDialog();

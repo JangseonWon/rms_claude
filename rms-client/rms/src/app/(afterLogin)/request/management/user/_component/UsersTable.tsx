@@ -34,12 +34,23 @@ const selectBoxOptions: SelectBoxOption[] = [
     { table: "user", column: "branch_serial", name: "Serial" },
     { table: "user", column: "role", name: "Role" }
 ];
+const defaultQuery: Query = {
+    sorts: [
+        {
+            table: "user",
+            column: "id"
+        }
+    ],
+    size:10,
+    page:1
+}
+
 
 export default function UsersTable() {
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [userData, setUserData] = useState<UserWithSelected[]>([]);
     const [totalPage, setTotalPage] = useState<number>(0);
-    const [search, setSearch] = useState<Query>({sort_by:"state", asc: true, size:10, page:1});
+    const [search, setSearch] = useState<Query>(defaultQuery);
     const [userServiceModalOpen, setUserServiceModalOpen] = useState<boolean>(false);
     const [managerAddModalOpen, setManagerAddModalOpen] = useState<boolean>(false);
     const [selectedUser, setSelectedUser] = useState<User>();

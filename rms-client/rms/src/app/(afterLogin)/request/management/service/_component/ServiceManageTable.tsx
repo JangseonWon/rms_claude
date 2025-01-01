@@ -30,7 +30,16 @@ const selectBoxOptions: SelectBoxOption[] = [
     { table: "service", column: "type", name: "Type" },
     { table: "category", column: "name", name: "Category Name" },
 ];
-const defaultSearch: Query = {size:10, page:1}
+const defaultSearch: Query = {
+    sorts: [
+        {
+            table: "service",
+            column: "id"
+        }
+    ],
+    size:10,
+    page:1
+}
 
 export default function ServiceManageTable() {
     const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -78,7 +87,6 @@ export default function ServiceManageTable() {
             setServices(responseData as Service[]);
             setTotalPage(totalPage);
         } catch(error) {
-            console.error("Failed to fetch data:", error);
             setServices([]);
             setTotalPage(0);
         }
