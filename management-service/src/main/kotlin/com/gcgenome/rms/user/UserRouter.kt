@@ -33,8 +33,7 @@ class UserRouter(
     private fun findUser(request: ServerRequest): Mono<ServerResponse> {
         val userId = request.pathVariable("user-id")
         return authenticationHandler.chkManager(request)
-            .flatMap { request.bodyToMono(Query::class.java).defaultIfEmpty(Query()) }
-            .flatMap { query -> userHandler.selectUser(userId) }
+            .flatMap { userHandler.selectUser(userId) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), UserDTO::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error : $it") }

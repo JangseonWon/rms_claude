@@ -36,18 +36,44 @@ class UserHandler(
     fun updateUserById(userAuthentication: UserAuthentication, user: UserDTO): Mono<UserHistory> {
         val hostUserId = userAuthentication.user.id!!
         return Mono.from(dslContext.transactionPublisher { trx ->
-            trx.dsl().run {
+            val dsl = trx.dsl()
+            dsl.run {
                 updateUserById(user)
                     .then(
-                        user.services?.takeIf { it.isNotEmpty() }?.let {
-                            deleteUserServiceByUserId(user.id)
-                                .thenMany(Flux.fromArray(it)
-                                    .flatMap { service -> insertUserService(user.id, service.id!!) }
-                                ).then()
-                            } ?: Mono.empty()
-                    ).then(userHistoryHandler.logUserChanges(dsl(), hostUserId, user))
+                        if(user.services == null){ Mono.empty() }
+                        else{
+                            Mono.defer {
+                                val serviceIds = user.services?.mapNotNull { it.id } ?: emptyList()
+                                updateUserServiceRelationships(dsl, user.id, serviceIds)
+                            }
+                        }
+                    )
+                    .then(userHistoryHandler.logUserChanges(dsl(), hostUserId, user))
             }
         })
+    }
+
+    private fun updateUserServiceRelationships(dsl: DSLContext, userId: String, serviceIds: List<String>): Mono<Void> {
+        return dsl.run {
+            selectUserServices(userId)
+                .collectList()
+                .flatMap { existingServices ->
+                    val existingServiceIds = existingServices.map { it.serviceId } ?: emptyList()
+                    val servicesToDelete = existingServiceIds - serviceIds
+                    val servicesToInsert = serviceIds - existingServiceIds
+
+                    Flux.fromIterable(servicesToDelete)
+                        .flatMap { serviceId ->
+                            deleteUserServiceByUserIdAndServiceId(userId, serviceId!!)
+                        }
+                        .thenMany(
+                            Flux.fromIterable(servicesToInsert)
+                                .flatMap { serviceId ->
+                                    insertUserService(userId, serviceId!!)
+                                }
+                        ).then()
+                }
+        }
     }
 
     fun insertManager(hostId: String, user: User): Mono<UserHistory>{
