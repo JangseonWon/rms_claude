@@ -29,10 +29,9 @@ const selectBoxOptions: SelectBoxOption[] = [
     { table: "organization", column: "name", name: "Institution" },
     { table: "sample", column: "barcode", name: "Registration ID" },
     { table: "service", column: "name", name: "Service" },
+    { table: "request", column: "status", name: "Status"},
     { table: "patient", column: "name", name: "Patient(s) Name" },
-    { table: "patient", column: "serial", name: "MRN" },
-    { table: "request", column: "courier_company", name: "Global courier" },
-    { table: "request", column: "awb_number", name: "AirWaybill no" },
+    { table: "patient", column: "serial", name: "MRN" }
 ];
 const defaultSearch: Query = {size:10, page:1}
 
@@ -215,10 +214,9 @@ export default function OrderDeletePage() {
                                     <th>Institution</th>
                                     <th>Registration ID</th>
                                     <th>Service</th>
+                                    <th>Status</th>
                                     <th>Patient(s) Name</th>
                                     <th>MRN</th>
-                                    <th>Global courier</th>
-                                    <th className={requestStyle.middleColumn}>AirWaybill no.</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -241,10 +239,9 @@ export default function OrderDeletePage() {
                                         <td>{request.sample?.patient?.organization?.name}</td>
                                         <td>{request.sample?.barcode}</td>
                                         <td>{request.service?.name}</td>
+                                        <td>{request.status}</td>
                                         <td>{request.sample?.patient?.name}</td>
                                         <td>{request.sample?.patient?.serial}</td>
-                                        <td>{request.courier_company}</td>
-                                        <td>{request.awb_number}</td>
                                     </tr>
                                 ))}
                                 </tbody>
