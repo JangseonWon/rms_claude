@@ -13,7 +13,19 @@ import {useRouter} from "next/navigation";
 import QnaLoading from "@/app/(afterLogin)/qna/_component/QnaLoading";
 import {getCategories} from "@/app/(afterLogin)/_api/getCategories";
 import SearchSelectBox, {Option} from "@/app/_component/SearchSelectBox";
-import {getServices} from "@/app/(afterLogin)/request/management/user/_api/getServices";
+import {postServiceByUser} from "@/app/(afterLogin)/request/service-catalog/_api/postServiceByUser";
+import {Query} from "@/model/Query";
+
+const defaultSearch: Query = {
+    sorts: [
+        {
+            table: "service",
+            column: "name"
+        }
+    ],
+    size:10,
+    page:1
+}
 
 export default function ListServicePage() {
     const router = useRouter();
@@ -76,7 +88,7 @@ export default function ListServicePage() {
     }
 
     const fetchServices = async () => {
-        const response = await getServices()
+        const response = await postServiceByUser(defaultSearch);
         if (response.ok) {
             const data = await response.json();
             const services = data as Service[]
