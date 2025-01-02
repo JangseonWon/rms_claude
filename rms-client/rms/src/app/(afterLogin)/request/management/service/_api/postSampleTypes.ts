@@ -2,7 +2,7 @@ import {Query} from "@/model/Query";
 
 
 export async function postSampleTypes(search: Query) {
-    const res = await fetch(`/w-api/management-service/sample-types`, {
+    const res = await fetch(`/w-api/management-service/sample-types/search`, {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
