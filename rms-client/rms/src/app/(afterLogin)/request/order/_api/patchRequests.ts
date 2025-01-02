@@ -10,9 +10,5 @@ export async function patchRequests(requests: Request[]) {
         credentials: 'include',
         cache: 'no-store'
     });
-    if (!res.ok) {
-        const errorMessage = await res.text();
-        // alert(`Error: ${errorMessage}`);
-    }
     return res
 }

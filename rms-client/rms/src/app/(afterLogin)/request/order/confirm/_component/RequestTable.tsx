@@ -18,6 +18,7 @@ import GreenButton from "@/app/_component/GreenButton";
 import AirWaybillModal from "@/app/(afterLogin)/request/order/confirm/_component/AirWaybillModal";
 import {patchRequests} from "@/app/(afterLogin)/request/order/_api/patchRequests";
 import RequestInfo from "@/app/(afterLogin)/request/order/_component/RequestInfo";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 export interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -50,6 +51,7 @@ export default function RequestTable() {
     const [orderDateFilter, setOrderDateFilter] = useState<FilterGroup>();
     const [infoModalOpen, setInfoModalOpen] = useState<boolean>(false);
     const [infoRequest, setInfoRequest] = useState<Request>();
+    const showAlert = CallAlertDialog();
 
     const handleSelectChange = (rowIndex: number, isSelected: boolean) => {
         setRequestData((prevData) => {
@@ -83,7 +85,7 @@ export default function RequestTable() {
         try {
             const response = await patchRequests(updatedRequests);
             if(response.ok) {
-                alert("입력 완료되었습니다.")
+                showAlert("Success")
                 await fetchData(updatedSearch());
             } else {
                 console.error("Failed to confirm requests:", response.statusText);
@@ -273,9 +275,14 @@ export default function RequestTable() {
                             courier_company: courierCompany,
                             awb_number: awbNumber,
                         }));
-                        await patchRequests(updatedRequests);
+                        const response = await patchRequests(updatedRequests);
                         closeModal();
-                        await fetchData(updatedSearch());
+
+                        if (response.ok) {
+                            showAlert("Success");
+                            closeModal();
+                            await fetchData(updatedSearch());
+                        } else {showAlert("Fail");}
                     }}
                 />
             )}
