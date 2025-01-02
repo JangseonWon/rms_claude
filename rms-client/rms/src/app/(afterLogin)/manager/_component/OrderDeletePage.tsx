@@ -24,12 +24,15 @@ interface RequestWithSelected extends Request {
 }
 
 const selectBoxOptions: SelectBoxOption[] = [
-    { table: "sample", column: "barcode", name: "Registration ID" },
+    { table: "user", column: "id", name: "User ID" },
+    { table: "user", column: "name", name: "User Name" },
     { table: "organization", column: "name", name: "Institution" },
-    { table: "patient", column: "name", name: "Patient(s) Name" },
+    { table: "sample", column: "barcode", name: "Registration ID" },
     { table: "service", column: "name", name: "Service" },
-    { table: "patient", column: "sex", name: "Gender" },
+    { table: "patient", column: "name", name: "Patient(s) Name" },
     { table: "patient", column: "serial", name: "MRN" },
+    { table: "request", column: "courier_company", name: "Global courier" },
+    { table: "request", column: "awb_number", name: "AirWaybill no" },
 ];
 const defaultSearch: Query = {size:10, page:1}
 
@@ -207,14 +210,15 @@ export default function OrderDeletePage() {
                                         </label>
                                     </th>
                                     <th className={requestStyle.longColumn}>Order Date<br/>(DD-MM-YYYY)</th>
-                                    <th>Global courier</th>
-                                    <th className={requestStyle.middleColumn}>AirWaybill no.</th>
+                                    <th>User ID</th>
                                     <th>User Name</th>
                                     <th>Institution</th>
                                     <th>Registration ID</th>
                                     <th>Service</th>
                                     <th>Patient(s) Name</th>
                                     <th>MRN</th>
+                                    <th>Global courier</th>
+                                    <th className={requestStyle.middleColumn}>AirWaybill no.</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -232,14 +236,15 @@ export default function OrderDeletePage() {
                                             </label>
                                         </td>
                                         <td>{request.create_at ? new Date(request.create_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
-                                        <td>{request.courier_company}</td>
-                                        <td>{request.awb_number}</td>
+                                        <td>{request.order?.user?.id}</td>
                                         <td>{request.order?.user?.name}</td>
                                         <td>{request.sample?.patient?.organization?.name}</td>
                                         <td>{request.sample?.barcode}</td>
                                         <td>{request.service?.name}</td>
                                         <td>{request.sample?.patient?.name}</td>
                                         <td>{request.sample?.patient?.serial}</td>
+                                        <td>{request.courier_company}</td>
+                                        <td>{request.awb_number}</td>
                                     </tr>
                                 ))}
                                 </tbody>
