@@ -72,7 +72,7 @@ export default function RequestTable() {
         );
 
         if (hasMissingInfo) {
-            alert("누락된 정보가 있습니다. AirWaybill 번호와 Global courier 정보를 모두 입력해주세요.");
+            showAlert("There is no AirWaybill or Global Courier information entered.");
             return;
         }
 
