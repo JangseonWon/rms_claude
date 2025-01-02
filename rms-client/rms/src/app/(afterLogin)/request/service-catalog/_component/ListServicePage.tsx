@@ -65,6 +65,16 @@ export default function ListServicePage() {
         }
     };
 
+    const serviceOnClick = async (service: Service) => {
+        setIsLoading(true);
+        try {
+            await new Promise(resolve => setTimeout(resolve, 500));
+            router.push(`/request/services/${service.id}/single`);
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
     const fetchServices = async () => {
         const response = await getServices()
         if (response.ok) {
@@ -167,7 +177,8 @@ export default function ListServicePage() {
                                 <div className={`${style.cartBottomSection} ${selectedCard === category.id ? style.expanded : ''}`}>
                                     <div className={style.cartBottomSectionScroll}>
                                         {serviceData && serviceData.length > 0 ? (serviceData?.map((service) => (
-                                                <div key={service.id} className={style.serviceLink}>
+                                                <div key={service.id} className={style.serviceLink}
+                                                     onClick={() => serviceOnClick(service)}>
                                                     <span className={style.serviceCode}>{service.id}</span>
                                                     <span className={style.serviceName}>{service.name}</span>
                                                 </div>
