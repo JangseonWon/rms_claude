@@ -9,6 +9,7 @@ import BlueButton from "@/app/_component/BlueButton";
 import {User} from "@/model/User";
 import {postUserPassword} from "@/app/(beforeLogin)/_api/postUserPassword";
 import LoadingFullScreen from "@/app/_component/LoadingFullScreen";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 
 type Props = {
@@ -19,6 +20,7 @@ export default function PasswordChangeModal({closeModal}: Props) {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [user, setUser] = useState<User>();
     const [message, setMessage] = useState<string | null>(null);
+    const showAlert = CallAlertDialog();
 
     const handleChange = (path: string, value: string) => {
         setUser(prevState => ({
@@ -42,7 +44,7 @@ export default function PasswordChangeModal({closeModal}: Props) {
             }
             const res = await postUserPassword(user)
             if (res.status === 200) {
-                alert("success!");
+                showAlert("success!");
                 closeModal();
             } else {
                 setMessage("Please correct the word");

@@ -111,9 +111,9 @@ export default function GroupOrder() {
         putRequest(allRequests)
             .then((res) => {
                 if (res.ok) {
-                    alert("All requests submitted successfully!");
+                    showAlert("All requests submitted successfully!");
                 } else {
-                    alert("Submission failed.");
+                    showAlert("Submission failed.");
                 }
             })
             .catch((error) => console.error("Failed to submit requests:", error));

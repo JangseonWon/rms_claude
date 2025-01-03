@@ -11,6 +11,7 @@ import BlueButton from "@/app/_component/BlueButton";
 import SelectBox from "@/app/_component/SelectBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import {addManager} from "@/app/(afterLogin)/request/management/user/_api/addManager";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 
 type Props = {
@@ -36,11 +37,12 @@ export default function ManagerAddModal({closeModal}: Props) {
     });
     const [selectOption, setSelectOption] = useState<SelectBoxOption>({ table: "organization", column: "name", name: "LIMS", value: "123" });
     const [message, setMessage] = useState<string | null>(null);
+    const showAlert = CallAlertDialog();
 
     const insertManager = async () => {
         const response = await addManager(user);
         if (response.ok) {
-            alert("Manager Add Successful");
+            showAlert("Manager Add Successful");
             closeModal();
         } else {
             const errorMessage = await response.text();

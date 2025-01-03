@@ -11,11 +11,13 @@ import {getPostByPostId} from "@/app/(afterLogin)/qna/[id]/_api/getPostByPostId"
 import {getPostFile} from "@/app/(afterLogin)/qna/[id]/_api/getPostFile";
 import {PostFile} from "@/model/PostFile";
 import {faArrowLeft} from "@fortawesome/free-solid-svg-icons";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 export default function FaqPage() {
     const [postData, setPostData] = useState<Post>();
     const route = useRouter();
     const {data: session} = useSession();
+    const showAlert = CallAlertDialog();
 
     const pathname = usePathname();
     const pathSegments = pathname.split('/');
@@ -79,7 +81,7 @@ export default function FaqPage() {
             setPostData(data as Post);
 
         } else {
-            alert('Post not found');
+            showAlert('Post not found');
             route.push('/qna');
             return;
         }

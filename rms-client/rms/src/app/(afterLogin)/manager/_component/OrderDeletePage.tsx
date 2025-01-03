@@ -18,6 +18,7 @@ import type {Request} from "@/model/Request";
 import BlueButton from "@/app/_component/BlueButton";
 import {deleteOrder} from "@/app/(afterLogin)/manager/_api/deleteOrder";
 import {format} from "date-fns";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -41,16 +42,17 @@ export default function OrderDeletePage() {
     const [totalPage, setTotalPage] = useState<number>(0);
     const [search, setSearch] = useState<Query>(defaultSearch);
     const isSelectedAll = requestData.length > 0 && requestData.every((row) => row.isSelected);
+    const showAlert = CallAlertDialog();
 
     const handleOnClickOrderDelete = async () => {
         const selectedRequests = requestData.filter(request => request.isSelected);
         if( selectedRequests.length === 0) {
-            alert("No selected.");
+            showAlert("No selected.");
             return;
         }
         const response = await deleteOrder(selectedRequests)
-        if(response.ok) alert("deleted!")
-        else alert("fail");
+        if(response.ok) showAlert("deleted!")
+        else showAlert("fail");
         fetchData(search);
     }
 

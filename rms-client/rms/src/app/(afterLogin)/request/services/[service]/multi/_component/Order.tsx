@@ -206,7 +206,7 @@ export default function Order() {
                 showAlert("Failed to place the order.");
             }
         } catch (error) {
-            alert("An error occurred while placing the order.");
+            showAlert("An error occurred while placing the order.");
         }
     };
 
@@ -216,17 +216,22 @@ export default function Order() {
             return;
         }
 
+        const cartData = transformDataToFormat(requestData, "CART");
+
+        if (!cartData) {
+            return;
+        }
+
         try {
-            const cartData = transformDataToFormat(requestData, "CART");
             const response = await putRequest(cartData);
             if (response.ok) {
-                alert("successfully!");
+                showAlert("Add Cart successfully!", true);
                 setRequestData([]);
             } else {
-                alert(cartData);
+                showAlert("Failed to place the cart.");
             }
         } catch (error) {
-            alert(error);
+            showAlert("An error occurred while placing the cart.");
         }
     }, [requestData]);
 

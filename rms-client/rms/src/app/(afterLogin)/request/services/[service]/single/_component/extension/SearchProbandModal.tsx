@@ -15,7 +15,7 @@ import {SelectBoxOption} from "@/model/SelectBoxOption";
 import {Query} from "@/model/Query";
 import {postPatients} from "@/app/(afterLogin)/request/services/[service]/single/_api/postPatients";
 import {useSetProband} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
-import {SampleType} from "@/model/SampleType";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 type Props = {
     closeModal: () => void;
@@ -35,6 +35,7 @@ export default function SearchProbandModal({ closeModal }: Props) {
     const [totalPage, setTotalPage] = useState<number>(0);
     const [selectedSerial, setSelectedSerial] = useState<string | null>(null);
     const setProband = useSetProband();
+    const showAlert = CallAlertDialog();
 
     const fetchPatient = async () => {
         const response = await postPatients(search);
@@ -82,7 +83,7 @@ export default function SearchProbandModal({ closeModal }: Props) {
             setProband(selectedSerial);
             closeModal();
         } else {
-            alert("Please select a row before confirming.");
+            showAlert("Please select a row before confirming.");
         }
     };
 

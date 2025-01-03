@@ -21,6 +21,7 @@ import {
     categoryUUID
 } from "@/app/(afterLogin)/qna/_component/QnaUtils";
 import {fetchSendToJandi} from "@/app/(afterLogin)/qna/_api/fetchSendToJandi";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 interface QnaWritingPageProps {
     category: string;
@@ -28,6 +29,7 @@ interface QnaWritingPageProps {
 
 export default function QnaWritingPage({ category }: QnaWritingPageProps) {
     const route = useRouter();
+    const showAlert = CallAlertDialog();
     const { data: session } = useSession();
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
@@ -46,7 +48,7 @@ export default function QnaWritingPage({ category }: QnaWritingPageProps) {
 
     const addButtonClick = async () => {
         if (!title.trim() || !content.trim()) {
-            alert('Please enter the title and content.');
+            showAlert('Please enter the title and content.');
             return;
         }
 
@@ -67,7 +69,7 @@ export default function QnaWritingPage({ category }: QnaWritingPageProps) {
                     await fetchSendToJandi(session?.user.name!, 0, 'qna', postData);
                 }
             } finally {
-                alert('Registered successfully.');
+                showAlert('Registered successfully.');
                 setIsLoading(false);
                 route.push('/qna');
             }

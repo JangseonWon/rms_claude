@@ -55,7 +55,7 @@ export default function RequestModal({propRequest, closeModal,refreshData}: Prop
             closeModal();
             refreshData();
         }else{
-            alert("fail!!")
+            showAlert("fail!!")
         }
     }
 

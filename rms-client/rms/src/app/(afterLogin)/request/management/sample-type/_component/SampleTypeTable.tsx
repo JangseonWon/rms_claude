@@ -16,6 +16,7 @@ import {postSampleTypes} from "@/app/(afterLogin)/request/management/sample-type
 import SampleTypeModal from "@/app/(afterLogin)/request/management/sample-type/_component/SampleTypeModal";
 import LoadingFullScreen from "@/app/_component/LoadingFullScreen";
 import {putAlisSampleTypes} from "@/app/(afterLogin)/request/management/sample-type/_api/putAlisSampleTypes";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 const selectBoxOptions: SelectBoxOption[] = [
     { table: "sample_type", column: "id", name: "Code" },
@@ -40,7 +41,7 @@ export default function SampleTypeTable() {
     const [search, setSearch] = useState<Query>(defaultQuery);
     const [totalPage, setTotalPage] = useState<number>();
     const [selectOption, setSelectOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
-
+    const showAlert = CallAlertDialog();
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage =>({
@@ -109,10 +110,10 @@ export default function SampleTypeTable() {
             setTotalPage(totalPage)
             if(response.ok){
                 await fetchData(search)
-                alert("sync success!")
+                showAlert("sync success!")
             }
         } catch(error) {
-            alert(`fail: ${error}`)
+            showAlert(`fail: ${error}`)
         } finally {
             setIsLoading(false)
         }

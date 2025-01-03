@@ -10,6 +10,7 @@ import BlueButton from "@/app/_component/BlueButton";
 import {SampleType} from "@/model/SampleType";
 import {getSampleType} from "@/app/(afterLogin)/request/management/sample-type/_api/getSampleType";
 import {patchSampleType} from "@/app/(afterLogin)/request/management/sample-type/_api/patchSampleTypes";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 type Props = {
     sampleTypeId: string;
@@ -19,6 +20,7 @@ type Props = {
 
 export default function SampleTypeModal({sampleTypeId, closeModal, refreshTable}: Props) {
     const [sampleType, setSampleType] = useState<SampleType>()
+    const showAlert = CallAlertDialog();
 
     const fetchSampleType = async (sampleTypeId: string)=>{
         const response = await getSampleType(sampleTypeId)
@@ -37,11 +39,11 @@ export default function SampleTypeModal({sampleTypeId, closeModal, refreshTable}
     const handleUpdateButtonClick = async () => {
         const response = await patchSampleType(sampleType!)
         if(response.ok){
-            alert("Update successful")
+            showAlert("Update successful")
             closeModal()
             refreshTable()
         } else {
-            alert("Fail update")
+            showAlert("Fail update")
         }
 
     };

@@ -26,6 +26,7 @@ import {fetchSendToJandi} from "@/app/(afterLogin)/qna/_api/fetchSendToJandi";
 import {PostComment} from "@/model/PostComment";
 import {putPostReadChangeNew} from "@/app/(afterLogin)/qna/_api/putPostReadChangeNew";
 import {putPostReadByUserId} from "@/app/(afterLogin)/qna/_api/putPostReadByUserId";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 export default function Answer() {
     const [postData, setPostData] = useState<Post>();
@@ -33,6 +34,7 @@ export default function Answer() {
     const [writerCheck, setWriterCheck] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const showAlert = CallAlertDialog();
     const route = useRouter();
     const {data: session} = useSession();
 
@@ -68,14 +70,14 @@ export default function Answer() {
                     await updatePost(postData!, selectedFiles);
                     await putPostReadChangeNew(postId);
                     await fetchSendToJandi(session?.user?.name!, postId, "update", postData!);
-                    alert('It has been corrected properly.');
+                    showAlert('It has been corrected properly.');
                     route.push('/qna');
                 } finally {
                     setIsLoading(false);
                 }
             }
         } else {
-            alert('Modification is not possible.');
+            showAlert('Modification is not possible.');
         }
     }
 
@@ -86,7 +88,7 @@ export default function Answer() {
             try {
                 await deletePostById(postId);
             } finally {
-                alert('Deletion has been completed.');
+                showAlert('Deletion has been completed.');
                 setIsLoading(false);
                 route.push('/qna');
             }
@@ -165,7 +167,7 @@ export default function Answer() {
             fetchData();
             setCommentData(undefined);
         } else {
-            alert('Please enter a comment');
+            showAlert('Please enter a comment');
         }
     }
 
@@ -174,7 +176,7 @@ export default function Answer() {
             const selectedFiles = Array.from(e.target.files);
             const validFiles = selectedFiles.filter(file => {
                 if (file.size > MAX_FILE_SIZE) {
-                    alert(`${file.name} size exceeds 50 MB.`);
+                    showAlert(`${file.name} size exceeds 50 MB.`);
                     return false;
                 }
                 return true;
@@ -194,7 +196,7 @@ export default function Answer() {
                 setWriterCheck(true);
             }
         } else {
-            alert('Post not found');
+            showAlert('Post not found');
             route.push('/qna');
             return;
         }
