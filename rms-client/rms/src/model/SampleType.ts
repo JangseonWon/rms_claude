@@ -1,5 +1,5 @@
 export interface SampleType {
-    id: string
+    id?: string
     name?: string
     name_kr?: string
 }
