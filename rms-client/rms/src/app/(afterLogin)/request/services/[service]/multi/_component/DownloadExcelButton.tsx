@@ -55,22 +55,32 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
             return { width: Math.max(header!.length, 20) };
         });
 
-        const sampleTypeFormulae = sampleTypeList?.map(sample => `${sample.id}/${sample.name}`).join(',') || '';
-        const institutionFormulae = institutionList?.map(institution => `${institution.id}/${institution.name}`).join(',') || '';
+        const institutionSheet = workbook.addWorksheet('Institutions');
+        const sampleTypeSheet = workbook.addWorksheet('SampleTypes');
+
+        institutionList?.forEach((institution, index) => {
+            institutionSheet.getCell(`A${index + 1}`).value = `${institution.id}/${institution.name}`;
+        });
+
+        sampleTypeList?.forEach((sampleType, index) => {
+            sampleTypeSheet.getCell(`A${index + 1}`).value = `${sampleType.id}/${sampleType.name}`;
+        });
 
 
         const startRow = 2;
         const endRow = 10000;
 
         for (let rowIndex = startRow; rowIndex <= endRow; rowIndex++) {
-            worksheet.getCell(rowIndex, 1).dataValidation = {
-                type: 'list',
-                allowBlank: true,
-                formulae: [`"${institutionFormulae}"`],
-                showErrorMessage: true,
-                errorTitle: 'Invalid Institution',
-                error: 'Please check List.',
-            };
+            if (institutionList && institutionList.length > 0) {
+                worksheet.getCell(rowIndex, 1).dataValidation = {
+                    type: 'list',
+                    allowBlank: true,
+                    formulae: [`Institutions!$A$1:$A$${institutionList.length}`],
+                    showErrorMessage: true,
+                    errorTitle: 'Invalid Institution',
+                    error: 'Please select a valid institution from the list.',
+                };
+            }
 
             worksheet.getCell(rowIndex, 4).dataValidation = {
                 type: 'date',
@@ -90,14 +100,16 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
                 error: 'Please select "Male" or "Female".',
             };
 
-            worksheet.getCell(rowIndex, 6).dataValidation = {
-                type: 'list',
-                allowBlank: true,
-                formulae: [`"${sampleTypeFormulae}"`],
-                showErrorMessage: true,
-                errorTitle: 'Invalid SampleType',
-                error: 'Please check List.',
-            };
+            if (sampleTypeList && sampleTypeList.length > 0) {
+                worksheet.getCell(rowIndex, 6).dataValidation = {
+                    type: 'list',
+                    allowBlank: true,
+                    formulae: [`SampleTypes!$A$1:$A$${sampleTypeList.length}`],
+                    showErrorMessage: true,
+                    errorTitle: 'Invalid Sample Type',
+                    error: 'Please select a valid sample type from the list.',
+                };
+            }
 
             worksheet.getCell(rowIndex, 7).dataValidation = {
                 type: 'date',
