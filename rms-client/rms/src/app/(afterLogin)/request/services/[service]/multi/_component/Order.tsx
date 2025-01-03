@@ -103,70 +103,99 @@ export default function Order() {
     }, [extensions]);
 
     const transformDataToFormat = (data: RequestData[], status: string): any => {
-        return data.filter((item) => item.institution && item.institution.includes('/'))
+        const missingExtensions: string[] = [];
+
+        const transformedData = data.filter((item) => item.institution && item.institution.includes('/'))
             .map((item) => {
-            const birthDate = new Date(item.birth);
-            const birthYear = birthDate.getFullYear();
-            const birthMonth = birthDate.getMonth() + 1;
-            const birthDay = birthDate.getDate();
+                const birthDate = new Date(item.birth);
+                const birthYear = birthDate.getFullYear();
+                const birthMonth = birthDate.getMonth() + 1;
+                const birthDay = birthDate.getDate();
 
-            const currentDate = new Date();
-            let age = currentDate.getFullYear() - birthYear;
+                const currentDate = new Date();
+                let age = currentDate.getFullYear() - birthYear;
 
-            if (
-                currentDate.getMonth() + 1 < birthMonth ||
-                (currentDate.getMonth() + 1 === birthMonth && currentDate.getDate() < birthDay)
-            ) {
-                age--;
-            }
-
-            const [sampleTypeId, sampleTypeName] = item.sampleType.split('/');
-            const [institutionId, institutionName] = item.institution.split('/');
-
-            const extensionData = extensions.map(extension => ({
-                id: extension.id,
-                value: item.extensions[extension.name!]
-            }));
-
-            const sex = item.sex === "Male" ? "M" : item.sex === "Female" ? "F" : item.sex;
-
-            return {
-                service: {
-                    id: serviceId
-                },
-                memo: item.memo,
-                ward: item.ward,
-                physician: item.physician,
-                status: status,
-                department: item.medicalDepartment,
-                sample: {
-                    quantity: item.quantity,
-                    age: age.toString(),
-                    sampling_on: item.collectionDate,
-                    sample_type: {
-                        id: sampleTypeId,
-                        name: sampleTypeName
-                    },
-                    patient: {
-                        serial: item.mrn,
-                        sex: sex,
-                        name: item.patientName,
-                        birth_year: birthYear,
-                        birth_month: birthMonth,
-                        birth_day: birthDay,
-                        organization: {
-                            id: institutionId,
-                            name: institutionName
-                        }
-                    },
-                    extensions: extensionData
+                if (
+                    currentDate.getMonth() + 1 < birthMonth ||
+                    (currentDate.getMonth() + 1 === birthMonth && currentDate.getDate() < birthDay)
+                ) {
+                    age--;
                 }
-            };
-        })
+
+                const [sampleTypeId, sampleTypeName] = item.sampleType.split('/');
+                const [institutionId, institutionName] = item.institution.split('/');
+
+                const extensionData = extensions.map(extension => {
+                    const value = item.extensions[extension.name!];
+
+                    if (extension.required && (value === undefined || value === null || value === "")) {
+                        if (!missingExtensions.includes(extension.name!)) {
+                            missingExtensions.push(extension.name!);
+                        }
+                    }
+
+                    return {
+                        id: extension.id,
+                        value: value
+                    };
+                });
+
+                const sex = item.sex === "Male" ? "M" : item.sex === "Female" ? "F" : item.sex;
+
+                return {
+                    service: {
+                        id: serviceId
+                    },
+                    memo: item.memo,
+                    ward: item.ward,
+                    physician: item.physician,
+                    status: status,
+                    department: item.medicalDepartment,
+                    sample: {
+                        quantity: item.quantity,
+                        age: age.toString(),
+                        sampling_on: item.collectionDate,
+                        sample_type: {
+                            id: sampleTypeId,
+                            name: sampleTypeName
+                        },
+                        patient: {
+                            serial: item.mrn,
+                            sex: sex,
+                            name: item.patientName,
+                            birth_year: birthYear,
+                            birth_month: birthMonth,
+                            birth_day: birthDay,
+                            organization: {
+                                id: institutionId,
+                                name: institutionName
+                            }
+                        },
+                        extensions: extensionData
+                    }
+                };
+            });
+
+        if (missingExtensions.length > 0) {
+            showAlert(`Error: The following required extensions are 
+            missing values:\n${missingExtensions.join(', ')}. \nPlease provide values.`);
+            return null;
+        }
+
+        return transformedData;
     };
 
     const handleOrderNowClick = async () => {
+        if (requestData.length === 0) {
+            showAlert("Error: No data available for ordering.");
+            return;
+        }
+
         const orderData = transformDataToFormat(requestData, "UNCONFIRMED_ORDER");
+
+        if (!orderData) {
+            return;
+        }
 
         try {
             const response = await putRequest(orderData);
@@ -182,6 +211,11 @@ export default function Order() {
     };
 
     const handleConfirmedAddToCart = useCallback(async () => {
+        if (requestData.length === 0) {
+            showAlert("Error: No data available to add to cart.");
+            return;
+        }
+
         try {
             const cartData = transformDataToFormat(requestData, "CART");
             const response = await putRequest(cartData);

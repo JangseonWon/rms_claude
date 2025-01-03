@@ -101,8 +101,8 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
         if (!request?.sample?.patient?.serial) return false;
         if (!request?.sample?.sample_type?.name) return false;
         return request?.sample?.quantity;
-
     };
+
     const getDateFromComponents = (year?: number, month?: number, day?: number): Date | undefined => {
         if (!year || !month || !day) return undefined;
         return new Date(year, month - 1, day);

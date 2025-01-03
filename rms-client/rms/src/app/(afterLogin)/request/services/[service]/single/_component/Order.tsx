@@ -36,6 +36,7 @@ export default function Order() {
     const [selectedOrganization, setSelectedOrganization] = useState<SelectBoxOption | null>(null);
     const [selectedSampleType, setSelectedSampleType] = useState<SelectBoxOption | null>(null);
     const [selectedSex, setSelectedSex] = useState<SelectBoxOption | null>(null);
+    const [isExtensionValid, setIsExtensionValid] = useState(false);
     const pathname = usePathname();
     const pathSegments = pathname.split('/');
     const serviceId = decodeURIComponent(pathSegments[pathSegments.length - 2]);
@@ -92,6 +93,7 @@ export default function Order() {
             ...prevState,
             ...setNestedValue({...prevState}, path, value)
         }));
+        console.log(JSON.stringify(request));
     };
 
     const handleExtensionChange = (id: string, value: any): void => {
@@ -174,10 +176,13 @@ export default function Order() {
     };
 
     const isAllRequiredFilled = () => {
-        if (!request?.sample?.patient?.name) return false;
-        if (!request?.sample?.patient?.serial) return false;
-        if (!request?.sample?.sample_type?.id) return false;
-        if (!request?.sample?.sampling_on) return false;
+        if (!request.sample?.patient?.name) return false;
+        if (!request.sample.patient?.serial) return false;
+        if (!request.sample.sample_type?.id) return false;
+        if (!request.sample.sampling_on) return false;
+        if (!request.sample.patient.sex) return false;
+        if (!request.sample.patient.birth_year) return false;
+        if (!isExtensionValid) return false;
         return request?.sample?.quantity;
     };
 
@@ -327,7 +332,7 @@ export default function Order() {
                     onChange={(value) => handleRequestChange('physician', value)}
                 />
             </div>
-            <ExtensionInputComponent serviceId={serviceId} onChange={handleExtensionChange}/>
+            <ExtensionInputComponent serviceId={serviceId} onChange={handleExtensionChange} onValidationChange={setIsExtensionValid}/>
             <div className={style.memoSection}>
                 <TextBox
                     label={'Memo'}

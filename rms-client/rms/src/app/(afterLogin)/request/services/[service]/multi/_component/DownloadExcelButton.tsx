@@ -130,11 +130,13 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
                 error: 'Please enter a valid decimal number.',
             };
 
-            extensions.forEach((extension, index) => {
+            extensions.forEach((extension) => {
                 const columnIndex = headers.indexOf(extension.name) + 1;
+                const cell = worksheet.getCell(rowIndex, columnIndex);
+
                 switch (extension.type) {
                     case ExtensionType.LIST:
-                        worksheet.getCell(rowIndex, columnIndex).dataValidation = {
+                        cell.dataValidation = {
                             type: 'list',
                             allowBlank: !extension.required,
                             formulae: [`"${extension.regex!.replace(/\\b\(\?:|\)\\b/g, '').split('|').join(',')}"`],
@@ -144,7 +146,7 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
                         };
                         break;
                     case ExtensionType.INTEGER:
-                        worksheet.getCell(rowIndex, columnIndex).dataValidation = {
+                        cell.dataValidation = {
                             type: 'whole',
                             allowBlank: !extension.required,
                             operator: 'between',
@@ -155,7 +157,7 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
                         };
                         break;
                     case ExtensionType.NUMBER:
-                        worksheet.getCell(rowIndex, columnIndex).dataValidation = {
+                        cell.dataValidation = {
                             type: 'decimal',
                             allowBlank: !extension.required,
                             operator: 'between',
@@ -166,7 +168,7 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
                         };
                         break;
                     case ExtensionType.BOOLEAN:
-                        worksheet.getCell(rowIndex, columnIndex).dataValidation = {
+                        cell.dataValidation = {
                             type: 'list',
                             allowBlank: !extension.required,
                             formulae: ['"true,false"'],
