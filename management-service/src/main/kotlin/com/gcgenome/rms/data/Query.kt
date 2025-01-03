@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
 data class Query(
     @JsonProperty("sorts")
     var sorts: List<Sort>? = null,
-    var asc: Boolean? = null,
     var page: Int? = null,
     var size: Int? = null,
     @JsonProperty("filter_groups")

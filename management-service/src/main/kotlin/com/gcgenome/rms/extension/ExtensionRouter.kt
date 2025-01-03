@@ -23,15 +23,24 @@ class ExtensionRouter (
 ) {
     @Bean("ExtensionRouter")
     fun route() = router {
-        POST("/w-api/management-service/extensions/search", ::findExtensions)
-        GET("/w-api/management-service/extensions/{extension-id}", ::findExtension)
-        PATCH("/w-api/management-service/extensions/{extension-id}", ::updateExtension)
+        GET("/w-api/management-service/extensions", ::getAllExtensions)
+        POST("/w-api/management-service/extensions/search", ::searchExtensions)
+        GET("/w-api/management-service/extensions/{extension-id}", ::getExtensionById)
+        PATCH("/w-api/management-service/extensions/{extension-id}", ::updateExtensionById)
+    }
+    private fun getAllExtensions(request: ServerRequest): Mono<ServerResponse> {
+        return authenticationHandler.principal(request)
+            .flatMap { extensionHandler.getAllExtensions().collectList() }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), ExtensionDTO::class.java) }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error : $it") }
     }
 
-    private fun findExtensions(request: ServerRequest): Mono<ServerResponse> {
+    private fun searchExtensions(request: ServerRequest): Mono<ServerResponse> {
         return authenticationHandler.principal(request)
             .flatMap { request.bodyToMono(Query::class.java) }
-            .flatMap { extensionHandler.selectExtensionsWithPage(it) }
+            .flatMap { extensionHandler.searchExtensions(it) }
             .flatMap { ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-Total-Count", it.totalCount.toString())
@@ -44,21 +53,21 @@ class ExtensionRouter (
             .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
             .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error : $it") }
     }
-    private fun findExtension(request: ServerRequest): Mono<ServerResponse> {
+    private fun getExtensionById(request: ServerRequest): Mono<ServerResponse> {
         val extensionId = request.pathVariable("extension-id")
         return authenticationHandler.principal(request)
-            .flatMap { extensionHandler.selectExtension(extensionId) }
+            .flatMap { extensionHandler.getExtensionById(extensionId) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), ExtensionDTO::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
             .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error : $it") }
     }
 
-    private fun updateExtension(request: ServerRequest): Mono<ServerResponse> {
+    private fun updateExtensionById(request: ServerRequest): Mono<ServerResponse> {
         val extensionId = request.pathVariable("extension-id")
         return authenticationHandler.chkManager(request)
             .flatMap { request.bodyToMono(ExtensionDTO::class.java) }
-            .flatMap { extensionHandler.updateExtension(it.apply { id = extensionId }) }
+            .flatMap { extensionHandler.updateExtensionById(it.apply { id = extensionId }) }
             .flatMap {
                 ServerResponse.ok()
                     .contentType(MediaType.APPLICATION_JSON)

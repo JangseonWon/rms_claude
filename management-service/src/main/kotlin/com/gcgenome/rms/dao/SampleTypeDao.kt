@@ -14,6 +14,11 @@ import reactor.core.publisher.Mono
 
 
 interface SampleTypeDao : QueryDao {
+    fun DSLContext.selectSampleTypes(): Flux<SampleTypeDTO> {
+        return Flux.from(
+            selectFrom(SAMPLE_TYPE)
+        ).map { it.into(SampleTypeDTO::class.java) }
+    }
     fun DSLContext.selectSampleTypeById(sampleTypeId: String): Mono<SampleTypeDTO> {
         return Mono.from(
             selectFrom(SAMPLE_TYPE)

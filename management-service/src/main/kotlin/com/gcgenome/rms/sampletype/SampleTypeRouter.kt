@@ -21,15 +21,26 @@ class SampleTypeRouter (
 ) {
     @Bean("SampleTypeRouter")
     fun route() = router {
-        GET("/w-api/management-service/sample-types/{sample-type-id}", ::findSampleType)
-        POST("/w-api/management-service/sample-types/search", ::findSampleTypes)
-        PATCH("/w-api/management-service/sample-types/{sample-type-id}", ::updateSampleType)
+        GET("/w-api/management-service/sample-types/{sample-type-id}", ::getSampleTypeById)
+        GET("/w-api/management-service/sample-types", ::getAllSampleTypes)
+        POST("/w-api/management-service/sample-types/search", ::searchSampleTypes)
+        PATCH("/w-api/management-service/sample-types/{sample-type-id}", ::updateSampleTypeById)
 
     }
-    private fun findSampleType(request: ServerRequest): Mono<ServerResponse> {
+    private fun getSampleTypeById(request: ServerRequest): Mono<ServerResponse> {
         val sampleTypeId = request.pathVariable("sample-type-id")
         return authenticationHandler.chkManager(request)
-            .flatMap { sampleTypeHandler.selectSampleType(sampleTypeId) }
+            .flatMap { sampleTypeHandler.getSampleTypeById(sampleTypeId) }
+            .flatMap { ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(it), SampleTypeDTO::class.java)
+            }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error : $it, ${it.cause}") }
+    }
+    private fun getAllSampleTypes(request: ServerRequest): Mono<ServerResponse> {
+        return authenticationHandler.chkManager(request)
+            .flatMap { sampleTypeHandler.getAllSampleTypes().collectList() }
             .flatMap { ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(it), SampleTypeDTO::class.java)
@@ -38,10 +49,11 @@ class SampleTypeRouter (
             .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error : $it, ${it.cause}") }
     }
 
-    private fun findSampleTypes(request: ServerRequest): Mono<ServerResponse> {
+
+    private fun searchSampleTypes(request: ServerRequest): Mono<ServerResponse> {
         return authenticationHandler.chkManager(request)
             .flatMap { request.bodyToMono(Query::class.java) }
-            .flatMap { sampleTypeHandler.selectSampleTypes(it) }
+            .flatMap { sampleTypeHandler.searchSampleTypes(it) }
             .flatMap { ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("X-Total-Count", it.totalCount.toString())
@@ -53,7 +65,7 @@ class SampleTypeRouter (
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error : $it, ${it.cause}") }
     }
-    private fun updateSampleType(request: ServerRequest): Mono<ServerResponse> {
+    private fun updateSampleTypeById(request: ServerRequest): Mono<ServerResponse> {
         return authenticationHandler.chkManager(request)
             .flatMap { request.bodyToMono(SampleTypeDTO::class.java) }
             .flatMap { sampleType -> sampleTypeHandler.updateSampleType(sampleType) }

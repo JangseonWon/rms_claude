@@ -6,10 +6,14 @@ import com.gcgenome.rms.data.Page
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.tables.references.EXTENSION
 import org.jooq.DSLContext
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 interface ExtensionDao : QueryDao{
-
+    fun DSLContext.selectExtensions(): Flux<ExtensionDTO> {
+        return Flux.from(selectFrom(EXTENSION))
+            .map { it.into(ExtensionDTO::class.java) }
+    }
     fun DSLContext.selectExtensionsWithPage(query: Query): Mono<Page<ExtensionDTO>> {
         return selectPage(EXTENSION, query) {record ->
             record.into(ExtensionDTO::class.java)
