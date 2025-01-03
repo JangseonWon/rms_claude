@@ -24,8 +24,8 @@ import logo from "@/css/orderGenomeLogo.module.css";
 import Image from "next/image";
 import {Service} from "@/model/Service";
 import {getServiceGroup} from "@/app/(afterLogin)/request/services/[service]/single/_api/getServiceGroup";
-import {formatExtensionValue, setNestedValue, setAge} from './GroupOrderUtils';
-import {Patient} from "@/model/Patient";
+import {formatExtensionValue, setAge, setNestedValue} from './GroupOrderUtils';
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 export default function GroupOrder() {
     const [organizationOptions, setOrganizationOptions] = useState<SelectBoxOption[]>([])
@@ -35,11 +35,13 @@ export default function GroupOrder() {
     const [selectedSampleType, setSelectedSampleType] = useState<{ [index: number]: string }>({});
     const [selectedSex, setSelectedSex] = useState<{ [index: number]: string }>({});
     const [publishStatus, setPublishStatus] = useState<string | null>(null);
+    const [isFilled, setIsFilled] = useState(false);
     const pathname = usePathname();
     const pathSegments = pathname.split('/');
     const serviceId = decodeURIComponent(pathSegments[pathSegments.length - 2]);
     const [serviceGroup, setServiceGroup] = useState<Service[]>([]);
     const [birthDates, setBirthDates] = useState<Date[]>([]);
+    const showAlert = CallAlertDialog();
     const sexOption: SelectBoxOption[] = [
         { value: "M", name: "Male" },
         { value: "F", name: "Female" }
@@ -96,8 +98,16 @@ export default function GroupOrder() {
         }
     }, [publishStatus]);
 
+    useEffect(() => {
+        setIsFilled(isAllRequiredFilled());
+    }, [requests]);
+
     const publishRequests = (status: string) => {
         const allRequests = Object.values(requests).map((req) => ({ ...req, status }));
+        if (allRequests.length === 0) {
+            showAlert("Error: No data available");
+            return;
+        }
         putRequest(allRequests)
             .then((res) => {
                 if (res.ok) {
@@ -184,14 +194,18 @@ export default function GroupOrder() {
 
 
     const isAllRequiredFilled = () => {
+        if (Object.keys(requests).length === 0) {
+            return false;
+        }
+
         return Object.values(requests).every((req) => {
-            return (
-                req?.sample?.patient?.name &&
-                req?.sample?.patient?.serial &&
-                req?.sample?.sample_type?.id &&
-                req?.sample?.sampling_on &&
-                req?.sample?.quantity
-            );
+            if (!req.sample?.patient?.name) return false;
+            if (!req.sample.patient?.serial) return false;
+            if (!req.sample.sample_type?.id) return false;
+            if (!req.sample.sampling_on) return false;
+            if (!req.sample.patient.sex) return false;
+            if (!req.sample.patient.birth_year) return false;
+            return req.sample.quantity;
         });
     };
 
@@ -337,7 +351,7 @@ export default function GroupOrder() {
             <div className={style.buttonSection}>
                 <GreenButton
                     name={"Add to Cart"}
-                    disabled={!isAllRequiredFilled()}
+                    disabled={!isFilled}
                     onClick={() => {
                         handleOrganizationChange(selectedOrganization?.value, selectedOrganization?.name);
                         setPublishStatus("CART");
@@ -346,7 +360,7 @@ export default function GroupOrder() {
                 />
                 <BlueButton
                     name={"Order Now"}
-                    disabled={!isAllRequiredFilled()}
+                    disabled={!isFilled}
                     onClick={() => {
                         handleOrganizationChange(selectedOrganization?.value, selectedOrganization?.name);
                         setPublishStatus("UNCONFIRMED_ORDER");

@@ -14,10 +14,10 @@ import {ProbandComponent} from './ProbandComponenet';
 interface ExtensionInputComponentProps {
     onChange: (path: string, value: any) => void;
     serviceId: string;
-    onValidationChange: (isValid: boolean) => void;
+    onValidationChange?: (isValid: boolean) => void;
 }
 
-export default function ExtensionInputComponent({ serviceId, onChange, onValidationChange }: ExtensionInputComponentProps) {
+export default function ExtensionInputComponent({ serviceId, onChange, onValidationChange = () => {} }: ExtensionInputComponentProps) {
     const probandValue = useProband();
     const relationship = useRelationship();
     const [extensions, setExtensions] = useState<Extension[]>([]);

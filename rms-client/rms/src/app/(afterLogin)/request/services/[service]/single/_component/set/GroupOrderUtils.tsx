@@ -23,6 +23,9 @@ export const setNestedValue = (object: any, nestedPath: string, newValue: any): 
 };
 
 export const setAge = (birthDate: Date, samplingDate: Date): number => {
+    if (!birthDate || !samplingDate) {
+        return 0;
+    }
     let age = samplingDate.getFullYear() - birthDate.getFullYear();
     const monthDifference = samplingDate.getMonth() - birthDate.getMonth()
     if (monthDifference < 0 || (monthDifference === 0 && samplingDate.getDate() < birthDate.getDate())) {
