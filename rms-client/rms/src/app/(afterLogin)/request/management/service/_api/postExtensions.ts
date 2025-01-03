@@ -1,7 +1,7 @@
 import {Query} from "@/model/Query";
 
 export async function postExtensions(query: Query) {
-    const res = await fetch(`/w-api/management-service/extensions/search`, {
+    return await fetch(`/w-api/management-service/extensions/search`, {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
@@ -10,9 +10,4 @@ export async function postExtensions(query: Query) {
         credentials: 'include',
         cache: 'no-store'
     });
-    if (!res.ok) {
-        const errorMessage = await res.text();
-        // alert(`Error: ${errorMessage}`);
-    }
-    return res
 }

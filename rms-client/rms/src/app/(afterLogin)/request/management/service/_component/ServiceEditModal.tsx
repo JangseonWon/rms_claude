@@ -10,13 +10,17 @@ import SelectBox from "@/app/_component/SelectBox";
 import {Categories} from "@/model/Categories";
 import {getCategories} from "@/app/(afterLogin)/request/management/service/_api/getCategories";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
-import SelectSearchBox from "@/app/(afterLogin)/request/management/_component/SelectSearchBox";
 import {Service} from "@/model/Service";
 import {getService} from "@/app/(afterLogin)/_api/getService";
 import GreenButton from "@/app/_component/GreenButton";
 import BlueButton from "@/app/_component/BlueButton";
 import {patchService} from "@/app/(afterLogin)/request/management/service/_api/patchService";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
+import SearchSelectBox, {Option} from "@/app/_component/SearchSelectBox";
+import {SampleType} from "@/model/SampleType";
+import {getSampleTypes} from "@/app/(afterLogin)/request/management/service/_api/getSampleTypes";
+import {getExtensions} from "@/app/(afterLogin)/request/management/service/_api/getExtensions";
+import {Extension} from "@/model/Extension";
 
 
 type Props = {
@@ -36,9 +40,13 @@ const requestTypes = [
 export default function ServiceEditModal({serviceId, closeModal, refreshData}: Props) {
     const [service, setService] = useState<Service>();
     const [categories, setCategories] = useState<SelectBoxOption[]>([]);
+    const [sampleTypeOptions, setSampleTypeOptions] = useState<Option[]>([])
+    const [extensionOptions, setExtensionOptions] = useState<Option[]>([])
     const [required, setRequired] = useState<SelectBoxOption>(requiredOption[0]);
-    const [selectedSampleType, setSelectedSampleType] = useState<SelectBoxOption | null>(null);
-    const [selectedExtension, setSelectedExtension] = useState<SelectBoxOption | null>(null);
+    const [selectedSampleType, setSelectedSampleType] = useState<Option| undefined>();
+    const [selectedExtension, setSelectedExtension] = useState<Option | undefined>();
+    const [searchSampleType, setSearchSampleType] = useState('');
+    const [searchExtension, setSearchExtension] = useState('');
     const showAlert = CallAlertDialog();
 
     const fetchCategoryData = async () => {
@@ -48,6 +56,32 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
             setCategories(transformCategoryToOptions(data as Categories[]));
         }
     }
+    const fetchSampleTypeData = async () => {
+        const response = await getSampleTypes();
+        if (response.ok) {
+            const data = await response.json();
+            const sampleTypes = data as SampleType[]
+            const mappedOptions = sampleTypes.map(mapSampleTypeToOption)
+            setSampleTypeOptions(mappedOptions)
+        }
+    }
+    const mapSampleTypeToOption = (sampleType: SampleType): Option => ({
+        id: sampleType.id!,
+        label: sampleType.name!
+    });
+    const fetchExtensionData = async () => {
+        const response = await getExtensions();
+        if (response.ok) {
+            const data = await response.json();
+            const extensions = data as Extension[]
+            const mappedOptions = extensions.map(mapExtensionToOption)
+            setExtensionOptions(mappedOptions)
+        }
+    }
+    const mapExtensionToOption = (extension: Extension): Option => ({
+        id: extension.id!,
+        label: extension.name!
+    });
     const transformCategoryToOptions = (data: Categories[]): SelectBoxOption[] => {
         return data.map(value => ({
             value: value.id,
@@ -76,29 +110,38 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
     }
     useEffect(() => {
         fetchCategoryData();
+        fetchSampleTypeData();
+        fetchExtensionData();
         fetchServiceData(serviceId);
     }, []);
 
     const handleSampleTypeAddClick = async () => {
-        setService((prev) => {
-            const isAlreadyAdded = prev?.sample_types?.some(
-                (sampleType) => sampleType.id === selectedSampleType?.value
-            );
-            if (isAlreadyAdded) {
-                showAlert("Already registered")
-                return prev;
-            }
-            return {
-                ...prev,
-                sample_types: [
-                    ...(prev?.sample_types || []),
-                    {
-                        id: selectedSampleType?.value,
-                        name: selectedSampleType?.name
-                    }
-                ]
-            };
-        });
+        if(selectedSampleType){
+            setService((prev) => {
+                const isAlreadyAdded = prev?.sample_types?.some(
+                    (sampleType) => sampleType.id === selectedSampleType?.id
+                );
+                if (isAlreadyAdded) {
+                    showAlert("Already registered")
+                    return prev;
+                }else{
+                    setSearchSampleType('')
+                    return {
+                        ...prev,
+                        sample_types: [
+                            ...(prev?.sample_types || []),
+                            {
+                                id: selectedSampleType?.id,
+                                name: selectedSampleType?.label
+                            }
+                        ]
+                    };
+                }
+            });
+        }else{
+            showAlert('No options selected.');
+        }
+
     }
 
     const handleSampleTypeDeleteClick = async (sampleTypeId: string) => {
@@ -113,26 +156,32 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
     };
 
     const handleExtensionAddClick = async () => {
-        setService((prev) => {
-            const isAlreadyAdded = prev?.extensions?.some(
-                (extension) => extension.id === selectedExtension?.value
-            );
-            if (isAlreadyAdded) {
-                showAlert("Already registered")
-                return prev;
-            }
-            return {
-                ...prev,
-                extensions: [
-                    ...(prev?.extensions || [] ),
-                    {
-                        id: selectedExtension?.value,
-                        name: selectedExtension?.name,
-                        required: required.value
-                    }
-                ]
-            };
-        });
+        if(selectedExtension){
+            setService((prev) => {
+                const isAlreadyAdded = prev?.extensions?.some(
+                    (extension) => extension.id === selectedExtension?.id
+                );
+                if (isAlreadyAdded) {
+                    showAlert("Already registered")
+                    return prev;
+                }else{
+                    setSearchExtension('')
+                    return {
+                        ...prev,
+                        extensions: [
+                            ...(prev?.extensions || [] ),
+                            {
+                                id: selectedExtension?.id,
+                                name: selectedExtension?.label,
+                                required: required.value
+                            }
+                        ]
+                    };
+                }
+            });
+        }else{
+            showAlert('No options selected.');
+        }
     }
 
     const handleExtensionDeleteClick = async (extensionId: string) => {
@@ -218,12 +267,17 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
                     <div className={style.content}>
                         <div className={style.contentTitle}>Sample Type</div>
                         <div className={style.contentFormGroup}>
-                            <SelectSearchBox
-                                type={'sampleType'}
+                            <SearchSelectBox
+                                options={sampleTypeOptions}
                                 onSelect={setSelectedSampleType}
-                                width={'220px'}
+                                placeholder={'Sample Type name...'}
+                                value={searchSampleType}
+                                onChange={setSearchSampleType}
                             />
-                            <button className={style.addButton} onClick={() => handleSampleTypeAddClick()}>Add</button>
+                            <BlueButton
+                                name={'Add'}
+                                onClick={handleSampleTypeAddClick}
+                                />
                         </div>
                         <table className={style.table}>
                             <thead>
@@ -242,7 +296,7 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
                                         <FontAwesomeIcon
                                             className={style.deleteButton}
                                             icon={faTrash}
-                                            onClick={() => handleSampleTypeDeleteClick(sampleType.id)}
+                                            onClick={() => handleSampleTypeDeleteClick(sampleType.id!)}
                                         />
                                     </td>
                                 </tr>
@@ -253,23 +307,33 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
                     <div className={style.content}>
                         <div className={style.contentTitle}>Extension</div>
                         <div className={style.contentFormGroup}>
-                            <SelectSearchBox type={'extension'} onSelect={setSelectedExtension} width={'220px'}/>
-                            <div>
-                                <SelectBox
-                                    value={required.name}
-                                    options={requiredOption}
-                                    label={"required"}
-                                    onChange={(selectedOption) => {
-                                        setRequired(
-                                            {
-                                                name: selectedOption.name,
-                                                value: selectedOption.value
-                                            } as SelectBoxOption
-                                        )
-                                    }}
-                                />
-                            </div>
-                            <button className={style.addButton} onClick={() => handleExtensionAddClick()}>Add</button>
+                            <SearchSelectBox
+                                options={extensionOptions}
+                                onSelect={setSelectedExtension}
+                                placeholder={'Extension name...'}
+                                value={searchExtension}
+                                onChange={setSearchExtension}
+                            />
+                            <SelectBox
+                                value={required.name}
+                                options={requiredOption}
+                                label={""}
+                                onChange={(selectedOption) => {
+                                    setRequired(
+                                        {
+                                            name: selectedOption.name,
+                                            value: selectedOption.value
+                                        } as SelectBoxOption
+                                    )
+                                }}
+                            />
+                            <BlueButton
+                                name={'Add'}
+                                onClick={handleExtensionAddClick}
+                            />
+                            {/*<SelectSearchBox type={'extension'} onSelect={setSelectedExtension} width={'220px'}/>
+
+                            <button className={style.addButton} onClick={() => handleExtensionAddClick()}>Add</button>*/}
                         </div>
                         <table className={style.table}>
                             <thead>
