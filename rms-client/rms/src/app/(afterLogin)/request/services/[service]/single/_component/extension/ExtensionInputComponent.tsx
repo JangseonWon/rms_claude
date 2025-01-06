@@ -127,6 +127,7 @@ export default function ExtensionInputComponent({ serviceId, onChange, onValidat
                 return <TextBox
                     key={extension.id}
                     label={extension.name!}
+                    required={extension.required}
                     onChange={(inputValue) => handleInputChange(extension.id!, inputValue, extension.required!)}
                 />;
             default:
@@ -176,7 +177,7 @@ export default function ExtensionInputComponent({ serviceId, onChange, onValidat
                 </div>
             )}
             {textComponents.length > 0 && (
-                <div className={style.textContainer}>
+                <div>
                     {textComponents.map(extension => (
                         <div key={extension.id}>
                             {renderExtensionComponent(extension)}

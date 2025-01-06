@@ -2,25 +2,16 @@
     display: grid;
 }
 .section > * {
-    margin-top: 20px;
-    padding-right: 20px;
+    padding-top: 10px;
 }
 .gridContainer {
     width: 1000px;
     display: flex;
     flex-wrap: wrap;
     gap: 2%;
-    margin-bottom: 10px;
 }
 .gridItem {
     width: 200px;
-    margin-bottom: 20px;
-}
-.textContainer {
-    margin-bottom: 10px;
-}
-.probandContainer {
-    margin-bottom: 10px;
 }
 .title {
     flex-basis: 100%;

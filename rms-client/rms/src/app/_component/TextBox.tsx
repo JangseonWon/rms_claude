@@ -28,8 +28,8 @@ export default function TextBox({ label, value, onChange, required=false }: Prop
     }, [required, value]);
 
     return (
-        <div className={style.content}>
-            <p className={style.title}>{label}</p>
+        <div className={`${style.content} ${hasError ? style.error : ""}`}>
+            <p>{label}</p>
             <textarea
                 className={style.memo}
                 rows={8}

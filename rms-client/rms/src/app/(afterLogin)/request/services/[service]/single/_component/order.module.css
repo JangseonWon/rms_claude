@@ -14,7 +14,7 @@
     box-sizing: border-box;
 }
 .section {
-    margin-top: 10px;
+    padding-top: 10px;
     display: flex;
 }
 .section > * {

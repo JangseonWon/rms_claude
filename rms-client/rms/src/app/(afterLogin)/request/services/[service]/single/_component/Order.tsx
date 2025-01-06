@@ -336,7 +336,6 @@ export default function Order() {
                 <TextBox
                     label={'Memo'}
                     value={request.memo}
-                    required={true}
                     onChange={(value) => handleRequestChange('memo', value)}
                 />
             </div>

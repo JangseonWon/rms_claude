@@ -30,18 +30,9 @@ export const ProbandComponent = () => {
     }
 
     return (
-        <div className={style.probandContainer}>
+        <div>
             <p className={style.title}>Proband Info.</p>
             <div key={'proband'} className={style.proband}>
-                <div className={style.probandInput}>
-                    <InputBox
-                        key={'probandInput'}
-                        label={'Proband Number'}
-                        required={true}
-                        value={probandValue}
-                        onChange={(inputValue) => setProbandValue(inputValue)}
-                    />
-                </div>
                 <SelectBox
                     key={'relationship'}
                     label={'RelationShip*'}
@@ -51,6 +42,16 @@ export const ProbandComponent = () => {
                     onChange={(selectedOption) => setRelationship(selectedOption.name)}
                     width="200px"
                 />
+                <div className={style.probandInput}>
+                    <InputBox
+                        key={'probandInput'}
+                        label={'Proband Number'}
+                        required={true}
+                        disabled={true}
+                        value={probandValue}
+                        onChange={(inputValue) => setProbandValue(inputValue)}
+                    />
+                </div>
                 <button className={style.button} onClick={Click}>Click here to find proband</button>
             </div>
         </div>
