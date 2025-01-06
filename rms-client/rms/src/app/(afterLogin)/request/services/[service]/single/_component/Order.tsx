@@ -181,7 +181,6 @@ export default function Order() {
         if (!request.sample.sample_type?.id) return false;
         if (!request.sample.sampling_on) return false;
         if (!request.sample.patient.sex) return false;
-        if (!request.sample.patient.birth_year) return false;
         if (!isExtensionValid) return false;
         return request?.sample?.quantity;
     };
