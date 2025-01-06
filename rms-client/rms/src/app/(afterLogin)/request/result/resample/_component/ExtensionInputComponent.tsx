@@ -8,6 +8,7 @@ import InputBox from "@/app/_component/InputBox";
 import SelectBox from "@/app/_component/SelectBox";
 import TextBox from "@/app/_component/TextBox";
 import { useRequestStore } from '@/store/useRequestStore';
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 interface ExtensionInputComponentProps {
     serviceId: string;
@@ -16,6 +17,7 @@ interface ExtensionInputComponentProps {
 export default function ExtensionInputComponent({ serviceId }: ExtensionInputComponentProps) {
     const { request, setRequest } = useRequestStore();
     const [extensions, setExtensions] = useState<Extension[]>([]);
+    const showAlert = CallAlertDialog();
 
     const handleRequestChange = (path: string, value: any) => {
         setRequest((prevState) => ({
@@ -60,7 +62,12 @@ export default function ExtensionInputComponent({ serviceId }: ExtensionInputCom
 
     const fetchExtensions = async () => {
         const response = await fetchServiceExtensions(serviceId);
-        setExtensions(response as Extension[]);
+        if(response.ok){
+            setExtensions(await response.json() as Extension[]);
+        }else{
+            showAlert("Error!")
+        }
+
     };
 
     const renderExtensionComponent = (extension: Extension) => {

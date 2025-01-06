@@ -51,7 +51,11 @@ export default function Order() {
 
     const fetchExtensions = async () => {
         const response = await fetchServiceExtensions(serviceId);
-        setExtensions(response as Extension[]);
+        if(response.ok){
+            setExtensions(await response.json() as Extension[]);
+        }else{
+            showAlert("Error!")
+        }
     };
 
     const handleFileUpload = useCallback((data: any[]) => {

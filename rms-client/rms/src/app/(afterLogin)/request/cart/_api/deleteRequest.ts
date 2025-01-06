@@ -1,7 +1,7 @@
 import {Request} from "@/model/Request"
 
 export async function deleteRequest(request: Request[]) {
-    const res = await fetch(`/w-api/cart-service/requests`, {
+    return await fetch(`/w-api/cart-service/requests`, {
         method: 'DELETE',
         headers: {
             "Content-Type": "application/json",
@@ -10,9 +10,4 @@ export async function deleteRequest(request: Request[]) {
         credentials: 'include',
         cache: 'no-store'
     });
-    if (!res.ok) {
-        const errorMessage = await res.text();
-        // alert(`Error: ${errorMessage}`);
-    }
-    return res
 }

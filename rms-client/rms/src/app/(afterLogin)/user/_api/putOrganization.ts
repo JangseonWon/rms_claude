@@ -1,7 +1,7 @@
 import {Organization} from "@/model/Organization";
 
 export async function putOrganization(userId: string, organization: Organization) {
-    const res = await fetch(`/w-api/profile-service/users/${userId}/organizations/${organization.id}`, {
+    return await fetch(`/w-api/profile-service/users/${userId}/organizations/${organization.id}`, {
         method: 'PUT',
         headers: {
             "Content-Type": "application/json",
@@ -10,9 +10,4 @@ export async function putOrganization(userId: string, organization: Organization
         credentials: 'include',
         cache: 'no-store'
     });
-    if (!res.ok) {
-        const errorMessage = await res.text();
-        // alert(`Error: ${errorMessage}`);
-    }
-    return res
 }

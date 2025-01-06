@@ -6,15 +6,10 @@ export async function updatePost(post: Post, files: File[]) {
         formData.append('file', file);
     });
     formData.append('data', JSON.stringify(post))
-    const res = await fetch(`/w-api/post-service/post/${post.id}`, {
+    return await fetch(`/w-api/post-service/post/${post.id}`, {
         method: 'PATCH',
         body: formData,
         credentials: 'include',
         cache: 'no-store'
     });
-    if (!res.ok) {
-        const errorMessage = await res.text();
-        // alert(`Error: ${errorMessage}`);
-    }
-    return res
 }

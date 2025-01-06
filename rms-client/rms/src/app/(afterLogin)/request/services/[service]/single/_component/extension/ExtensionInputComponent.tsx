@@ -10,6 +10,7 @@ import TextBox from "@/app/_component/TextBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import {useProband, useRelationship} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
 import {ProbandComponent} from './ProbandComponenet';
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 interface ExtensionInputComponentProps {
     onChange: (path: string, value: any) => void;
@@ -25,6 +26,7 @@ export default function ExtensionInputComponent({ serviceId, onChange, onValidat
     const [prevProbandValue, setPrevProbandValue] = useState(probandValue);
     const [prevRelationship, setPrevRelationship] = useState(relationship);
     const [validationState, setValidationState] = useState<{ [key: string]: boolean }>({});
+    const showAlert = CallAlertDialog();
 
     const generateSelectList = (regex: string): { name: string, value: string }[] => {
         if (regex.includes("|")) {
@@ -43,16 +45,20 @@ export default function ExtensionInputComponent({ serviceId, onChange, onValidat
 
     const fetchExtensions = async () => {
         const response = await fetchServiceExtensions(serviceId);
-        setExtensions(response as Extension[]);
-        const initialValidationState: { [key: string]: boolean } = {};
+        if(response.ok){
+            const data: Extension[] = await response.json()
+            setExtensions(data);
+            const initialValidationState: { [key: string]: boolean } = {};
+            data.forEach((extension: Extension) => {
+                if (extension.required) {
+                    initialValidationState[extension.id!] = false;
+                }
+            });
+            setValidationState(initialValidationState);
+        }else{
+            showAlert("Error!")
+        }
 
-        response.forEach((extension: Extension) => {
-            if (extension.required) {
-                initialValidationState[extension.id!] = false;
-            }
-        });
-
-        setValidationState(initialValidationState);
     };
 
     const handleInputChange = (id: string, value: any, required: boolean) => {
