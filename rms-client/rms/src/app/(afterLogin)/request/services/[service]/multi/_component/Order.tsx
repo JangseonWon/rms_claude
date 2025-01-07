@@ -23,7 +23,6 @@ type RequestData = {
     sampleType: string;       // 샘플 타입
     institution: string;      // 기관
     birth: string;            // 생일
-    ward: string;             // 병동
     patientName: string;      // 환자 이름
     sex: string;              // 성별
     physician: string;        // 의사 이름
@@ -90,7 +89,6 @@ export default function Order() {
                 birth: birth,
                 sex: mapByHeader("Sex"),
                 mrn: mapByHeader("MRN"),
-                ward: mapByHeader("Ward"),
                 patientName: mapByHeader("Patient Name"),
                 gender: mapByHeader("Gender"),
                 physician: mapByHeader("Physician Name"),
@@ -151,7 +149,6 @@ export default function Order() {
                         id: serviceId
                     },
                     memo: item.memo,
-                    ward: item.ward,
                     physician: item.physician,
                     status: status,
                     department: item.medicalDepartment,
@@ -291,7 +288,6 @@ export default function Order() {
                         <th className={style.header150}>Date of Collection</th>
                         <th className={style.header100}>Quantity</th>
                         <th className={style.header150}>Medical Department</th>
-                        <th className={style.header100}>Ward</th>
                         <th className={style.header150}>Physician Name</th>
                         <th className={style.notesHeader}>Memo</th>
                         {extensions.map((extension, index) => (
@@ -312,7 +308,6 @@ export default function Order() {
                             <td>{item.collectionDate || ''}</td>
                             <td>{item.quantity || ''}</td>
                             <td>{item.medicalDepartment || ''}</td>
-                            <td>{item.ward || ''}</td>
                             <td>{item.physician || ''}</td>
                             <td dangerouslySetInnerHTML={{__html: formatNotes(item.memo)}}/>
                             {extensions.map((extension, extIndex) => (

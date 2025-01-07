@@ -323,10 +323,6 @@ export default function Order() {
                     onChange={(value) => handleRequestChange('department', value)}
                 />
                 <InputBox
-                    label={"Ward"}
-                    onChange={(value) => handleRequestChange('ward', value)}
-                />
-                <InputBox
                     label={"Physician Name"}
                     onChange={(value) => handleRequestChange('physician', value)}
                 />

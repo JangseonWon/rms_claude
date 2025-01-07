@@ -35,7 +35,6 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
             "Date of Collection", // Date
             "Quantity", // Decimal
             "Medical Department",
-            "Ward",
             "Physician Name",
             "Memo",
             ...extensions.map(extension => extension.name),
