@@ -21,10 +21,9 @@ interface RequestDao: QueryDao {
                 DSL.count().filterWhere(REQUEST.STATUS.eq(Status.COMPLETED.name))
             )
                 .from(REQUEST)
-                .join(ORDER).on(REQUEST.ORDER_ID.eq(ORDER.ID))
                 .where().apply {
                     when(user.role) {
-                        Role.USER.name -> and(ORDER.USER_ID.eq(user.id))
+                        Role.USER.name -> and(REQUEST.USER_ID.eq(user.id))
                     }
                 }
         ).map(StatusCount::toModel)
@@ -32,9 +31,8 @@ interface RequestDao: QueryDao {
 
     fun DSLContext.selectRequestsWithPage(query: Query): Mono<Page<RequestDTO>> {
         val joins = listOf(
-            QueryDao.JoinInfo(ORDER, REQUEST.ORDER_ID.eq(ORDER.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(SERVICE, REQUEST.SERVICE_ID.eq(SERVICE.ID), QueryDao.JoinType.LEFT),
-            QueryDao.JoinInfo(USER, ORDER.USER_ID.eq(USER.ID), QueryDao.JoinType.LEFT),
+            QueryDao.JoinInfo(USER, REQUEST.USER_ID.eq(USER.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(SAMPLE, REQUEST.SAMPLE_ID.eq(SAMPLE.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(
                 PATIENT,
@@ -58,18 +56,13 @@ interface RequestDao: QueryDao {
             REQUEST.CREATE_AT.`as`("create_at"),
             REQUEST.SPECIFIED_AT.`as`("specified_at"),
             DSL.jsonObject(
+                DSL.key("id").value(USER.ID),
+                DSL.key("name").value(USER.NAME)
+            ).`as`("user"),
+            DSL.jsonObject(
                 DSL.key("id").value(SERVICE.ID),
                 DSL.key("name").value(SERVICE.NAME)
             ).`as`("service"),
-            DSL.jsonObject(
-                DSL.key("id").value(ORDER.ID),
-                DSL.key("user").value(
-                    DSL.jsonObject(
-                        DSL.key("id").value(USER.ID),
-                        DSL.key("name").value(USER.NAME)
-                    )
-                )
-            ).`as`("order"),
             DSL.jsonObject(
                 DSL.key("id").value(SAMPLE.ID),
                 DSL.key("barcode").value(SAMPLE.BARCODE),
@@ -96,7 +89,6 @@ interface RequestDao: QueryDao {
         )
         val groupByFields = listOf(
             REQUEST.USER_SERVICE_ID, REQUEST.STATUS, REQUEST.PHYSICIAN, REQUEST.REPORTED_AT, REQUEST.CREATE_AT, REQUEST.SPECIFIED_AT,
-            ORDER.ID,
             SERVICE.ID,
             USER.ID,
             SAMPLE.ID,

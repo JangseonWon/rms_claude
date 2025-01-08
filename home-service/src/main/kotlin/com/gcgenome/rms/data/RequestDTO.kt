@@ -36,5 +36,5 @@ data class RequestDTO(
     var reportedAt: LocalDateTime? = null,
     var service: ServiceDTO? = null,
     var sample: SampleDTO? = null,
-    var order: OrderDTO? = null
+    var user: UserDTO? = null
 )
