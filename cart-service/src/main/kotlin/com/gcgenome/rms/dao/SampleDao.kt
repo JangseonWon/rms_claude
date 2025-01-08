@@ -1,6 +1,6 @@
 package com.gcgenome.rms.dao
 
-import com.gcgenome.rms.data.Sample
+import com.gcgenome.rms.data.SampleDTO
 import com.gcgenome.rms.tables.references.REQUEST
 import com.gcgenome.rms.tables.references.SAMPLE
 import org.jooq.DSLContext
@@ -11,21 +11,21 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 interface SampleDao {
-    fun DSLContext.updateSample(sample: Sample): Mono<Sample> {
+    fun DSLContext.updateSample(sample: SampleDTO): Mono<SampleDTO> {
         return Mono.from(
             update(SAMPLE)
                 .set(SAMPLE.USER_SAMPLE_ID, coalesce(`val`(sample.userSampleId), SAMPLE.USER_SAMPLE_ID))
                 .set(SAMPLE.QUANTITY, coalesce(`val`(sample.quantity), SAMPLE.QUANTITY))
                 .set(SAMPLE.AGE, coalesce(`val`(sample.age), SAMPLE.AGE))
                 .set(SAMPLE.SAMPLING_ON, coalesce(`val`(sample.samplingOn), SAMPLE.SAMPLING_ON))
-                .set(SAMPLE.SAMPLE_TYPE_ID, coalesce(`val`(sample.sampleType!!.id), SAMPLE.SAMPLE_TYPE_ID))
+                .set(SAMPLE.SAMPLE_TYPE_ID, coalesce(`val`(sample.sampleType.id), SAMPLE.SAMPLE_TYPE_ID))
                 .set(SAMPLE.PATIENT_SERIAL, coalesce(`val`(sample.patient!!.serial), SAMPLE.PATIENT_SERIAL))
                 .set(SAMPLE.ORGANIZATION_ID, coalesce(`val`(sample.patient!!.organization!!.id), SAMPLE.ORGANIZATION_ID))
                 .where(SAMPLE.ID.eq(sample.id))
                 .returning()
-        ).map { it.into(Sample::class.java) }
+        ).map { it.into(SampleDTO::class.java) }
     }
-    fun DSLContext.deleteSampleById(sampleId: UUID): Mono<Sample> {
+    fun DSLContext.deleteSampleById(sampleId: UUID): Mono<SampleDTO> {
         return Mono.from(
             deleteFrom(SAMPLE)
                 .where(
@@ -36,9 +36,9 @@ interface SampleDao {
                             .where(REQUEST.SAMPLE_ID.eq(sampleId))
                     )
                 ).returning()
-        ).map { it.into(Sample::class.java) }
+        ).map { it.into(SampleDTO::class.java) }
     }
-    fun DSLContext.updateSampleBarcodeAndCreateAtById(sampleId: UUID, branchSerial: String): Mono<Sample> {
+    fun DSLContext.updateSampleBarcodeAndCreateAtById(sampleId: UUID, branchSerial: String): Mono<SampleDTO> {
         val ofPattern = DateTimeFormatter.ofPattern("yyyyMMdd")
         val currentDate = LocalDateTime.now().format(ofPattern)
         val serialPrefix = currentDate + branchSerial
@@ -55,6 +55,6 @@ interface SampleDao {
                 )
                 .where(SAMPLE.ID.eq(sampleId))
                 .returning()
-        ).map { it.into(Sample::class.java) }
+        ).map { it.into(SampleDTO::class.java) }
     }
 }

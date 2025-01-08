@@ -12,10 +12,10 @@ import java.util.*
 
 @Component
 class Handler(val dslContext: DSLContext ) :
-    RequestDao, OrganizationDao, SampleTypeDao, PatientDao, SampleDao, OrderDao, SampleExtensionDao
+    RequestDao, OrganizationDao, SampleTypeDao, PatientDao, SampleDao, SampleExtensionDao
 {
 
-    fun getCartInfo(sampleId: UUID, serviceId: String): Mono<Request> {
+    fun getCartInfo(sampleId: UUID, serviceId: String): Mono<RequestDTO> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
                 selectRequestById(sampleId, serviceId)
@@ -26,47 +26,46 @@ class Handler(val dslContext: DSLContext ) :
     fun requestSearch(user: UserAuthentication, query: Query): Mono<Page<RequestDTO>> {
         return dslContext.selectRequestCartByUserId(user.user, query)
     }
-    fun organizations(userId: String): Flux<Organization> {
+    fun organizations(userId: String): Flux<OrganizationDTO> {
         return dslContext.selectOrganizationByUserId(userId)
     }
-    fun updateRequest(request: Request): Mono<Request> {
+    fun updateRequest(request: RequestDTO): Mono<RequestDTO> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
-                selectRequestById(request.sampleId!!, request.serviceId!!)
+                selectRequestById(request.sample!!.id!!, request.service!!.id!!)
                     .flatMap { r->
-                        insertPatient(request.sample!!.patient!!)
-                            .then(updateSample(request.sample!!))
+                        insertPatient(request.sample.patient!!)
+                            .then(updateSample(request.sample))
                             .then(deletePatientById(r.sample!!.patient!!))
                             .then(updateRequest(request))
-                            .then(selectRequestById(request.sampleId!!, request.serviceId!!))
+                            .then(selectRequestById(request.sample.id!!, request.service.id!!))
                     }
             }
         })
     }
-    fun cartToOrder(requests: Array<Request>): Flux<Request> {
+    fun cartToOrder(requests: Array<RequestDTO>): Flux<RequestDTO> {
         return Flux.from(dslContext.transactionPublisher{trx ->
             trx.dsl().run {
                 Flux.fromArray(requests).flatMap { request ->
-                    updateRequestStatusAndCreateAtById(request.orderId!!, request.sample!!.id!!, request.service!!.id!!)
-                        .then(updateSampleBarcodeAndCreateAtById(request.sample!!.id!!, request.sample!!.patient!!.organization!!.user!!.branchSerial!!))
-                        .then(selectRequestById(request.sample!!.id!!, request.service!!.id!!))
+                    updateRequestStatusAndCreateAtById(request.sample!!.id!!, request.service!!.id!!)
+                        .then(updateSampleBarcodeAndCreateAtById(request.sample.id!!, request.sample.patient!!.organization!!.user!!.branchSerial!!))
+                        .then(selectRequestById(request.sample.id!!, request.service.id!!))
                 }
             }
         })
     }
-    fun sampleTypes(serviceId: String): Flux<SampleType> {
+    fun sampleTypes(serviceId: String): Flux<SampleTypeDTO> {
         return dslContext.selectSampleTypeByServiceId(serviceId)
     }
-    fun deleteCart(requests: Array<Request>): Flux<Request> {
+    fun deleteCart(requests: Array<RequestDTO>): Flux<RequestDTO> {
         return Flux.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
                 Flux.fromArray(requests).flatMap { request ->
                         deleteRequest(request)
-                            .then(deleteOrderById(request.orderId!!))
                             .then(deleteSampleExtensionBySampleId(request.sample!!.id!!))
-                            .then(deleteSampleById(request.sample!!.id!!))
-                            .then(deletePatientById(request.sample!!.patient!!))
-                            .then(selectRequestById(request.sample!!.id!!, request.service!!.id!!))
+                            .then(deleteSampleById(request.sample.id!!))
+                            .then(deletePatientById(request.sample.patient!!))
+                            .then(selectRequestById(request.sample.id!!, request.service!!.id!!))
                 }
             }
         })

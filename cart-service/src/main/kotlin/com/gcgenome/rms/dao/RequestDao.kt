@@ -12,7 +12,6 @@ import java.util.*
 interface RequestDao: QueryDao {
     fun DSLContext.selectRequestCartByUserId(userDto: User, query: Query): Mono<Page<RequestDTO>> {
         val joins = listOf(
-            QueryDao.JoinInfo(ORDER, REQUEST.ORDER_ID.eq(ORDER.ID), QueryDao.JoinType.INNER),
             QueryDao.JoinInfo(SAMPLE, REQUEST.SAMPLE_ID.eq(SAMPLE.ID), QueryDao.JoinType.INNER),
             QueryDao.JoinInfo(PATIENT, SAMPLE.PATIENT_SERIAL.eq(PATIENT.SERIAL)
                 .and(SAMPLE.ORGANIZATION_ID.eq(PATIENT.ORGANIZATION_ID))
@@ -30,7 +29,6 @@ interface RequestDao: QueryDao {
                 SERVICE.NAME,
                 SERVICE.CATEGORY_ID
             ).`as`("service"),
-            ORDER.ID.`as`("order_id"),
             REQUEST.USER_SERVICE_ID,
             REQUEST.STATUS,
             REQUEST.MEMO,
@@ -99,8 +97,7 @@ interface RequestDao: QueryDao {
             ).`as`("sample")
         )
 
-        val baseCondition = REQUEST.ORDER_ID.eq(ORDER.ID)
-            .and(REQUEST.SAMPLE_ID.eq(SAMPLE.ID))
+        val baseCondition = REQUEST.SAMPLE_ID.eq(SAMPLE.ID)
             .and(REQUEST.SERVICE_ID.eq(SERVICE.ID))
 
         val finalCondition = if (userDto.role == "USER") {
@@ -115,20 +112,19 @@ interface RequestDao: QueryDao {
         }
     }
 
-    fun DSLContext.updateRequestStatusAndCreateAtById(orderId: UUID, sampleId: UUID, serviceId: String):Mono<Request> {
+    fun DSLContext.updateRequestStatusAndCreateAtById(sampleId: UUID, serviceId: String):Mono<RequestDTO> {
         return Mono.from(
             update(REQUEST)
                 .set(REQUEST.CREATE_AT, LocalDateTime.now())
                 .set(REQUEST.STATUS, Status.UNCONFIRMED_ORDER.toString())
-                .where(REQUEST.ORDER_ID.eq(orderId)
-                    .and(REQUEST.SERVICE_ID.eq(serviceId))
+                .where(REQUEST.SERVICE_ID.eq(serviceId)
                     .and(REQUEST.SAMPLE_ID.eq(sampleId))
                 )
                 .returning()
-        ).map { it.into(Request::class.java) }
+        ).map { it.into(RequestDTO::class.java) }
 
     }
-    fun DSLContext.updateRequest(request: Request): Mono<Request> {
+    fun DSLContext.updateRequest(request: RequestDTO): Mono<RequestDTO> {
         return Mono.from(
             update(REQUEST)
                 .set(REQUEST.USER_SERVICE_ID, coalesce(`val`(request.userServiceId), REQUEST.USER_SERVICE_ID))
@@ -138,24 +134,24 @@ interface RequestDao: QueryDao {
                 .set(REQUEST.WARD, coalesce(`val`(request.ward), REQUEST.WARD))
                 .set(REQUEST.PHYSICIAN, coalesce(`val`(request.physician), REQUEST.PHYSICIAN))
                 .set(REQUEST.LAST_MODIFY_AT, LocalDateTime.now())
-                .where(REQUEST.ORDER_ID.eq(request.orderId).and(REQUEST.SAMPLE_ID.eq(request.sampleId).and(REQUEST.SERVICE_ID.eq(request.serviceId))))
-                .returning()
-        ).map { it.into(Request::class.java) }
+                .where(
+                    REQUEST.SAMPLE_ID.eq(request.sample!!.id),
+                    REQUEST.SERVICE_ID.eq(request.service!!.id)
+                ).returning()
+        ).map { it.into(RequestDTO::class.java) }
     }
-    fun DSLContext.deleteRequest(request: Request): Mono<Request> {
+    fun DSLContext.deleteRequest(request: RequestDTO): Mono<RequestDTO> {
         return Mono.from(
             deleteFrom(REQUEST).where(
-                REQUEST.ORDER_ID.eq(request.orderId)
-                    .and(REQUEST.SAMPLE_ID.eq(request.sample!!.id))
-                    .and(REQUEST.SERVICE_ID.eq(request.service!!.id))
+                REQUEST.SAMPLE_ID.eq(request.sample!!.id),
+                REQUEST.SERVICE_ID.eq(request.service!!.id)
             ).returning()
-        ).map { it.into(Request::class.java) }
+        ).map { it.into(RequestDTO::class.java) }
     }
 
-    fun DSLContext.selectRequestById(sampleId: UUID, serviceId: String): Mono<Request> {
+    fun DSLContext.selectRequestById(sampleId: UUID, serviceId: String): Mono<RequestDTO> {
         return Mono.from(
             select(
-                REQUEST.ORDER_ID,
                 REQUEST.USER_SERVICE_ID,
                 REQUEST.MEMO,
                 REQUEST.DEPARTMENT,
@@ -227,6 +223,6 @@ interface RequestDao: QueryDao {
                     .and(REQUEST.SAMPLE_ID.eq(sampleId))
                 )
 
-        ).map{it.into(Request::class.java)}
+        ).map{it.into(RequestDTO::class.java)}
     }
 }

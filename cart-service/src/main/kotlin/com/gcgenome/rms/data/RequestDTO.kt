@@ -1,26 +1,17 @@
 package com.gcgenome.rms.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
 import java.time.LocalDateTime
-import java.util.*
 
-@JsonSubTypes(JsonSubTypes.Type(Patient::class, name = "patient"))
 data class RequestDTO(
-    @JsonProperty("order_id")
-    var orderId: UUID?,
-    @JsonProperty("service_id")
-    var serviceId: String?,
     @JsonProperty("service")
     val service: ServiceDTO?,
-    @JsonProperty("sample_id")
-    var sampleId: UUID?,
-    @JsonProperty("serial")
-    val serial: String?,
+    @JsonProperty("sample")
+    val sample: SampleDTO?,
     @JsonProperty("user_service_id")
     val userServiceId: String?,
     @JsonProperty("status")
@@ -33,6 +24,10 @@ data class RequestDTO(
     val ward: String?,
     @JsonProperty("physician")
     val physician: String?,
+    @JsonProperty("courier_company")
+    val courierCompany: String?,
+    @JsonProperty("awb_number")
+    val awbNumber: String?,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("create_at")
@@ -55,9 +50,13 @@ data class RequestDTO(
     val resampleAt: LocalDateTime?,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonProperty("reported_at")
+    val reportedAt: LocalDateTime?,
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("last_modify_at")
     val lastModifyAt: LocalDateTime?,
-    @JsonProperty("sample")
-    val sample: SampleDTO?
+    @JsonProperty("user")
+    val user: UserDTO
 )
 

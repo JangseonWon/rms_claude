@@ -1,6 +1,7 @@
 package com.gcgenome.rms.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
@@ -11,31 +12,29 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-data class SampleDTO(
+data class UserDTO(
     @JsonProperty("id")
-    var id: UUID?,
-    @JsonProperty("barcode")
-    var barcode: String?,
-    @JsonProperty("user_sample_id")
-    var userSampleId: String?,
-    @JsonProperty("quantity")
-    var quantity: Int,
-    @JsonProperty("age")
-    var age: Int?,
-    @JsonProperty("sampling_on")
-    @JsonDeserialize(using = LocalDateDeserializer::class)
-    @JsonSerialize(using = LocalDateSerializer::class)
-    var samplingOn: LocalDate?,
-    @JsonProperty("resample_reason")
-    var resampleReason: String?,
+    var id: String?,
+    @JsonProperty("name")
+    var name: String?,
+    @JsonProperty("role")
+    var role: Role?,
+    @JsonProperty("type")
+    var type: String?,
+    @JsonProperty("email")
+    var email: String?,
+    @JsonProperty("phone_number")
+    var phoneNumber: String?,
+    @JsonProperty("key")
+    var key: UUID?,
+    @JsonProperty("state")
+    var state: String?,
+    @JsonProperty("branch_serial")
+    var branchSerial: String?,
+    @JsonProperty("branch_name")
+    var branchName: String?,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("create_at")
-    var createAt: LocalDateTime?,
-    @JsonProperty("sample_type")
-    var sampleType: SampleTypeDTO,
-    @JsonProperty("patient")
-    var patient: PatientDTO?,
-    @JsonProperty("extensions")
-    var extensions: List<ExtensionDTO>?,
+    var createAt: LocalDateTime?
 )

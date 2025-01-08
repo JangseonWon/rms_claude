@@ -34,7 +34,7 @@ class Router (
         val serviceId = request.pathVariable("service_id")
         return principal(request)
             .flatMap { handler.getCartInfo(sampleId, serviceId) }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), Order::class.java) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), RequestDTO::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(OrderNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
     }
@@ -56,13 +56,13 @@ class Router (
         val userId = request.queryParam("user_id").get()
         return principal(request)
             .flatMap { handler.organizations(userId).collectList() }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), Organization::class.java) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), OrganizationDTO::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
     }
     private fun cartToOrder(request: ServerRequest): Mono<ServerResponse> {
         return principal(request)
-            .flatMap { request.bodyToMono(Array<Request>::class.java) }
+            .flatMap { request.bodyToMono(Array<RequestDTO>::class.java) }
             .flatMap { handler.cartToOrder(it).collectList() }
             .flatMap { ServerResponse.ok().build()}
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
@@ -73,11 +73,11 @@ class Router (
         val sampleIdPathVar = UUID.fromString(request.pathVariable("sample_id"))
         val serviceIdPathVar = request.pathVariable("service_id")
         return principal(request)
-            .flatMap { request.bodyToMono(Request::class.java) }
+            .flatMap { request.bodyToMono(RequestDTO::class.java) }
             .flatMap { handler.updateRequest(
                 it.apply {
-                    sampleId = sampleIdPathVar
-                    serviceId = serviceIdPathVar
+                    sample!!.id = sampleIdPathVar
+                    service!!.id = serviceIdPathVar
                 }
             ) }
             .flatMap { ServerResponse.ok().bodyValue(it)}
@@ -88,13 +88,13 @@ class Router (
         val serviceId = request.queryParam("service_id").get()
         return principal(request)
             .flatMap { handler.sampleTypes(serviceId).collectList() }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), SampleType::class.java) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), SampleTypeDTO::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(OrderNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
     }
     private fun deleteCart(request: ServerRequest): Mono<ServerResponse> {
         return principal(request)
-            .flatMap { request.bodyToMono(Array<Request>::class.java) }
+            .flatMap { request.bodyToMono(Array<RequestDTO>::class.java) }
             .flatMap { handler.deleteCart(it).collectList() }
             .then(ServerResponse.ok().build())
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}

@@ -1,8 +1,0 @@
-package com.gcgenome.rms.data
-
-data class Extension(
-    var id: String?,
-    var name: String?,
-    var regex: String?,
-    var value: String?
-)

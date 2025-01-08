@@ -4,9 +4,15 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 data class ServiceDTO (
     @JsonProperty("id")
-    val id : String?,
+    var id : String?,
     @JsonProperty("name")
-    val name: String?,
-    @JsonProperty("category_id")
-    val categoryId: String?
+    var name: String?,
+    @JsonProperty("name_kr")
+    var nameKr: String?,
+    @JsonProperty("group_name")
+    var groupName: String?,
+    @JsonProperty("type")
+    var type: String?,
+    @JsonProperty("category")
+    var category: CategoryDTO?
 )
