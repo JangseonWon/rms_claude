@@ -10,10 +10,9 @@ interface RequestDao {
     fun DSLContext.insertRequest(request: RequestDTO): Mono<RequestDTO> {
         return Mono.from(
             insertInto(REQUEST)
-                .set(REQUEST.ORDER_ID, request.orderId)
                 .set(REQUEST.SERVICE_ID, request.service!!.id)
                 .set(REQUEST.SAMPLE_ID, request.sample!!.id)
-                .set(REQUEST.USER_SERVICE_ID, request.userServiceId ?: request.service.id)
+                .set(REQUEST.USER_SERVICE_ID, request.userServiceId ?: request.service!!.id)
                 .set(REQUEST.STATUS, request.status)
                 .set(REQUEST.MEMO, request.memo)
                 .set(REQUEST.DEPARTMENT, request.department)

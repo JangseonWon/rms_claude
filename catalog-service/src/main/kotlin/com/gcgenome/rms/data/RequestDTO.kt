@@ -12,32 +12,30 @@ import java.util.*
 
 @JsonSubTypes(JsonSubTypes.Type(PatientDTO::class, name = "patient"))
 data class RequestDTO(
-    @JsonProperty("order_id")
-    var orderId: UUID?,
     @JsonProperty("service_id")
     var serviceId: String?,
     @JsonProperty("service")
-    val service: Service?,
+    var service: Service?,
     @JsonProperty("sample_id")
     var sampleId: UUID?,
     @JsonProperty("serial")
-    val serial: String?,
+    var serial: String?,
     @JsonProperty("user_service_id")
-    val userServiceId: String?,
+    var userServiceId: String?,
     @JsonProperty("status")
-    val status: String?,
+    var status: String?,
     @JsonProperty("memo")
-    val memo: String?,
+    var memo: String?,
     @JsonProperty("department")
-    val department: String?,
+    var department: String?,
     @JsonProperty("ward")
-    val ward: String?,
+    var ward: String?,
     @JsonProperty("physician")
-    val physician: String?,
+    var physician: String?,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("create_at")
-    val createAt: LocalDateTime?,
+    var createAt: LocalDateTime?,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("cart_at")
@@ -45,20 +43,22 @@ data class RequestDTO(
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("specified_at")
-    val specifiedAt: LocalDateTime?,
+    var specifiedAt: LocalDateTime?,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("complete_at")
-    val completeAt: LocalDateTime?,
+    var completeAt: LocalDateTime?,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("resample_at")
-    val resampleAt: LocalDateTime?,
+    var resampleAt: LocalDateTime?,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("last_modify_at")
-    val lastModifyAt: LocalDateTime?,
+    var lastModifyAt: LocalDateTime?,
     @JsonProperty("sample")
-    val sample: SampleDTO?
+    var sample: SampleDTO?,
+    @JsonProperty("user_id")
+    var userId: String?
 )
 
