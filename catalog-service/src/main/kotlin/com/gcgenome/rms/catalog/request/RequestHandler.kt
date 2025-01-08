@@ -25,7 +25,7 @@ class RequestHandler(val dslContext: DSLContext):
                                 }
                                 .then(insertRequest(request.apply {
                                     this.sample!!.id = sampleRecord.id
-                                    this.userId = user.id
+                                    this.user!!.id = user.id
                                 }))
                         }
                 }

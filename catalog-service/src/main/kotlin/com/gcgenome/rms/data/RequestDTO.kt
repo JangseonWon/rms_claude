@@ -58,7 +58,7 @@ data class RequestDTO(
     var lastModifyAt: LocalDateTime?,
     @JsonProperty("sample")
     var sample: SampleDTO?,
-    @JsonProperty("user_id")
-    var userId: String?
+    @JsonProperty("user")
+    var user: UserDTO?
 )
 
