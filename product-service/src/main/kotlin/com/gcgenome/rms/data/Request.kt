@@ -12,28 +12,26 @@ import java.util.*
 
 @JsonSubTypes(JsonSubTypes.Type(Patient::class, name = "patient"))
 data class Request(
-    @JsonProperty("order_id")
-    var orderId: UUID?,
     @JsonProperty("service")
-    val service: Service?,
+    var service: Service?,
     @JsonProperty("sample_id")
     var sampleId: UUID?,
     @JsonProperty("service_id")
     var serviceId: String?,
     @JsonProperty("serial")
-    val serial: String?,
+    var serial: String?,
     @JsonProperty("user_service_id")
-    val userServiceId: String?,
+    var userServiceId: String?,
     @JsonProperty("status")
-    val status: String?,
+    var status: String?,
     @JsonProperty("memo")
-    val memo: String?,
+    var memo: String?,
     @JsonProperty("department")
-    val department: String?,
+    var department: String?,
     @JsonProperty("ward")
-    val ward: String?,
+    var ward: String?,
     @JsonProperty("physician")
-    val physician: String?,
+    var physician: String?,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("create_at")
@@ -45,33 +43,35 @@ data class Request(
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("specified_at")
-    val specifiedAt: LocalDateTime?,
+    var specifiedAt: LocalDateTime?,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("complete_at")
-    val completeAt: LocalDateTime?,
+    var completeAt: LocalDateTime?,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("resample_at")
-    val resampleAt: LocalDateTime?,
+    var resampleAt: LocalDateTime?,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("last_modify_at")
-    val lastModifyAt: LocalDateTime?,
+    var lastModifyAt: LocalDateTime?,
     @JsonProperty("emp_id")
-    val empId: String?,
+    var empId: String?,
     @JsonProperty("emp_name")
-    val empName: String?,
+    var empName: String?,
     @JsonProperty("emp_mobile")
-    val empMobile: String?,
+    var empMobile: String?,
     @JsonProperty("test")
-    val test: Boolean?,
+    var test: Boolean?,
     @JsonProperty("credit")
-    val credit: Boolean?,
+    var credit: Boolean?,
     @JsonProperty("price")
-    val price: Int?,
+    var price: Int?,
     @JsonProperty("outsourcing_cost")
-    val outsourcingCost: Int?,
+    var outsourcingCost: Int?,
     @JsonProperty("sample")
-    val sample: Sample?
+    var sample: Sample?,
+    @JsonProperty("user_id")
+    var userId: String?
 )

@@ -7,9 +7,7 @@ import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 
 @Component
-class OrganizationHandler(val dslContext: DSLContext):
-    OrganizationDao, ServiceDao, SampleTypeDao, OrderDao, RequestDao, PatientDao, SampleDao, SampleExtensionDao
-{
+class OrganizationHandler(val dslContext: DSLContext): OrganizationDao {
     fun getOrganizations(userId: String): Flux<Organization> {
         return dslContext.selectOrganizationsByUserId(userId)
     }

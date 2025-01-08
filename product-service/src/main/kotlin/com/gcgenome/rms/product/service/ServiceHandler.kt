@@ -12,7 +12,7 @@ import java.util.*
 
 @Component
 class ServiceHandler(val dslContext: DSLContext):
-    OrganizationDao, ServiceDao, SampleTypeDao, OrderDao, RequestDao, PatientDao, SampleDao, SampleExtensionDao
+    OrganizationDao, ServiceDao, SampleTypeDao, RequestDao, PatientDao, SampleDao, SampleExtensionDao
 {
     fun getServices(user: UserAuthentication, categoryId: UUID): Flux<Service> {
         val andWhere = if (user.user.role == "USER") USER_SERVICE.USER_ID.eq(user.user.id) else DSL.noCondition()

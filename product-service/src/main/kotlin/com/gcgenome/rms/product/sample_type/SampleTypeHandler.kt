@@ -7,9 +7,7 @@ import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 
 @Component
-class SampleTypeHandler(val dslContext: DSLContext):
-    OrganizationDao, ServiceDao, SampleTypeDao, OrderDao, RequestDao, PatientDao, SampleDao, SampleExtensionDao
-{
+class SampleTypeHandler(val dslContext: DSLContext): SampleTypeDao {
     fun getSampleTypes(serviceId: String): Flux<SampleType> {
         return dslContext.selectSampleTypeByServiceId(serviceId)
     }
