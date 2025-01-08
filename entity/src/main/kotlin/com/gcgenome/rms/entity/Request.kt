@@ -46,18 +46,17 @@ data class Request(
     val report: List<Report>,
 
     @ManyToOne
-    @JoinColumn(name = "order_id", insertable = false, updatable = false)
-    val orderId: Order,
-    @ManyToOne
     @JoinColumn(name = "service_id", insertable = false, updatable = false)
     val serviceId: Service,
     @ManyToOne
     @JoinColumn(name = "sample_id", insertable = false, updatable = false)
-    val sampleId: Sample
+    val sampleId: Sample,
+    @ManyToOne
+    @JoinColumn(name = "user_id", insertable = false, updatable = false, nullable = false)
+    val userId: User
 ){
     @Embeddable
     data class RequestPK (
-        @Column(name = "order_id") val orderId: UUID,
         @Column(name = "service_id") val serviceId: String,
         @Column(name = "sample_id") val sampleId: UUID
     ) : Serializable

@@ -24,7 +24,6 @@ data class Report(
 
     @ManyToOne
     @JoinColumns(value = [
-        JoinColumn(name = "order_id", referencedColumnName = "order_id", insertable=false, updatable=false),
         JoinColumn(name = "service_id", referencedColumnName = "service_id", insertable=false, updatable=false),
         JoinColumn(name = "sample_id", referencedColumnName = "sample_id", insertable=false, updatable=false)
     ])

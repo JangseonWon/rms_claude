@@ -38,11 +38,11 @@ data class User(
     @OneToMany(mappedBy = "userId")
     val userServices: List<UserService>,
     @OneToMany(mappedBy = "userId")
-    val orders: List<Order>,
-    @OneToMany(mappedBy = "userId")
     val posts: List<Post>,
     @OneToMany(mappedBy = "userId")
     val comments: List<Comment>,
     @OneToMany(mappedBy = "userId")
-    val postRead: List<PostRead>
+    val postRead: List<PostRead>,
+    @OneToMany(mappedBy = "userId")
+    val requests: List<Request>
     )
