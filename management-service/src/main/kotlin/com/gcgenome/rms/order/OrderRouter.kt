@@ -18,10 +18,10 @@ class OrderRouter(
 ) {
     @Bean("OrderRouter")
     fun route() = router {
-        DELETE("/w-api/management-service/requests", :: deleteOrder)
+        DELETE("/w-api/management-service/requests", :: deleteRequest)
     }
-    private fun deleteOrder(request: ServerRequest): Mono<ServerResponse> {
-        return authenticationHandler.principal(request)
+    private fun deleteRequest(request: ServerRequest): Mono<ServerResponse> {
+        return authenticationHandler.chkAdmin(request)
             .flatMap { request.bodyToMono(Array<RequestDTO>::class.java) }
             .flatMap { orderHandler.deleteOrder(it).collectList() }
             .then(ServerResponse.ok().build())

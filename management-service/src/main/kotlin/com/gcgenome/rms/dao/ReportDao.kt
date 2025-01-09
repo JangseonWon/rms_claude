@@ -7,10 +7,13 @@ import reactor.core.publisher.Mono
 import java.util.*
 
 interface ReportDao{
-    fun DSLContext.deleteReportByOrderId(orderId: UUID): Mono<ReportDTO> {
+    fun DSLContext.deleteReportByServiceIdAndSampleId(serviceId: String, sampleId: UUID): Mono<ReportDTO> {
         return Mono.from(
             deleteFrom(REPORT)
-                .where(REPORT.ORDER_ID.eq(orderId)).returning()
+                .where(
+                    REPORT.SERVICE_ID.eq(serviceId),
+                    REPORT.SAMPLE_ID.eq(sampleId)
+                ).returning()
         ).map { it.into(ReportDTO::class.java) }
     }
 }
