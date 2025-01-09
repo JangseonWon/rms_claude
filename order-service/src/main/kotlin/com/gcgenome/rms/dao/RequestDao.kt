@@ -29,9 +29,8 @@ interface RequestDao: QueryDao {
     }
     fun DSLContext.selectRequestsWithPage(query: Query, user: User): Mono<Page<RequestDTO>> {
         val joins = listOf(
-            QueryDao.JoinInfo(ORDER, REQUEST.ORDER_ID.eq(ORDER.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(SERVICE, REQUEST.SERVICE_ID.eq(SERVICE.ID), QueryDao.JoinType.LEFT),
-            QueryDao.JoinInfo(USER, ORDER.USER_ID.eq(USER.ID), QueryDao.JoinType.LEFT),
+            QueryDao.JoinInfo(USER, REQUEST.USER_ID.eq(USER.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(SAMPLE, REQUEST.SAMPLE_ID.eq(SAMPLE.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(SAMPLE_TYPE, SAMPLE.SAMPLE_TYPE_ID.eq(SAMPLE_TYPE.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(
@@ -62,14 +61,9 @@ interface RequestDao: QueryDao {
                 key("name").value(SERVICE.NAME)
             ).`as`("service"),
             jsonObject(
-                key("id").value(ORDER.ID),
-                key("user").value(
-                    jsonObject(
-                        key("id").value(USER.ID),
-                        key("name").value(USER.NAME)
-                    )
-                )
-            ).`as`("order"),
+                key("id").value(USER.ID),
+                key("name").value(USER.NAME)
+            ).`as`("user"),
             jsonObject(
                 key("id").value(SAMPLE.ID),
                 key("barcode").value(SAMPLE.BARCODE),
@@ -103,13 +97,12 @@ interface RequestDao: QueryDao {
             ).`as`("sample")
         )
         val condition = if (user.role == "USER") {
-            ORDER.USER_ID.eq(user.id)
+            REQUEST.USER_ID.eq(user.id)
         } else noCondition()
 
         val groupByFields = listOf(
             REQUEST.USER_SERVICE_ID, REQUEST.STATUS, REQUEST.PHYSICIAN, REQUEST.REPORTED_AT, REQUEST.CREATE_AT, REQUEST.SPECIFIED_AT,
             REQUEST.AWB_NUMBER, REQUEST.COURIER_COMPANY,
-            ORDER.ID,
             SERVICE.ID,
             USER.ID,
             SAMPLE.ID, SAMPLE_TYPE.ID,
@@ -124,7 +117,6 @@ interface RequestDao: QueryDao {
     fun DSLContext.selectRequestBySampleIdAndService(sampleId: UUID, serviceId: String): Mono<RequestDTO> {
         return Mono.from(
             select(
-                REQUEST.ORDER_ID,
                 REQUEST.USER_SERVICE_ID,
                 REQUEST.MEMO,
                 REQUEST.DEPARTMENT,

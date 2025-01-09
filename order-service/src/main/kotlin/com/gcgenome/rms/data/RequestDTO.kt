@@ -40,5 +40,5 @@ data class RequestDTO(
     var awbNumber: String? = null,
     var service: ServiceDTO? = null,
     var sample: SampleDTO? = null,
-    var order: OrderDTO? = null
+    var user: UserDTO? = null
 )
