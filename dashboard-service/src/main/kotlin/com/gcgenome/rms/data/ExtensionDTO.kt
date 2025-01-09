@@ -3,7 +3,7 @@ package com.gcgenome.rms.data
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.util.*
 
-data class Extension(
+data class ExtensionDTO(
     @JsonProperty("id")
     val id: String?,
     @JsonProperty("sample_id")

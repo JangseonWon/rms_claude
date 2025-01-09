@@ -3,7 +3,7 @@ package com.gcgenome.rms.data
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.gcgenome.rms.tables.pojos.User
 
-data class Organization(
+data class OrganizationDTO(
     @JsonProperty("id")
     val id:String,
     @JsonProperty("name")

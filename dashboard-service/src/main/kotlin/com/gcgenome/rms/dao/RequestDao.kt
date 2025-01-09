@@ -10,11 +10,9 @@ import reactor.core.publisher.Mono
 interface RequestDao: QueryDao {
     fun DSLContext.selectRequestsWithPage(query: Query, userDto: User): Mono<Page<RequestDTO>> {
         val joins = listOf(
-            QueryDao.JoinInfo(ORDER, REQUEST.ORDER_ID.eq(ORDER.ID), QueryDao.JoinType.INNER),
             QueryDao.JoinInfo(SAMPLE, REQUEST.SAMPLE_ID.eq(SAMPLE.ID), QueryDao.JoinType.INNER),
-            QueryDao.JoinInfo(REPORT, REQUEST.ORDER_ID.eq(REPORT.ORDER_ID)
-                .and(REQUEST.SERVICE_ID.eq(REPORT.SERVICE_ID)
-                    .and(REQUEST.SAMPLE_ID.eq(REPORT.SAMPLE_ID))), QueryDao.JoinType.LEFT),
+            QueryDao.JoinInfo(REPORT, REQUEST.SERVICE_ID.eq(REPORT.SERVICE_ID)
+                    .and(REQUEST.SAMPLE_ID.eq(REPORT.SAMPLE_ID)), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(PATIENT, SAMPLE.PATIENT_SERIAL.eq(PATIENT.SERIAL)
                 .and(SAMPLE.ORGANIZATION_ID.eq(PATIENT.ORGANIZATION_ID))
                 .and(SAMPLE.USER_ID.eq(PATIENT.USER_ID)), QueryDao.JoinType.INNER),
@@ -26,12 +24,6 @@ interface RequestDao: QueryDao {
         )
 
         val fields = listOf(
-            jsonObject(
-                SERVICE.ID,
-                SERVICE.NAME,
-                SERVICE.CATEGORY_ID
-            ).`as`("service"),
-            ORDER.ID.`as`("order_id"),
             REQUEST.USER_SERVICE_ID,
             REQUEST.STATUS,
             REQUEST.MEMO,
@@ -44,6 +36,15 @@ interface RequestDao: QueryDao {
             REQUEST.COMPLETE_AT,
             REQUEST.RESAMPLE_AT,
             REQUEST.LAST_MODIFY_AT,
+            jsonObject(
+                key("id").value(USER.ID),
+                key("name").value(USER.NAME)
+            ).`as`("user"),
+            jsonObject(
+                key("id").value(SERVICE.ID),
+                key("name").value(SERVICE.NAME),
+                key("category_id").value(SERVICE.CATEGORY_ID)
+            ).`as`("service"),
             jsonObject(
                 key("id").value(SAMPLE.ID),
                 key("barcode").value(SAMPLE.BARCODE),
@@ -107,12 +108,11 @@ interface RequestDao: QueryDao {
             ).`as`("report")
         )
 
-        val baseCondition = REQUEST.ORDER_ID.eq(ORDER.ID)
-            .and(REQUEST.SAMPLE_ID.eq(SAMPLE.ID))
+        val baseCondition = REQUEST.SAMPLE_ID.eq(SAMPLE.ID)
             .and(REQUEST.SERVICE_ID.eq(SERVICE.ID))
 
         val finalCondition = if (userDto.role == "USER") {
-            baseCondition.and(ORDER.USER_ID.eq(userDto.id))
+            baseCondition.and(REQUEST.USER_ID.eq(userDto.id))
         } else {
             baseCondition
         }.and(REQUEST.STATUS.ne("CART"))
@@ -136,10 +136,9 @@ interface RequestDao: QueryDao {
                 count().filterWhere(REQUEST.STATUS.eq(Status.COMPLETED.name))
             )
                 .from(REQUEST)
-                .join(ORDER).on(REQUEST.ORDER_ID.eq(ORDER.ID))
                 .where().apply {
                     when(user.role) {
-                        Role.USER.name -> and(ORDER.USER_ID.eq(user.id))
+                        Role.USER.name -> and(REQUEST.USER_ID.eq(user.id))
                     }
                 }
         ).map(StatusCount::toModel)

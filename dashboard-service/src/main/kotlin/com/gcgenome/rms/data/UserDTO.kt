@@ -1,5 +1,5 @@
 package com.gcgenome.rms.data
 
-data class User(
+data class UserDTO(
     var id: String?
 )

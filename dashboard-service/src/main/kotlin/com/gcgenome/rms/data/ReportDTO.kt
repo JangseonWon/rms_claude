@@ -8,7 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
 import java.time.LocalDateTime
 import java.util.*
 
-data class Report(
+data class ReportDTO(
     @JsonProperty("id")
     val id: UUID?,
     @JsonProperty("type")

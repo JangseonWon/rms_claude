@@ -2,11 +2,9 @@ package com.gcgenome.rms.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-data class Service (
+data class SampleTypeDTO(
     @JsonProperty("id")
-    val id : String?,
+    var id: String?,
     @JsonProperty("name")
-    val name: String?,
-    @JsonProperty("category_id")
-    val categoryId: String?
+    var name: String?
 )

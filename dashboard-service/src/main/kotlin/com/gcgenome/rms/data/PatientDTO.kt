@@ -1,11 +1,8 @@
 package com.gcgenome.rms.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.annotation.JsonPropertyOrder
 
-
-@JsonPropertyOrder(value = ["serial", "sex", "name", "birth_year", "birth_month", "birth_day", "organization"])
-data class Patient(
+data class PatientDTO(
     @JsonProperty("serial")
     var serial: String?,
     @JsonProperty("sex")
@@ -19,5 +16,5 @@ data class Patient(
     @JsonProperty("birth_day")
     val birthDay: Byte?,
     @JsonProperty("organization")
-    val organization: Organization?
+    val organization: OrganizationDTO?
 )
