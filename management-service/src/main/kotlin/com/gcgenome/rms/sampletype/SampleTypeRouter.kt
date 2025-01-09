@@ -25,7 +25,6 @@ class SampleTypeRouter (
         GET("/w-api/management-service/sample-types", ::getAllSampleTypes)
         POST("/w-api/management-service/sample-types/search", ::searchSampleTypes)
         PATCH("/w-api/management-service/sample-types/{sample-type-id}", ::updateSampleTypeById)
-
     }
     private fun getSampleTypeById(request: ServerRequest): Mono<ServerResponse> {
         val sampleTypeId = request.pathVariable("sample-type-id")

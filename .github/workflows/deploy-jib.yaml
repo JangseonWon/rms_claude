@@ -114,11 +114,6 @@ jobs:
             export POSTGRES_PASSWORD=$DATABASE_PASSWORD_DEPLOY
           fi
           gradle $SUBMODULE:test
-      - name: Publish Unit Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        if: ${{ always() }}
-        with:
-          files: ${{ env.SUBMODULE }}/build/test-results/**/*.xml
       - name: Deploy
         run: |
           if [ "$GITHUB_REF_NAME" = "master" ]; then 
