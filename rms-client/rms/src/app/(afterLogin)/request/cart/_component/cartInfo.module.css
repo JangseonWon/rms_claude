@@ -42,6 +42,7 @@
     background-color: #C8C9CB;
 }
 .modalContent {
+    padding: 5px;
     height: 600px;
     overflow-y: scroll;
 }
@@ -59,6 +60,13 @@
 .modalContent .content > * {
     padding-right: 20px;
 }
+.section {
+    padding-top: 10px;
+    display: flex;
+}
+.section > * {
+    padding-right: 20px;
+}
 .memoSection {
     width: 98.5%;
 }
@@ -67,4 +75,10 @@
     padding: 0 20px;
     display: flex;
     justify-content: flex-end;
+}
+.mainName {
+    margin: 10px 0 0 0;
+    color: #002b49;
+    font-weight: 700;
+    font-size: 18px;
 }

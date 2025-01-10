@@ -31,10 +31,15 @@ type Props = {
 }
 
 export default function CartInfo({serviceId, sampleId, userId, closeModal}: Props) {
-    const [request, setRequest] = useState<Request>()
+    const [request, setRequest] = useState<Request>({});
     const [organizationOptions, setOrganizationOptions] = useState<SelectBoxOption[]>([])
     const [sampleTypeOptions, setSampleTypeOptions] = useState<SelectBoxOption[]>([]);
     const showAlert = CallAlertDialog();
+
+    const sexOption: SelectBoxOption[] = [
+        { value: "M", name: "Male" },
+        { value: "F", name: "Female" }
+    ];
 
     const handleRequestChange = (path: string, value: any) => {
         setRequest(prevState => ({
@@ -108,6 +113,44 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
         return new Date(year, month - 1, day);
     }
 
+    const handleExtensionChange = (id: string, value: any): void => {
+        setRequest(prevState => {
+            const existingExtensions = prevState.sample?.extensions || [];
+
+            const existingExtensionIndex = existingExtensions.findIndex(ext => ext.id === id);
+
+            let updatedExtensions;
+
+            if (existingExtensionIndex > -1) {
+                updatedExtensions = [...existingExtensions];
+                updatedExtensions[existingExtensionIndex] = { id, value: formatExtensionValue(value) };
+            } else {
+                updatedExtensions = [...existingExtensions, { id, value: formatExtensionValue(value) }];
+            }
+            console.log(updatedExtensions);
+
+            return {
+                ...prevState,
+                sample: {
+                    ...prevState.sample,
+                    extensions: updatedExtensions
+                }
+            };
+        });
+    };
+
+    const formatExtensionValue = (value: any) => {
+        if (typeof value === 'object' && value !== null && 'name' in value && 'value' in value) {
+            return value.value;
+        }
+
+        if (typeof value === 'boolean') {
+            return value;
+        }
+
+        return value;
+    };
+
     useEffect(() => {
         fetchRequest()
         fetchOrganizations()
@@ -133,6 +176,7 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
                                     handleRequestChange('sample.patient.organization.id', value.value)
                                     handleRequestChange('sample.patient.organization.name', value.name)
                                 }}
+                                width="200px"
                             />
                         </div>
                         <div className={style.content}>
@@ -143,8 +187,8 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
                                 disabled={true}
                             />
                         </div>
-                        <div className={style.content}>
-                            <p className={style.title}>Patient Info.</p>
+                        <p className={style.mainName}>Patient Info.</p>
+                        <div className={style.section}>
                             <InputBox
                                 label={"Name*"}
                                 value={request.sample?.patient?.name}
@@ -157,6 +201,11 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
                                 onChange={(value) => handleRequestChange('sample.patient.serial', value)}
                                 required={true}
                             />
+                            <InputBox
+                                label={"Age"}
+                                value={request.sample?.age}
+                                onChange={(value) => handleRequestChange('sample.age', value)}
+                            />
                             <DatePickerBox
                                 label={"Date of Birth"}
                                 value={getDateFromComponents(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}
@@ -166,10 +215,18 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
                                     handleRequestChange('sample.patient.birth_day', date.getDate());
                                 }}
                             />
-                            <InputBox
-                                label={"Age"}
-                                value={request.sample?.age}
-                                onChange={(value) => handleRequestChange('sample.age', value)}
+                        </div>
+                        <div className={style.section}>
+                            <SelectBox
+                                label={"Gender*"}
+                                value={request.sample?.patient?.sex}
+                                options={sexOption}
+                                required={true}
+                                onChange={(value) => {
+                                    handleRequestChange('sample.patient.sex', value.value)
+                                    // setSelectedSex(value.name);
+                                }}
+                                width="200px"
                             />
                         </div>
                         <div className={style.content}>
@@ -182,6 +239,7 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
                                     handleRequestChange('sample.sample_type.id', value.value)
                                     handleRequestChange('sample.sample_type.name', value.name)
                                 }}
+                                width="200px"
                             />
                             <DatePickerBox
                                 label={"Date or collection*"}
@@ -203,16 +261,14 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
                                 onChange={(value) => handleRequestChange('department', value)}
                             />
                             <InputBox
-                                label={"Ward"}
-                                value={request.ward}
-                                onChange={(value) => handleRequestChange('ward', value)}
-                            />
-                            <InputBox
                                 label={"Physician Name"}
                                 value={request.physician}
                                 onChange={(value) => handleRequestChange('physician', value)}
                             />
                         </div>
+                        {/*{request.sample?.extensions && (
+                            <RequestInfoExtensionComponent extensions={request.sample?.extensions} onChange={handleExtensionChange}/>
+                        )}*/}
                         <div className={style.memoSection}>
                             <TextBox
                                 label={'Memo'}

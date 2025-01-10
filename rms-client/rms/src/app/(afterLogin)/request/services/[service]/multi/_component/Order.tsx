@@ -24,7 +24,7 @@ type RequestData = {
     institution: string;      // 기관
     birth: string;            // 생일
     patientName: string;      // 환자 이름
-    sex: string;              // 성별
+    gender: string;              // 성별
     physician: string;        // 의사 이름
     medicalDepartment: string;// 병원명
     collectionDate: string;   // 채취일자
@@ -87,7 +87,6 @@ export default function Order() {
                 sampleType: mapByHeader("Sample Type"),
                 institution: mapByHeader("Institution Name"),
                 birth: birth,
-                sex: mapByHeader("Sex"),
                 mrn: mapByHeader("MRN"),
                 patientName: mapByHeader("Patient Name"),
                 gender: mapByHeader("Gender"),
@@ -142,7 +141,7 @@ export default function Order() {
                     };
                 });
 
-                const sex = item.sex === "Male" ? "M" : item.sex === "Female" ? "F" : item.sex;
+                const sex = item.gender === "Male" ? "M" : item.gender === "Female" ? "F" : item.gender;
 
                 return {
                     service: {
@@ -283,7 +282,7 @@ export default function Order() {
                         <th className={style.header150}>Patient Name</th>
                         <th className={style.header100}>MRN</th>
                         <th className={style.header150}>Date of Birth</th>
-                        <th className={style.header100}>Sex</th>
+                        <th className={style.header100}>Gender</th>
                         <th className={style.header150}>Sample Type</th>
                         <th className={style.header150}>Date of Collection</th>
                         <th className={style.header100}>Quantity</th>
@@ -303,7 +302,7 @@ export default function Order() {
                             <td>{item.patientName || ''}</td>
                             <td>{item.mrn || ''}</td>
                             <td>{item.birth || ''}</td>
-                            <td>{item.sex || ''}</td>
+                            <td>{item.gender || ''}</td>
                             <td>{item.sampleType && item.sampleType.includes('/') ? item.sampleType.split('/')[1] : ''}</td>
                             <td>{item.collectionDate || ''}</td>
                             <td>{item.quantity || ''}</td>

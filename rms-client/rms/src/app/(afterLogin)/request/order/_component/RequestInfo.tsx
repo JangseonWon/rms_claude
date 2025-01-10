@@ -1,16 +1,17 @@
 "use client"
 
-import style from "@/app/(afterLogin)/request/order/barcode/_component/requestInfo.module.css";
+import style from "@/app/(afterLogin)/request/order/_component/requestInfo.module.css";
 import globalStyle from '@/css/modal.module.css';
 import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {useCallback, useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {Request} from "@/model/Request"
 import InputBox from "@/app/_component/InputBox";
 import Loading from "@/app/(afterLogin)/_component/Loading";
 import {getRequestOrderInfo} from "@/app/(afterLogin)/request/order/_api/getRequestOrderInfo";
 import classNames from "classnames";
 import scroll from "@/css/scrollBar.module.css";
+import RequestInfoExtensionComponent from "@/app/(afterLogin)/request/order/_component/RequestInfoExtensionComponent";
 
 type Props = {
     serviceId: string;
@@ -19,7 +20,7 @@ type Props = {
 }
 
 export default function RequestInfo({serviceId, sampleId, closeModal}: Props) {
-    const [request, setRequest] = useState<Request>();
+    const [request, setRequest] = useState<Request>({});
 
     const handleRequestChange = (path: string, value: any) => {
         setRequest(prevState => ({
@@ -60,6 +61,7 @@ export default function RequestInfo({serviceId, sampleId, closeModal}: Props) {
         const date = new Date(year, month - 1, day);
         return formatDate(date);
     };
+
     useEffect(() => {
         fetchRequest()
     }, []);
@@ -92,8 +94,8 @@ export default function RequestInfo({serviceId, sampleId, closeModal}: Props) {
                                     />
                                 </div>
                             </div>
-                            <div className={style.content}>
-                                <p className={style.title}>Patient Info.</p>
+                            <p className={style.title}>Patient Info.</p>
+                            <div className={style.section}>
                                 <InputBox
                                     label={"Name*"}
                                     value={request.sample?.patient?.name}
@@ -107,13 +109,20 @@ export default function RequestInfo({serviceId, sampleId, closeModal}: Props) {
                                     disabled={true}
                                 />
                                 <InputBox
+                                    label={"Age"}
+                                    value={request.sample?.age}
+                                    disabled={true}
+                                />
+                                <InputBox
                                     label={"Date of Birth"}
                                     value={getDateFromComponents(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}
                                     disabled={true}
                                 />
+                            </div>
+                            <div className={style.section}>
                                 <InputBox
-                                    label={"Age"}
-                                    value={request.sample?.age}
+                                    label={"Gender"}
+                                    value={request.sample?.patient?.sex === "M" ? "Male" : "Female"}
                                     disabled={true}
                                 />
                             </div>
@@ -122,11 +131,6 @@ export default function RequestInfo({serviceId, sampleId, closeModal}: Props) {
                                 <InputBox
                                     label={"Medical Department"}
                                     value={request.department}
-                                    disabled={true}
-                                />
-                                <InputBox
-                                    label={"Ward"}
-                                    value={request.ward}
                                     disabled={true}
                                 />
                                 <InputBox
@@ -153,6 +157,9 @@ export default function RequestInfo({serviceId, sampleId, closeModal}: Props) {
                                     disabled={true}
                                 />
                             </div>
+                            {request.sample?.extensions && (
+                                <RequestInfoExtensionComponent extensions={request.sample?.extensions}/>
+                            )}
                             <div className={style.content}>
                                 <p className={style.title}>Memo</p>
                                 <textarea

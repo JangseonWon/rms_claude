@@ -262,7 +262,7 @@ export default function Order() {
             <div className={style.section}>
                 <div className={style.selectBox}>
                     <SelectBox
-                        label={"Sex*"}
+                        label={"Gender*"}
                         value={selectedSex}
                         options={sexOption}
                         required={true}
