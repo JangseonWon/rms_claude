@@ -27,7 +27,9 @@ class RequestRouter (
             .flatMap { requestHandler.saveRequest(it.t1.user, it.t2).collectList() }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build() }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
+            .onErrorResume { e ->
+                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: ${e.javaClass.name}\n메시지: ${e.message}\n스택 트레이스:\n${e.stackTraceToString()}")
+            }.doOnError { e -> println("오류 발생: ${e.message}") }
     }
 }
 

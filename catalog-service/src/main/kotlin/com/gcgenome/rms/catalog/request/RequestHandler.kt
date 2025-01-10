@@ -20,9 +20,7 @@ class RequestHandler(val dslContext: DSLContext):
                         .flatMap { sampleRecord ->
                             val extensions = request.sample!!.extensions ?: emptyList()
                             Flux.fromIterable(extensions)
-                                .flatMap { extension ->
-                                    insertSampleExtension(extension, sampleRecord.id!!)
-                                }
+                                .flatMap { extension -> insertSampleExtension(extension, sampleRecord.id!!) }
                                 .then(insertRequest(request.apply {
                                     this.sample!!.id = sampleRecord.id
                                     this.user!!.id = user.id

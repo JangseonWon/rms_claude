@@ -59,6 +59,6 @@ data class RequestDTO(
     @JsonProperty("sample")
     var sample: SampleDTO?,
     @JsonProperty("user")
-    var user: UserDTO?
+    var user: UserDTO? = UserDTO()
 )
 
