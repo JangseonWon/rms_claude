@@ -63,6 +63,7 @@ data class Request(
 
     enum class RequestStatus {
         TOTAL,
+        CART,
         UNCONFIRMED_ORDER,
         COMPLETED_ORDER,
         IN_PROGRESS,
