@@ -1,7 +1,6 @@
 'use client';
 
-import style
-    from "@/app/(afterLogin)/request/services/[service]/single/_component/extension/extensionInputComponent.module.css";
+import style from "../../order/_component/extensionComponent.module.css";
 import InputBox from "@/app/_component/InputBox";
 import React from "react";
 import {

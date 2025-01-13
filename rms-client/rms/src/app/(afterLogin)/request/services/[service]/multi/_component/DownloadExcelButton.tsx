@@ -30,7 +30,7 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
             "Patient Name",
             "MRN",
             "Date of Birth", // Date
-            "Sex", // List
+            "Gender", // List
             "Sample Type",
             "Date of Collection", // Date
             "Quantity", // Decimal
@@ -95,7 +95,7 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
                 allowBlank: true,
                 formulae: ['"Male,Female"'],
                 showErrorMessage: true,
-                errorTitle: 'Invalid Sex',
+                errorTitle: 'Invalid Gender',
                 error: 'Please select "Male" or "Female".',
             };
 

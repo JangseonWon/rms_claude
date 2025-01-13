@@ -9,7 +9,7 @@ import SelectBox from "@/app/_component/SelectBox";
 import TextBox from "@/app/_component/TextBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import {useProband, useRelationship} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
-import {ProbandComponent} from './ProbandComponenet';
+import {ProbandInputComponent} from './ProbandInputComponenet';
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 interface ExtensionInputComponentProps {
@@ -186,7 +186,7 @@ export default function ExtensionInputComponent({ serviceId, onChange, onValidat
                 </div>
             )}
             {probandComponent.length > 0 && (
-                <ProbandComponent/>
+                <ProbandInputComponent/>
             )}
         </div>
     );

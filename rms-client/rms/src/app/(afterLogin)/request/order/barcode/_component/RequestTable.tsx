@@ -227,6 +227,7 @@ export default function RequestTable() {
                         <td>
                             <FontAwesomeIcon
                                 icon={faFileLines}
+                                className={globalTableScrollStyle.info}
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     handleInfoClick(request);

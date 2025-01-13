@@ -262,7 +262,7 @@ export default function GroupOrder() {
                 <div className={style.section}>
                     <div className={style.selectBox}>
                         <SelectBox
-                            label={"Sex*"}
+                            label={"Gender*"}
                             value={selectedSex[index]}
                             options={sexOption}
                             required={true}
