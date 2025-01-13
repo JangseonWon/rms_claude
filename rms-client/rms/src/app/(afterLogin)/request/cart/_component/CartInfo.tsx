@@ -113,44 +113,6 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
         return new Date(year, month - 1, day);
     }
 
-    const handleExtensionChange = (id: string, value: any): void => {
-        setRequest(prevState => {
-            const existingExtensions = prevState.sample?.extensions || [];
-
-            const existingExtensionIndex = existingExtensions.findIndex(ext => ext.id === id);
-
-            let updatedExtensions;
-
-            if (existingExtensionIndex > -1) {
-                updatedExtensions = [...existingExtensions];
-                updatedExtensions[existingExtensionIndex] = { id, value: formatExtensionValue(value) };
-            } else {
-                updatedExtensions = [...existingExtensions, { id, value: formatExtensionValue(value) }];
-            }
-            console.log(updatedExtensions);
-
-            return {
-                ...prevState,
-                sample: {
-                    ...prevState.sample,
-                    extensions: updatedExtensions
-                }
-            };
-        });
-    };
-
-    const formatExtensionValue = (value: any) => {
-        if (typeof value === 'object' && value !== null && 'name' in value && 'value' in value) {
-            return value.value;
-        }
-
-        if (typeof value === 'boolean') {
-            return value;
-        }
-
-        return value;
-    };
-
     useEffect(() => {
         fetchRequest()
         fetchOrganizations()
@@ -224,7 +186,6 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
                                 required={true}
                                 onChange={(value) => {
                                     handleRequestChange('sample.patient.sex', value.value)
-                                    // setSelectedSex(value.name);
                                 }}
                                 width="200px"
                             />
@@ -266,9 +227,6 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
                                 onChange={(value) => handleRequestChange('physician', value)}
                             />
                         </div>
-                        {/*{request.sample?.extensions && (
-                            <RequestInfoExtensionComponent extensions={request.sample?.extensions} onChange={handleExtensionChange}/>
-                        )}*/}
                         <div className={style.memoSection}>
                             <TextBox
                                 label={'Memo'}

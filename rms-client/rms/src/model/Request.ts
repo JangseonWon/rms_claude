@@ -2,6 +2,7 @@ import {Sample} from "@/model/Sample";
 import {Service} from "@/model/Service";
 import {Report} from "@/model/Report"
 import {Order} from "@/model/Order";
+import {User} from "@/model/User";
 
 export interface Request {
     service?: Service
@@ -24,4 +25,5 @@ export interface Request {
     awb_number?: string
     report?: Report
     reports?: Report[]
+    user?: User
 }

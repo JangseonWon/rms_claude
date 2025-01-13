@@ -273,7 +273,7 @@ export default function CartTable() {
                 <CartInfo
                     serviceId={infoRequest?.service!.id!}
                     sampleId={infoRequest?.sample!.id!}
-                    userId={infoRequest?.sample!.patient!.organization!.user!.id!}
+                    userId={infoRequest?.user!.id!}
                     closeModal={closeModal}
                 />
             )}
