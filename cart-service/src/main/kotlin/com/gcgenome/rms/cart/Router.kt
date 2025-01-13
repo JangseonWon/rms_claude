@@ -36,7 +36,7 @@ class Router (
             .flatMap { handler.getCartInfo(sampleId, serviceId) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), RequestDTO::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume(OrderNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
+            .onErrorResume(OrderNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message} ${e.stackTraceToString()}") }
     }
     private fun requestSearch(request: ServerRequest): Mono<ServerResponse> {
         return principal(request)
@@ -50,7 +50,7 @@ class Router (
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(it.data), RequestDTO::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
+            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e / ${e.stackTraceToString()}")}
     }
     private fun organizations(request: ServerRequest): Mono<ServerResponse> {
         val userId = request.queryParam("user_id").get()

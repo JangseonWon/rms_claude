@@ -12,22 +12,25 @@ import java.util.*
 interface RequestDao: QueryDao {
     fun DSLContext.selectRequestCartByUserId(userDto: User, query: Query): Mono<Page<RequestDTO>> {
         val joins = listOf(
+            QueryDao.JoinInfo(USER, REQUEST.USER_ID.eq(USER.ID), QueryDao.JoinType.INNER),
             QueryDao.JoinInfo(SAMPLE, REQUEST.SAMPLE_ID.eq(SAMPLE.ID), QueryDao.JoinType.INNER),
+            QueryDao.JoinInfo(SERVICE, REQUEST.SERVICE_ID.eq(SERVICE.ID), QueryDao.JoinType.INNER),
             QueryDao.JoinInfo(PATIENT, SAMPLE.PATIENT_SERIAL.eq(PATIENT.SERIAL)
                 .and(SAMPLE.ORGANIZATION_ID.eq(PATIENT.ORGANIZATION_ID))
                 .and(SAMPLE.USER_ID.eq(PATIENT.USER_ID)), QueryDao.JoinType.INNER),
-            QueryDao.JoinInfo(SERVICE, REQUEST.SERVICE_ID.eq(SERVICE.ID), QueryDao.JoinType.INNER),
             QueryDao.JoinInfo(SAMPLE_TYPE, SAMPLE.SAMPLE_TYPE_ID.eq(SAMPLE_TYPE.ID), QueryDao.JoinType.INNER),
-            QueryDao.JoinInfo(ORGANIZATION, ORGANIZATION.ID.eq(PATIENT.ORGANIZATION_ID)
-                .and(ORGANIZATION.USER_ID.eq(PATIENT.USER_ID)), QueryDao.JoinType.INNER),
-            QueryDao.JoinInfo(USER, USER.ID.eq(PATIENT.USER_ID), QueryDao.JoinType.INNER)
+            QueryDao.JoinInfo(ORGANIZATION, ORGANIZATION.ID.eq(PATIENT.ORGANIZATION_ID).and(ORGANIZATION.USER_ID.eq(PATIENT.USER_ID)), QueryDao.JoinType.INNER),
         )
 
         val fields = listOf(
             jsonObject(
-                SERVICE.ID,
-                SERVICE.NAME,
-                SERVICE.CATEGORY_ID
+                key("id").value(USER.ID),
+                key("name").value(USER.NAME),
+                key("role").value(USER.ROLE)
+            ).`as`("user"),
+            jsonObject(
+                key("id").value(SERVICE.ID),
+                key("name").value(SERVICE.NAME)
             ).`as`("service"),
             REQUEST.USER_SERVICE_ID,
             REQUEST.STATUS,
@@ -70,29 +73,10 @@ interface RequestDao: QueryDao {
                                 key("name").value(ORGANIZATION.NAME),
                                 key("type").value(ORGANIZATION.TYPE),
                                 key("registration_number").value(ORGANIZATION.REGISTRATION_NUMBER),
-                                key("nursing_number").value(ORGANIZATION.NURSING_NUMBER),
-                                key("user").value(
-                                    select(
-                                        jsonObject(
-                                            key("id").value(USER.ID),
-                                            key("name").value(USER.NAME),
-                                            key("branch_serial").value(USER.BRANCH_SERIAL)
-                                        )
-                                    ).from(USER).where(ORGANIZATION.USER_ID.eq(USER.ID))
-                                )
+                                key("nursing_number").value(ORGANIZATION.NURSING_NUMBER)
                             )
                         )
                     )
-                ),
-                key("extensions").value(
-                    select(
-                        jsonArrayAgg(
-                            jsonObject(
-                                key("id").value(SAMPLE_EXTENSION.EXTENSION_ID),
-                                key("value").value(SAMPLE_EXTENSION.VALUE)
-                            )
-                        )
-                    ).from(SAMPLE_EXTENSION).where(SAMPLE.ID.eq(SAMPLE_EXTENSION.SAMPLE_ID))
                 )
             ).`as`("sample")
         )
@@ -101,7 +85,7 @@ interface RequestDao: QueryDao {
             .and(REQUEST.SERVICE_ID.eq(SERVICE.ID))
 
         val finalCondition = if (userDto.role == "USER") {
-            baseCondition.and(ORDER.USER_ID.eq(userDto.id))
+            baseCondition.and(REQUEST.USER_ID.eq(userDto.id))
         } else {
             baseCondition
         }.and(REQUEST.STATUS.eq("CART"))
@@ -159,17 +143,21 @@ interface RequestDao: QueryDao {
                 REQUEST.PHYSICIAN,
                 REQUEST.CART_AT,
                 jsonObject(
+                    key("id").value(USER.ID),
+                    key("name").value(USER.NAME)
+                ).`as`("user"),
+                jsonObject(
                     key("id").value(SERVICE.ID),
                     key("name").value(SERVICE.NAME)
                 ).`as`("service"),
                 jsonObject(
                     key("id").value(SAMPLE.ID),
-                    key("userSampleId").value(SAMPLE.USER_SAMPLE_ID),
+                    key("user_sample_id").value(SAMPLE.USER_SAMPLE_ID),
                     key("quantity").value(SAMPLE.QUANTITY),
                     key("age").value(SAMPLE.AGE),
-                    key("samplingOn").value(SAMPLE.SAMPLING_ON),
-                    key("createAt").value(SAMPLE.CREATE_AT),
-                    key("sampleType").value(jsonObject(
+                    key("sampling_on").value(SAMPLE.SAMPLING_ON),
+                    key("create_at").value(SAMPLE.CREATE_AT),
+                    key("sample_type").value(jsonObject(
                         key("id").value(SAMPLE_TYPE.ID),
                         key("name").value(SAMPLE_TYPE.NAME)
                     )),
@@ -177,35 +165,20 @@ interface RequestDao: QueryDao {
                         key("serial").value(PATIENT.SERIAL),
                         key("name").value(PATIENT.NAME),
                         key("sex").value(PATIENT.SEX),
-                        key("birthYear").value(PATIENT.BIRTH_YEAR),
-                        key("birthMonth").value(PATIENT.BIRTH_MONTH),
-                        key("birthDay").value(PATIENT.BIRTH_DAY),
+                        key("birth_year").value(PATIENT.BIRTH_YEAR),
+                        key("birth_month").value(PATIENT.BIRTH_MONTH),
+                        key("birth_day").value(PATIENT.BIRTH_DAY),
                         key("organization").value(jsonObject(
                             key("id").value(ORGANIZATION.ID),
                             key("name").value(ORGANIZATION.NAME),
-                            key("registrationNumber").value(ORGANIZATION.REGISTRATION_NUMBER),
+                            key("registration_number").value(ORGANIZATION.REGISTRATION_NUMBER),
                             key("type").value(ORGANIZATION.TYPE),
-                            key("nursingNumber").value(ORGANIZATION.NURSING_NUMBER),
-                            key("user").value(jsonObject(
-                                key("id").value(USER.ID)
-                            ))
+                            key("nursing_number").value(ORGANIZATION.NURSING_NUMBER)
                         ))
-                    )),
-                    key("extensions").value(
-                        select(
-                            jsonArrayAgg(jsonObject(
-                                key("id").value(EXTENSION.ID),
-                                key("name").value(EXTENSION.NAME),
-                                key("value").value(SAMPLE_EXTENSION.VALUE),
-                                key("regex").value(EXTENSION.REGEX)
-                            ))
-
-                        ).from(SAMPLE_EXTENSION)
-                            .join(EXTENSION).on(SAMPLE_EXTENSION.EXTENSION_ID.eq(EXTENSION.ID))
-                            .where(SAMPLE_EXTENSION.SAMPLE_ID.eq(sampleId))
-                    )
+                    ))
                 ).`as`("sample")
             ).from(REQUEST)
+                .join(USER).on(REQUEST.USER_ID.eq(USER.ID))
                 .join(SERVICE).on(REQUEST.SERVICE_ID.eq(SERVICE.ID))
                 .join(SAMPLE).on(REQUEST.SAMPLE_ID.eq(SAMPLE.ID))
                 .join(SAMPLE_TYPE).on(SAMPLE.SAMPLE_TYPE_ID.eq(SAMPLE_TYPE.ID))
@@ -217,7 +190,6 @@ interface RequestDao: QueryDao {
                 .join(ORGANIZATION).on(
                     PATIENT.ORGANIZATION_ID.eq(ORGANIZATION.ID)
                         .and(PATIENT.USER_ID.eq(ORGANIZATION.USER_ID)))
-                .join(USER).on(ORGANIZATION.USER_ID.eq(USER.ID))
                 .where(
                     REQUEST.SERVICE_ID.eq(serviceId)
                     .and(REQUEST.SAMPLE_ID.eq(sampleId))
