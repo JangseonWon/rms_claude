@@ -18,7 +18,7 @@ interface SampleDao {
                 .set(SAMPLE.QUANTITY, coalesce(`val`(sample.quantity), SAMPLE.QUANTITY))
                 .set(SAMPLE.AGE, coalesce(`val`(sample.age), SAMPLE.AGE))
                 .set(SAMPLE.SAMPLING_ON, coalesce(`val`(sample.samplingOn), SAMPLE.SAMPLING_ON))
-                .set(SAMPLE.SAMPLE_TYPE_ID, coalesce(`val`(sample.sampleType.id), SAMPLE.SAMPLE_TYPE_ID))
+                .set(SAMPLE.SAMPLE_TYPE_ID, coalesce(`val`(sample.sampleType!!.id), SAMPLE.SAMPLE_TYPE_ID))
                 .set(SAMPLE.PATIENT_SERIAL, coalesce(`val`(sample.patient!!.serial), SAMPLE.PATIENT_SERIAL))
                 .set(SAMPLE.ORGANIZATION_ID, coalesce(`val`(sample.patient!!.organization!!.id), SAMPLE.ORGANIZATION_ID))
                 .where(SAMPLE.ID.eq(sample.id))

@@ -4,6 +4,7 @@ import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.dao.*
 import com.gcgenome.rms.data.*
 import com.gcgenome.rms.exceptions.OrderNotFoundException
+import org.jooq.Configuration
 import org.jooq.DSLContext
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
@@ -14,7 +15,6 @@ import java.util.*
 class Handler(val dslContext: DSLContext ) :
     RequestDao, OrganizationDao, SampleTypeDao, PatientDao, SampleDao, SampleExtensionDao
 {
-
     fun getCartInfo(sampleId: UUID, serviceId: String): Mono<RequestDTO> {
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
@@ -34,9 +34,10 @@ class Handler(val dslContext: DSLContext ) :
             trx.dsl().run {
                 selectRequestById(request.sample!!.id!!, request.service!!.id!!)
                     .flatMap { r->
-                        insertPatient(request.sample.patient!!)
+                        insertPatient(request.user?.id!!, request.sample.patient!!)
                             .then(updateSample(request.sample))
-                            .then(deletePatientById(r.sample!!.patient!!))
+                            .then(deletePatientById(request.user.id!!, r.sample!!.patient!!))
+                            .then(processExtensions(trx, request.sample.id!!, request.sample.extensions))
                             .then(updateRequest(request))
                             .then(selectRequestById(request.sample.id!!, request.service.id!!))
                     }
@@ -64,10 +65,22 @@ class Handler(val dslContext: DSLContext ) :
                         deleteRequest(request)
                             .then(deleteSampleExtensionBySampleId(request.sample!!.id!!))
                             .then(deleteSampleById(request.sample.id!!))
-                            .then(deletePatientById(request.sample.patient!!))
+                            .then(deletePatientById(request.user?.id!!, request.sample.patient!!))
                             .then(selectRequestById(request.sample.id!!, request.service!!.id!!))
                 }
             }
         })
+    }
+    private fun processExtensions(trx: Configuration, sampleId: UUID, extensions: List<ExtensionDTO>?): Mono<Void> {
+        return extensions
+            ?.takeIf { it.isNotEmpty() }
+            ?.let {
+                Flux.fromIterable(it)
+                    .flatMap { extension ->
+                        trx.dsl().updateSampleExtensionBySampleId(sampleId, extension)
+                    }
+                    .then()
+            }
+            ?: Mono.empty()
     }
 }

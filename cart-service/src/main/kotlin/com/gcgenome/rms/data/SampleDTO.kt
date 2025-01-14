@@ -19,7 +19,7 @@ data class SampleDTO(
     @JsonProperty("user_sample_id")
     var userSampleId: String?,
     @JsonProperty("quantity")
-    var quantity: Int,
+    var quantity: Int?,
     @JsonProperty("age")
     var age: Int?,
     @JsonProperty("sampling_on")
@@ -33,7 +33,7 @@ data class SampleDTO(
     @JsonProperty("create_at")
     var createAt: LocalDateTime?,
     @JsonProperty("sample_type")
-    var sampleType: SampleTypeDTO,
+    var sampleType: SampleTypeDTO?,
     @JsonProperty("patient")
     var patient: PatientDTO?,
     @JsonProperty("extensions")

@@ -175,7 +175,21 @@ interface RequestDao: QueryDao {
                             key("type").value(ORGANIZATION.TYPE),
                             key("nursing_number").value(ORGANIZATION.NURSING_NUMBER)
                         ))
-                    ))
+                    )),
+                    key("extensions").value(
+                        select(
+                            jsonArrayAgg(jsonObject(
+                                key("id").value(EXTENSION.ID),
+                                key("name").value(EXTENSION.NAME),
+                                key("value").value(SAMPLE_EXTENSION.VALUE),
+                                key("regex").value(EXTENSION.REGEX),
+                                key("type").value(EXTENSION.TYPE)
+                            ))
+
+                        ).from(SAMPLE_EXTENSION)
+                            .join(EXTENSION).on(SAMPLE_EXTENSION.EXTENSION_ID.eq(EXTENSION.ID))
+                            .where(SAMPLE_EXTENSION.SAMPLE_ID.eq(sampleId))
+                    )
                 ).`as`("sample")
             ).from(REQUEST)
                 .join(USER).on(REQUEST.USER_ID.eq(USER.ID))

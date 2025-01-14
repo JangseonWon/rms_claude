@@ -57,6 +57,6 @@ data class RequestDTO(
     @JsonProperty("last_modify_at")
     val lastModifyAt: LocalDateTime?,
     @JsonProperty("user")
-    val user: UserDTO
+    val user: UserDTO?
 )
 

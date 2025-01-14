@@ -22,6 +22,9 @@ import DatePickerBox from "@/app/_component/DatePickerBox";
 import TextBox from "@/app/_component/TextBox";
 import classNames from "classnames";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
+import CartInfoExtensionComponent from "@/app/(afterLogin)/request/cart/_component/CartInfoExtensionComponent";
+import {Extension} from "@/model/Extension";
+import {format} from "date-fns";
 
 type Props = {
     serviceId: string;
@@ -113,6 +116,25 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
         return new Date(year, month - 1, day);
     }
 
+    const handleExtensionChange = (updatedExtensions: Extension[]) => {
+        setRequest((prevState) => ({
+            ...prevState,
+            sample: {
+                ...prevState.sample,
+                extensions: updatedExtensions,
+            },
+        }));
+    };
+
+    const setAge = (birthDate: Date, samplingDate: Date): number => {
+        let age = samplingDate.getFullYear() - birthDate.getFullYear();
+        const monthDifference = samplingDate.getMonth() - birthDate.getMonth()
+        if (monthDifference < 0 || (monthDifference === 0 && samplingDate.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age;
+    };
+
     useEffect(() => {
         fetchRequest()
         fetchOrganizations()
@@ -172,9 +194,19 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
                                 label={"Date of Birth"}
                                 value={getDateFromComponents(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}
                                 onChange={(date) => {
-                                    handleRequestChange('sample.patient.birth_year', date.getFullYear());
-                                    handleRequestChange('sample.patient.birth_month', date.getMonth() + 1);
-                                    handleRequestChange('sample.patient.birth_day', date.getDate());
+                                    if (date) {
+                                        handleRequestChange('sample.patient.birth_year', date.getFullYear());
+                                        handleRequestChange('sample.patient.birth_month', date.getMonth() + 1);
+                                        handleRequestChange('sample.patient.birth_day', date.getDate());
+                                        if (request.sample?.sampling_on) {
+                                            handleRequestChange('sample.age', setAge(date, new Date(request.sample.sampling_on)));
+                                        }
+                                    } else {
+                                        handleRequestChange('sample.patient.birth_year', null);
+                                        handleRequestChange('sample.patient.birth_month', null);
+                                        handleRequestChange('sample.patient.birth_day', null);
+                                        handleRequestChange('sample.age', null);
+                                    }
                                 }}
                             />
                         </div>
@@ -205,7 +237,20 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
                             <DatePickerBox
                                 label={"Date or collection*"}
                                 value={request.sample?.sampling_on}
-                                onChange={(date) => handleRequestChange('sample.sampling_on', date)}
+                                onChange={(date) => {
+                                    if (date) {
+                                        handleRequestChange('sample.sampling_on', format(date, "yyyy-MM-dd"))
+                                        if (request.sample?.patient?.birth_year
+                                            && request.sample?.patient?.birth_month
+                                            && request.sample?.patient?.birth_day) {
+                                            handleRequestChange('sample.age', setAge(new Date(`${request.sample.patient.birth_year}-${request.sample.patient.birth_month}-${request.sample.patient.birth_day}`), date));
+                                        }
+                                    } else {
+                                        handleRequestChange('sample.sampling_on', null)
+                                        handleRequestChange('sample.age', null);
+                                    }
+
+                                }}
                             />
                             <InputBox
                                 label={"Quantity*"}
@@ -227,6 +272,9 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
                                 onChange={(value) => handleRequestChange('physician', value)}
                             />
                         </div>
+                        {request.sample?.extensions && (
+                            <CartInfoExtensionComponent extensions={request.sample?.extensions} onChange={handleExtensionChange}/>
+                        )}
                         <div className={style.memoSection}>
                             <TextBox
                                 label={'Memo'}

@@ -1,7 +1,6 @@
 package com.gcgenome.rms.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import java.util.*
 
 data class ExtensionDTO(
     @JsonProperty("id")
@@ -14,6 +13,6 @@ data class ExtensionDTO(
     var regex: String?,
     @JsonProperty("type")
     var type: String?,
-    @JsonProperty("varue")
-    var varue: String?
+    @JsonProperty("value")
+    var value: String?
 )

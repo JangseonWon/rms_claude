@@ -7,12 +7,12 @@ import org.jooq.DSLContext
 import reactor.core.publisher.Mono
 
 interface PatientDao {
-    fun DSLContext.insertPatient(patient: PatientDTO): Mono<PatientDTO> {
+    fun DSLContext.insertPatient(userId: String, patient: PatientDTO): Mono<PatientDTO> {
         return Mono.from(
             insertInto(PATIENT)
                 .set(PATIENT.SERIAL, patient.serial)
                 .set(PATIENT.ORGANIZATION_ID, patient.organization!!.id)
-                .set(PATIENT.USER_ID, patient.organization.user!!.id)
+                .set(PATIENT.USER_ID, userId)
                 .set(PATIENT.NAME, patient.name)
                 .set(PATIENT.SEX, patient.sex)
                 .set(PATIENT.BIRTH_YEAR, patient.birthYear)
@@ -27,19 +27,19 @@ interface PatientDao {
                 .returning()
         ).map { it.into(PatientDTO::class.java) }
     }
-    fun DSLContext.deletePatientById(patient: PatientDTO): Mono<PatientDTO> {
+    fun DSLContext.deletePatientById(userId: String, patient: PatientDTO): Mono<PatientDTO> {
         return Mono.from(
             deleteFrom(PATIENT)
                 .where(PATIENT.SERIAL.eq(patient.serial)
                     .and(PATIENT.ORGANIZATION_ID.eq(patient.organization!!.id))
-                    .and(PATIENT.USER_ID.eq(patient.organization.user!!.id))
+                    .and(PATIENT.USER_ID.eq(userId))
                     .andNotExists(
                         selectOne()
                             .from(SAMPLE)
                             .where(
                                 SAMPLE.PATIENT_SERIAL.eq(patient.serial)
                                     .and(SAMPLE.ORGANIZATION_ID.eq(patient.organization.id))
-                                    .and(SAMPLE.USER_ID.eq(patient.organization.user.id))
+                                    .and(SAMPLE.USER_ID.eq(userId))
                             )
                     )
                 ).returning()

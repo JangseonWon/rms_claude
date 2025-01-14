@@ -110,7 +110,6 @@ export default function Order() {
             } else {
                 updatedExtensions = [...existingExtensions, { id, value: formatExtensionValue(value) }];
             }
-            console.log(updatedExtensions);
 
             return {
                 ...prevState,
