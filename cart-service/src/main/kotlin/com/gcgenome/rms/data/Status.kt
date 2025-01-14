@@ -7,5 +7,5 @@ enum class Status {
     IN_PROGRESS,
     TEST_FAILED,
     DELIVERED,
-    COMPLETE
+    COMPLETED
 }
