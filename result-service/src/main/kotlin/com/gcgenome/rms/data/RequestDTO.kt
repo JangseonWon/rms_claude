@@ -39,5 +39,5 @@ data class RequestDTO(
     var service: ServiceDTO? = null,
     var sample: SampleDTO? = null,
     var reports: List<ReportDTO>? = null,
-    var order: OrderDTO? = null
+    var user: UserDTO? = null
 )

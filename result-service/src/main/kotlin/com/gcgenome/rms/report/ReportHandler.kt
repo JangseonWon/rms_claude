@@ -33,7 +33,7 @@ class ReportHandler(
                         val reports = request.reports ?: emptyList()
                         Flux.fromIterable(reports)
                             .flatMap { report ->
-                                val isAuthorizedUser = userAuth.user.id == request.order?.user?.id
+                                val isAuthorizedUser = userAuth.user.id == request.user?.id
                                 val isAdminOrManager = userAuth.user.role in listOf(Role.ADMIN.toString(), Role.MANAGER.toString())
 
                                 if (isAuthorizedUser) {
@@ -72,7 +72,7 @@ class ReportHandler(
         return Mono.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run { selectReportById(reportId)
                 .flatMap { report ->
-                    val isAuthorizedUser = userAuth.user.id == report.request?.order?.user?.id
+                    val isAuthorizedUser = userAuth.user.id == report.request?.user?.id
                     val isAdminOrManager = userAuth.user.role in listOf(Role.ADMIN.toString(), Role.MANAGER.toString())
 
                     if(isAuthorizedUser){

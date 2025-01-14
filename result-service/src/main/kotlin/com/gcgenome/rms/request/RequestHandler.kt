@@ -22,7 +22,7 @@ class RequestHandler(
                 val newRequest = request.copy(
                     sample = request.sample?.copy(id = null),
                 )
-                dsl.insertSample(newRequest.order!!.user!!, newRequest.sample!!, newRequest.status!!)
+                dsl.insertSample(newRequest.user!!, newRequest.sample!!, newRequest.status!!)
                     .flatMap { dsl.insertResampleRequest(newRequest.apply { sample?.id = it.id}) }
                     .flatMapMany { saveSampleExtensions(dsl, newRequest.sample!!.id!!,newRequest.sample!!.extensions!!) }
                     .then(dsl.updateRequestStatusToComplete(request))
@@ -31,12 +31,12 @@ class RequestHandler(
     }
     fun selectRequests(authentication: UserAuthentication, query: Query):  Mono<Page<RequestDTO>> {
         authentication.takeIf { it.user.role == Role.USER.toString() }?.let {
-            query.filterGroups = query.filterGroups ?: mutableListOf()  // null 체크 및 초기화
+            query.filterGroups = query.filterGroups ?: mutableListOf()
             query.filterGroups?.add(
                 Query.FilterGroup(
                     filters = listOf(
                         Query.FilterGroup.Filter(
-                            table = "order",
+                            table = "request",
                             column = "user_id",
                             operator = "=",
                             value = authentication.user.id!!

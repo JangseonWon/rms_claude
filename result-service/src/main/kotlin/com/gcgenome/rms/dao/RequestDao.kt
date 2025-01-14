@@ -11,7 +11,6 @@ interface RequestDao: QueryDao{
     fun DSLContext.insertResampleRequest(request: RequestDTO): Mono<RequestDTO> {
         return Mono.from(
             insertInto(REQUEST)
-                .set(REQUEST.ORDER_ID, request.order!!.id)
                 .set(REQUEST.SERVICE_ID, request.service!!.id)
                 .set(REQUEST.SAMPLE_ID, request.sample!!.id)
                 .set(REQUEST.USER_SERVICE_ID, request.userServiceId ?: request.service!!.id)
@@ -41,10 +40,10 @@ interface RequestDao: QueryDao{
     }
 
     fun DSLContext.selectRequestsWithPage(query: Query): Mono<Page<RequestDTO>> {
+        val mainTable = REQUEST
         val joins = listOf(
-            QueryDao.JoinInfo(ORDER, REQUEST.ORDER_ID.eq(ORDER.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(SERVICE, REQUEST.SERVICE_ID.eq(SERVICE.ID), QueryDao.JoinType.LEFT),
-            QueryDao.JoinInfo(USER, ORDER.USER_ID.eq(USER.ID), QueryDao.JoinType.LEFT),
+            QueryDao.JoinInfo(USER, REQUEST.USER_ID.eq(USER.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(SAMPLE, REQUEST.SAMPLE_ID.eq(SAMPLE.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(SAMPLE_TYPE, SAMPLE.SAMPLE_TYPE_ID.eq(SAMPLE_TYPE.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(SAMPLE_EXTENSION, SAMPLE.ID.eq(SAMPLE_EXTENSION.SAMPLE_ID), QueryDao.JoinType.LEFT),
@@ -55,8 +54,7 @@ interface RequestDao: QueryDao{
                 , QueryDao.JoinType.LEFT
             ),
             QueryDao.JoinInfo(REPORT,
-                REQUEST.ORDER_ID.eq(REPORT.ORDER_ID)
-                    .and(REQUEST.SERVICE_ID.eq(REPORT.SERVICE_ID))
+                    REQUEST.SERVICE_ID.eq(REPORT.SERVICE_ID)
                     .and(REQUEST.SAMPLE_ID.eq(REPORT.SAMPLE_ID))
                 , QueryDao.JoinType.LEFT
             ),
@@ -78,14 +76,11 @@ interface RequestDao: QueryDao{
                 key("name").value(SERVICE.NAME)
             ).`as`("service"),
             jsonObject(
-                key("id").value(ORDER.ID),
-                key("user").value(jsonObject(
-                    key("id").value(USER.ID),
-                    key("name").value(USER.NAME),
-                    key("branch_name").value(USER.BRANCH_NAME),
-                    key("branch_serial").value(USER.BRANCH_SERIAL)
-                ))
-            ).`as`("order"),
+                key("id").value(USER.ID),
+                key("name").value(USER.NAME),
+                key("branch_name").value(USER.BRANCH_NAME),
+                key("branch_serial").value(USER.BRANCH_SERIAL)
+            ).`as`("user"),
             jsonObject(
                 key("id").value(SAMPLE.ID),
                 key("barcode").value(SAMPLE.BARCODE),
@@ -128,7 +123,6 @@ interface RequestDao: QueryDao{
         )
         val groupByFields = listOf(
             REQUEST.USER_SERVICE_ID, REQUEST.STATUS, REQUEST.PHYSICIAN, REQUEST.REPORTED_AT, REQUEST.SPECIFIED_AT, REQUEST.RESAMPLE_AT,
-            ORDER.ID,
             SERVICE.ID,
             USER.ID,
             SAMPLE.ID,
@@ -136,7 +130,7 @@ interface RequestDao: QueryDao{
             PATIENT.SERIAL, PATIENT.NAME, PATIENT.SEX, PATIENT.BIRTH_YEAR, PATIENT.BIRTH_MONTH, PATIENT.BIRTH_DAY,
             ORGANIZATION.ID, ORGANIZATION.NAME, ORGANIZATION.REGISTRATION_NUMBER, ORGANIZATION.TYPE, ORGANIZATION.NURSING_NUMBER
         )
-        return selectPage(mainTable = REQUEST, query = query, joinTables = joins, selectFields = fields, groupByFields = groupByFields) { record ->
+        return selectPage(mainTable = mainTable, query = query, joinTables = joins, selectFields = fields, groupByFields = groupByFields) { record ->
             record.into(RequestDTO::class.java)
         }
     }
@@ -146,8 +140,7 @@ interface RequestDao: QueryDao{
                 .set(REQUEST.STATUS, Status.COMPLETED.toString())
                 .set(REQUEST.COMPLETE_AT, LocalDateTime.now())
                 .where(
-                    REQUEST.ORDER_ID.eq(request.order!!.id)
-                        .and(REQUEST.SERVICE_ID.eq(request.service!!.id))
+                    REQUEST.SERVICE_ID.eq(request.service!!.id)
                         .and(REQUEST.SAMPLE_ID.eq(request.sample!!.id))
                 )
                 .returning()

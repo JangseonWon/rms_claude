@@ -47,7 +47,7 @@ class ReportRouter (
                 .body(Mono.just(it), ByteArray::class.java) }
             .switchIfEmpty(ServerResponse.status(HttpStatus.NO_CONTENT).build())
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}") }
-            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Error code: $e") }
+            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Error code: ${e.stackTraceToString()}") }
     }
     private fun downloadFiles(request: ServerRequest): Mono<ServerResponse> {
         return Mono.zip(authenticationHandler.principal(request), request.bodyToFlux(RequestDTO::class.java).collectList())
