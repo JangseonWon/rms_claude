@@ -52,6 +52,7 @@ export default function DownloadTable() {
     const [totalPage, setTotalPage] = useState<number>(0);
     const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
     const [search, setSearch] = useState<Query>(defaultSearch);
+    const [updateSearch, setUpdateSearch] = useState<Query>({});
     const [searchFilter, setSearchFilter] = useState<Filter | undefined>(undefined);
     const [orderDateFilter, setOrderDateFilter] = useState<FilterGroup>()
     const showAlert = CallAlertDialog();
@@ -117,6 +118,7 @@ export default function DownloadTable() {
                 }
             ],
         };
+        setUpdateSearch(updatedSearch)
         fetchData(updatedSearch);
     }, [search,searchFilter,orderDateFilter]);
 
@@ -133,6 +135,7 @@ export default function DownloadTable() {
                 a.click();
                 a.remove();
                 URL.revokeObjectURL(url);
+                fetchData(updateSearch);
             } else {
                 showAlert("Download failed")
             }
@@ -156,7 +159,7 @@ export default function DownloadTable() {
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                fetchData(search);
+                fetchData(updateSearch);
             } else {
                 showAlert("Download failed")
             }
@@ -262,7 +265,7 @@ export default function DownloadTable() {
                                 </label>
                             </td>
                             <td>{request.specified_at ? new Date(request.specified_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
-                            <td>{request.order?.user?.name}</td>
+                            <td>{request.user?.name}</td>
                             <td>{request.sample?.patient?.organization?.name}</td>
                             <td>{request.sample?.barcode}</td>
                             <td>{request.service?.name}</td>
