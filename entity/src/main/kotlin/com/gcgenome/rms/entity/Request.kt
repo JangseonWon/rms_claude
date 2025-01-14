@@ -69,6 +69,6 @@ data class Request(
         IN_PROGRESS,
         TEST_FAILED,
         DELIVERED,
-        COMPLETE
+        COMPLETED
     }
 }
