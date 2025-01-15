@@ -15,6 +15,9 @@ import java.util.*
 class RequestHandler(
     val dslContext: DSLContext
 ): RequestDao, SampleDao, SampleExtensionDao {
+    fun getRequestById(sampleId: UUID, serviceId: String): Mono<RequestDTO> {
+        return dslContext.selectRequestById(sampleId, serviceId)
+    }
     fun saveResampleRequest(request: RequestDTO): Mono<Void> {
         return Mono.from(
             dslContext.transactionPublisher { transaction ->
