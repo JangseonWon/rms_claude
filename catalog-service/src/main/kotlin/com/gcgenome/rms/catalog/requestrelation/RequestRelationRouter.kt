@@ -1,7 +1,7 @@
-package com.gcgenome.rms.catalog.request
+package com.gcgenome.rms.catalog.requestrelation
 
 import com.gcgenome.rms.auth.AuthenticationHandler
-import com.gcgenome.rms.data.RequestDTO
+import com.gcgenome.rms.data.RequestRelationDTO
 import com.gcgenome.rms.exceptions.AuthenticationNotFoundException
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -13,23 +13,20 @@ import org.springframework.web.reactive.function.server.router
 import reactor.core.publisher.Mono
 
 @Configuration
-class RequestRouter (
+class RequestRelationRouter (
     private val authenticationHandler: AuthenticationHandler,
-    private val requestHandler: RequestHandler
+    private val requestRelationHandler: RequestRelationHandler
 ) {
-    @Bean("RequestRouter")
+    @Bean("RequestRelationRouter")
     fun route() = router {
-        PUT("/w-api/catalog-service/requests", :: saveRequests)
+        GET("/w-api/catalog-service/request-relations", :: getRequestRelations)
     }
-    private fun saveRequests(request: ServerRequest): Mono<ServerResponse> {
+    private fun getRequestRelations(request: ServerRequest): Mono<ServerResponse> {
         return authenticationHandler.principal(request)
-            .zipWith(request.bodyToMono(Array<RequestDTO>::class.java))
-            .flatMap { requestHandler.saveRequest(it.t1.user, it.t2).collectList() }
-            .flatMap { ServerResponse.ok().build() }
+            .flatMap { requestRelationHandler.getRequestGroups().collectList() }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), RequestRelationDTO::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume { e ->
-                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: ${e.javaClass.name}\n메시지: ${e.message}\n스택 트레이스:\n${e.stackTraceToString()}")
-            }.doOnError { e -> println("오류 발생: ${e.message}") }
+            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error: ${e.stackTraceToString()}") }
     }
 }
 

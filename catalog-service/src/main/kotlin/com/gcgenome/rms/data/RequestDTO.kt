@@ -59,6 +59,10 @@ data class RequestDTO(
     @JsonProperty("sample")
     var sample: SampleDTO?,
     @JsonProperty("user")
-    var user: UserDTO? = UserDTO()
+    var user: UserDTO? = UserDTO(),
+    @JsonProperty("request_group")
+    var requestGroup: RequestGroupDTO? = RequestGroupDTO(),
+    @JsonProperty("request_relation")
+    var requestRelation: RequestRelationDTO? = RequestRelationDTO(id=1)
 )
 

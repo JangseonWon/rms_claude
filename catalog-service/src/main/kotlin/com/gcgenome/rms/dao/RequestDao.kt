@@ -22,6 +22,8 @@ interface RequestDao {
                 .set(REQUEST.CART_AT, request.status.takeIf { it == "CART" }?.let { LocalDateTime.now() })
                 .set(REQUEST.LAST_MODIFY_AT, LocalDateTime.now())
                 .set(REQUEST.USER_ID, request.user!!.id)
+                .set(REQUEST.REQUEST_GROUP_ID, request.requestGroup!!.id)
+                .set(REQUEST.REQUEST_RELATION_ID, request.requestRelation!!.id)
                 .returning()
         ).map { it.into(RequestDTO::class.java) }
     }

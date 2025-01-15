@@ -6,10 +6,11 @@ import com.gcgenome.rms.data.RequestDTO
 import org.jooq.DSLContext
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 
 @Component
 class RequestHandler(val dslContext: DSLContext):
-    RequestDao, PatientDao, SampleDao, SampleExtensionDao
+    RequestDao, RequestGroupDao, PatientDao, SampleDao, SampleExtensionDao
 {
     fun saveRequest(user: User, requests: Array<RequestDTO>): Flux<RequestDTO> {
         return Flux.from(dslContext.transactionPublisher { trx ->
@@ -21,10 +22,18 @@ class RequestHandler(val dslContext: DSLContext):
                             val extensions = request.sample!!.extensions ?: emptyList()
                             Flux.fromIterable(extensions)
                                 .flatMap { extension -> insertSampleExtension(extension, sampleRecord.id!!) }
-                                .then(insertRequest(request.apply {
-                                    this.sample!!.id = sampleRecord.id
-                                    this.user!!.id = user.id
-                                }))
+                                .then(
+                                    if (request.requestGroup!!.id == null) { insertRequestGroup() }
+                                    else { Mono.just(request.requestGroup!!) }
+                                )
+                                .flatMap { requestGroup ->
+                                    val updatedRequest = request.apply {
+                                        this.sample!!.id = sampleRecord.id
+                                        this.user!!.id = user.id
+                                        this.requestGroup!!.id = requestGroup.id
+                                    }
+                                    insertRequest(updatedRequest)
+                                }
                         }
                 }
             }
