@@ -1,12 +1,20 @@
 'use client';
 
-import React from "react";
+import React, {useEffect} from "react";
 import style from './cartExtensionComponent.module.css';
 import {Extension, ExtensionType} from "@/model/Extension";
 import InputBox from "@/app/_component/InputBox";
 import SelectBox from "@/app/_component/SelectBox";
 import TextBox from "@/app/_component/TextBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
+import {ProbandComponent} from "@/app/(afterLogin)/request/cart/_component/ProbandComponent";
+import SearchProbandModal
+    from "@/app/(afterLogin)/request/services/[service]/single/_component/extension/SearchProbandModal";
+import {
+    useProband,
+    useProbandModalOpen, useRelationship,
+    useSetProbandModalOpen
+} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
 
 interface ExtensionComponentProps {
     extensions: Extension[];
@@ -14,6 +22,15 @@ interface ExtensionComponentProps {
 }
 
 export default function CartInfoExtensionComponent({ extensions, onChange }: ExtensionComponentProps) {
+    const probandModal = useProbandModalOpen();
+    const probandValue = useProband();
+    const relationship = useRelationship();
+    const setProbandModal = useSetProbandModalOpen();
+
+    const Close = () => {
+        setProbandModal(false);
+    }
+
     const generateSelectList = (regex: string): { name: string, value: string }[] => {
         if (regex.includes("|")) {
             return regex
@@ -47,6 +64,14 @@ export default function CartInfoExtensionComponent({ extensions, onChange }: Ext
         updateExtensionValue(id, option.value);
     };
 
+    useEffect(() => {
+        updateExtensionValue("TEST01", probandValue);
+    }, [probandValue]);
+
+    useEffect(() => {
+        updateExtensionValue("TEST02", relationship);
+    }, [relationship]);
+
     const renderExtensionComponent = (extension: Extension) => {
         switch (extension.type) {
             case ExtensionType.LIST:
@@ -77,7 +102,6 @@ export default function CartInfoExtensionComponent({ extensions, onChange }: Ext
             case ExtensionType.INTEGER:
             case ExtensionType.FLOAT:
             case ExtensionType.STRING:
-            case ExtensionType.PROBAND:
                 return <InputBox
                     key={extension.id}
                     label={extension.name}
@@ -100,33 +124,40 @@ export default function CartInfoExtensionComponent({ extensions, onChange }: Ext
 
     const textComponents = extensions.filter(extension => extension.type === ExtensionType.TEXT);
     const otherComponents = extensions.filter(extension => extension.type !== ExtensionType.TEXT);
+    const probandComponent = extensions.filter(extension => extension.type === ExtensionType.PROBAND);
 
     return (
         <div className={style.section}>
             {otherComponents.length > 0 && (
                 <div className={style.gridContainer}>
-                    {otherComponents.map((extension) => (
-                        <div
-                            key={extension.id}
-                            className={style.gridItem}
-                        >
-                            {renderExtensionComponent(extension)}
-                        </div>
-                    ))}
+                    {otherComponents.map((extension) => {
+                        const component = renderExtensionComponent(extension);
+                        return component ? (
+                            <div key={extension.id} className={style.gridItem}>
+                                {component}
+                            </div>
+                        ) : null;
+                    })}
                 </div>
             )}
             {textComponents.length > 0 && (
                 <div>
-                    {textComponents.map(extension => (
-                        <div key={extension.id}>
-                            {renderExtensionComponent(extension)}
-                        </div>
-                    ))}
+                    {textComponents.map((extension) => {
+                        const component = renderExtensionComponent(extension);
+                        return component ? (
+                            <div key={extension.id}>
+                                {component}
+                            </div>
+                        ) : null;
+                    })}
                 </div>
             )}
-            {/*{probandComponent.length > 0 && (
-                <ProbandComponent/>
-            )}*/}
+            {probandComponent && (
+                <ProbandComponent extensions={probandComponent}/>
+            )}
+            {probandModal && (
+                <SearchProbandModal closeModal={Close}/>
+            ) }
         </div>
     );
 }

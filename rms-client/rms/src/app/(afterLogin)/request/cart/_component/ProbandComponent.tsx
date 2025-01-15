@@ -1,8 +1,8 @@
 'use client';
 
-import style from "../../order/_component/extensionComponent.module.css";
+import style from "./cartExtensionComponent.module.css";
 import InputBox from "@/app/_component/InputBox";
-import React from "react";
+import React, {useEffect} from "react";
 import {
     useProband,
     useRelationship,
@@ -11,11 +11,16 @@ import {
     useSetRelationship
 } from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
 import SelectBox from "@/app/_component/SelectBox";
+import {Extension} from "@/model/Extension";
 
-export const ProbandComponent = () => {
+type Props = {
+    extensions?: Extension[];
+}
+
+export const ProbandComponent = ({extensions = []}: Props) => {
     const probandValue = useProband();
-    const setProbandValue = useSetProband();
     const relationship = useRelationship();
+    const setProbandValue = useSetProband();
     const setRelationship = useSetRelationship();
     const setProbandModal = useSetProbandModalOpen();
 
@@ -24,9 +29,23 @@ export const ProbandComponent = () => {
         {name: "MOTHER", value: 'mother'}
     ];
 
+    const handleExtensionSetup = () => {
+        extensions.forEach(extension => {
+            if (extension.id?.includes('01')) {
+                setProbandValue(extension.value!);
+            } else if (extension.id?.includes('02')) {
+                setRelationship(extension.value!);
+            }
+        });
+    };
+
     const Click = () => {
         setProbandModal(true);
-    }
+    };
+
+    useEffect(() => {
+        handleExtensionSetup();
+    }, []);
 
     return (
         <div>

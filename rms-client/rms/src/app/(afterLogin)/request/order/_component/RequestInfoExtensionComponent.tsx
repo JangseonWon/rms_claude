@@ -83,28 +83,28 @@ export default function RequestInfoExtensionComponent({ extensions }: ExtensionC
         <div className={style.section}>
             {otherComponents.length > 0 && (
                 <div className={style.gridContainer}>
-                    {otherComponents.map((extension) => (
-                        <div
-                            key={extension.id}
-                            className={style.gridItem}
-                        >
-                            {renderExtensionComponent(extension)}
-                        </div>
-                    ))}
+                    {otherComponents.map((extension) => {
+                        const component = renderExtensionComponent(extension);
+                        return component ? (
+                            <div key={extension.id} className={style.gridItem}>
+                                {component}
+                            </div>
+                        ) : null;
+                    })}
                 </div>
             )}
             {textComponents.length > 0 && (
                 <div>
-                    {textComponents.map(extension => (
-                        <div key={extension.id}>
-                            {renderExtensionComponent(extension)}
-                        </div>
-                    ))}
+                    {textComponents.map((extension) => {
+                        const component = renderExtensionComponent(extension);
+                        return component ? (
+                            <div key={extension.id}>
+                                {component}
+                            </div>
+                        ) : null;
+                    })}
                 </div>
             )}
-            {/*{probandComponent.length > 0 && (
-                <ProbandComponent/>
-            )}*/}
         </div>
     );
 }

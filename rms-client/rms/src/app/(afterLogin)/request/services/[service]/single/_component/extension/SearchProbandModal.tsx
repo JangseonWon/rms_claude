@@ -87,7 +87,6 @@ export default function SearchProbandModal({ closeModal }: Props) {
         }
     };
 
-
     useEffect(() => {
         fetchPatient();
     }, [search]);
