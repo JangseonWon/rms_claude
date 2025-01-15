@@ -20,6 +20,7 @@ import ExtensionInputComponent from "@/app/(afterLogin)/request/result/resample/
 import {putRequest} from "@/app/(afterLogin)/request/result/resample/_api/putRequest";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 import {Status} from "@/model/Status";
+import {getRequest} from "@/app/(afterLogin)/request/result/resample/_api/getRequest";
 
 type Props = {
     propRequest: Request | undefined
@@ -78,29 +79,9 @@ export default function RequestModal({propRequest, closeModal,refreshData}: Prop
         return age;
     };
     const fetchRequest = async () => {
-        const query: Query = {
-            filter_groups: [
-                {
-                    filters: [
-                        {
-                            table: "sample",
-                            column: "id",
-                            value: propRequest!.sample!.id,
-                            operator: "="
-                        },
-                        {
-                            table: "service",
-                            column: "id",
-                            value: propRequest!.service!.id,
-                            operator: "="
-                        }
-                    ]
-                }
-            ]
-        } as Query
-        const response = await postRequests(query)
+        const response = await getRequest(propRequest!.sample!.id!, propRequest!.service!.id!)
         const json = await response.json()
-        setRequest(json[0] as Request)
+        setRequest(json as Request)
     };
 
     const formatDate = (date: Date): string => {
@@ -159,7 +140,7 @@ export default function RequestModal({propRequest, closeModal,refreshData}: Prop
                                 label={"MRN*"}
                                 value={request.sample?.patient?.serial}
                                 onChange={(value) => handleRequestChange('sample.patient.serial', value)}
-                                disabled={false}
+                                disabled={true}
                             />
                             <InputBox
                                 label={"Date of Birth"}

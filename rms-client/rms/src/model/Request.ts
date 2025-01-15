@@ -3,6 +3,7 @@ import {Service} from "@/model/Service";
 import {Report} from "@/model/Report"
 import {Order} from "@/model/Order";
 import {User} from "@/model/User";
+import {RequestRelation} from "@/model/RequestRelation";
 
 export interface Request {
     service?: Service
@@ -26,4 +27,5 @@ export interface Request {
     report?: Report
     reports?: Report[]
     user?: User
+    request_relation?: RequestRelation
 }

@@ -3,7 +3,7 @@
 import style
     from "@/app/(afterLogin)/request/services/[service]/single/_component/extension/extensionInputComponent.module.css";
 import InputBox from "@/app/_component/InputBox";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {
     useProband,
     useRelationship,
@@ -12,6 +12,9 @@ import {
     useSetRelationship
 } from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
 import SelectBox from "@/app/_component/SelectBox";
+import {getRequestRelations} from "@/app/(afterLogin)/request/services/[service]/single/_api/getRequestRelations";
+import {SelectBoxOption} from "@/model/SelectBoxOption";
+import {RequestRelation} from "@/model/RequestRelation";
 
 export const ProbandInputComponent = () => {
     const probandValue = useProband();
@@ -19,15 +22,33 @@ export const ProbandInputComponent = () => {
     const relationship = useRelationship();
     const setRelationship = useSetRelationship();
     const setProbandModal = useSetProbandModalOpen();
-
-    const relationshipList = [
-        {name: "FATHER", value: 'father'},
-        {name: "MOTHER", value: 'mother'}
-    ];
+    const [options, setOptions] = useState<SelectBoxOption[]>()
 
     const Click = () => {
         setProbandModal(true);
     }
+
+    const fetchRequestGroup = async () => {
+        const response = await getRequestRelations()
+        if (response.ok) {
+            const data = await response.json();
+            setOptions(transformRequestRelationToOptions(data as RequestRelation[]));
+        }
+
+    }
+    const transformRequestRelationToOptions = (data: RequestRelation[]): SelectBoxOption[] => {
+        return data
+            .filter(value => value.id !==1)
+            .map(value => ({
+                value: value.id,
+                name: value.name
+            }));
+    };
+
+    useEffect(() => {
+        fetchRequestGroup()
+    }, []);
+
 
     return (
         <div>
@@ -37,7 +58,7 @@ export const ProbandInputComponent = () => {
                     key={'relationship'}
                     label={'RelationShip*'}
                     value={relationship}
-                    options={relationshipList}
+                    options={options}
                     required={true}
                     onChange={(selectedOption) => setRelationship(selectedOption.name)}
                     width="200px"
