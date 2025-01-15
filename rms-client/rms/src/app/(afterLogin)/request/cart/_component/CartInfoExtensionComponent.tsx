@@ -152,7 +152,7 @@ export default function CartInfoExtensionComponent({ extensions, onChange }: Ext
                     })}
                 </div>
             )}
-            {probandComponent && (
+            {probandComponent.length > 0 && (
                 <ProbandComponent extensions={probandComponent}/>
             )}
             {probandModal && (
