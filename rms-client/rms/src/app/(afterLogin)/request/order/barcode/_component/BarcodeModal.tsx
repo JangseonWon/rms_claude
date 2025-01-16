@@ -1,7 +1,7 @@
 "use client"
 
 import globalStyle from "@/css/modal.module.css";
-import globalTableScrollStyle from "@/css/globalTableScroll.module.css";
+import globalTableStyle from "@/css/globalTable.module.css";
 import style from "@/app/(afterLogin)/request/order/barcode/_component/barcodeModal.module.css";
 import React, {useState} from "react";
 import {faXmark} from "@fortawesome/free-solid-svg-icons";
@@ -132,7 +132,7 @@ export default function BarcodeModal({requests, closeModal}: Props) {
                     <BlueButton name={'Print'} onClick={handlePrint}/>
                 </div>
                 <div className={style.content}>
-                    <table className={globalTableScrollStyle.table}>
+                    <table className={globalTableStyle.table}>
                         <thead>
                         <tr>
                             <th style={{width: "90px"}}>Copies</th>

@@ -2,7 +2,7 @@
 
 import React, {useCallback, useEffect, useState} from "react";
 import institutionStyle from "@/app/(afterLogin)/user/_component/institutionTable.module.css";
-import style from "@/css/globalTable.module.css";
+import globalTableStyle from "@/css/globalTable.module.css";
 import type {Organization} from "@/model/Organization";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -109,7 +109,7 @@ export default function InstitutionTable() {
     }, [search]);
 
     return (
-        <div className={style.container}>
+        <div className={globalTableStyle.container}>
             <section className={institutionStyle.filterContainer}>
                 <div className={institutionStyle.filterContainerLeft}>
                 </div>
@@ -131,7 +131,7 @@ export default function InstitutionTable() {
                     </InputBox>
                 </div>
             </section>
-            <table className={style.table}>
+            <table className={globalTableStyle.table}>
                 <thead>
                 <tr>
                     <th>Institution Id</th>
@@ -157,9 +157,9 @@ export default function InstitutionTable() {
                 ))}
                 </tbody>
             </table>
-            <div className={style.pagination}>
+            <div className={globalTableStyle.pagination}>
                 <span>items per page:</span>
-                <div className={style.select}>
+                <div className={globalTableStyle.select}>
                     <select onChange={handlePageSizeChange}>
                         <option value="10">10</option>
                         <option value="20">20</option>

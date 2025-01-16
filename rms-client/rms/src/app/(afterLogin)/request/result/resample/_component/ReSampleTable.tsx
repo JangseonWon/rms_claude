@@ -214,7 +214,7 @@ export default function ReSampleTable() {
                         </tr>
                         </thead>
                         <tbody>
-                        {requestData.map((request, rowIndex) => (
+                        {requestData && requestData.length > 0 ? ( requestData.map((request, rowIndex) => (
                             <tr key={request!.sample!.barcode! + request!.service!.id!}>
                                 <td>{request.specified_at ? new Date(request.specified_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
                                 <td>{request.order?.user?.name}</td>
@@ -228,7 +228,14 @@ export default function ReSampleTable() {
                                 <td className={globalTableStyle.underlineBlue} onClick={() => handleRequestClick(request)}>Request</td>
                                 <td className={globalTableStyle.underlineRed} onClick={() => handleCancel(request)}>Cancel</td>
                             </tr>
-                        ))}
+                        ))
+                        ) : (
+                            <tr>
+                                <td colSpan={11} className={globalTableStyle.noData}>
+                                    The searched data does not exist
+                                </td>
+                            </tr>
+                        )}
                         </tbody>
                     </table>
                 </section>

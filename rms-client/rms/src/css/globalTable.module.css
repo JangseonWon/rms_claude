@@ -44,7 +44,7 @@
 .table thead {
     background: linear-gradient(to right, #023a60, #5676a2);
     color: #ffffff;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
 }
 .table thead tr th:first-child {
@@ -196,4 +196,9 @@
 }
 .selected {
     background-color: #f0f8ff !important;
+}
+.noData {
+    text-align: center;
+    color: gray;
+    font-weight: 700;
 }

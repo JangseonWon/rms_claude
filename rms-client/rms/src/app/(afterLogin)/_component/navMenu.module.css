@@ -73,3 +73,7 @@
 .icon {
     width: 14px;
 }
+.activeLink {
+    color: #002b49;
+    font-weight: 800;
+}

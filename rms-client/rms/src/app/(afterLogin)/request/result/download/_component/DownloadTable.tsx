@@ -251,7 +251,7 @@ export default function DownloadTable() {
                     </tr>
                     </thead>
                     <tbody>
-                    {requestData.map((request, rowIndex) => (
+                    {requestData && requestData.length > 0 ? ( requestData.map((request, rowIndex) => (
                         <tr key={request!.sample!.barcode! + request!.service!.id!}>
                             <td>
                                 <label form="agree" className={globalTableStyle.checkbox}>
@@ -283,7 +283,14 @@ export default function DownloadTable() {
                                 ))}
                             </td>
                         </tr>
-                    ))}
+                    ))
+                    ) : (
+                        <tr>
+                            <td colSpan={11} className={globalTableStyle.noData}>
+                                The searched data does not exist
+                            </td>
+                        </tr>
+                    )}
                     </tbody>
                 </table>
             </section>

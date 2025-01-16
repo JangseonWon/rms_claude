@@ -1,6 +1,6 @@
 "use client"
 
-import style from "@/css/globalTable.module.css";
+import globalTableStyle from "@/css/globalTable.module.css";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import React, {useEffect, useState} from "react";
@@ -155,13 +155,13 @@ export default function CartTable() {
     };
 
     return (
-        <div className={style.container}>
+        <div className={globalTableStyle.container}>
             <section>
-                <div className={style.topFirstSection}>
+                <div className={globalTableStyle.formGroupRight}>
                     <GreenButton name={"Delete"} onClick={handleDeleteCart}/>
                     <BlueButton name={"Save & Order"} onClick={handleCartToOrder}/>
                 </div>
-                <div className={style.topSecondSection}>
+                <div className={globalTableStyle.formGroupRight}>
                     <SelectBox
                         width={"200px"}
                         value={selectedOption.name}
@@ -184,43 +184,43 @@ export default function CartTable() {
                     }}></InputBox>
                 </div>
             </section>
-            <div className={style.tableContainer}>
-                <table className={style.table}>
+            <div className={globalTableStyle.tableContainer}>
+                <table className={globalTableStyle.table}>
                     <thead>
                     <tr>
                         <th>
-                            <label form="agree" className={style.checkbox}>
+                            <label form="agree" className={globalTableStyle.checkbox}>
                                 <input
                                     type="checkbox"
                                     checked={isSelectedAll}
                                     onChange={() => handleSelectAll(!isSelectedAll)}
-                                    className={style.checkbox}
+                                    className={globalTableStyle.checkbox}
                                 />
-                                <span className={style.checkmark}></span>
+                                <span className={globalTableStyle.checkmark}></span>
                             </label>
                         </th>
-                        <th className={style.shortColumn}>Institution</th>
-                        <th className={style.shortColumn}>Patient(s) Name</th>
-                        <th className={style.longColumn}>Service</th>
-                        <th className={style.dateColumn}>Patient BOD<br/>(DD/MM/YYYY)</th>
+                        <th className={globalTableStyle.shortColumn}>Institution</th>
+                        <th className={globalTableStyle.shortColumn}>Patient(s) Name</th>
+                        <th className={globalTableStyle.longColumn}>Service</th>
+                        <th className={globalTableStyle.dateColumn}>Patient BOD<br/>(DD/MM/YYYY)</th>
                         <th>Gender</th>
-                        <th className={style.longColumn}>MRN</th>
-                        <th className={style.dateColumn}>Collection Date<br/>(DD/MM/YYYY)</th>
+                        <th className={globalTableStyle.longColumn}>MRN</th>
+                        <th className={globalTableStyle.dateColumn}>Collection Date<br/>(DD/MM/YYYY)</th>
                         <th>Info</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {requestData && requestData.length > 0 && requestData.map((row, rowIndex) => (
+                    {requestData && requestData.length > 0 ? ( requestData.map((row, rowIndex) => (
                         <tr key={row.order_id! + row.service!.id + row.sample!.id}>
                             <td onClick={(e) => e.stopPropagation()}>
-                                <label form="agree" className={style.checkbox}>
+                                <label form="agree" className={globalTableStyle.checkbox}>
                                     <input
                                         type="checkbox"
                                         checked={row.isSelected || false}
                                         onChange={() => handleSelectChange(rowIndex, !row.isSelected)}
-                                        className={style.checkbox}
+                                        className={globalTableStyle.checkbox}
                                     />
-                                    <span className={style.checkmark}></span>
+                                    <span className={globalTableStyle.checkmark}></span>
                                 </label>
                             </td>
                             <td>{row.sample!.patient!.organization!.id}</td>
@@ -235,20 +235,27 @@ export default function CartTable() {
                             <td>
                                 <FontAwesomeIcon
                                     icon={faFileLines}
-                                    className={style.info}
+                                    className={globalTableStyle.info}
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         handleInfoClick(row)
                                     }}/>
                             </td>
                         </tr>
-                    ))}
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan={10} className={globalTableStyle.noData}>
+                                The searched data does not exist
+                            </td>
+                        </tr>
+                    )}
                     </tbody>
                 </table>
             </div>
-            <div className={style.pagination}>
+            <div className={globalTableStyle.pagination}>
                 <span>items per page:</span>
-                <div className={style.select}>
+                <div className={globalTableStyle.select}>
                     <select onChange={handlePageSizeChange}>
                         <option value="10">10</option>
                         <option value="20">20</option>
@@ -257,13 +264,13 @@ export default function CartTable() {
                 </div>
                 <span> 1-{totalPage} of {search.page} </span>
                 <button
-                    className={style.pageButton}
+                    className={globalTableStyle.pageButton}
                     disabled={search.page === 1}
                     onClick={() => handlePageChange((search.page ?? 1) - 1)}
                 ><FontAwesomeIcon icon={faAngleLeft}/>
                 </button>
                 <button
-                    className={style.pageButton}
+                    className={globalTableStyle.pageButton}
                     disabled={search.page === totalPage}
                     onClick={() => handlePageChange((search.page ?? 1) + 1)}
                 ><FontAwesomeIcon icon={faAngleRight}/>

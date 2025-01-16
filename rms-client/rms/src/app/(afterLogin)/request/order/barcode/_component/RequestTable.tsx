@@ -1,6 +1,6 @@
 "use client"
 
-import globalTableScrollStyle from "@/css/globalTableScroll.module.css";
+import globalTableStyle from "@/css/globalTable.module.css";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React, {useEffect, useState} from "react";
 import type {Request} from "@/model/Request";
@@ -123,10 +123,10 @@ export default function RequestTable() {
 
     return (
         <>
-            <div className={globalTableScrollStyle.formGroupRight}>
+            <div className={globalTableStyle.formGroupRight}>
                 <BlueButton name={'Print Barcode'} onClick={handleBarcodeClick}/>
             </div>
-            <div className={globalTableScrollStyle.formGroupBetween}>
+            <div className={globalTableStyle.formGroupBetween}>
                 <div>
                     <DatePickerRangeBox
                         label={"from-to"}
@@ -177,18 +177,18 @@ export default function RequestTable() {
                     }}></InputBox>
                 </div>
             </div>
-            <table className={globalTableScrollStyle.table}>
+            <table className={globalTableStyle.table}>
                 <thead>
                 <tr>
                     <th>
-                        <label form="agree" className={globalTableScrollStyle.checkbox}>
+                        <label form="agree" className={globalTableStyle.checkbox}>
                             <input
                                 type="checkbox"
                                 checked={isSelectedAll}
                                 onChange={() => handleSelectAll(!isSelectedAll)}
-                                className={globalTableScrollStyle.checkbox}
+                                className={globalTableStyle.checkbox}
                             />
-                            <span className={globalTableScrollStyle.checkmark}></span>
+                            <span className={globalTableStyle.checkmark}></span>
                         </label>
                     </th>
                     <th>Order Date<br/>(DD-MM-YYYY)</th>
@@ -202,18 +202,18 @@ export default function RequestTable() {
                     <th>Info</th>
                 </tr>
                 </thead>
-                <tbody style={{height: "300px"}}>
-                {requestData && requestData.length > 0 && requestData.map((request, rowIndex) => (
+                <tbody>
+                {requestData && requestData.length > 0 ? ( requestData.map((request, rowIndex) => (
                     <tr key={request.order_id! + request.service!.id + request.sample!.id}>
                         <td onClick={(e) => e.stopPropagation()}>
-                            <label form="agree" className={globalTableScrollStyle.checkbox}>
+                            <label form="agree" className={globalTableStyle.checkbox}>
                                 <input
                                     type="checkbox"
                                     checked={request.isSelected || false}
                                     onChange={() => handleSelectChange(rowIndex, !request.isSelected)}
-                                    className={globalTableScrollStyle.checkbox}
+                                    className={globalTableStyle.checkbox}
                                 />
-                                <span className={globalTableScrollStyle.checkmark}></span>
+                                <span className={globalTableStyle.checkmark}></span>
                             </label>
                         </td>
                         <td>{request.create_at ? new Date(request.create_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
@@ -227,14 +227,21 @@ export default function RequestTable() {
                         <td>
                             <FontAwesomeIcon
                                 icon={faFileLines}
-                                className={globalTableScrollStyle.info}
+                                className={globalTableStyle.info}
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     handleInfoClick(request);
                                 }}/>
                         </td>
                     </tr>
-                ))}
+                ))
+                    ) : (
+                    <tr>
+                        <td colSpan={10} className={globalTableStyle.noData}>
+                            The searched data does not exist
+                        </td>
+                    </tr>
+                )}
                 </tbody>
             </table>
             {modalOpen && (

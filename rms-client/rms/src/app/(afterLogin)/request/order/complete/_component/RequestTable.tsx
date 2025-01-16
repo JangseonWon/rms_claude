@@ -169,7 +169,7 @@ export default function RequestTable() {
                     </tr>
                     </thead>
                     <tbody>
-                    {requestData && requestData.length > 0 && requestData.map((request) => (
+                    {requestData && requestData.length > 0 ? ( requestData.map((request) => (
                         <tr key={request.order_id! + request.service!.id + request.sample!.id}>
                             <td>{request.create_at ? new Date(request.create_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
                             <td>{request.courier_company}</td>
@@ -191,7 +191,14 @@ export default function RequestTable() {
                                     }}/>
                             </td>
                         </tr>
-                    ))}
+                    ))
+                    ) : (
+                        <tr>
+                            <td colSpan={10} className={globalTableStyle.noData}>
+                                The searched data does not exist
+                            </td>
+                        </tr>
+                    )}
                     </tbody>
                     {infoModalOpen && (
                         <RequestInfo

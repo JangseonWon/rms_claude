@@ -66,7 +66,7 @@ export const ProbandInputComponent = () => {
                 <div className={style.probandInput}>
                     <InputBox
                         key={'probandInput'}
-                        label={'Proband Number'}
+                        label={'Registration ID'}
                         required={true}
                         disabled={true}
                         value={probandValue}
