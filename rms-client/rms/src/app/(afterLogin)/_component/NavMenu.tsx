@@ -13,11 +13,12 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React, {useState} from "react";
-import {useSelectedLayoutSegment} from "next/navigation";
+import {usePathname, useSelectedLayoutSegment} from "next/navigation";
 import {useSession} from "next-auth/react";
 
 export default function NavMenu() {
     const segment = useSelectedLayoutSegment();
+    const pathname = usePathname();
     const [showResultDropdown, setShowResultDropdown] = useState(false);
     const [showManagementDropdown, setShowManagementDropdown] = useState(false);
     const [showRequestOrder, setShowRequestOrder] = useState(false);
@@ -89,17 +90,23 @@ export default function NavMenu() {
                     <>
                         <ol>
                             <Link href={"/request/order/barcode"}>
-                                Print Barcode
+                                <span className={pathname === "/request/order/barcode" ? style.activeLink : ""}>
+                                    Print Barcode
+                                </span>
                             </Link>
                         </ol>
                         <ol>
                             <Link href={"/request/order/confirm"}>
-                                Confirm Order
+                                <span className={pathname === "/request/order/confirm" ? style.activeLink : ""}>
+                                    Confirm Order
+                                </span>
                             </Link>
                         </ol>
                         <ol>
                             <Link href={"/request/order/complete"}>
-                                Complete Order
+                                <span className={pathname === "/request/order/complete" ? style.activeLink : ""}>
+                                    Complete Order
+                                </span>
                             </Link>
                         </ol>
                     </>
@@ -116,12 +123,16 @@ export default function NavMenu() {
                     <>
                         <ol>
                             <Link href={"/request/result/download"}>
-                                Download
+                                <span className={pathname === "/request/result/download" ? style.activeLink : ""}>
+                                    Download
+                                </span>
                             </Link>
                         </ol>
                         <ol>
                             <Link href={"/request/result/resample"}>
-                                Re-sample
+                                <span className={pathname === "/request/result/resample" ? style.activeLink : ""}>
+                                    Re-sample
+                                </span>
                             </Link>
                         </ol>
                     </>
@@ -140,22 +151,30 @@ export default function NavMenu() {
                     <>
                         <ol>
                             <Link href={"/request/management/user"}>
-                                User Management
+                                <span className={pathname === "/request/management/user" ? style.activeLink : ""}>
+                                    User Management
+                                </span>
                             </Link>
                         </ol>
                         <ol>
                             <Link href={"/request/management/service"}>
-                                Service Management
+                                <span className={pathname === "/request/management/service" ? style.activeLink : ""}>
+                                    Service Management
+                                </span>
                             </Link>
                         </ol>
                         <ol>
                             <Link href={"/request/management/additional-info"}>
-                                Additional info Management
+                                <span className={pathname === "/request/management/additional-info" ? style.activeLink : ""}>
+                                    Additional info Management
+                                </span>
                             </Link>
                         </ol>
                         <ol>
                             <Link href={"/request/management/sample-type"}>
-                                SampleType Management
+                                <span className={pathname === "/request/management/sample-type" ? style.activeLink : ""}>
+                                    SampleType Management
+                                </span>
                             </Link>
                         </ol>
                     </>

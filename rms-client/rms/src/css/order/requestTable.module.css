@@ -76,9 +76,3 @@
 .checkbox input:checked + .checkmark:after {
     display: block;
 }
-.longColumn {
-    width: 90px;
-}
-.middleColumn {
-    width: 75px;
-}

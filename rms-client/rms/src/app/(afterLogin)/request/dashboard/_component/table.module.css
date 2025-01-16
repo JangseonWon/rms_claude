@@ -7,15 +7,16 @@
     justify-content: space-between;
     padding-bottom: 10px;
 }
-.filterContainerRight{
+.filterContainerLeft{
     display: flex;
 }
-.filterContainerRight > *{
+.filterContainerLeft > *{
     padding-right: 5px;
 }
-.filterContainerLeft{
-    margin-top: 15px;
+.filterContainerRight{
+    margin-top: 20px;
     display: flex;
+    gap: 10px;
 }
 .resetButton {
     margin-top: 30px;

@@ -1,6 +1,6 @@
 "use client"
 
-import globalTableScrollStyle from "@/css/globalTableScroll.module.css";
+import globalTableStyle from "@/css/globalTable.module.css";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React, {useEffect, useState} from "react";
 import type {Request} from "@/model/Request";
@@ -16,6 +16,7 @@ import BlueButton from "@/app/_component/BlueButton";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import RequestInfo from "@/app/(afterLogin)/request/order/_component/RequestInfo";
 import BarcodeModal from "@/app/(afterLogin)/request/order/barcode/_component/BarcodeModal";
+import CellTooltip from "@/app/_component/CellToolTip";
 
 export interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -123,10 +124,10 @@ export default function RequestTable() {
 
     return (
         <>
-            <div className={globalTableScrollStyle.formGroupRight}>
+            <div className={globalTableStyle.formGroupRight}>
                 <BlueButton name={'Print Barcode'} onClick={handleBarcodeClick}/>
             </div>
-            <div className={globalTableScrollStyle.formGroupBetween}>
+            <div className={globalTableStyle.formGroupBetween}>
                 <div>
                     <DatePickerRangeBox
                         label={"from-to"}
@@ -177,64 +178,71 @@ export default function RequestTable() {
                     }}></InputBox>
                 </div>
             </div>
-            <table className={globalTableScrollStyle.table}>
+            <table className={globalTableStyle.table}>
                 <thead>
                 <tr>
                     <th>
-                        <label form="agree" className={globalTableScrollStyle.checkbox}>
+                        <label form="agree" className={globalTableStyle.checkbox}>
                             <input
                                 type="checkbox"
                                 checked={isSelectedAll}
                                 onChange={() => handleSelectAll(!isSelectedAll)}
-                                className={globalTableScrollStyle.checkbox}
+                                className={globalTableStyle.checkbox}
                             />
-                            <span className={globalTableScrollStyle.checkmark}></span>
+                            <span className={globalTableStyle.checkmark}></span>
                         </label>
                     </th>
-                    <th>Order Date<br/>(DD-MM-YYYY)</th>
-                    <th>User Name</th>
-                    <th>Institution</th>
-                    <th>Registration ID</th>
-                    <th>Patient(s) Name</th>
-                    <th>Service</th>
-                    <th>Patient(s) DOB<br/>(DD-MM-YYYY)</th>
-                    <th>MRN</th>
-                    <th>Info</th>
+                    <th className={globalTableStyle.middleColumn}>Order Date<br/>(DD-MM-YYYY)</th>
+                    <th className={globalTableStyle.longColumn}>User Name</th>
+                    <th className={globalTableStyle.middleColumn}>Institution</th>
+                    <th className={globalTableStyle.longColumn}>Registration ID</th>
+                    <th className={globalTableStyle.longColumn}>Service</th>
+                    <th className={globalTableStyle.longColumn}>Patient(s) Name</th>
+                    <th className={globalTableStyle.middleColumn}>Patient(s) DOB<br/>(DD-MM-YYYY)</th>
+                    <th className={globalTableStyle.longColumn}>MRN</th>
+                    <th className={globalTableStyle.shortColumn}>Info</th>
                 </tr>
                 </thead>
-                <tbody style={{height: "300px"}}>
-                {requestData && requestData.length > 0 && requestData.map((request, rowIndex) => (
-                    <tr key={request.order_id! + request.service!.id + request.sample!.id}>
-                        <td onClick={(e) => e.stopPropagation()}>
-                            <label form="agree" className={globalTableScrollStyle.checkbox}>
-                                <input
-                                    type="checkbox"
-                                    checked={request.isSelected || false}
-                                    onChange={() => handleSelectChange(rowIndex, !request.isSelected)}
-                                    className={globalTableScrollStyle.checkbox}
-                                />
-                                <span className={globalTableScrollStyle.checkmark}></span>
-                            </label>
-                        </td>
-                        <td>{request.create_at ? new Date(request.create_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
-                        <td>{request.order?.user?.name}</td>
-                        <td>{request.sample?.patient?.organization?.name}</td>
-                        <td>{request.sample?.barcode}</td>
-                        <td>{request.sample?.patient?.name}</td>
-                        <td>{request.service?.name}</td>
-                        <td>{request.sample?.patient?.birth_day}-{request.sample?.patient?.birth_month}-{request.sample?.patient?.birth_year}</td>
-                        <td>{request.sample?.patient?.serial}</td>
-                        <td>
-                            <FontAwesomeIcon
-                                icon={faFileLines}
-                                className={globalTableScrollStyle.info}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleInfoClick(request);
-                                }}/>
+                <tbody>
+                {requestData && requestData.length > 0 ? ( requestData.map((request, rowIndex) => (
+                        <tr key={request.order_id! + request.service!.id + request.sample!.id}>
+                            <td onClick={(e) => e.stopPropagation()}>
+                                <label form="agree" className={globalTableStyle.checkbox}>
+                                    <input
+                                        type="checkbox"
+                                        checked={request.isSelected || false}
+                                        onChange={() => handleSelectChange(rowIndex, !request.isSelected)}
+                                        className={globalTableStyle.checkbox}
+                                    />
+                                    <span className={globalTableStyle.checkmark}></span>
+                                </label>
+                            </td>
+                            <td className={globalTableStyle.middleColumn}>{request.create_at ? new Date(request.create_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
+                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.order?.user?.name}/></td>
+                            <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample?.patient?.organization?.name}/></td>
+                            <td className={globalTableStyle.longColumn}>{request.sample?.barcode}</td>
+                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.service?.name}/></td>
+                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.sample?.patient?.name}/></td>
+                            <td className={globalTableStyle.middleColumn}>{request.sample?.patient?.birth_day}-{request.sample?.patient?.birth_month}-{request.sample?.patient?.birth_year}</td>
+                            <td className={globalTableStyle.longColumn}>{request.sample?.patient?.serial}</td>
+                            <td className={globalTableStyle.shortColumn}>
+                                <FontAwesomeIcon
+                                    icon={faFileLines}
+                                    className={globalTableStyle.info}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleInfoClick(request);
+                                    }}/>
+                            </td>
+                        </tr>
+                    ))
+                ) : (
+                    <tr>
+                        <td colSpan={10} className={globalTableStyle.noData}>
+                            The searched data does not exist
                         </td>
                     </tr>
-                ))}
+                )}
                 </tbody>
             </table>
             {modalOpen && (

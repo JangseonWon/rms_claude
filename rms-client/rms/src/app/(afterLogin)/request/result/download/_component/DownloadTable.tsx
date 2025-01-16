@@ -19,6 +19,7 @@ import {getReportFiles} from "@/app/(afterLogin)/request/result/download/_api/ge
 import {Status} from "@/model/Status";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
+import CellTooltip from "@/app/_component/CellToolTip";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -238,20 +239,20 @@ export default function DownloadTable() {
                                 <span className={globalTableStyle.checkmark}></span>
                             </label>
                         </th>
-                        <th>Specified At<br/>(DD-MM-YYYY)</th>
-                        <th>User Name</th>
-                        <th>Institution</th>
-                        <th>Registration ID</th>
-                        <th>Service</th>
-                        <th>Patient(s) Name</th>
-                        <th>MRN</th>
-                        <th>Report Date<br/>(YYYY/MM/DD)</th>
-                        <th>Status</th>
-                        <th>Report Download</th>
+                        <th className={globalTableStyle.middleColumn}>Specified At<br/>(DD-MM-YYYY)</th>
+                        <th className={globalTableStyle.longColumn}>User Name</th>
+                        <th className={globalTableStyle.middleColumn}>Institution</th>
+                        <th className={globalTableStyle.longColumn}>Registration ID</th>
+                        <th className={globalTableStyle.longColumn}>Service</th>
+                        <th className={globalTableStyle.longColumn}>Patient(s) Name</th>
+                        <th className={globalTableStyle.longColumn}>MRN</th>
+                        <th className={globalTableStyle.middleColumn}>Report Date<br/>(YYYY/MM/DD)</th>
+                        <th className={globalTableStyle.middleColumn}>Status</th>
+                        <th className={globalTableStyle.middleColumn}>Report Download</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {requestData.map((request, rowIndex) => (
+                    {requestData && requestData.length > 0 ? ( requestData.map((request, rowIndex) => (
                         <tr key={request!.sample!.barcode! + request!.service!.id!}>
                             <td>
                                 <label form="agree" className={globalTableStyle.checkbox}>
@@ -264,16 +265,16 @@ export default function DownloadTable() {
                                     <span className={globalTableStyle.checkmark}></span>
                                 </label>
                             </td>
-                            <td>{request.specified_at ? new Date(request.specified_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
-                            <td>{request.user?.name}</td>
-                            <td>{request.sample?.patient?.organization?.name}</td>
-                            <td>{request.sample?.barcode}</td>
-                            <td>{request.service?.name}</td>
-                            <td>{request.sample?.patient?.name}</td>
-                            <td>{request.sample?.patient?.serial}</td>
-                            <td>{request.reported_at ? new Date(request.reported_at).toLocaleDateString() : '-'}</td>
-                            <td>{request.status}</td>
-                            <td>
+                            <td className={globalTableStyle.middleColumn}>{request.specified_at ? new Date(request.specified_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
+                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.order?.user?.name}/></td>
+                            <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample?.patient?.organization?.name}/></td>
+                            <td className={globalTableStyle.longColumn}>{request.sample?.barcode}</td>
+                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.service?.name}/></td>
+                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.sample?.patient?.name}/></td>
+                            <td className={globalTableStyle.longColumn}>{request.sample?.patient?.serial}</td>
+                            <td className={globalTableStyle.middleColumn}>{request.reported_at ? new Date(request.reported_at).toLocaleDateString() : '-'}</td>
+                            <td className={globalTableStyle.middleColumn}>{request.status}</td>
+                            <td className={globalTableStyle.middleColumn}>
                                 {(request.reports as Report[])?.filter((report: Report) => report.type === 'PDF').map((report) => (
                                     <FontAwesomeIcon
                                         key={report.id}
@@ -283,7 +284,14 @@ export default function DownloadTable() {
                                 ))}
                             </td>
                         </tr>
-                    ))}
+                    ))
+                    ) : (
+                        <tr>
+                            <td colSpan={11} className={globalTableStyle.noData}>
+                                The searched data does not exist
+                            </td>
+                        </tr>
+                    )}
                     </tbody>
                 </table>
             </section>

@@ -16,6 +16,7 @@ import DownloadExcelButton from "@/app/(afterLogin)/request/dashboard/_component
 import {Status} from "@/model/Status";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import {GrPowerReset} from "react-icons/gr";
+import globalTableStyle from "@/css/globalTable.module.css";
 
 export default function Table() {
     const [requestData, setRequestData] = useState<Request[]>([]);
@@ -194,7 +195,7 @@ export default function Table() {
                 />
             </div>
             <div className={style.filterContainer}>
-                <div className={style.filterContainerRight}>
+                <div className={style.filterContainerLeft}>
                     <DatePickerRangeBox
                         label={"from-to"}
                         onChange={(from, to) =>{
@@ -204,7 +205,7 @@ export default function Table() {
                         className={style.resetButton}
                         onClick={handleReset}/>
                 </div>
-                <div className={style.filterContainerLeft}>
+                <div className={style.filterContainerRight}>
                     <SelectBox
                         width={'155px'}
                         value={selectOption.name}
@@ -224,20 +225,20 @@ export default function Table() {
             <table className={style.table}>
                 <thead>
                 <tr>
-                    <th>Order Date<br/>(DD/MM/YYYY)</th>
+                    <th>Order Date<br/>(DD-MM-YYYY)</th>
                     <th>Registration ID</th>
                     <th>User Name</th>
                     <th>Institution</th>
                     <th>Service</th>
                     <th>Patient(s) Name</th>
                     <th>MRN</th>
-                    <th>Patient BOD<br/>(DD/MM/YYYY)</th>
+                    <th>Patient BOD<br/>(DD-MM-YYYY)</th>
                     <th>Current Status</th>
-                    <th>Report Date<br/>(DD/MM/YYYY)</th>
+                    <th>Report Date<br/>(DD-MM-YYYY)</th>
                 </tr>
                 </thead>
                 <tbody>
-                {requestData && requestData.length > 0 && requestData.map((row) => (
+                {requestData && requestData.length > 0 ? ( requestData.map((row) => (
                     <tr key={`${row.order_id}${row.sample?.id}${row.service!.id}`}>
                         <td>{row.create_at ? format(new Date(row.create_at), "dd-MM-yyyy") : '-'}</td>
                         <td>{row.sample!.barcode}</td>
@@ -256,7 +257,14 @@ export default function Table() {
                                 : '-'}
                         </td>
                     </tr>
-                ))}
+                ))
+                ) : (
+                    <tr>
+                        <td colSpan={10} className={globalTableStyle.noData}>
+                            The searched data does not exist
+                        </td>
+                    </tr>
+                )}
                 </tbody>
             </table>
             <div className={style.pagination}>

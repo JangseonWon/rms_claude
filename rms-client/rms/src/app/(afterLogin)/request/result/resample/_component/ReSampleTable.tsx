@@ -15,9 +15,8 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {Status} from "@/model/Status";
 import {patchRequests} from "@/app/(afterLogin)/request/result/download/_api/patchRequests";
-import RequestInfo from "@/app/(afterLogin)/request/order/_component/RequestInfo";
-import {Service} from "@/model/Service";
 import RequestModal from "@/app/(afterLogin)/request/result/resample/_component/RequestModal";
+import CellTooltip from "@/app/_component/CellToolTip";
 
 const selectBoxOptions: SelectBoxOption[] = [
     { table: "user", column: "name", name: "User Name" },
@@ -200,35 +199,42 @@ export default function ReSampleTable() {
                     <table className={globalTableStyle.table}>
                         <thead>
                         <tr>
-                            <th>Specified At<br/>(DD-MM-YYYY)</th>
-                            <th>User Name</th>
-                            <th>Institution</th>
-                            <th>Registration ID</th>
-                            <th>Service</th>
-                            <th>Patient(s) Name</th>
-                            <th>MRN</th>
-                            <th>Reason</th>
-                            <th>Resample Notice</th>
-                            <th>Request</th>
-                            <th>Cancel</th>
+                            <th className={globalTableStyle.middleColumn}>Specified At<br/>(DD-MM-YYYY)</th>
+                            <th className={globalTableStyle.longColumn}>User Name</th>
+                            <th className={globalTableStyle.middleColumn}>Institution</th>
+                            <th className={globalTableStyle.longColumn}>Registration ID</th>
+                            <th className={globalTableStyle.longColumn}>Service</th>
+                            <th className={globalTableStyle.longColumn}>Patient(s) Name</th>
+                            <th className={globalTableStyle.longColumn}>MRN</th>
+                            <th className={globalTableStyle.longColumn}>Reason</th>
+                            <th className={globalTableStyle.longColumn}>Resample Notice</th>
+                            <th className={globalTableStyle.middleColumn}>Request</th>
+                            <th className={globalTableStyle.middleColumn}>Cancel</th>
                         </tr>
                         </thead>
                         <tbody>
-                        {requestData.map((request, rowIndex) => (
+                        {requestData && requestData.length > 0 ? ( requestData.map((request, rowIndex) => (
                             <tr key={request!.sample!.barcode! + request!.service!.id!}>
-                                <td>{request.specified_at ? new Date(request.specified_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
-                                <td>{request.order?.user?.name}</td>
-                                <td>{request.sample?.patient?.organization?.name}</td>
-                                <td>{request.sample?.barcode}</td>
-                                <td>{request.service?.name}</td>
-                                <td>{request.sample?.patient?.name}</td>
-                                <td>{request.sample?.patient?.serial}</td>
+                                <td className={globalTableStyle.middleColumn}>{request.specified_at ? new Date(request.specified_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
+                                <td className={globalTableStyle.longColumn}><CellTooltip text={request.order?.user?.name}/></td>
+                                <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample?.patient?.organization?.name}/></td>
+                                <td className={globalTableStyle.longColumn}>{request.sample?.barcode}</td>
+                                <td className={globalTableStyle.longColumn}><CellTooltip text={request.service?.name}/></td>
+                                <td className={globalTableStyle.longColumn}><CellTooltip text={request.sample?.patient?.name}/></td>
+                                <td className={globalTableStyle.longColumn}>{request.sample?.patient?.serial}</td>
                                 <td>Reason</td>
-                                <td>{request.resample_at ? new Date(request.resample_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
+                                <td className={globalTableStyle.middleColumn}>{request.resample_at ? new Date(request.resample_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
                                 <td className={globalTableStyle.underlineBlue} onClick={() => handleRequestClick(request)}>Request</td>
                                 <td className={globalTableStyle.underlineRed} onClick={() => handleCancel(request)}>Cancel</td>
                             </tr>
-                        ))}
+                        ))
+                        ) : (
+                            <tr>
+                                <td colSpan={11} className={globalTableStyle.noData}>
+                                    The searched data does not exist
+                                </td>
+                            </tr>
+                        )}
                         </tbody>
                     </table>
                 </section>

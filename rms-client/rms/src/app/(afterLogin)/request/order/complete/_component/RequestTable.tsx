@@ -16,6 +16,7 @@ import {Filter} from "@/model/Filter";
 import {Status} from "@/model/Status";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import RequestInfo from "@/app/(afterLogin)/request/order/_component/RequestInfo";
+import CellTooltip from "@/app/_component/CellToolTip";
 
 export interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -155,33 +156,33 @@ export default function RequestTable() {
                 <table className={requestStyle.table}>
                     <thead>
                     <tr>
-                        <th className={requestStyle.longColumn}>Order Date<br/>(DD-MM-YYYY)</th>
-                        <th>Global courier</th>
-                        <th className={requestStyle.middleColumn}>AirWaybill no.</th>
-                        <th>User Name</th>
-                        <th>Institution</th>
-                        <th>Registration ID</th>
-                        <th>Service</th>
-                        <th>Patient(s) Name</th>
-                        <th className={requestStyle.longColumn}>Patient(s) DOB<br/>(DD-MM-YYYY)</th>
-                        <th>MRN</th>
-                        <th>Info</th>
+                        <th className={globalTableStyle.middleColumn}>Order Date<br/>(DD-MM-YYYY)</th>
+                        <th className={globalTableStyle.longColumn}>Global courier</th>
+                        <th className={globalTableStyle.longColumn}>AirWaybill no.</th>
+                        <th className={globalTableStyle.longColumn}>User Name</th>
+                        <th className={globalTableStyle.middleColumn}>Institution</th>
+                        <th className={globalTableStyle.longColumn}>Registration ID</th>
+                        <th className={globalTableStyle.longColumn}>Service</th>
+                        <th className={globalTableStyle.longColumn}>Patient(s) Name</th>
+                        <th className={globalTableStyle.middleColumn}>Patient(s) DOB<br/>(DD-MM-YYYY)</th>
+                        <th className={globalTableStyle.longColumn}>MRN</th>
+                        <th className={globalTableStyle.shortColumn}>Info</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {requestData && requestData.length > 0 && requestData.map((request) => (
+                    {requestData && requestData.length > 0 ? ( requestData.map((request) => (
                         <tr key={request.order_id! + request.service!.id + request.sample!.id}>
-                            <td>{request.create_at ? new Date(request.create_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
-                            <td>{request.courier_company}</td>
-                            <td>{request.awb_number}</td>
-                            <td>{request.order?.user?.name}</td>
-                            <td>{request.sample?.patient?.organization?.name}</td>
-                            <td>{request.sample?.barcode}</td>
-                            <td>{request.service?.name}</td>
-                            <td>{request.sample?.patient?.name}</td>
-                            <td>{request.sample?.patient?.birth_day}-{request.sample?.patient?.birth_month}-{request.sample?.patient?.birth_year}</td>
-                            <td>{request.sample?.patient?.serial}</td>
-                            <td>
+                            <td className={globalTableStyle.middleColumn}>{request.create_at ? new Date(request.create_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
+                            <td className={globalTableStyle.longColumn}>{request.courier_company}</td>
+                            <td className={globalTableStyle.longColumn}>{request.awb_number}</td>
+                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.order?.user?.name}/></td>
+                            <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample?.patient?.organization?.name}/></td>
+                            <td className={globalTableStyle.longColumn}>{request.sample?.barcode}</td>
+                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.service?.name}/></td>
+                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.sample?.patient?.name}/></td>
+                            <td className={globalTableStyle.middleColumn}>{request.sample?.patient?.birth_day}-{request.sample?.patient?.birth_month}-{request.sample?.patient?.birth_year}</td>
+                            <td className={globalTableStyle.longColumn}>{request.sample?.patient?.serial}</td>
+                            <td className={globalTableStyle.shortColumn}>
                                 <FontAwesomeIcon
                                     icon={faFileLines}
                                     className={globalTableStyle.info}
@@ -191,7 +192,14 @@ export default function RequestTable() {
                                     }}/>
                             </td>
                         </tr>
-                    ))}
+                    ))
+                    ) : (
+                        <tr>
+                            <td colSpan={10} className={globalTableStyle.noData}>
+                                The searched data does not exist
+                            </td>
+                        </tr>
+                    )}
                     </tbody>
                     {infoModalOpen && (
                         <RequestInfo

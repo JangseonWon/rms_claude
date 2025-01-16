@@ -166,14 +166,14 @@ export default function NonArrivedTable() {
                 <table className={globalTableStyle.table}>
                     <thead>
                     <tr>
-                        <th>Order Date<br/>(DD/MM/YYYY)</th>
+                        <th>Order Date<br/>(DD-MM-YYYY)</th>
                         <th>Registration ID</th>
                         <th>User Name</th>
                         <th>Institution</th>
                         <th>Patient(s) Name</th>
                         <th>Service</th>
                         <th>MRN</th>
-                        <th>Patient BOD<br/>(DD/MM/YYYY)</th>
+                        <th>Patient BOD<br/>(DD-MM-YYYY)</th>
                         <th>Global<br/>courier</th>
                         <th>Airwaybill</th>
                     </tr>
