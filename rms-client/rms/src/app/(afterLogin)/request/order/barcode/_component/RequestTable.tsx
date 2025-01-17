@@ -178,73 +178,75 @@ export default function RequestTable() {
                     }}></InputBox>
                 </div>
             </div>
-            <table className={globalTableStyle.table}>
-                <thead>
-                <tr>
-                    <th>
-                        <label form="agree" className={globalTableStyle.checkbox}>
-                            <input
-                                type="checkbox"
-                                checked={isSelectedAll}
-                                onChange={() => handleSelectAll(!isSelectedAll)}
-                                className={globalTableStyle.checkbox}
-                            />
-                            <span className={globalTableStyle.checkmark}></span>
-                        </label>
-                    </th>
-                    <th className={globalTableStyle.middleColumn}>Order Date<br/>(DD-MM-YYYY)</th>
-                    <th className={globalTableStyle.longColumn}>User Name</th>
-                    <th className={globalTableStyle.middleColumn}>Institution</th>
-                    <th className={globalTableStyle.longColumn}>Registration ID</th>
-                    <th className={globalTableStyle.longColumn}>Service</th>
-                    <th className={globalTableStyle.longColumn}>Patient(s) Name</th>
-                    <th className={globalTableStyle.middleColumn}>Patient(s) DOB<br/>(DD-MM-YYYY)</th>
-                    <th className={globalTableStyle.longColumn}>MRN</th>
-                    <th className={globalTableStyle.shortColumn}>Info</th>
-                </tr>
-                </thead>
-                <tbody>
-                {requestData && requestData.length > 0 ? ( requestData.map((request, rowIndex) => (
-                        <tr key={request.order_id! + request.service!.id + request.sample!.id}>
-                            <td onClick={(e) => e.stopPropagation()}>
-                                <label form="agree" className={globalTableStyle.checkbox}>
-                                    <input
-                                        type="checkbox"
-                                        checked={request.isSelected || false}
-                                        onChange={() => handleSelectChange(rowIndex, !request.isSelected)}
-                                        className={globalTableStyle.checkbox}
-                                    />
-                                    <span className={globalTableStyle.checkmark}></span>
-                                </label>
-                            </td>
-                            <td className={globalTableStyle.middleColumn}>{request.create_at ? new Date(request.create_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
-                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.order?.user?.name}/></td>
-                            <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample?.patient?.organization?.name}/></td>
-                            <td className={globalTableStyle.longColumn}>{request.sample?.barcode}</td>
-                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.service?.name}/></td>
-                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.sample?.patient?.name}/></td>
-                            <td className={globalTableStyle.middleColumn}>{request.sample?.patient?.birth_day}-{request.sample?.patient?.birth_month}-{request.sample?.patient?.birth_year}</td>
-                            <td className={globalTableStyle.longColumn}>{request.sample?.patient?.serial}</td>
-                            <td className={globalTableStyle.shortColumn}>
-                                <FontAwesomeIcon
-                                    icon={faFileLines}
-                                    className={globalTableStyle.info}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleInfoClick(request);
-                                    }}/>
+            <div className={globalTableStyle.tableContainer}>
+                <table className={globalTableStyle.table}>
+                    <thead>
+                    <tr>
+                        <th>
+                            <label form="agree" className={globalTableStyle.checkbox}>
+                                <input
+                                    type="checkbox"
+                                    checked={isSelectedAll}
+                                    onChange={() => handleSelectAll(!isSelectedAll)}
+                                    className={globalTableStyle.checkbox}
+                                />
+                                <span className={globalTableStyle.checkmark}></span>
+                            </label>
+                        </th>
+                        <th className={globalTableStyle.middleColumn}>Order Date<br/>(DD-MM-YYYY)</th>
+                        <th className={globalTableStyle.longColumn}>User Name</th>
+                        <th className={globalTableStyle.middleColumn}>Institution</th>
+                        <th className={globalTableStyle.longColumn}>Registration ID</th>
+                        <th className={globalTableStyle.longColumn}>Service</th>
+                        <th className={globalTableStyle.longColumn}>Patient(s) Name</th>
+                        <th className={globalTableStyle.middleColumn}>Patient(s) DOB<br/>(DD-MM-YYYY)</th>
+                        <th className={globalTableStyle.longColumn}>MRN</th>
+                        <th className={globalTableStyle.shortColumn}>Info</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {requestData && requestData.length > 0 ? ( requestData.map((request, rowIndex) => (
+                            <tr key={request.order_id! + request.service!.id + request.sample!.id}>
+                                <td onClick={(e) => e.stopPropagation()}>
+                                    <label form="agree" className={globalTableStyle.checkbox}>
+                                        <input
+                                            type="checkbox"
+                                            checked={request.isSelected || false}
+                                            onChange={() => handleSelectChange(rowIndex, !request.isSelected)}
+                                            className={globalTableStyle.checkbox}
+                                        />
+                                        <span className={globalTableStyle.checkmark}></span>
+                                    </label>
+                                </td>
+                                <td className={globalTableStyle.middleColumn}>{request.create_at ? new Date(request.create_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
+                                <td className={globalTableStyle.longColumn}><CellTooltip text={request.order?.user?.name}/></td>
+                                <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample?.patient?.organization?.name}/></td>
+                                <td className={globalTableStyle.longColumn}>{request.sample?.barcode}</td>
+                                <td className={globalTableStyle.longColumn}><CellTooltip text={request.service?.name}/></td>
+                                <td className={globalTableStyle.longColumn}><CellTooltip text={request.sample?.patient?.name}/></td>
+                                <td className={globalTableStyle.middleColumn}>{request.sample?.patient?.birth_day}-{request.sample?.patient?.birth_month}-{request.sample?.patient?.birth_year}</td>
+                                <td className={globalTableStyle.longColumn}>{request.sample?.patient?.serial}</td>
+                                <td className={globalTableStyle.shortColumn}>
+                                    <FontAwesomeIcon
+                                        icon={faFileLines}
+                                        className={globalTableStyle.info}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleInfoClick(request);
+                                        }}/>
+                                </td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan={10} className={globalTableStyle.noData}>
+                                The searched data does not exist
                             </td>
                         </tr>
-                    ))
-                ) : (
-                    <tr>
-                        <td colSpan={10} className={globalTableStyle.noData}>
-                            The searched data does not exist
-                        </td>
-                    </tr>
-                )}
-                </tbody>
-            </table>
+                    )}
+                    </tbody>
+                </table>
+            </div>
             {modalOpen && (
                 <RequestInfo
                     serviceId={infoRequest?.service!.id!}
