@@ -326,7 +326,7 @@ export default function Order() {
                     onChange={(value) => handleRequestChange('physician', value)}
                 />
             </div>
-            <ExtensionInputComponent serviceId={serviceId} onChange={handleExtensionChange} onValidationChange={setIsExtensionValid}/>
+            <ExtensionInputComponent serviceId={serviceId}/>
             <div className={style.memoSection}>
                 <TextBox
                     label={'Memo'}

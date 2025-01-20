@@ -331,7 +331,7 @@ export default function GroupOrder() {
                     />
                 </div>
                 <div className={style.extensionSection}>
-                    <ExtensionInputComponent serviceId={service.id!} onChange={(id, value) => handleExtensionChange(index, id, value)}/>
+                    <ExtensionInputComponent serviceId={service.id!}/>
                 </div>
                 <div className={style.memoSection}>
                     <TextBox
