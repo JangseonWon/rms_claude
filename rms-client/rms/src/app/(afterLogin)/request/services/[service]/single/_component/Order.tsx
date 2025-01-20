@@ -7,36 +7,28 @@ import React, {useCallback, useEffect, useState} from "react";
 import {Organization} from "@/model/Organization";
 import {getOrganization} from "@/app/(afterLogin)/request/services/[service]/single/_api/getOrganization";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
-import {Request} from "@/model/Request";
 import DatePickerBox from "@/app/_component/DatePickerBox";
 import {SampleType} from "@/model/SampleType";
 import {getSampleType} from "@/app/(afterLogin)/request/services/_api/getSampleType"
 import GreenButton from "@/app/_component/GreenButton";
 import BlueButton from "@/app/_component/BlueButton";
-import {putRequest} from "@/app/(afterLogin)/request/services/[service]/single/_api/putRequest";
 import {format} from "date-fns";
 import {usePathname} from "next/navigation";
-import ExtensionInputComponent
-    from "@/app/(afterLogin)/request/services/[service]/single/_component/extension/ExtensionInputComponent";
+import ExtensionInputComponent from "@/app/(afterLogin)/request/services/[service]/single/_component/extension/ExtensionInputComponent";
 import TextBox from "@/app/_component/TextBox";
 import genomeImg from "@/../public/GCgenome_white.png";
 import logo from "@/css/orderGenomeLogo.module.css";
 import Image from "next/image";
 import SearchProbandModal from "@/app/(afterLogin)/request/services/[service]/single/_component/extension/SearchProbandModal";
-import {
-    useProbandModalOpen,
-    useSetProbandModalOpen
-} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
+import {useProbandModalOpen, useSetProbandModalOpen} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
+import {useRequestStore} from "@/store/useRequestStore";
+import {putRequest} from "@/app/(afterLogin)/request/services/[service]/single/_api/putRequest";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 export default function Order() {
     const [organizationOptions, setOrganizationOptions] = useState<SelectBoxOption[]>([])
     const [sampleTypeOptions, setSampleTypeOptions] = useState<SelectBoxOption[]>([])
-    const [request, setRequest] = useState<Request>({})
-    const [selectedOrganization, setSelectedOrganization] = useState<SelectBoxOption | null>(null);
-    const [selectedSampleType, setSelectedSampleType] = useState<SelectBoxOption | null>(null);
-    const [selectedSex, setSelectedSex] = useState<SelectBoxOption | null>(null);
-    const [isExtensionValid, setIsExtensionValid] = useState(false);
+    const { request, setRequest } = useRequestStore();
     const pathname = usePathname();
     const pathSegments = pathname.split('/');
     const serviceId = decodeURIComponent(pathSegments[pathSegments.length - 2]);
@@ -44,8 +36,8 @@ export default function Order() {
     const setProbandModal = useSetProbandModalOpen();
     const showAlert = CallAlertDialog();
     const sexOption: SelectBoxOption[] = [
-        { value: "M", name: "Male" },
-        { value: "F", name: "Female" }
+        { value: "M", name: "M" },
+        { value: "F", name: "F" }
     ];
 
     const fetchOrganizations = useCallback(async () => {
@@ -73,7 +65,7 @@ export default function Order() {
         fetchOrganizations();
         fetchSampleType(serviceId);
         handleRequestChange('service.id', serviceId);
-    }, [fetchOrganizations]);
+    }, []);
 
     const publishRequest = (status:string) => {
         const updateRequest = [{
@@ -93,45 +85,8 @@ export default function Order() {
             ...prevState,
             ...setNestedValue({...prevState}, path, value)
         }));
-        console.log(JSON.stringify(request));
     };
 
-    const handleExtensionChange = (id: string, value: any): void => {
-        setRequest(prevState => {
-            const existingExtensions = prevState.sample?.extensions || [];
-
-            const existingExtensionIndex = existingExtensions.findIndex(ext => ext.id === id);
-
-            let updatedExtensions;
-
-            if (existingExtensionIndex > -1) {
-                updatedExtensions = [...existingExtensions];
-                updatedExtensions[existingExtensionIndex] = { id, value: formatExtensionValue(value) };
-            } else {
-                updatedExtensions = [...existingExtensions, { id, value: formatExtensionValue(value) }];
-            }
-
-            return {
-                ...prevState,
-                sample: {
-                    ...prevState.sample,
-                    extensions: updatedExtensions
-                }
-            };
-        });
-    };
-
-    const formatExtensionValue = (value: any) => {
-        if (typeof value === 'object' && value !== null && 'name' in value && 'value' in value) {
-            return value.value;
-        }
-
-        if (typeof value === 'boolean') {
-            return value;
-        }
-
-        return value;
-    };
 
     const setNestedValue = (object: any, nestedPath: string, newValue: any): any => {
         const [firstKey, ...remainingPathSegments] = nestedPath.split('.');
@@ -175,16 +130,24 @@ export default function Order() {
     };
 
     const isAllRequiredFilled = () => {
-        if (!request.sample?.patient?.name) return false;
-        if (!request.sample.patient?.serial) return false;
-        if (!request.sample.sample_type?.id) return false;
-        if (!request.sample.sampling_on) return false;
-        if (!request.sample.patient.sex) return false;
-        if (!isExtensionValid) return false;
-        return request?.sample?.quantity;
+        const sample = request?.sample;
+        if (!sample) return false;
+        const requiredFields = [
+            sample?.patient?.name,
+            sample?.patient?.serial,
+            sample?.patient?.sex,
+            sample?.sample_type?.id,
+            sample?.sampling_on,
+            sample?.quantity,
+        ];
+        if (requiredFields.some(field => typeof field !== 'string' || field.trim() === '')) return false;
+        return (sample.extensions || []).every(
+            extension =>
+                !extension.required || (extension.value != null && extension.value !== '')
+        );
     };
 
-    const Close = () => {
+    const probandModalClose = () => {
         setProbandModal(false);
     }
 
@@ -209,12 +172,11 @@ export default function Order() {
                     <SelectBox
                         label={""}
                         options={organizationOptions}
-                        value={selectedOrganization}
+                        value={request?.sample?.patient?.organization?.name}
                         required={true}
                         onChange={(value) => {
                             handleRequestChange('sample.patient.organization.id', value.value)
                             handleRequestChange('sample.patient.organization.name', value.name)
-                            setSelectedOrganization(value.name);
                         }}
                         width="200px"
                     />
@@ -235,7 +197,7 @@ export default function Order() {
                 <InputBox
                     label={"Age"}
                     disabled={true}
-                    value={request.sample?.age}
+                    value={request?.sample?.age}
                 />
                 <div className={style.dateBox}>
                     <DatePickerBox
@@ -245,7 +207,7 @@ export default function Order() {
                                 handleRequestChange('sample.patient.birth_year', date.getFullYear());
                                 handleRequestChange('sample.patient.birth_month', date.getMonth() + 1);
                                 handleRequestChange('sample.patient.birth_day', date.getDate());
-                                if (request.sample?.sampling_on) {
+                                if (request?.sample?.sampling_on) {
                                     handleRequestChange('sample.age', setAge(date, new Date(request.sample.sampling_on)));
                                 }
                             } else {
@@ -262,12 +224,11 @@ export default function Order() {
                 <div className={style.selectBox}>
                     <SelectBox
                         label={"Gender*"}
-                        value={selectedSex}
+                        value={request?.sample?.patient?.sex}
                         options={sexOption}
                         required={true}
                         onChange={(value) => {
                             handleRequestChange('sample.patient.sex', value.value)
-                            setSelectedSex(value.name);
                         }}
                         width="200px"
                     />
@@ -278,13 +239,12 @@ export default function Order() {
                 <div className={style.selectBox}>
                     <SelectBox
                         label={"Type*"}
-                        value={selectedSampleType}
+                        value={request?.sample?.sample_type?.name}
                         options={sampleTypeOptions}
                         required={true}
                         onChange={(value) => {
                             handleRequestChange('sample.sample_type.id', value.value)
                             handleRequestChange('sample.sample_type.name', value.name)
-                            setSelectedSampleType(value.name);
                         }}
                         width="200px"
                     />
@@ -296,10 +256,8 @@ export default function Order() {
                         onChange={(date) => {
                             if (date) {
                                 handleRequestChange('sample.sampling_on', format(date, "yyyy-MM-dd"))
-                                if (request.sample?.patient?.birth_year
-                                    && request.sample?.patient?.birth_month
-                                    && request.sample?.patient?.birth_day) {
-                                    handleRequestChange('sample.age', setAge(new Date(`${request.sample.patient.birth_year}-${request.sample.patient.birth_month}-${request.sample.patient.birth_day}`), date));
+                                if (request?.sample?.patient?.birth_year && request?.sample?.patient?.birth_month && request?.sample?.patient?.birth_day) {
+                                    handleRequestChange('sample.age', setAge(new Date(`${request?.sample.patient.birth_year}-${request?.sample.patient.birth_month}-${request?.sample.patient.birth_day}`), date));
                                 }
                             } else {
                                 handleRequestChange('sample.sampling_on', null)
@@ -330,12 +288,12 @@ export default function Order() {
             <div className={style.memoSection}>
                 <TextBox
                     label={'Memo'}
-                    value={request.memo}
+                    value={request?.memo}
                     onChange={(value) => handleRequestChange('memo', value)}
                 />
             </div>
             {probandModal && (
-                <SearchProbandModal closeModal={Close}/>
+                <SearchProbandModal closeModal={probandModalClose}/>
             ) }
         </div>
     )
