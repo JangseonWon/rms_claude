@@ -1,8 +1,12 @@
 package com.gcgenome.rms.catalog.request
 
 import com.gcgenome.rms.authentication.User
+import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.dao.*
+import com.gcgenome.rms.data.Page
+import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.RequestDTO
+import com.gcgenome.rms.data.Role
 import org.jooq.DSLContext
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
@@ -21,6 +25,7 @@ class RequestHandler(val dslContext: DSLContext):
                         .flatMap { sampleRecord ->
                             val extensions = request.sample!!.extensions ?: emptyList()
                             Flux.fromIterable(extensions)
+                                .filter { it.value != null }
                                 .flatMap { extension -> insertSampleExtension(extension, sampleRecord.id!!) }
                                 .then(
                                     if (request.requestGroup!!.id == null) { insertRequestGroup() }
@@ -39,4 +44,24 @@ class RequestHandler(val dslContext: DSLContext):
             }
         })
     }
+
+    fun searchRequests(authentication: UserAuthentication, query: Query):  Mono<Page<RequestDTO>> {
+        authentication.takeIf { it.user.role == Role.USER.toString() }?.let {
+            query.filterGroups = query.filterGroups ?: mutableListOf()
+            query.filterGroups?.add(
+                Query.FilterGroup(
+                    filters = listOf(
+                        Query.FilterGroup.Filter(
+                            table = "request",
+                            column = "user_id",
+                            operator = "=",
+                            value = authentication.user.id!!
+                        )
+                    )
+                )
+            )
+        }
+        return dslContext.selectRequestsWithPage(query)
+    }
+
 }

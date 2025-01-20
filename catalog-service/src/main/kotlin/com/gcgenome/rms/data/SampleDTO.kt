@@ -8,7 +8,6 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
-import com.gcgenome.rms.tables.pojos.SampleType
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -36,7 +35,7 @@ data class SampleDTO(
     @JsonProperty("create_at")
     val createAt: LocalDateTime?,
     @JsonProperty("sample_type")
-    val sampleType: SampleType?,
+    val sampleType: SampleTypeDTO?,
     @JsonProperty("patient")
     val patient: PatientDTO?,
     @JsonProperty("extensions")

@@ -1,6 +1,7 @@
 package com.gcgenome.rms.catalog.request
 
 import com.gcgenome.rms.auth.AuthenticationHandler
+import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.RequestDTO
 import com.gcgenome.rms.exceptions.AuthenticationNotFoundException
 import org.springframework.context.annotation.Bean
@@ -20,6 +21,7 @@ class RequestRouter (
     @Bean("RequestRouter")
     fun route() = router {
         PUT("/w-api/catalog-service/requests", :: saveRequests)
+        POST("/w-api/catalog-service/requests/search", ::searchRequests)
     }
     private fun saveRequests(request: ServerRequest): Mono<ServerResponse> {
         return authenticationHandler.principal(request)
@@ -30,6 +32,20 @@ class RequestRouter (
             .onErrorResume { e ->
                 ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: ${e.javaClass.name}\n메시지: ${e.message}\n스택 트레이스:\n${e.stackTraceToString()}")
             }.doOnError { e -> println("오류 발생: ${e.message}") }
+    }
+    private fun searchRequests(request: ServerRequest): Mono<ServerResponse> {
+        return Mono.zip(authenticationHandler.principal(request), request.bodyToMono(Query::class.java))
+            .flatMap { requestHandler.searchRequests(it.t1, it.t2) }
+            .flatMap { ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Total-Count", it.totalCount.toString())
+                .header("X-Total-Page", it.totalPage.toString())
+                .header("X-Page-Size", it.pageSize.toString())
+                .header("X-Current-Page", it.currentPage.toString())
+                .body(Mono.just(it.data), RequestDTO::class.java) }
+            .switchIfEmpty(ServerResponse.status(HttpStatus.NO_CONTENT).build())
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}") }
+            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Error: ${e.stackTraceToString()}") }
     }
 }
 

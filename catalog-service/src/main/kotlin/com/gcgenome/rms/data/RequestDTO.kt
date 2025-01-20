@@ -1,25 +1,17 @@
 package com.gcgenome.rms.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
-import com.gcgenome.rms.tables.pojos.Service
 import java.time.LocalDateTime
-import java.util.*
 
-@JsonSubTypes(JsonSubTypes.Type(PatientDTO::class, name = "patient"))
 data class RequestDTO(
-    @JsonProperty("service_id")
-    var serviceId: String?,
     @JsonProperty("service")
-    var service: Service?,
-    @JsonProperty("sample_id")
-    var sampleId: UUID?,
-    @JsonProperty("serial")
-    var serial: String?,
+    var service: ServiceDTO?,
+    @JsonProperty("sample")
+    var sample: SampleDTO?,
     @JsonProperty("user_service_id")
     var userServiceId: String?,
     @JsonProperty("status")
@@ -32,6 +24,10 @@ data class RequestDTO(
     var ward: String?,
     @JsonProperty("physician")
     var physician: String?,
+    @JsonProperty("courier_company")
+    var courierCompany: String?,
+    @JsonProperty("awb_number")
+    var awbNumber: String?,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("create_at")
@@ -54,10 +50,12 @@ data class RequestDTO(
     var resampleAt: LocalDateTime?,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonProperty("reported_at")
+    var reportedAt: LocalDateTime?,
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("last_modify_at")
     var lastModifyAt: LocalDateTime?,
-    @JsonProperty("sample")
-    var sample: SampleDTO?,
     @JsonProperty("user")
     var user: UserDTO? = UserDTO(),
     @JsonProperty("request_group")
