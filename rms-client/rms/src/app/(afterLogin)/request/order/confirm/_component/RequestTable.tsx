@@ -209,8 +209,8 @@ export default function RequestTable() {
                                 <span className={globalTableStyle.checkmark}></span>
                             </label>
                         </th>
-                        <th className={globalTableStyle.longColumn}>Global courier</th>
-                        <th className={globalTableStyle.longColumn}>AirWaybill no.</th>
+                        <th className={`${globalTableStyle.longColumn} ${globalTableStyle.stickyColumnHeader}`}>Global courier</th>
+                        <th className={`${globalTableStyle.longColumn} ${globalTableStyle.stickyColumnHeaderSecond}`}>AirWaybill no.</th>
                         <th className={globalTableStyle.middleColumn}>Order Date<br/>(DD-MM-YYYY)</th>
                         <th className={globalTableStyle.longColumn}>User Name</th>
                         <th className={globalTableStyle.middleColumn}>Institution</th>
@@ -236,8 +236,8 @@ export default function RequestTable() {
                                         <span className={globalTableStyle.checkmark}></span>
                                     </label>
                                 </td>
-                                <td className={globalTableStyle.longColumn}>{request.courier_company}</td>
-                                <td className={globalTableStyle.longColumn}>{request.awb_number}</td>
+                                <td className={`${globalTableStyle.longColumn} ${globalTableStyle.stickyColumn}`}>{request.courier_company}</td>
+                                <td className={`${globalTableStyle.longColumn} ${globalTableStyle.stickyColumnSecond}`}>{request.awb_number}</td>
                                 <td className={globalTableStyle.middleColumn}>{request.create_at ? new Date(request.create_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
                                 <td className={globalTableStyle.longColumn}><CellTooltip text={request.order?.user?.name}/></td>
                                 <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample?.patient?.organization?.name}/></td>

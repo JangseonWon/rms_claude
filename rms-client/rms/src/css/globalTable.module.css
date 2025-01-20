@@ -203,6 +203,30 @@
     color: gray;
     font-weight: 700;
 }
+.stickyColumnHeader {
+    position: sticky;
+    left: 0;
+    background: #023a60;
+    z-index: 1;
+}
+.stickyColumnHeaderSecond {
+    position: sticky;
+    left: 150px;
+    background: linear-gradient(to right, #023a60, #31446D);
+    z-index: 1;
+}
+.stickyColumn {
+    position: sticky;
+    left: 0;
+    background-color: white;
+    z-index: 1;
+}
+.stickyColumnSecond {
+    position: sticky;
+    left: 150px;
+    background-color: white;
+    z-index: 1;
+}
 .longColumn {
     min-width: 150px;
     max-width: 150px;
