@@ -29,6 +29,7 @@ const extensionOptions: SelectBoxOption[] = [
     {value: '.*', name: ExtensionType.TEXT},
     {value: '-?\\d+', name: ExtensionType.INTEGER},
     {value: '-?\\d+(\\.\\d+)?', name: ExtensionType.FLOAT},
+    {name: ExtensionType.RELATION},
     {name: ExtensionType.LIST}
 ];
 export default function ExtensionModal({extensionId, closeModal, refreshTable}: Props) {

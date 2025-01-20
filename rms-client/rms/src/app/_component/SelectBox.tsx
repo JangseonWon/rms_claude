@@ -5,7 +5,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 
 type Props = {
-    options?: SelectBoxOption[]
+    options: SelectBoxOption[]
     label: string
     value?: any
     onChange?: (selectedValue: SelectBoxOption) => void;
@@ -45,7 +45,7 @@ export default function SelectBox({ label, value, options = [], onChange, requir
             <section className={`${style.selectSection} ${hasError ? style.error : null}`}>
                 <p className={style.label}>{label}</p>
                 <button className={`${style.btnSelect} ${isOpen ? style.open : ''}`} onClick={toggleList}>
-                    <div>{value || '-'}</div>
+                    <div>{value || selectedValue || '-'}</div>
                     <FontAwesomeIcon style={{paddingLeft: '20px'}} icon={faChevronDown} />
                 </button>
                 <ul className={`${style.listMember} ${isOpen ? style.open : ''}`} style={{ width }}>

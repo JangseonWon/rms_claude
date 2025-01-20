@@ -7,26 +7,50 @@ import {Extension, ExtensionType} from "@/model/Extension";
 import InputBox from "@/app/_component/InputBox";
 import SelectBox from "@/app/_component/SelectBox";
 import TextBox from "@/app/_component/TextBox";
-import {SelectBoxOption} from "@/model/SelectBoxOption";
-import {useProband, useRelationship} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
-import {ProbandInputComponent} from './ProbandInputComponenet';
+import {useProbandRequest, useSetProbandModalOpen} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
+import {useRequestStore} from "@/store/useRequestStore";
+import {getRequestRelations} from "@/app/(afterLogin)/request/services/[service]/single/_api/getRequestRelations";
+import {RequestRelation} from "@/model/RequestRelation";
+import {SelectBoxOption} from "@/model/SelectBoxOption";
 
 interface ExtensionInputComponentProps {
-    onChange: (path: string, value: any) => void;
     serviceId: string;
-    onValidationChange?: (isValid: boolean) => void;
 }
 
-export default function ExtensionInputComponent({ serviceId, onChange, onValidationChange = () => {} }: ExtensionInputComponentProps) {
-    const probandValue = useProband();
-    const relationship = useRelationship();
+export default function ExtensionInputComponent({serviceId}: ExtensionInputComponentProps) {
+    const { request, setRequest } = useRequestStore();
+    const setProbandModal = useSetProbandModalOpen();
     const [extensions, setExtensions] = useState<Extension[]>([]);
-    const [values, setValues] = useState<{ [key: string]: any }>({});
-    const [prevProbandValue, setPrevProbandValue] = useState(probandValue);
-    const [prevRelationship, setPrevRelationship] = useState(relationship);
-    const [validationState, setValidationState] = useState<{ [key: string]: boolean }>({});
+    const probandRequest = useProbandRequest()
+    const [relationOptions, setRelationOptions] = useState<SelectBoxOption[]>([])
     const showAlert = CallAlertDialog();
+
+    const handleRequestChange = (path: string, value: any) => {
+        setRequest((prevState) => ({
+            ...prevState,
+            ...setNestedValue({...prevState}, path, value)
+        }));
+    };
+
+    const setNestedValue = (object: any, nestedPath: string, newValue: any): any => {
+        const [firstKey, ...remainingPathSegments] = nestedPath.split('.');
+        if (remainingPathSegments.length === 0) {
+            if (Array.isArray(object[firstKey])) {
+                const updatedArray = object[firstKey].some((item: any) => item.id === newValue.id)
+                    ? object[firstKey].map((item: any) =>
+                        item.id === newValue.id ? { ...item, ...newValue } : item
+                    )
+                    : [...object[firstKey], newValue];
+                return { ...object, [firstKey]: updatedArray };
+            }
+            return { ...object, [firstKey]: newValue };
+        }
+        return {
+            ...object,
+            [firstKey]: setNestedValue(object[firstKey] || {}, remainingPathSegments.join('.'), newValue),
+        };
+    };
 
     const generateSelectList = (regex: string): { name: string, value: string }[] => {
         if (regex.includes("|")) {
@@ -48,56 +72,48 @@ export default function ExtensionInputComponent({ serviceId, onChange, onValidat
         if(response.ok){
             const data: Extension[] = await response.json()
             setExtensions(data);
-            const initialValidationState: { [key: string]: boolean } = {};
-            data.forEach((extension: Extension) => {
-                if (extension.required) {
-                    initialValidationState[extension.id!] = false;
+            setRequest((prevState) => ({
+                ...prevState,
+                sample: {
+                    ...prevState?.sample,
+                    extensions: data
                 }
-            });
-            setValidationState(initialValidationState);
+            }));
         }else{
             showAlert("Error!")
         }
-
     };
-
-    const handleInputChange = (id: string, value: any, required: boolean) => {
-        setValues(prevValues => ({ ...prevValues, [id]: value }));
-        onChange(id, value);
-
-        if (required) {
-            setValidationState((prevState) => ({
-                ...prevState,
-                [id]: value !== undefined && value !== null && value !== ""
-            }));
+    const fetchRequestGroup = async () => {
+        const response = await getRequestRelations()
+        if (response.ok) {
+            const data = await response.json();
+            setRelationOptions(transformRequestRelationToOptions(data as RequestRelation[]));
         }
-    };
-
-    const handleSelectChange = (id: string, option: SelectBoxOption, required: boolean) => {
-        setValues(prevValues => ({ ...prevValues, [id]: option.name }));
-        onChange(id, option.value);
-
-        if (required) {
-            setValidationState((prevState) => ({
-                ...prevState,
-                [id]: option.value !== undefined && option.value !== null && option.value !== ""
+    }
+    const transformRequestRelationToOptions = (data: RequestRelation[]): SelectBoxOption[] => {
+        return data
+            .filter(value => value.id !==1)
+            .map(value => ({
+                value: value.id,
+                name: value.name
             }));
-        }
     };
+
+    const probandModalOpen = () => {
+        if(request?.sample?.patient?.organization) setProbandModal(true);
+        else showAlert("Please choose the institution")
+    }
 
     const renderExtensionComponent = (extension: Extension) => {
-        let value = values[extension.id!] || '';
-
         switch (extension.type) {
             case ExtensionType.LIST:
                 const selectList = generateSelectList(extension.regex || '');
                 return <SelectBox
                     key={extension.id}
                     label={extension.name!}
-                    value={value}
                     options={selectList}
                     required={extension.required}
-                    onChange={(selectedOption) => handleSelectChange(extension.id!, selectedOption, extension.required!)}
+                    onChange={(selectedOption) => handleRequestChange("sample.extensions", { id: extension.id, value: selectedOption.value })}
                     width="200px"
                 />;
             case ExtensionType.BOOLEAN:
@@ -108,10 +124,9 @@ export default function ExtensionInputComponent({ serviceId, onChange, onValidat
                 return <SelectBox
                     key={extension.id}
                     label={extension.name!}
-                    value={value}
                     options={booleanList}
                     required={extension.required}
-                    onChange={(selectedOption) => handleSelectChange(extension.id!, selectedOption, extension.required!)}
+                    onChange={(selectedOption) => handleRequestChange("sample.extensions", { id: extension.id, value: selectedOption.value })}
                     width="200px"
                 />;
             case ExtensionType.INTEGER:
@@ -121,73 +136,101 @@ export default function ExtensionInputComponent({ serviceId, onChange, onValidat
                     key={extension.id}
                     label={extension.name}
                     required={extension.required}
-                    onChange={(inputValue) => handleInputChange(extension.id!, inputValue, extension.required!)}
+                    onChange={(value) => handleRequestChange("sample.extensions", { id: extension.id, value: value })}
                 />;
             case ExtensionType.TEXT:
                 return <TextBox
                     key={extension.id}
                     label={extension.name!}
                     required={extension.required}
-                    onChange={(inputValue) => handleInputChange(extension.id!, inputValue, extension.required!)}
+                    onChange={(value) => handleRequestChange("sample.extensions", { id: extension.id, value: value })}
                 />;
             default:
                 return null;
         }
     };
 
-    useEffect(() => {
-        if (probandValue !== prevProbandValue) {
-            handleInputChange('TEST01', probandValue, true);
-            setPrevProbandValue(probandValue);
-        }
-    }, [probandValue, prevProbandValue]);
 
     useEffect(() => {
-        if (relationship !== prevRelationship) {
-            handleInputChange('TEST02', relationship, true);
-            setPrevRelationship(relationship);
-        }
-    }, [relationship, prevRelationship]);
-
-    useEffect(()=> {
         fetchExtensions();
+        fetchRequestGroup()
     }, []);
-
     useEffect(() => {
-        const allValid = Object.values(validationState).every((isValid) => isValid);
-        onValidationChange(allValid);
-    }, [validationState, onValidationChange]);
+        handleRequestChange("sample.extensions", {
+            id: "TEST01",
+            value: probandRequest?.sample?.barcode
+        })
+        setRequest((prevState) => ({
+            ...prevState,
+            request_group: {
+                id: probandRequest?.request_group?.id
+            }
+        }));
+    }, [probandRequest]);
 
     const textComponents = extensions.filter(extension => extension.type === ExtensionType.TEXT);
-    const otherComponents = extensions.filter(extension => extension.type !== ExtensionType.TEXT);
-    const probandComponent = extensions.filter(extension => extension.type === ExtensionType.PROBAND);
+    const excludedTypes = [ExtensionType.TEXT, ExtensionType.RELATION];
+    const otherComponents = extensions.filter(extension => !excludedTypes.includes(extension.type!));
+    const probandComponent = extensions.filter(extension => extension.type === ExtensionType.RELATION);
 
     return (
-        <div className={style.section}>
-            {otherComponents.length > 0 && (
-                <div className={style.gridContainer}>
-                    {otherComponents.map((extension) => (
-                        <div
-                            key={extension.id}
-                            className={style.gridItem}
-                        >
-                            {renderExtensionComponent(extension)}
-                        </div>
-                    ))}
-                </div>
-            )}
-            {textComponents.length > 0 && (
-                <div>
-                    {textComponents.map(extension => (
-                        <div key={extension.id}>
-                            {renderExtensionComponent(extension)}
-                        </div>
-                    ))}
-                </div>
-            )}
+        <>
+            <div className={style.section}>
+                {otherComponents.length > 0 && (
+                    <div className={style.gridContainer}>
+                        {otherComponents.map((extension) => (
+                            <div key={extension.id} className={style.gridItem}>
+                                {renderExtensionComponent(extension)}
+                            </div>
+                        ))}
+                    </div>
+                )}
+                {textComponents.length > 0 && (
+                    <div>
+                        {textComponents.map(extension => (
+                            <div key={extension.id}>
+                                {renderExtensionComponent(extension)}
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
             {probandComponent.length > 0 && (
-                <ProbandInputComponent/>
+                <div>
+                    <p className={style.title}>Proband Info.</p>
+                    <div className={style.proband}>
+                        <SelectBox
+                            key={'relationship'}
+                            label={'RelationShip*'}
+                            options={relationOptions}
+                            required={true}
+                            onChange={(selectedOption) => {
+                                setRequest((prevState) => ({
+                                    ...prevState,
+                                    request_relation: {
+                                        id: selectedOption.value
+                                    }
+                                }));
+                                handleRequestChange("sample.extensions", {
+                                    id: "TEST02",
+                                    value: selectedOption.name
+                                })
+                            }}
+                            width="200px"
+                        />
+                        <div className={style.probandInput}>
+                            <InputBox
+                                key={'probandInput'}
+                                label={'Proband Number*'}
+                                required={true}
+                                disabled={true}
+                                value={probandRequest?.sample?.barcode}
+                            />
+                        </div>
+                        <button className={style.button} onClick={probandModalOpen}>Click here to find proband</button>
+                    </div>
+                </div>
             )}
-        </div>
+        </>
     );
 }

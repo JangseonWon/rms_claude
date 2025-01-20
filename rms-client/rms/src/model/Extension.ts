@@ -15,6 +15,6 @@ export enum ExtensionType {
     NUMBER = "NUMBER",
     FLOAT = "FLOAT",
     TEXT = "TEXT",
+    RELATION = "RELATION",
     LIST = "LIST",
-    PROBAND = "PROBAND"
 }

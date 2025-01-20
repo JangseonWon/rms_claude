@@ -8,64 +8,62 @@ import {faAngleLeft, faAngleRight, faXmark} from "@fortawesome/free-solid-svg-ic
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
 import BlueButton from "@/app/_component/BlueButton";
-import {Patient} from "@/model/Patient";
+import {Request} from "@/model/Request";
 import managementStyle from "@/css/managementTable.module.css";
 import SelectBox from "@/app/_component/SelectBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import {Query} from "@/model/Query";
-import {postPatients} from "@/app/(afterLogin)/request/services/[service]/single/_api/postPatients";
-import {useSetProband} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
+import {useSetProbandReqeust} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
+import {postRequests} from "@/app/(afterLogin)/request/services/[service]/single/_api/postRequests";
+import {format} from "date-fns";
+import {useRequestStore} from "@/store/useRequestStore";
+import {Filter} from "@/model/Filter";
 
 type Props = {
     closeModal: () => void;
 }
 
 const selectBoxOptions: SelectBoxOption[] = [
-    { table: "patient", column: "name", name: "Name" },
-    { table: "patient", column: "user_id", name: "User Id" },
-    { table: "patient", column: "serial", name: "Serial" },
-    { table: "organization", column: "name", name: "Organization Name" }
+    { table: "service", column: "name", name: "Service" },
+    { table: "sample", column: "barcode", name: "Registration ID" },
+    { table: "patient", column: "name", name: "Patient(s) Name" },
+    { table: "patient", column: "serial", name: "MRN" }
 ];
+const relationFilter: Filter = {
+    table: "request_relation",
+    column: "name",
+    value: "ROOT",
+    operator: "="
+}
+
 
 export default function SearchProbandModal({ closeModal }: Props) {
-    const [patients, setPatients] = useState<Patient[]>([]);
-    const [selectOption, setSelectOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
-    const [search, setSearch] = useState<Query>({sort_by:"serial", asc: false, size:5, page:1});
+    const {request} = useRequestStore()
+    const organizationFilter: Filter = {
+        table: "organization",
+        column: "id",
+        value: request?.sample?.patient?.organization?.id!!,
+        operator: "="
+    }
+    const [requests, setRequests] = useState<Request[]>([]);
+    const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
+    const [search, setSearch] = useState<Query>({});
+    const [searchFilter, setSearchFilter] = useState<Filter | undefined>(undefined);
     const [totalPage, setTotalPage] = useState<number>(0);
-    const [selectedSerial, setSelectedSerial] = useState<string | null>(null);
-    const setProband = useSetProband();
+    const [selectedRequest, setSelectedRequest] = useState<Request>({});
+    const setProbandRequest = useSetProbandReqeust();
     const showAlert = CallAlertDialog();
 
-    const fetchPatient = async () => {
-        const response = await postPatients(search);
+    const fetchRequests = async (search: Query) => {
+        const response = await postRequests(search);
         if (response.ok) {
             const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
-            const data = await response.json();
-            const patient = data as Patient[];
-            setPatients(patient);
+            const data: Request[] = await response.json();
+            setRequests(data);
             setTotalPage(totalPage);
         }
     }
-
-    const handleSearchChange = (option: SelectBoxOption, value: string) => {
-        setSearch((prevSearch) => ({
-            ...prevSearch,
-            filter_groups:[
-                {
-                    filters: [
-                        {
-                            table: option.table!,
-                            column: option.column!,
-                            value: value,
-                            operator: "LIKE"
-                        }
-                    ]
-                }
-            ],
-            page:1
-        }));
-    };
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage =>({
@@ -74,13 +72,13 @@ export default function SearchProbandModal({ closeModal }: Props) {
         }));
     };
 
-    const handleRowClick = (serial: string) => {
-        setSelectedSerial(serial);
+    const handleRowClick = (request: Request) => {
+        setSelectedRequest(request);
     };
 
     const handleConfirmClick = () => {
-        if (selectedSerial) {
-            setProband(selectedSerial);
+        if (selectedRequest) {
+            setProbandRequest(selectedRequest);
             closeModal();
         } else {
             showAlert("Please select a row before confirming.");
@@ -88,8 +86,32 @@ export default function SearchProbandModal({ closeModal }: Props) {
     };
 
     useEffect(() => {
-        fetchPatient();
-    }, [search]);
+        const updateSearch: Query = {
+            ...search,
+            filter_groups:[
+                {
+                    filters: [
+                        organizationFilter,
+                        relationFilter
+                    ]
+                },
+                {
+                    filters: [
+                        ...(searchFilter ? [searchFilter] : [])
+                    ]
+                }
+            ]
+        }
+        fetchRequests(updateSearch);
+    }, [search, searchFilter]);
+
+    const formatDate = (year: number | undefined, month: number | undefined, day: number | undefined) => {
+        if (year !== undefined && month !== undefined && day !== undefined) {
+            const date = new Date(year, month - 1, day);
+            return format(date, "dd-MMM-yyyy");
+        }
+        return "-";
+    };
 
     return (
         <div className={style.modalBackground}>
@@ -101,16 +123,25 @@ export default function SearchProbandModal({ closeModal }: Props) {
                         <div className={managementStyle.filterContainerSearch}>
                             <SelectBox
                                 width={"200px"}
-                                value={selectOption.name}
+                                value={selectedOption.name}
                                 options={selectBoxOptions}
                                 label={"status"}
-                                onChange={(selectedOption) => {
-                                    setSelectOption(selectedOption);
+                                onChange={(option) => {
+                                    setSelectedOption(option);
                                 }}
                             />
                             <div className={managementStyle.search}>
                                 <InputBox label={"search"} onChange={(value) => {
-                                    handleSearchChange(selectOption, value)
+                                    setSearchFilter(
+                                        value && value.trim() !== ""
+                                            ? {
+                                                table: selectedOption.table,
+                                                column: selectedOption.column,
+                                                operator: "LIKE",
+                                                value: value
+                                            } as Filter
+                                            : undefined
+                                    );
                                 }}>
                                 </InputBox>
                             </div>
@@ -133,24 +164,26 @@ export default function SearchProbandModal({ closeModal }: Props) {
                         <table className={tableStyle.table}>
                             <thead>
                             <tr>
-                                <th style={{width:'150px'}}>Name</th>
-                                <th style={{width:'150px'}}>Serial</th>
-                                <th style={{width:'20px'}}>Sex</th>
-                                <th style={{width:'150px'}}>Organization Name</th>
-                                <th style={{width:'100px'}}>Birth</th>
+                                <th style={{width: '150px'}}>Institution</th>
+                                <th style={{width: '150px'}}>Service</th>
+                                <th style={{width: '20px'}}>Registration ID</th>
+                                <th style={{width: '150px'}}>Patient(s) Name</th>
+                                <th style={{width: '100px'}}>MRN</th>
+                                <th style={{width: '100px'}}>Patient(s) DOB</th>
                             </tr>
                             </thead>
                             <tbody>
-                            {patients?.map((patient, index) => (
+                            {requests?.map((request, index) => (
                                 <tr key={index}
-                                    onClick={() => handleRowClick(patient.serial!)}
-                                    className={`${tableStyle.selectRow} ${selectedSerial === patient.serial ? tableStyle.selected : ''}`}
+                                    onClick={() => handleRowClick(request)}
+                                    className={`${tableStyle.selectRow} ${selectedRequest.sample?.barcode === request.sample?.barcode ? tableStyle.selected : ''}`}
                                 >
-                                    <td>{patient.name}</td>
-                                    <td>{patient.serial}</td>
-                                    <td>{patient.sex}</td>
-                                    <td>{patient.organization?.name}</td>
-                                    <td>{`${patient.birth_year}-${patient.birth_month}-${patient.birth_day}`}</td>
+                                    <td>{request.sample?.patient?.organization?.name}</td>
+                                    <td>{request.service?.name}</td>
+                                    <td>{request.sample?.barcode}</td>
+                                    <td>{request.sample?.patient?.name}</td>
+                                    <td>{request.sample?.patient?.serial}</td>
+                                    <td>{formatDate(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}</td>
                                 </tr>
                             ))}
                             </tbody>
