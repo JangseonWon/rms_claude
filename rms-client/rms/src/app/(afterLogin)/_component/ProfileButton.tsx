@@ -10,12 +10,13 @@ import {signOut, useSession} from "next-auth/react";
 import ProfileAlarm from "@/app/(afterLogin)/_component/alarm/ProfileAlarm";
 import {getAlarmCountByUser} from "@/app/(afterLogin)/_api/getAlarmCountByUser";
 import {useAlarmCount, useSetAlarmCount} from "@/app/(afterLogin)/_component/alarm/store/useAlarmCountStore";
-import {Categories} from "@/model/Categories";
+// import {Client} from "@stomp/stompjs";
 
 export default function ProfileButton() {
     const { data: session } = useSession();
     const [profileOpen, setProfileOpen] = useState(false);
     const [alarmOpen, setAlarmOpen] = useState(false);
+    // const ws = useRef<WebSocket | null>(null);
     const alarmCount = useAlarmCount();
     const setAlarmCount = useSetAlarmCount();
     const router = useRouter()
@@ -54,11 +55,13 @@ export default function ProfileButton() {
     };
 
     useEffect(() => {
-        document.addEventListener("mousedown", handleClickOutside);
+        if (alarmOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
-    }, []);
+    }, [alarmOpen]);
 
     const fetchAlarmCount = async () => {
         const response = await getAlarmCountByUser();
@@ -70,6 +73,30 @@ export default function ProfileButton() {
         }
     };
 
+    /*useEffect(() => {
+        fetchAlarmCount();
+        console.log("start 함");
+        ws.current = new WebSocket("/api/ws");
+        ws.current.onopen = () => {
+            console.log('WebSocket connection opened.')
+        }
+        ws.current.onmessage = (event) => {
+            if (event.data) {
+                setAlarmCount(event.data);
+            }
+        };
+        ws.current.onerror = () => console.log('WebSocket Error');
+        ws.current.onclose = () => {
+            console.log('Websocket connection is closed');
+        };
+
+        return () => {
+            if (ws.current && ws.current.readyState === 1) {
+                ws.current.close();
+            }
+        };
+    }, []);*/
+
     useEffect(() => {
         fetchAlarmCount();
 
@@ -78,7 +105,7 @@ export default function ProfileButton() {
         }, 60000);
 
         return () => clearInterval(interval);
-    }, [alarmOpen]);
+    }, []);
 
     return(
         <div className={style.container}>
@@ -89,7 +116,7 @@ export default function ProfileButton() {
                 )}
             </div>
             {alarmOpen && (
-                <div className={`${style.profileAlarm} active`}>
+                <div className={`${style.profileAlarm} active`} ref={alarmRef}>
                     <ProfileAlarm/>
                 </div>
             )}
