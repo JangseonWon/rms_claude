@@ -43,8 +43,8 @@ export default function GroupOrder() {
     const [birthDates, setBirthDates] = useState<Date[]>([]);
     const showAlert = CallAlertDialog();
     const sexOption: SelectBoxOption[] = [
-        { value: "M", name: "Male" },
-        { value: "F", name: "Female" }
+        { value: "M", name: "M" },
+        { value: "F", name: "F" }
     ];
 
     const fetchOrganizations = useCallback(async () => {
@@ -108,7 +108,7 @@ export default function GroupOrder() {
             showAlert("Error: No data available");
             return;
         }
-        putRequest(allRequests)
+        putRequest(allRequests, true)
             .then((res) => {
                 if (res.ok) {
                     showAlert("All requests submitted successfully!");
@@ -178,7 +178,6 @@ export default function GroupOrder() {
             if (!req.sample.sample_type?.id) return false;
             if (!req.sample.sampling_on) return false;
             if (!req.sample.patient.sex) return false;
-            if (!req.sample.patient.birth_year) return false;
             return req.sample.quantity;
         });
     };
@@ -311,7 +310,6 @@ export default function GroupOrder() {
                     <TextBox
                         label={"Memo"}
                         value={requests[index]?.memo}
-                        required={true}
                         onChange={(value) => handleRequestChange(index,`memo`, value)}
                     />
                 </div>
