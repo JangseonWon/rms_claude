@@ -48,7 +48,7 @@ export default function TestOption() {
                 {categoryData && categoryData.length > 0 && categoryData.map(category => (
                     <Link
                         key={category.id}
-                        href={`/request/service-catalog`}>
+                        href={`/request/service-catalog/#${category.id}`}>
                         <div className={style.card}>
                             <Image src={'/category/' + category.name + '.jpg'}
                                    alt={`${category.name}`}

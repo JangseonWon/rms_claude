@@ -137,6 +137,25 @@ export default function ListServicePage() {
             setSelectCategory(firstCategory);
             setSelectedCard(firstCategory.id!);
             fetchServiceData(firstCategory.id!);
+
+            const { hash } = window.location;
+            if (hash) {
+                const hashId = hash.replace("#", "");
+                const matchedCategory = categoryArray.find(category => category.id === hashId);
+
+                if (matchedCategory) {
+                    cardOnClick(matchedCategory);
+                    const target = document.getElementById(hashId);
+                    if (target) {
+                        target.scrollIntoView({ behavior: "smooth" });
+                    }
+                }
+            } else {
+                const firstCategory = categoryArray[0];
+                setSelectCategory(firstCategory);
+                setSelectedCard(firstCategory.id!);
+                fetchServiceData(firstCategory.id!);
+            }
         }
     }, [categoryArray]);
 
@@ -163,6 +182,7 @@ export default function ListServicePage() {
                 <section className={style.categorySection}>
                     {categoryArray && categoryArray.length > 0 && categoryArray.map((category) => (
                         <div key={category.id}
+                             id={category.id}
                              className={`${style.categoryItem} ${selectedCard === category.id ? style.selectedCard : ''}`}
                              onClick={() => cardOnClick(category)}
                         >
