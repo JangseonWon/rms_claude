@@ -15,6 +15,7 @@ import {SelectBoxOption} from "@/model/SelectBoxOption";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import {format} from "date-fns";
 import {useSession} from "next-auth/react";
+import globalTableStyle from "@/css/globalTable.module.css";
 
 export default function FaqTable() {
     const router = useRouter();
@@ -174,7 +175,7 @@ export default function FaqTable() {
                     </tr>
                     </thead>
                     <tbody>
-                    {postData && postData.length > 0 && postData.map((row, rowIndex) => {
+                    {postData && postData.length > 0 ? ( postData.map((row, rowIndex) => {
                         const isNew = row.last_modify_at && (new Date().getTime() - new Date(row.last_modify_at).getTime()) <= 7 * 24 * 60 * 60 * 1000;
 
                         return (
@@ -196,7 +197,13 @@ export default function FaqTable() {
                                 <td>{row.create_at ? format(new Date(row.create_at), "dd-MM-yyyy") : '-'}</td>
                             </tr>
                         );
-                    })}
+                    }) ) : (
+                        <tr>
+                            <td colSpan={5} className={globalTableStyle.noData}>
+                                The searched data does not exist
+                            </td>
+                        </tr>
+                    )}
                     </tbody>
                 </table>
                 {session?.user.role !== 'USER' && (

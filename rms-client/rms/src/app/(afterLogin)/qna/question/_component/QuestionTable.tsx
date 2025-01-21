@@ -14,6 +14,7 @@ import SelectBox from "@/app/_component/SelectBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import {format} from "date-fns";
+import globalTableStyle from "@/css/globalTable.module.css";
 
 export default function QuestionTable() {
     const router = useRouter();
@@ -172,7 +173,7 @@ export default function QuestionTable() {
                     </tr>
                     </thead>
                     <tbody>
-                    {postData && postData.length > 0 && postData.map((row, rowIndex) => {
+                    {postData && postData.length > 0 ? ( postData.map((row, rowIndex) => {
                         const isNew = !row.read_at;
                         return (
                             <tr key={rowIndex} onClick={() => handleRowClick(row)}>
@@ -193,7 +194,13 @@ export default function QuestionTable() {
                                 <td>{row.create_at ? format(new Date(row.create_at), "dd-MM-yyyy") : '-'}</td>
                             </tr>
                         );
-                    })}
+                    })) : (
+                        <tr>
+                            <td colSpan={5} className={globalTableStyle.noData}>
+                                The searched data does not exist
+                            </td>
+                        </tr>
+                    )}
                     </tbody>
                 </table>
                 <button className={style.addButton} onClick={qnaButtonClick}>
