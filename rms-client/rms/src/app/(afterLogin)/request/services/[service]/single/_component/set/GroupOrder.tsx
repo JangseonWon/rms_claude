@@ -19,12 +19,12 @@ import {usePathname} from "next/navigation";
 import ExtensionInputComponent
     from "@/app/(afterLogin)/request/services/[service]/single/_component/extension/ExtensionInputComponent";
 import TextBox from "@/app/_component/TextBox";
-import genomeImg from "../../../../../../../../../public/GCgenome_white.png";
+import genomeImg from "@/../public/GCgenome_white.png";
 import logo from "@/css/orderGenomeLogo.module.css";
 import Image from "next/image";
 import {Service} from "@/model/Service";
 import {getServiceGroup} from "@/app/(afterLogin)/request/services/[service]/single/_api/getServiceGroup";
-import {formatExtensionValue, setAge, setNestedValue} from './GroupOrderUtils';
+import {setAge, setNestedValue} from './GroupOrderUtils';
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 export default function GroupOrder() {
@@ -155,32 +155,6 @@ export default function GroupOrder() {
                 };
             });
 
-            return updatedRequests;
-        });
-    };
-
-    const handleExtensionChange = (index: number, id: string, value: any): void => {
-        setRequests((prevRequests) => {
-            const updatedRequests = { ...prevRequests };
-            const currentRequest = { ...updatedRequests[index] };
-            const existingExtensions = currentRequest.sample?.extensions || [];
-
-            const existingExtensionIndex = existingExtensions.findIndex((ext) => ext.id === id);
-            let updatedExtensions;
-
-            if (existingExtensionIndex > -1) {
-                updatedExtensions = [...existingExtensions];
-                updatedExtensions[existingExtensionIndex] = { id, value: formatExtensionValue(value) };
-            } else {
-                updatedExtensions = [...existingExtensions, { id, value: formatExtensionValue(value) }];
-            }
-
-            currentRequest.sample = {
-                ...currentRequest.sample,
-                extensions: updatedExtensions,
-            };
-
-            updatedRequests[index] = currentRequest;
             return updatedRequests;
         });
     };
