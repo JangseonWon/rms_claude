@@ -1,5 +1,8 @@
 package com.gcgenome.rms.catalog.request
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.node.ArrayNode
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.gcgenome.rms.auth.AuthenticationHandler
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.RequestDTO
@@ -24,9 +27,10 @@ class RequestRouter (
         POST("/w-api/catalog-service/requests/search", ::searchRequests)
     }
     private fun saveRequests(request: ServerRequest): Mono<ServerResponse> {
+        val isGroup: Boolean? = request.queryParam("is_group").orElse(null)?.toBoolean()
         return authenticationHandler.principal(request)
             .zipWith(request.bodyToMono(Array<RequestDTO>::class.java))
-            .flatMap { requestHandler.saveRequest(it.t1.user, it.t2).collectList() }
+            .flatMap { requestHandler.saveRequest(it.t1.user, it.t2, isGroup).collectList() }
             .flatMap { ServerResponse.ok().build() }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume { e ->

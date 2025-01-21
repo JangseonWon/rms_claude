@@ -11,12 +11,14 @@ import org.jooq.DSLContext
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import java.util.UUID
 
 @Component
 class RequestHandler(val dslContext: DSLContext):
     RequestDao, RequestGroupDao, PatientDao, SampleDao, SampleExtensionDao
 {
-    fun saveRequest(user: User, requests: Array<RequestDTO>): Flux<RequestDTO> {
+    fun saveRequest(user: User, requests: Array<RequestDTO>, isGroup: Boolean?): Flux<RequestDTO> {
+        val newGroupId = if (isGroup == true) UUID.randomUUID() else null
         return Flux.from(dslContext.transactionPublisher { trx ->
             trx.dsl().run {
                 Flux.fromArray(requests).flatMap { request ->
@@ -28,7 +30,8 @@ class RequestHandler(val dslContext: DSLContext):
                                 .filter { it.value != null }
                                 .flatMap { extension -> insertSampleExtension(extension, sampleRecord.id!!) }
                                 .then(
-                                    if (request.requestGroup!!.id == null) { insertRequestGroup() }
+                                    if(isGroup == true) insertRequestGroupWithId(newGroupId!!)
+                                    else if (request.requestGroup!!.id == null) { insertRequestGroup() }
                                     else { Mono.just(request.requestGroup!!) }
                                 )
                                 .flatMap { requestGroup ->

@@ -14,4 +14,13 @@ interface RequestGroupDao {
                 .returning()
         ).map { it.into(RequestGroupDTO::class.java) }
     }
+    fun DSLContext.insertRequestGroupWithId(requestGroupId: UUID): Mono<RequestGroupDTO> {
+        return Mono.from(
+            insertInto(REQUEST_GROUP)
+                .set(REQUEST_GROUP.ID, requestGroupId)
+                .onDuplicateKeyIgnore()
+                .returning()
+        ).map { it.into(RequestGroupDTO::class.java) }
+        .switchIfEmpty(Mono.just(RequestGroupDTO(requestGroupId)))
+    }
 }
