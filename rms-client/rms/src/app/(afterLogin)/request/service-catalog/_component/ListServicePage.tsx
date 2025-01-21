@@ -138,24 +138,39 @@ export default function ListServicePage() {
             setSelectedCard(firstCategory.id!);
             fetchServiceData(firstCategory.id!);
 
-            const { hash } = window.location;
-            if (hash) {
-                const hashId = hash.replace("#", "");
-                const matchedCategory = categoryArray.find(category => category.id === hashId);
+            const {hash} = window.location;
 
-                if (matchedCategory) {
-                    cardOnClick(matchedCategory);
-                    const target = document.getElementById(hashId);
-                    if (target) {
-                        target.scrollIntoView({ behavior: "smooth" });
+            const categoryOffsets: { [key: string]: number } = {
+                "38fecf42-1404-490f-ab97-37ed7eeecd78": 200,
+                "9b488043-ee87-447a-bd9b-000815fb0e98": 400,
+                "a57e0b55-ee39-4544-a835-74b5aa4a25ef": 600,
+                "e3205ea8-5f6b-4731-9871-4fcfed5382cc": 800,
+                default: 100,
+            };
+
+            setTimeout(() => {
+                if (hash) {
+                    const hashId = hash.replace("#", "");
+                    const matchedCategory = categoryArray.find(category => category.id === hashId);
+
+                    if (matchedCategory) {
+                        cardOnClick(matchedCategory);
+                        const target = document.getElementById(hashId);
+                        if (target) {
+                            const offset = categoryOffsets[hashId] || categoryOffsets.default;
+                            window.scrollTo({
+                                top: offset,
+                                behavior: "smooth",
+                            });
+                        }
                     }
+                } else {
+                    const firstCategory = categoryArray[0];
+                    setSelectCategory(firstCategory);
+                    setSelectedCard(firstCategory.id!);
+                    fetchServiceData(firstCategory.id!);
                 }
-            } else {
-                const firstCategory = categoryArray[0];
-                setSelectCategory(firstCategory);
-                setSelectedCard(firstCategory.id!);
-                fetchServiceData(firstCategory.id!);
-            }
+            }, 100);
         }
     }, [categoryArray]);
 
