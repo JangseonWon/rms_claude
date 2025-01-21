@@ -199,7 +199,7 @@ export default function NoticeTable() {
                                     {row.comment_count}
                                 </td>
                                 <td>{row.user?.name}</td>
-                                <td>{row.create_at ? format(new Date(row.create_at), "dd-MMM-yyyy") : '-'}</td>
+                                <td>{row.create_at ? format(new Date(row.create_at), "dd-MM-yyyy") : '-'}</td>
                             </tr>
                         );
                     })}

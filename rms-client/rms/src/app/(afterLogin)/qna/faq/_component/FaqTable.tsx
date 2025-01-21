@@ -15,7 +15,6 @@ import {SelectBoxOption} from "@/model/SelectBoxOption";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import {format} from "date-fns";
 import {useSession} from "next-auth/react";
-import type {Statistics} from "@/model/Statistics";
 
 export default function FaqTable() {
     const router = useRouter();
@@ -194,7 +193,7 @@ export default function FaqTable() {
                                     {row.comment_count}
                                 </td>
                                 <td>{row.user?.name}</td>
-                                <td>{row.create_at ? format(new Date(row.create_at), "dd-MMM-yyyy") : '-'}</td>
+                                <td>{row.create_at ? format(new Date(row.create_at), "dd-MM-yyyy") : '-'}</td>
                             </tr>
                         );
                     })}
