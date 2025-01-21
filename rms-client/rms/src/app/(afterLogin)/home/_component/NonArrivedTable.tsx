@@ -112,8 +112,8 @@ export default function NonArrivedTable() {
         <div>
             <div className={style.line}></div>
             <h1>Non-arrived (+10days)</h1>
-            <div className={style.filterContainer}>
-                <div className={style.filterContainerRight}>
+            <div className={globalTableStyle.formGroupBetween}>
+                <div className={globalTableStyle.formGroupLeft}>
                     <DatePickerRangeBox
                         label={"from-to"}
                         onChange={(from, to) => {
@@ -137,7 +137,7 @@ export default function NonArrivedTable() {
                             )
                         }}/>
                 </div>
-                <div className={style.filterContainerLeft}>
+                <div className={globalTableStyle.formGroupRight}>
                     <SelectBox
                         width={'155px'}
                         value={selectOption.name}
@@ -179,7 +179,7 @@ export default function NonArrivedTable() {
                     </tr>
                     </thead>
                     <tbody>
-                    {requestData && requestData.length > 0 && requestData.map((request, rowIndex) => (
+                    {requestData && requestData.length > 0 ? ( requestData.map((request, rowIndex) => (
                         <tr key={rowIndex}>
                             <td>{request.specified_at ? new Date(request.specified_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
                             <td>{request.sample?.barcode}</td>
@@ -192,7 +192,13 @@ export default function NonArrivedTable() {
                             <td>global courire</td>
                             <td>airwaybill</td>
                         </tr>
-                    ))}
+                    ))): (
+                        <tr>
+                        <td colSpan={10} className={globalTableStyle.noData}>
+                    The searched data does not exist
+                    </td>
+                </tr>
+                )}
                     </tbody>
                 </table>
             </section>

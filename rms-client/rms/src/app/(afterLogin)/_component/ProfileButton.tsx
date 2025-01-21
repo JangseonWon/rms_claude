@@ -10,13 +10,11 @@ import {signOut, useSession} from "next-auth/react";
 import ProfileAlarm from "@/app/(afterLogin)/_component/alarm/ProfileAlarm";
 import {getAlarmCountByUser} from "@/app/(afterLogin)/_api/getAlarmCountByUser";
 import {useAlarmCount, useSetAlarmCount} from "@/app/(afterLogin)/_component/alarm/store/useAlarmCountStore";
-// import {Client} from "@stomp/stompjs";
 
 export default function ProfileButton() {
     const { data: session } = useSession();
     const [profileOpen, setProfileOpen] = useState(false);
     const [alarmOpen, setAlarmOpen] = useState(false);
-    // const ws = useRef<WebSocket | null>(null);
     const alarmCount = useAlarmCount();
     const setAlarmCount = useSetAlarmCount();
     const router = useRouter()
@@ -72,30 +70,6 @@ export default function ProfileButton() {
             setAlarmCount(data as number);
         }
     };
-
-    /*useEffect(() => {
-        fetchAlarmCount();
-        console.log("start 함");
-        ws.current = new WebSocket("/api/ws");
-        ws.current.onopen = () => {
-            console.log('WebSocket connection opened.')
-        }
-        ws.current.onmessage = (event) => {
-            if (event.data) {
-                setAlarmCount(event.data);
-            }
-        };
-        ws.current.onerror = () => console.log('WebSocket Error');
-        ws.current.onclose = () => {
-            console.log('Websocket connection is closed');
-        };
-
-        return () => {
-            if (ws.current && ws.current.readyState === 1) {
-                ws.current.close();
-            }
-        };
-    }, []);*/
 
     useEffect(() => {
         fetchAlarmCount();

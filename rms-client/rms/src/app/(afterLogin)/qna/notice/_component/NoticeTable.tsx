@@ -2,6 +2,7 @@
 
 import React, {useCallback, useEffect, useState} from "react";
 import style from "@/css/qna/qnaTable.module.css";
+import globalTableStyle from "@/css/globalTable.module.css";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
@@ -16,7 +17,6 @@ import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import {format} from "date-fns";
 import {useSession} from "next-auth/react";
 import {putPostReadByUserId} from "@/app/(afterLogin)/qna/_api/putPostReadByUserId";
-import globalTableStyle from "@/css/globalTable.module.css";
 
 export default function NoticeTable() {
     const router = useRouter();
