@@ -66,9 +66,9 @@ export default function Order() {
                 const index = headers.indexOf(header);
                 return index !== -1 ? row[index] : undefined;
             };
-            const extensionFields = headers.slice(12);
+            const extensionFields = headers.slice(11);
             const extensions = extensionFields.reduce((acc: Record<string, string | number | boolean>, field: string, idx: number) => {
-                const value = row[12 + idx];
+                const value = row[11 + idx];
                 acc[field] = value === false || value ? value : '';
                 return acc;
             }, {});
@@ -79,10 +79,10 @@ export default function Order() {
 
             const birth = mapByHeader("Date of Birth")
                 ? format(excelToDate(mapByHeader("Date of Birth")), 'yyyy-MM-dd')
-                : 'Error';
+                : '-';
             const collectionDate = mapByHeader("Date of Collection")
                 ? format(excelToDate(mapByHeader("Date of Collection")), 'yyyy-MM-dd')
-                : 'Error';
+                : '-';
             return {
                 sampleType: mapByHeader("Sample Type"),
                 institution: mapByHeader("Institution Name"),
@@ -104,7 +104,7 @@ export default function Order() {
     }, [extensions]);
 
     const transformDataToFormat = (data: RequestData[], status: string): any => {
-        const missingExtensions: string[] = [];
+        const missingFields: string[] = [];
 
         const transformedData = data.filter((item) => item.institution && item.institution.includes('/'))
             .map((item) => {
@@ -123,15 +123,29 @@ export default function Order() {
                     age--;
                 }
 
-                const [sampleTypeId, sampleTypeName] = item.sampleType.split('/');
-                const [institutionId, institutionName] = item.institution.split('/');
+                const [sampleTypeId, sampleTypeName] = item.sampleType?.split('/') || ["", ""];
+                const [institutionId, institutionName] = item.institution?.split('/') || ["", ""];
+
+                const checkMissingField = (field: string | number, fieldName: string) => {
+                    if (field === '-' && !missingFields.includes(fieldName) ||
+                        !field && !missingFields.includes(fieldName)) {
+                        missingFields.push(fieldName);
+                    }
+                };
+
+                checkMissingField(item.patientName, "patient name");
+                checkMissingField(item.mrn, "mrn");
+                checkMissingField(item.gender, "gender");
+                checkMissingField(item.sampleType, "sample type");
+                checkMissingField(item.collectionDate, "date of collection");
+                checkMissingField(item.quantity, "quantity");
 
                 const extensionData = extensions.map(extension => {
                     const value = item.extensions[extension.name!];
 
                     if (extension.required && (value === undefined || value === null || value === "")) {
-                        if (!missingExtensions.includes(extension.name!)) {
-                            missingExtensions.push(extension.name!);
+                        if (!missingFields.includes(extension.name!)) {
+                            missingFields.push(extension.name!);
                         }
                     }
 
@@ -176,9 +190,10 @@ export default function Order() {
                 };
             });
 
-        if (missingExtensions.length > 0) {
-            showAlert(`Error: The following required extensions are 
-            missing values:\n${missingExtensions.join(', ')}. \nPlease provide values.`);
+        if (missingFields.length > 0) {
+            showAlert(`Error: The following required fields are missing values:
+            \n${missingFields.join(', ')}. 
+            \nPlease provide values.`);
             return null;
         }
 
@@ -298,16 +313,16 @@ export default function Order() {
                     {requestData.filter((item) => item.institution && item.institution.includes('/'))
                         .map((item, index) => (
                         <tr key={index}>
-                            <td>{item.institution && item.institution.includes('/') ? item.institution.split('/')[1] : ''}</td>
-                            <td>{item.patientName || ''}</td>
-                            <td>{item.mrn || ''}</td>
-                            <td>{item.birth || ''}</td>
-                            <td>{item.gender || ''}</td>
-                            <td>{item.sampleType && item.sampleType.includes('/') ? item.sampleType.split('/')[1] : ''}</td>
-                            <td>{item.collectionDate || ''}</td>
-                            <td>{item.quantity || ''}</td>
-                            <td>{item.medicalDepartment || ''}</td>
-                            <td>{item.physician || ''}</td>
+                            <td>{item.institution && item.institution.includes('/') ? item.institution.split('/')[1] : '-'}</td>
+                            <td>{item.patientName || '-'}</td>
+                            <td>{item.mrn || '-'}</td>
+                            <td>{item.birth || '-'}</td>
+                            <td>{item.gender || '-'}</td>
+                            <td>{item.sampleType && item.sampleType.includes('/') ? item.sampleType.split('/')[1] : '-'}</td>
+                            <td>{item.collectionDate || '-'}</td>
+                            <td>{item.quantity || '-'}</td>
+                            <td>{item.medicalDepartment || '-'}</td>
+                            <td>{item.physician || '-'}</td>
                             <td dangerouslySetInnerHTML={{__html: formatNotes(item.memo)}}/>
                             {extensions.map((extension, extIndex) => (
                                 <td key={extIndex}>
