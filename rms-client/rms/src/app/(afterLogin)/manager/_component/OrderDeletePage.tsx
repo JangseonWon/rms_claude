@@ -13,7 +13,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import {Status} from "@/model/Status";
-import {postRequests} from "@/app/(afterLogin)/request/order/_api/postRequests";
+import {postRequests} from "@/app/(afterLogin)/manager/_api/postRequests"
 import type {Request} from "@/model/Request";
 import BlueButton from "@/app/_component/BlueButton";
 import {deleteOrder} from "@/app/(afterLogin)/manager/_api/deleteOrder";
@@ -210,7 +210,7 @@ export default function OrderDeletePage() {
                                             <span className={style.checkmark}></span>
                                         </label>
                                     </th>
-                                    <th className={requestStyle.longColumn}>Order Date<br/>(DD-MM-YYYY)</th>
+                                    <th>Order Date<br/>(DD-MM-YYYY)</th>
                                     <th>User ID</th>
                                     <th>User Name</th>
                                     <th>Institution</th>
