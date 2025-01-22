@@ -171,11 +171,11 @@ export default function RequestTable() {
                     </thead>
                     <tbody>
                     {requestData && requestData.length > 0 ? ( requestData.map((request) => (
-                        <tr key={request.order_id! + request.service!.id + request.sample!.id}>
+                        <tr key={`${request.service!.id}${request.sample!.id}`}>
                             <td className={globalTableStyle.middleColumn}>{request.create_at ? new Date(request.create_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
                             <td className={globalTableStyle.longColumn}>{request.courier_company}</td>
                             <td className={globalTableStyle.longColumn}>{request.awb_number}</td>
-                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.order?.user?.name}/></td>
+                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.user?.name}/></td>
                             <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample?.patient?.organization?.name}/></td>
                             <td className={globalTableStyle.longColumn}>{request.sample?.barcode}</td>
                             <td className={globalTableStyle.longColumn}><CellTooltip text={request.service?.name}/></td>

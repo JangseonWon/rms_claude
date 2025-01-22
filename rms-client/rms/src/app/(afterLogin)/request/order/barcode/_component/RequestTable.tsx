@@ -206,7 +206,7 @@ export default function RequestTable() {
                     </thead>
                     <tbody>
                     {requestData && requestData.length > 0 ? ( requestData.map((request, rowIndex) => (
-                            <tr key={request.order_id! + request.service!.id + request.sample!.id}>
+                            <tr key={`${request.service!.id}${request.sample!.id}`}>
                                 <td onClick={(e) => e.stopPropagation()}>
                                     <label form="agree" className={globalTableStyle.checkbox}>
                                         <input
@@ -219,7 +219,7 @@ export default function RequestTable() {
                                     </label>
                                 </td>
                                 <td className={globalTableStyle.middleColumn}>{request.create_at ? new Date(request.create_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
-                                <td className={globalTableStyle.longColumn}><CellTooltip text={request.order?.user?.name}/></td>
+                                <td className={globalTableStyle.longColumn}><CellTooltip text={request.user?.name}/></td>
                                 <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample?.patient?.organization?.name}/></td>
                                 <td className={globalTableStyle.longColumn}>{request.sample?.barcode}</td>
                                 <td className={globalTableStyle.longColumn}><CellTooltip text={request.service?.name}/></td>

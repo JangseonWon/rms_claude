@@ -211,35 +211,35 @@ export default function CartTable() {
                     </tr>
                     </thead>
                     <tbody>
-                    {requestData && requestData.length > 0 ? ( requestData.map((row, rowIndex) => (
-                            <tr key={row.order_id! + row.service!.id + row.sample!.id}>
+                    {requestData && requestData.length > 0 ? ( requestData.map((request, rowIndex) => (
+                            <tr key={`${request.service!.id}${request.sample!.id}`}>
                                 <td onClick={(e) => e.stopPropagation()}>
                                     <label form="agree" className={globalTableStyle.checkbox}>
                                         <input
                                             type="checkbox"
-                                            checked={row.isSelected || false}
-                                            onChange={() => handleSelectChange(rowIndex, !row.isSelected)}
+                                            checked={request.isSelected || false}
+                                            onChange={() => handleSelectChange(rowIndex, !request.isSelected)}
                                             className={globalTableStyle.checkbox}
                                         />
                                         <span className={globalTableStyle.checkmark}></span>
                                     </label>
                                 </td>
-                                <td className={globalTableStyle.middleColumn}><CellTooltip text={row.sample!.patient!.organization!.id}/></td>
-                                <td className={globalTableStyle.longColumn}><CellTooltip text={row.sample!.patient!.name}/></td>
-                                <td className={globalTableStyle.longColumn}><CellTooltip text={row.service!.name}/></td>
-                                <td className={globalTableStyle.middleColumn}>{row.sample?.patient ?
-                                    formatDate(row.sample.patient.birth_year, row.sample.patient.birth_month, row.sample.patient.birth_day) : '-'}
+                                <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample!.patient!.organization!.id}/></td>
+                                <td className={globalTableStyle.longColumn}><CellTooltip text={request.sample!.patient!.name}/></td>
+                                <td className={globalTableStyle.longColumn}><CellTooltip text={request.service!.name}/></td>
+                                <td className={globalTableStyle.middleColumn}>{request.sample?.patient ?
+                                    formatDate(request.sample.patient.birth_year, request.sample.patient.birth_month, request.sample.patient.birth_day) : '-'}
                                 </td>
-                                <td className={globalTableStyle.shortColumn}>{row.sample!.patient!.sex}</td>
-                                <td className={globalTableStyle.longColumn}>{row.sample!.patient!.serial}</td>
-                                <td className={globalTableStyle.middleColumn}>{row.sample?.sampling_on! ? format(new Date(row.sample?.sampling_on!), "dd-MM-yyyy") : '-'}</td>
+                                <td className={globalTableStyle.shortColumn}>{request.sample!.patient!.sex}</td>
+                                <td className={globalTableStyle.longColumn}>{request.sample!.patient!.serial}</td>
+                                <td className={globalTableStyle.middleColumn}>{request.sample?.sampling_on! ? format(new Date(request.sample?.sampling_on!), "dd-MM-yyyy") : '-'}</td>
                                 <td className={globalTableStyle.shortColumn}>
                                     <FontAwesomeIcon
                                         icon={faFileLines}
                                         className={globalTableStyle.info}
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            handleInfoClick(row)
+                                            handleInfoClick(request)
                                         }}/>
                                 </td>
                             </tr>

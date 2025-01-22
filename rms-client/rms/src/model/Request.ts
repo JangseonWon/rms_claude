@@ -1,15 +1,12 @@
 import {Sample} from "@/model/Sample";
 import {Service} from "@/model/Service";
 import {Report} from "@/model/Report"
-import {Order} from "@/model/Order";
 import {User} from "@/model/User";
 import {RequestRelation} from "@/model/RequestRelation";
 import {RequestGroup} from "@/model/RequestGroup";
 
 export interface Request {
     service?: Service
-    order?: Order
-    order_id?: string
     user_service_id?: string
     status?: string
     memo?: string

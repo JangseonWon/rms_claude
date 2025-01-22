@@ -183,7 +183,7 @@ export default function NonArrivedTable() {
                         <tr key={rowIndex}>
                             <td>{request.specified_at ? new Date(request.specified_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
                             <td>{request.sample?.barcode}</td>
-                            <td>{request.order?.user?.name}</td>
+                            <td>{request.user?.name}</td>
                             <td>{request.sample?.patient?.organization?.name}</td>
                             <td>{request.sample?.patient?.name}</td>
                             <td>{request.service?.name}</td>

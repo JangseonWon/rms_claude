@@ -253,7 +253,7 @@ export default function DownloadTable() {
                     </thead>
                     <tbody>
                     {requestData && requestData.length > 0 ? ( requestData.map((request, rowIndex) => (
-                        <tr key={request!.sample!.barcode! + request!.service!.id!}>
+                        <tr key={`${request.service!.id}${request.sample!.id}`}>
                             <td>
                                 <label form="agree" className={globalTableStyle.checkbox}>
                                     <input
@@ -266,7 +266,7 @@ export default function DownloadTable() {
                                 </label>
                             </td>
                             <td className={globalTableStyle.middleColumn}>{request.specified_at ? new Date(request.specified_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
-                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.order?.user?.name}/></td>
+                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.user?.name}/></td>
                             <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample?.patient?.organization?.name}/></td>
                             <td className={globalTableStyle.longColumn}>{request.sample?.barcode}</td>
                             <td className={globalTableStyle.longColumn}><CellTooltip text={request.service?.name}/></td>

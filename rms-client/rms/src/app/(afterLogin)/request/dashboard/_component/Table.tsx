@@ -238,22 +238,22 @@ export default function Table() {
                 </tr>
                 </thead>
                 <tbody>
-                {requestData && requestData.length > 0 ? ( requestData.map((row) => (
-                    <tr key={`${row.order_id}${row.sample?.id}${row.service!.id}`}>
-                        <td>{row.create_at ? format(new Date(row.create_at), "dd-MM-yyyy") : '-'}</td>
-                        <td>{row.sample!.barcode}</td>
-                        <td>{row.sample!.patient!.organization!.user!.name}</td>
-                        <td>{row.sample!.patient!.organization!.id}</td>
-                        <td>{row.service!.name}</td>
-                        <td>{row.sample!.patient!.name}</td>
-                        <td>{row.sample!.patient!.serial}</td>
-                        <td>{row.sample?.patient ?
-                            formatDate(row.sample.patient.birth_year, row.sample.patient.birth_month, row.sample.patient.birth_day) : '-'}
+                {requestData && requestData.length > 0 ? ( requestData.map((request) => (
+                    <tr key={`${request.service!.id}${request.sample!.id}`}>
+                        <td>{request.create_at ? format(new Date(request.create_at), "dd-MM-yyyy") : '-'}</td>
+                        <td>{request.sample!.barcode}</td>
+                        <td>{request.sample!.patient!.organization!.user!.name}</td>
+                        <td>{request.sample!.patient!.organization!.id}</td>
+                        <td>{request.service!.name}</td>
+                        <td>{request.sample!.patient!.name}</td>
+                        <td>{request.sample!.patient!.serial}</td>
+                        <td>{request.sample?.patient ?
+                            formatDate(request.sample.patient.birth_year, request.sample.patient.birth_month, request.sample.patient.birth_day) : '-'}
                         </td>
-                        <td>{row.status}</td>
+                        <td>{request.status}</td>
                         <td>
-                            {row.report?.create_at && !isNaN(new Date(row.report.create_at).getTime())
-                                ? format(new Date(row.report.create_at), "dd-MM-yyyy")
+                            {request.report?.create_at && !isNaN(new Date(request.report.create_at).getTime())
+                                ? format(new Date(request.report.create_at), "dd-MM-yyyy")
                                 : '-'}
                         </td>
                     </tr>

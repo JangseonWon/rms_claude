@@ -223,7 +223,7 @@ export default function OrderDeletePage() {
                                 </thead>
                                 <tbody>
                                 {requestData && requestData.length > 0 && requestData.map((request, rowIndex) => (
-                                    <tr key={request.order_id! + request.service!.id + request.sample!.id}>
+                                    <tr key={`${request.service!.id}${request.sample!.id}`}>
                                         <td onClick={(e) => e.stopPropagation()}>
                                             <label form="agree" className={style.checkbox}>
                                                 <input
@@ -236,8 +236,8 @@ export default function OrderDeletePage() {
                                             </label>
                                         </td>
                                         <td>{request.create_at ? new Date(request.create_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
-                                        <td>{request.order?.user?.id}</td>
-                                        <td>{request.order?.user?.name}</td>
+                                        <td>{request.user?.id}</td>
+                                        <td>{request.user?.name}</td>
                                         <td>{request.sample?.patient?.organization?.name}</td>
                                         <td>{request.sample?.barcode}</td>
                                         <td>{request.service?.name}</td>
