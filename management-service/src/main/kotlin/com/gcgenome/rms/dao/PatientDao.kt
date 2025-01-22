@@ -7,19 +7,19 @@ import org.jooq.DSLContext
 import reactor.core.publisher.Mono
 
 interface PatientDao {
-    fun DSLContext.deletePatientById(patient: PatientDTO): Mono<PatientDTO> {
+    fun DSLContext.deletePatientById(patient: PatientDTO, userId: String): Mono<PatientDTO> {
         return Mono.from(
             deleteFrom(PATIENT)
                 .where(PATIENT.SERIAL.eq(patient.serial)
                     .and(PATIENT.ORGANIZATION_ID.eq(patient.organization!!.id))
-                    .and(PATIENT.USER_ID.eq(patient.organization.userId))
+                    .and(PATIENT.USER_ID.eq(userId))
                     .andNotExists(
                         selectOne()
                             .from(SAMPLE)
                             .where(
                                 SAMPLE.PATIENT_SERIAL.eq(patient.serial)
                                     .and(SAMPLE.ORGANIZATION_ID.eq(patient.organization.id))
-                                    .and(SAMPLE.USER_ID.eq(patient.organization.userId))
+                                    .and(SAMPLE.USER_ID.eq(userId))
                             )
                     )
                 ).returning()
