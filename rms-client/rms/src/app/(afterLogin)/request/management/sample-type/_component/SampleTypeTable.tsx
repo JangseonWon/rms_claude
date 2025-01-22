@@ -1,6 +1,6 @@
 'use client';
 
-import style from "@/css/globalTable.module.css";
+import globalTableStyle from "@/css/globalTable.module.css";
 import managementStyle from "@/css/managementTable.module.css";
 import React, {useEffect, useState} from "react";
 import RectangleButton from "@/app/_component/RectangleButton";
@@ -149,8 +149,8 @@ export default function SampleTypeTable() {
                     </div>
                 </div>
             </section>
-            <section className={style.tableContainer}>
-                <table className={style.table}>
+            <section className={managementStyle.tableContainer}>
+                <table className={globalTableStyle.table}>
                     <thead>
                     <tr>
                         <th>Code</th>
@@ -173,9 +173,9 @@ export default function SampleTypeTable() {
                     </tbody>
                 </table>
             </section>
-            <div className={style.pagination}>
+            <div className={globalTableStyle.pagination}>
                 <span>items per page:</span>
-                <div className={style.select}>
+                <div className={globalTableStyle.select}>
                     <select onChange={handlePageSizeChange}>
                         <option value="10">10</option>
                         <option value="20">20</option>

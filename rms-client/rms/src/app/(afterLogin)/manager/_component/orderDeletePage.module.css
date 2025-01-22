@@ -58,3 +58,7 @@
 .checkbox input:checked + .checkmark:after {
     display: block;
 }
+.tableContainer {
+    width: 100%;
+    overflow-x: scroll;
+}

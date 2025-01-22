@@ -1,14 +1,14 @@
 "use client"
 
-import style from "@/app/(afterLogin)/manager/_component/orderDeletePage.module.css";
 import * as React from "react";
 import {useEffect, useState} from "react";
+import style from "@/app/(afterLogin)/manager/_component/orderDeletePage.module.css";
 import globalTableStyle from "@/css/globalTable.module.css";
+import requestStyle from "@/css/order/requestTable.module.css";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import {Query} from "@/model/Query";
 import SelectBox from "@/app/_component/SelectBox";
 import InputBox from "@/app/_component/InputBox";
-import requestStyle from "@/css/order/requestTable.module.css";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
@@ -195,7 +195,7 @@ export default function OrderDeletePage() {
                                 }}></InputBox>
                             </div>
                         </div>
-                        <div className={globalTableStyle.tableContainer}>
+                        <div className={style.tableContainer}>
                             <table className={requestStyle.table}>
                                 <thead>
                                 <tr>

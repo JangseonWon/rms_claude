@@ -162,7 +162,7 @@ export default function NonArrivedTable() {
                     </div>
                 </div>
             </div>
-            <section className={globalTableStyle.tableContainer}>
+            <section className={style.tableContainer}>
                 <table className={globalTableStyle.table}>
                     <thead>
                     <tr>

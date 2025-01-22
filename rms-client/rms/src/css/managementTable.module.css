@@ -19,3 +19,6 @@
 .icon:hover {
     cursor: pointer;
 }
+.tableContainer {
+    width: 1080px;
+}

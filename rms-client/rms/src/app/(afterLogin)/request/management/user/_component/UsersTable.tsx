@@ -191,7 +191,7 @@ export default function UsersTable() {
                     </div>
                 </div>
             </section>
-            <section className={globalTableStyle.tableContainer}>
+            <section className={managementStyle.tableContainer}>
                 <table className={globalTableStyle.table}>
                     <thead>
                     <tr>

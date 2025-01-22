@@ -21,3 +21,7 @@
     height: 4px;
     background-color: #002b49;
 }
+.tableContainer {
+    width: 99.5%;
+    overflow-x: scroll;
+}
