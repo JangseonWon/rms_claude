@@ -18,6 +18,7 @@ import {fetchServiceExtensions} from "@/app/(afterLogin)/request/services/_api/f
 import {usePathname} from "next/navigation";
 import DownloadExcelButton from "@/app/(afterLogin)/request/services/[service]/multi/_component/DownloadExcelButton";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
+import globalTableStyle from "@/css/globalTable.module.css";
 
 type RequestData = {
     sampleType: string;       // 샘플 타입
@@ -310,29 +311,35 @@ export default function Order() {
                     </tr>
                     </thead>
                     <tbody>
-                    {requestData.filter((item) => item.institution && item.institution.includes('/'))
+                    {requestData && requestData.length > 0 ? (requestData.filter((item) => item.institution && item.institution.includes('/'))
                         .map((item, index) => (
-                        <tr key={index}>
-                            <td>{item.institution && item.institution.includes('/') ? item.institution.split('/')[1] : '-'}</td>
-                            <td>{item.patientName || '-'}</td>
-                            <td>{item.mrn || '-'}</td>
-                            <td>{item.birth || '-'}</td>
-                            <td>{item.gender || '-'}</td>
-                            <td>{item.sampleType && item.sampleType.includes('/') ? item.sampleType.split('/')[1] : '-'}</td>
-                            <td>{item.collectionDate || '-'}</td>
-                            <td>{item.quantity || '-'}</td>
-                            <td>{item.medicalDepartment || '-'}</td>
-                            <td>{item.physician || '-'}</td>
-                            <td dangerouslySetInnerHTML={{__html: formatNotes(item.memo)}}/>
-                            {extensions.map((extension, extIndex) => (
-                                <td key={extIndex}>
-                                    {item.extensions && item.extensions[extension.name!] !== undefined
-                                        ? formatBooleanValue(item.extensions[extension.name!])
-                                        : '-'}
-                                </td>
-                            ))}
+                            <tr key={index}>
+                                <td>{item.institution && item.institution.includes('/') ? item.institution.split('/')[1] : '-'}</td>
+                                <td>{item.patientName || '-'}</td>
+                                <td>{item.mrn || '-'}</td>
+                                <td>{item.birth || '-'}</td>
+                                <td>{item.gender || '-'}</td>
+                                <td>{item.sampleType && item.sampleType.includes('/') ? item.sampleType.split('/')[1] : '-'}</td>
+                                <td>{item.collectionDate || '-'}</td>
+                                <td>{item.quantity || '-'}</td>
+                                <td>{item.medicalDepartment || '-'}</td>
+                                <td>{item.physician || '-'}</td>
+                                <td dangerouslySetInnerHTML={{__html: formatNotes(item.memo)}}/>
+                                {extensions.map((extension, extIndex) => (
+                                    <td key={extIndex}>
+                                        {item.extensions && item.extensions[extension.name!] !== undefined
+                                            ? formatBooleanValue(item.extensions[extension.name!])
+                                            : '-'}
+                                    </td>
+                                ))}
+                            </tr>
+                        ))) : (
+                        <tr>
+                            <td colSpan={7} className={globalTableStyle.noData}>
+                                There are no data.
+                            </td>
                         </tr>
-                    ))}
+                    )}
                     </tbody>
                 </table>
             </div>
