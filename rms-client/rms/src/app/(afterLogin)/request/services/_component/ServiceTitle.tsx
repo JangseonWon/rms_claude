@@ -3,6 +3,7 @@
 import style from "./serviceTitle.module.css";
 import {Service} from "@/model/Service";
 import SingleMultiChangeButton from "@/app/(afterLogin)/request/services/_component/SingleMultiChangeButton";
+import {ServiceType} from "@/model/ServiceType";
 
 interface Props {
     serviceData?: Service;
@@ -20,7 +21,10 @@ export default function ServiceTitle({serviceData}: Props) {
                 </div>
             </div>
             <div className={style.changeButton}>
-                {serviceData?.group_name == null && <SingleMultiChangeButton />}
+                {!(serviceData?.type === ServiceType.SET ||
+                    serviceData?.extensions?.some(extension => extension.id === "TEST01" || extension.id === "TEST02")) && (
+                    <SingleMultiChangeButton />
+                )}
             </div>
         </div>
     )

@@ -12,5 +12,4 @@ export interface Service {
     category?: Categories,
     sample_types?: SampleType[],
     extensions?: Extension[]
-
 }
