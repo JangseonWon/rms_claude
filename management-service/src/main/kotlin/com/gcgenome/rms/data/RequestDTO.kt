@@ -41,5 +41,8 @@ data class RequestDTO(
     var awbNumber: String? = null,
     var service: ServiceDTO? = null,
     var sample: SampleDTO? = null,
-    var order: OrderDTO? = null
+    @JsonProperty("request_group")
+    var requestGroup: RequestGroupDTO? = null,
+    @JsonProperty("user")
+    var user: UserDTO? = null
 )
