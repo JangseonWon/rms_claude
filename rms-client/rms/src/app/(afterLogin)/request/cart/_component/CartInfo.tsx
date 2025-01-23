@@ -188,6 +188,7 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
                             <InputBox
                                 label={"Age"}
                                 value={request.sample?.age}
+                                disabled={true}
                                 onChange={(value) => handleRequestChange('sample.age', value)}
                             />
                             <DatePickerBox
@@ -279,7 +280,6 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
                             <TextBox
                                 label={'Memo'}
                                 value={request.memo}
-                                required={true}
                                 onChange={(value) => handleRequestChange('memo', value)}
                             />
                         </div>

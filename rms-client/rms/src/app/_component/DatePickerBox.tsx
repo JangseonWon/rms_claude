@@ -75,6 +75,9 @@ export default function DatePickerBox({label, value, onChange, disable=false, re
     useEffect(() => {
         setHasError(!selectedDate && required)
     }, [selectedDate, required]);
+    useEffect(() => {
+        setSelectedDate(value);
+    }, [value]);
 
     return (
         <div className={`${style.dateBox} ${hasError ? style.error : ""}`}>
