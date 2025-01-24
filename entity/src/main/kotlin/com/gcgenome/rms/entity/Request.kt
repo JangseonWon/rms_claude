@@ -53,7 +53,14 @@ data class Request(
     val sampleId: Sample,
     @ManyToOne
     @JoinColumn(name = "user_id", insertable = false, updatable = false, nullable = false)
-    val userId: User
+    val userId: User,
+    @ManyToOne
+    @JoinColumn(name = "request_group_id", insertable = false, updatable = false, nullable = false)
+    val requestGroupId: RequestGroup,
+    @ManyToOne
+    @JoinColumn(name = "request_relation_id", insertable = false, updatable = false, nullable = false)
+    val requestRelationId: RequestRelation
+
 ){
     @Embeddable
     data class RequestPK (
