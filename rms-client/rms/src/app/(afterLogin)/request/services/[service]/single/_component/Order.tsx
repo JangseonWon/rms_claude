@@ -133,6 +133,7 @@ export default function Order() {
         const sample = request?.sample;
         if (!sample) return false;
         const requiredFields = [
+            sample?.patient?.organization?.id,
             sample?.patient?.name,
             sample?.patient?.serial,
             sample?.patient?.sex,
@@ -251,7 +252,7 @@ export default function Order() {
                 </div>
                 <div className={style.dateBox}>
                     <DatePickerBox
-                        label={"Date of Collection*"}
+                        label={"Collection Date*"}
                         required={true}
                         onChange={(date) => {
                             if (date) {

@@ -30,22 +30,29 @@ const selectBoxOptions: SelectBoxOption[] = [
     { table: "patient", column: "name", name: "Patient(s) Name" },
     { table: "patient", column: "serial", name: "MRN" }
 ];
-const relationFilter: Filter = {
-    table: "request_relation",
-    column: "name",
-    value: "ROOT",
-    operator: "="
-}
-
-
 export default function SearchProbandModal({ closeModal }: Props) {
     const {request} = useRequestStore()
-    const organizationFilter: Filter = {
-        table: "organization",
-        column: "id",
-        value: request?.sample?.patient?.organization?.id!!,
-        operator: "="
-    }
+    const defaultFilters: Filter[] = [
+        {
+            table: "organization",
+            column: "id",
+            value: request?.sample?.patient?.organization?.id!!,
+            operator: "="
+        },
+        {
+            table: "request_relation",
+            column: "name",
+            value: "ROOT",
+            operator: "="
+        },
+        {
+            table: "request",
+            column: "status",
+            value: "CART",
+            operator: "!="
+        }
+    ]
+
     const [requests, setRequests] = useState<Request[]>([]);
     const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
     const [search, setSearch] = useState<Query>({});
@@ -90,10 +97,7 @@ export default function SearchProbandModal({ closeModal }: Props) {
             ...search,
             filter_groups:[
                 {
-                    filters: [
-                        organizationFilter,
-                        relationFilter
-                    ]
+                    filters: defaultFilters
                 },
                 {
                     filters: [

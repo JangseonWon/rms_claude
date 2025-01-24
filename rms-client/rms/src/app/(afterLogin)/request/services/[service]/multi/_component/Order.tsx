@@ -81,8 +81,8 @@ export default function Order() {
             const birth = mapByHeader("Date of Birth")
                 ? format(excelToDate(mapByHeader("Date of Birth")), 'yyyy-MM-dd')
                 : '-';
-            const collectionDate = mapByHeader("Date of Collection")
-                ? format(excelToDate(mapByHeader("Date of Collection")), 'yyyy-MM-dd')
+            const collectionDate = mapByHeader("Collection Date")
+                ? format(excelToDate(mapByHeader("Collection Date")), 'yyyy-MM-dd')
                 : '-';
             return {
                 sampleType: mapByHeader("Sample Type"),
@@ -300,7 +300,7 @@ export default function Order() {
                         <th className={style.header150}>Date of Birth</th>
                         <th className={style.header100}>Gender</th>
                         <th className={style.header150}>Sample Type</th>
-                        <th className={style.header150}>Date of Collection</th>
+                        <th className={style.header150}>Collection Date</th>
                         <th className={style.header100}>Quantity</th>
                         <th className={style.header150}>Medical Department</th>
                         <th className={style.header150}>Physician Name</th>

@@ -161,7 +161,7 @@ export default function RequestModal({propRequest, closeModal,refreshData}: Prop
                                 disabled={true}
                             />
                             <DatePickerBox
-                                label={"Date of Collection*"}
+                                label={"Collection Date*"}
                                 required={true}
                                 onChange={(date) => {
                                     if (date) {

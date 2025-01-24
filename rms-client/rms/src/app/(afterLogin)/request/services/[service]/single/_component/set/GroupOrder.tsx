@@ -100,7 +100,7 @@ export default function GroupOrder() {
 
     useEffect(() => {
         setIsFilled(isAllRequiredFilled());
-    }, [requests]);
+    }, [requests, selectedOrganization]);
 
     const publishRequests = (status: string) => {
         const allRequests = Object.values(requests).map((req) => ({ ...req, status }));
@@ -173,6 +173,7 @@ export default function GroupOrder() {
         }
 
         return Object.values(requests).every((req) => {
+            if (!selectedOrganization) return false
             if (!req.sample?.patient?.name) return false;
             if (!req.sample.patient?.serial) return false;
             if (!req.sample.sample_type?.id) return false;
@@ -210,7 +211,6 @@ export default function GroupOrder() {
                     <div className={style.dateBox}>
                         <DatePickerBox
                             label={"Date of Birth"}
-                            disable={!requests[index]?.sample?.patient?.name}
                             onChange={(date) => {
                                 if (date) {
                                     setBirthDates(prevDates => [...prevDates, date]);
@@ -265,8 +265,7 @@ export default function GroupOrder() {
                     </div>
                     <div className={style.dateBox}>
                         <DatePickerBox
-                            label={"Date of Collection*"}
-                            disable={!requests[index]?.sample?.patient?.name}
+                            label={"Collection Date*"}
                             required={true}
                             onChange={(date) => {
                                 if (date) {

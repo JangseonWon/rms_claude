@@ -236,7 +236,7 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
                                 width="200px"
                             />
                             <DatePickerBox
-                                label={"Date or collection*"}
+                                label={"Collection Date*"}
                                 value={request.sample?.sampling_on}
                                 onChange={(date) => {
                                     if (date) {

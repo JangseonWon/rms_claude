@@ -32,7 +32,7 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
             "Date of Birth", // Date
             "Gender", // List
             "Sample Type",
-            "Date of Collection", // Date
+            "Collection Date", // Date
             "Quantity", // Decimal
             "Medical Department",
             "Physician Name",

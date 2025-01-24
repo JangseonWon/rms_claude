@@ -147,7 +147,7 @@ export default function RequestInfo({serviceId, sampleId, closeModal}: Props) {
                                     disabled={true}
                                 />
                                 <InputBox
-                                    label={"Date or collection*"}
+                                    label={"Collection Date*"}
                                     value={request.sample?.sampling_on}
                                     disabled={true}
                                 />
