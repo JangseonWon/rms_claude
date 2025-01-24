@@ -4,28 +4,14 @@ import style from './listServicePage.module.css';
 import {useSelectCategory, useSetSelectCategory} from "@/store/useCategoryStore";
 import React, {useEffect, useState} from "react";
 import Image from "next/image";
-import {
-    getServicesByCategoryId
-} from "@/app/(afterLogin)/request/services/[service]/single/_api/getServicesByCategoryId";
+import {getServicesByCategoryId} from "@/app/(afterLogin)/request/services/[service]/single/_api/getServicesByCategoryId";
 import {Service} from "@/model/Service";
 import {Categories} from "@/model/Categories";
 import {useRouter} from "next/navigation";
 import QnaLoading from "@/app/(afterLogin)/qna/_component/QnaLoading";
 import {getCategories} from "@/app/(afterLogin)/_api/getCategories";
 import SearchSelectBox, {Option} from "@/app/_component/SearchSelectBox";
-import {postServiceByUser} from "@/app/(afterLogin)/request/service-catalog/_api/postServiceByUser";
-import {Query} from "@/model/Query";
-
-const defaultSearch: Query = {
-    sorts: [
-        {
-            table: "service",
-            column: "name"
-        }
-    ],
-    size:10,
-    page:1
-}
+import {getServices} from "@/app/(afterLogin)/request/service-catalog/_api/getServices";
 
 export default function ListServicePage() {
     const router = useRouter();
@@ -88,7 +74,7 @@ export default function ListServicePage() {
     }
 
     const fetchServices = async () => {
-        const response = await postServiceByUser(defaultSearch);
+        const response = await getServices();
         if (response.ok) {
             const data = await response.json();
             const services = data as Service[]

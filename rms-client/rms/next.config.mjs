@@ -8,10 +8,6 @@ const nextConfig = {
                 destination: `https://rms-test.gcgenome.com/w-api/login-service/:path*`,
             },
             {
-                source: '/w-api/product-service/:path*',
-                destination: `https://rms-test.gcgenome.com/w-api/product-service/:path*`,
-            },
-            {
                 source: '/w-api/management-service/:path*',
                 destination: `https://rms-test.gcgenome.com/w-api/management-service/:path*`,
             },
