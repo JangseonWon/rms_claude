@@ -4,8 +4,7 @@ import com.gcgenome.rms.data.Page
 import com.gcgenome.rms.data.Query
 import org.jooq.*
 import org.jooq.impl.DSL
-import org.jooq.impl.DSL.field
-import org.jooq.impl.DSL.noCondition
+import org.jooq.impl.DSL.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
@@ -58,30 +57,6 @@ interface QueryDao {
             .orderBy(orderBy(query))
 
         return Mono.from(queryBuilder).map(mapper)
-    }
-
-    fun <T> DSLContext.selectQueryFlux(
-        mainTable: Table<*>,
-        query: Query,
-        joinTables: List<JoinInfo> = emptyList(),
-        selectFields: List<Field<*>> = listOf(),
-        where: Condition = noCondition(),
-        groupByFields: List<Field<*>> = emptyList(),
-        mapper: (Record) -> T
-    ): Flux<T> {
-        val fields = selectFields.takeIf { it.isNotEmpty() } ?: mainTable.fields().toList()
-
-        val queryBuilder = select(*fields.toTypedArray())
-            .from(from(mainTable, joinTables))
-            .where(condition(query).and(where))
-            .apply {
-                if (groupByFields.isNotEmpty()) {
-                    groupBy(*groupByFields.toTypedArray())
-                }
-            }
-            .orderBy(orderBy(query))
-
-        return Flux.from(queryBuilder).map(mapper)
     }
 
     private fun DSLContext.getTotalElementsMono(
@@ -160,7 +135,7 @@ interface QueryDao {
             filterGroup.filters.forEach { filter ->
                 val table = filter.table
                 val column = filter.column
-                val field = field(DSL.name(table, column))
+                val field = field(name(table, column))
 
                 val filterCondition = when (filter.operator) {
                     "=" -> field.eq(filter.value)
@@ -186,15 +161,17 @@ interface QueryDao {
     }
     private fun orderBy(query: Query): List<SortField<*>> {
         val sortFields = mutableListOf<SortField<*>>()
-        query.sortBy?.let { sortBy ->
-            val field = field(sortBy)
-            val sortField = if (query.asc == true) {
+
+        query.sorts?.forEach { sort ->
+            val field = field(name(sort.table, sort.column))
+            val sortField = if (sort.asc == true) {
                 field.asc()
             } else {
                 field.desc()
             }
             sortFields.add(sortField)
         }
+
         return sortFields
     }
 }

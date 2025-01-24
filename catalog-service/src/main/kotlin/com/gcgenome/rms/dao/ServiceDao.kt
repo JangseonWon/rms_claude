@@ -1,5 +1,7 @@
 package com.gcgenome.rms.dao
 
+import com.gcgenome.rms.authentication.User
+import com.gcgenome.rms.data.Role
 import com.gcgenome.rms.data.ServiceDTO
 import com.gcgenome.rms.tables.pojos.Service
 import com.gcgenome.rms.tables.records.ServiceRecord
@@ -12,6 +14,15 @@ import reactor.core.publisher.Mono
 import java.util.*
 
 interface ServiceDao  {
+    fun DSLContext.selectServices(user: User): Flux<ServiceDTO> {
+        val condition = if (user.role == Role.USER.name) USER_SERVICE.USER_ID.eq(user.id) else null
+        return Flux.from(
+            select(SERVICE)
+                .from(SERVICE)
+                .leftJoin(USER_SERVICE).on(SERVICE.ID.eq(USER_SERVICE.SERVICE_ID))
+                .where(condition)
+        ).map { it.into(ServiceDTO::class.java) }
+    }
     fun DSLContext.selectServiceByUserIdAndCategoryId(andWhere: Condition, categoryId: UUID): Flux<ServiceDTO> {
         return Flux.from(
             selectDistinct(
