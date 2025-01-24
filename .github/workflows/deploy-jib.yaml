@@ -8,7 +8,6 @@ on:
       - management-service/**
       - login-service/**
       - dashboard-service/**
-      - product-service/**
       - organization-service/**
       - order-service/**
       - cart-service/**
@@ -48,7 +47,6 @@ jobs:
           "$module_name" == "api" ||
           "$module_name" == "post-service" ||
           "$module_name" == "alis-api" ||
-          "$module_name" == "product-service" ||
           "$module_name" == "catalog-service" ||
           "$module_name" == "result-service" ||
           "$module_name" == "home-service" ||
