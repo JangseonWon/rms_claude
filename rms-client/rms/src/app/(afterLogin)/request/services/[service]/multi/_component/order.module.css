@@ -7,7 +7,9 @@
     display: flex;
 }
 .orderAndCartButton {
+    display: flex;
     margin-left: auto;
+    gap: 10px;
 }
 
 .container {

@@ -20,6 +20,8 @@ import {Status} from "@/model/Status";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 import CellTooltip from "@/app/_component/CellToolTip";
+import style from "@/css/qna/qnaTable.module.css";
+import {GrPowerReset} from "react-icons/gr";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -54,7 +56,7 @@ export default function DownloadTable() {
     const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
     const [search, setSearch] = useState<Query>(defaultSearch);
     const [updateSearch, setUpdateSearch] = useState<Query>({});
-    const [searchFilter, setSearchFilter] = useState<Filter | undefined>(undefined);
+    const [searchFilter, setSearchFilter] = useState<Filter | null>(null);
     const [orderDateFilter, setOrderDateFilter] = useState<FilterGroup>()
     const showAlert = CallAlertDialog();
 
@@ -169,6 +171,12 @@ export default function DownloadTable() {
         }
     }
 
+    const handleReset = () => {
+        setSearchFilter(null);
+        setSelectedOption(selectBoxOptions[0]);
+        setOrderDateFilter(undefined);
+    };
+
     return (
         <div className={globalTableStyle.container}>
             <div className={globalTableStyle.formGroupRight}>
@@ -199,6 +207,9 @@ export default function DownloadTable() {
                             )
                         }}
                     />
+                    <GrPowerReset
+                        className={style.resetButton}
+                        onClick={handleReset}/>
                 </div>
                 <div className={downloadStyle.filterContainerLeft}>
                     <SelectBox
@@ -219,7 +230,7 @@ export default function DownloadTable() {
                                     operator: "LIKE",
                                     value: value
                                 } as Filter
-                                : undefined
+                                : null
                         );
                     }}></InputBox>
                 </div>

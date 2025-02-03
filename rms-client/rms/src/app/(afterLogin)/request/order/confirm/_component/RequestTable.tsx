@@ -20,6 +20,8 @@ import {patchRequests} from "@/app/(afterLogin)/request/order/_api/patchRequests
 import RequestInfo from "@/app/(afterLogin)/request/order/_component/RequestInfo";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 import CellTooltip from "@/app/_component/CellToolTip";
+import style from "@/css/qna/qnaTable.module.css";
+import {GrPowerReset} from "react-icons/gr";
 
 export interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -133,6 +135,12 @@ export default function RequestTable() {
         setInfoModalOpen(true);
     };
 
+    const handleReset = () => {
+        setSearchFilter(null);
+        setSelectedOption(selectBoxOptions[0]);
+        setOrderDateFilter(undefined);
+    };
+
     useEffect(() => {
         fetchData(updatedSearch());
     }, [searchFilter,orderDateFilter]);
@@ -167,6 +175,9 @@ export default function RequestTable() {
                                 } as FilterGroup : undefined
                             )
                         }}/>
+                    <GrPowerReset
+                        className={style.resetButton}
+                        onClick={handleReset}/>
                 </div>
                 <div>
                     <SelectBox

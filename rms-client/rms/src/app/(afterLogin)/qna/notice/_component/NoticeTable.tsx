@@ -17,6 +17,7 @@ import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import {format} from "date-fns";
 import {useSession} from "next-auth/react";
 import {putPostReadByUserId} from "@/app/(afterLogin)/qna/_api/putPostReadByUserId";
+import {GrPowerReset} from "react-icons/gr";
 
 export default function NoticeTable() {
     const router = useRouter();
@@ -139,6 +140,11 @@ export default function NoticeTable() {
         }
     }, []);
 
+    const handleReset = () => {
+        setSearch({ sort_by:"create_at", asc: false, size:8, page:1 });
+        setSelectOption({ table: "post", column: "title", name: "Title" });
+    };
+
     useEffect(() => {
         fetchData(search)
     }, [search]);
@@ -152,6 +158,9 @@ export default function NoticeTable() {
                         onChange={(from, to) =>{
                             addDateFilter(from, to);
                         }}/>
+                    <GrPowerReset
+                        className={style.resetButton}
+                        onClick={handleReset}/>
                 </div>
                 <div className={style.filterContainerRight}>
                     <SelectBox
