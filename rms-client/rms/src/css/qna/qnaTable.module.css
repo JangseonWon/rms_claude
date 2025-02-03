@@ -16,6 +16,13 @@
 .search {
     width: 300px;
 }
+.resetButton {
+    margin-top: 30px;
+    cursor: pointer;
+}
+.resetButton:hover {
+    color: #90BA2D;
+}
 /*테이블*/
 .tableContainer {
     display: grid;

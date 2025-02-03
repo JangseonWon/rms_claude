@@ -17,6 +17,8 @@ import {Status} from "@/model/Status";
 import {patchRequests} from "@/app/(afterLogin)/request/result/download/_api/patchRequests";
 import RequestModal from "@/app/(afterLogin)/request/result/resample/_component/RequestModal";
 import CellTooltip from "@/app/_component/CellToolTip";
+import style from "@/css/qna/qnaTable.module.css";
+import {GrPowerReset} from "react-icons/gr";
 
 const selectBoxOptions: SelectBoxOption[] = [
     { table: "user", column: "name", name: "User Name" },
@@ -41,7 +43,7 @@ export default function ReSampleTable() {
     const [totalPage, setTotalPage] = useState<number>(0);
     const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
     const [search, setSearch] = useState<Query>(defaultSearch);
-    const [searchFilter, setSearchFilter] = useState<Filter | undefined>(undefined);
+    const [searchFilter, setSearchFilter] = useState<Filter | null>(null);
     const [orderDateFilter, setOrderDateFilter] = useState<FilterGroup>()
     const [requestModalOpen, setRequestModalOpen] = useState<boolean>(false);
     const [selectedRequest, setSelectedRequest] = useState<Request>();
@@ -125,6 +127,11 @@ export default function ReSampleTable() {
         }
     }
 
+    const handleReset = () => {
+        setSearchFilter(null);
+        setSelectedOption(selectBoxOptions[0]);
+    };
+
     useEffect(() => {
         const updatedSearch = {
             ...search,
@@ -170,6 +177,9 @@ export default function ReSampleTable() {
                                 )
                             }}
                         />
+                        <GrPowerReset
+                            className={style.resetButton}
+                            onClick={handleReset}/>
                     </div>
                     <div className={downloadStyle.filterContainerLeft}>
                         <SelectBox
@@ -190,7 +200,7 @@ export default function ReSampleTable() {
                                         operator: "LIKE",
                                         value: value
                                     } as Filter
-                                    : undefined
+                                    : null
                             );
                         }}></InputBox>
                     </div>
@@ -213,7 +223,7 @@ export default function ReSampleTable() {
                         </tr>
                         </thead>
                         <tbody>
-                        {requestData && requestData.length > 0 ? ( requestData.map((request, rowIndex) => (
+                        {requestData && requestData.length > 0 ? ( requestData.map((request) => (
                             <tr key={`${request!.service!.id!}${request!.sample!.id!}`}>
                                 <td className={globalTableStyle.middleColumn}>{request.specified_at ? new Date(request.specified_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
                                 <td className={globalTableStyle.longColumn}><CellTooltip text={request.user?.name}/></td>

@@ -50,7 +50,6 @@
 .table tbody tr:last-child td:first-child {
     border-radius: 0 0 0 18px;
 }
-
 .table tbody tr:last-child td:last-child {
     border-radius: 0 0 18px 0;
 }
@@ -76,6 +75,9 @@
 .table td {
     padding: 7px 10px;
     text-align: center;
+}
+.noData {
+    border-radius: 0 0 18px 18px !important;
 }
 .pagination {
     display: flex;

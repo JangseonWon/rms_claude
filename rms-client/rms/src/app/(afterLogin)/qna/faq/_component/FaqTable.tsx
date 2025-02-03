@@ -16,6 +16,7 @@ import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import {format} from "date-fns";
 import {useSession} from "next-auth/react";
 import globalTableStyle from "@/css/globalTable.module.css";
+import {GrPowerReset} from "react-icons/gr";
 
 export default function FaqTable() {
     const router = useRouter();
@@ -133,6 +134,11 @@ export default function FaqTable() {
         }
     }, []);
 
+    const handleReset = () => {
+        setSearch({ sort_by:"create_at", asc: false, size:8, page:1 });
+        setSelectOption({ table: "post", column: "title", name: "Title" });
+    };
+
     useEffect(() => {
         fetchData(search)
     }, [search]);
@@ -146,6 +152,9 @@ export default function FaqTable() {
                         onChange={(from, to) =>{
                             addDateFilter(from, to);
                         }}/>
+                    <GrPowerReset
+                        className={style.resetButton}
+                        onClick={handleReset}/>
                 </div>
                 <div className={style.filterContainerRight}>
                     <SelectBox

@@ -16,7 +16,6 @@ import DownloadExcelButton from "@/app/(afterLogin)/request/dashboard/_component
 import {Status} from "@/model/Status";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import {GrPowerReset} from "react-icons/gr";
-import globalTableStyle from "@/css/globalTable.module.css";
 
 export default function Table() {
     const [requestData, setRequestData] = useState<Request[]>([]);
@@ -184,6 +183,7 @@ export default function Table() {
         setSearchValue('');
         setStatus(Status.TOTAL);
         setSelectOption({ table: "sample", column: "id", name: "Registration ID" });
+        addDateFilter(null , null);
     };
 
     return (
@@ -260,7 +260,7 @@ export default function Table() {
                 ))
                 ) : (
                     <tr>
-                        <td colSpan={10} className={globalTableStyle.noData}>
+                        <td colSpan={10} className={style.noData}>
                             The searched data does not exist
                         </td>
                     </tr>

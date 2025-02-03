@@ -17,6 +17,8 @@ import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import RequestInfo from "@/app/(afterLogin)/request/order/_component/RequestInfo";
 import BarcodeModal from "@/app/(afterLogin)/request/order/barcode/_component/BarcodeModal";
 import CellTooltip from "@/app/_component/CellToolTip";
+import style from "@/css/qna/qnaTable.module.css";
+import {GrPowerReset} from "react-icons/gr";
 
 export interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -107,6 +109,11 @@ export default function RequestTable() {
 
     const selectedRequest = requestData.filter((row) => row.isSelected);
 
+    const handleReset = () => {
+        setSearchFilter(null);
+        setSelectedOption(selectBoxOptions[0]);
+    };
+
     useEffect(() => {
         const updatedSearch = {
             filter_groups: [
@@ -153,6 +160,9 @@ export default function RequestTable() {
                                 } as FilterGroup : defaultOrderDateFilter
                             )
                         }}/>
+                    <GrPowerReset
+                        className={style.resetButton}
+                        onClick={handleReset}/>
                 </div>
                 <div>
                     <SelectBox
