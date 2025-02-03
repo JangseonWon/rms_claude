@@ -35,40 +35,42 @@ const selectBoxOptions: SelectBoxOption[] = [
     { table: "request", column: "report_at", name: "Report Date" }
 ];
 
+const defaultSearch: Query = {size:10, page:1}
+const defaultFilter: Filter = {
+    table: "request",
+    column: "status",
+    value: "CART",
+    operator: "="
+}
+
 export default function CartTable() {
     const showAlert = CallAlertDialog();
     const [requestData, setRequestData] = useState<RequestWithSelected[]>([])
-    const [search, setSearch] = useState<Query>({asc: false, size:10, page:1});
+    const [search, setSearch] = useState<Query>(defaultSearch);
+    const [updateSearch, setUpdateSearch] = useState<Query>({});
     const [totalPage, setTotalPage] = useState<number>();
     const [pageRange, setPageRange] = useState<{ start: number, end: number }>({ start: 1, end: 5 });
     const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
     const isSelectedAll = requestData.length > 0 && requestData.every((row) => row.isSelected);
     const [modalOpen, setModalOpen] = useState<boolean>(false);
     const [infoRequest, setInfoRequest] = useState<Request>();
-    const [filter, setFilter] = useState<Filter>({
-        table: selectBoxOptions[0].table!,
-        column: selectBoxOptions[0].column!,
-        operator: "LIKE",
-        value: ""
-    })
+    const [searchFilter, setSearchFilter] = useState<Filter | undefined>(undefined);
 
     useEffect(() => {
-        setSearch((prevSearch) => ({
-            ...prevSearch,
+        const updatedSearch = {
+            ...search,
             filter_groups: [
                 {
-                    ...prevSearch?.filter_groups?.[0] || {},
                     filters: [
-                        filter,
-                    ],
-                },
+                        ...(searchFilter ? [searchFilter] : []),
+                        defaultFilter
+                    ]
+                }
             ],
-        }));
-    }, [filter]);
-
-    useEffect(() => {
-        fetchData(search)
-    }, [search]);
+        };
+        setUpdateSearch(updatedSearch)
+        fetchData(updatedSearch);
+    }, [search,searchFilter]);
 
 
     const fetchData = async (search: Query) => {
@@ -124,7 +126,7 @@ export default function CartTable() {
     const closeModal = () => {
         setInfoRequest(undefined);
         setModalOpen(false);
-        fetchData(search);
+        fetchData(updateSearch);
     }
 
     const handleDeleteCart = async () => {
@@ -136,15 +138,19 @@ export default function CartTable() {
         const response = await deleteRequest(selectedRequests)
         if(response.ok) showAlert("deleted!");
         else showAlert("fail");
-        fetchData(search);
+        fetchData(updateSearch);
     };
 
     const handleCartToOrder = async () => {
         const selectedRequests = requestData.filter(request => request.isSelected);
+        if( selectedRequests.length === 0) {
+            showAlert("No selected.");
+            return;
+        }
         const response = await putRequest(selectedRequests)
         if(response.ok) showAlert("ordered!");
         else showAlert("fail");
-        fetchData(search);
+        fetchData(updateSearch);
     };
 
     const formatDate = (year: number | undefined, month: number | undefined, day: number | undefined) => {
@@ -170,19 +176,22 @@ export default function CartTable() {
                         label={"filter"}
                         onChange={(option) => {
                             setSelectedOption(option);
-                            setFilter(prev => ({
-                                ...prev,
-                                table: option.table!,
-                                column: option.column!
-                            }))
                         }}
                     />
-                    <InputBox label={"search"} onChange={(value) => {
-                        setFilter(prev => ({
-                            ...prev,
-                            value: value
-                        }))
-                    }}></InputBox>
+                    <InputBox
+                        label={"search"}
+                        onChange={(value) => {
+                        setSearchFilter(
+                            value && value.trim() !== ""
+                                ? {
+                                    table: selectedOption.table,
+                                    column: selectedOption.column,
+                                    operator: "LIKE",
+                                    value: value
+                                } as Filter
+                                : undefined
+                        );
+                    }}/>
                 </div>
             </section>
             <div className={globalTableStyle.tableContainer}>
