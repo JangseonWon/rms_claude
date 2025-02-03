@@ -174,6 +174,7 @@ export default function DownloadTable() {
     const handleReset = () => {
         setSearchFilter(null);
         setSelectedOption(selectBoxOptions[0]);
+        setOrderDateFilter(undefined);
     };
 
     return (

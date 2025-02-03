@@ -138,6 +138,7 @@ export default function RequestTable() {
     const handleReset = () => {
         setSearchFilter(null);
         setSelectedOption(selectBoxOptions[0]);
+        setOrderDateFilter(undefined);
     };
 
     useEffect(() => {
