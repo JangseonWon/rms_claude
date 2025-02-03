@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 interface RequestDao: QueryDao {
-    fun DSLContext.selectRequestCartByUserId(userDto: User, query: Query): Mono<Page<RequestDTO>> {
+    fun DSLContext.selectRequestsByUserId(userDto: User, query: Query): Mono<Page<RequestDTO>> {
         val joins = listOf(
             QueryDao.JoinInfo(USER, REQUEST.USER_ID.eq(USER.ID), QueryDao.JoinType.INNER),
             QueryDao.JoinInfo(SAMPLE, REQUEST.SAMPLE_ID.eq(SAMPLE.ID), QueryDao.JoinType.INNER),
@@ -24,9 +24,13 @@ interface RequestDao: QueryDao {
 
         val fields = listOf(
             jsonObject(
+                key("id").value(REQUEST.REQUEST_GROUP_ID)
+            ).`as`("request_group"),
+            jsonObject(
                 key("id").value(USER.ID),
                 key("name").value(USER.NAME),
-                key("role").value(USER.ROLE)
+                key("role").value(USER.ROLE),
+                key("branch_serial").value(USER.BRANCH_SERIAL)
             ).`as`("user"),
             jsonObject(
                 key("id").value(SERVICE.ID),
@@ -81,17 +85,12 @@ interface RequestDao: QueryDao {
             ).`as`("sample")
         )
 
-        val baseCondition = REQUEST.SAMPLE_ID.eq(SAMPLE.ID)
-            .and(REQUEST.SERVICE_ID.eq(SERVICE.ID))
-
-        val finalCondition = if (userDto.role == "USER") {
-            baseCondition.and(REQUEST.USER_ID.eq(userDto.id))
-        } else {
-            baseCondition
-        }.and(REQUEST.STATUS.eq("CART"))
+        val condition = if (userDto.role == "USER") {
+            REQUEST.USER_ID.eq(userDto.id)
+        } else noCondition()
 
         return selectPage(mainTable = REQUEST, query = query,
-            joinTables = joins, selectFields = fields, where = finalCondition) { record ->
+            joinTables = joins, selectFields = fields, where = condition) { record ->
             record.into(RequestDTO::class.java)
         }
     }

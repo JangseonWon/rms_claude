@@ -13,7 +13,7 @@ import java.util.*
 
 @Component
 class Handler(val dslContext: DSLContext ) :
-    RequestDao, OrganizationDao, SampleTypeDao, PatientDao, SampleDao, SampleExtensionDao
+    RequestDao, RequestGroupDao, OrganizationDao, SampleTypeDao, PatientDao, SampleDao, SampleExtensionDao
 {
     fun getCartInfo(sampleId: UUID, serviceId: String): Mono<RequestDTO> {
         return Mono.from(dslContext.transactionPublisher { trx ->
@@ -24,7 +24,7 @@ class Handler(val dslContext: DSLContext ) :
         })
     }
     fun requestSearch(user: UserAuthentication, query: Query): Mono<Page<RequestDTO>> {
-        return dslContext.selectRequestCartByUserId(user.user, query)
+        return dslContext.selectRequestsByUserId(user.user, query)
     }
     fun organizations(userId: String): Flux<OrganizationDTO> {
         return dslContext.selectOrganizationByUserId(userId)
@@ -49,7 +49,7 @@ class Handler(val dslContext: DSLContext ) :
             trx.dsl().run {
                 Flux.fromArray(requests).flatMap { request ->
                     updateRequestStatusAndCreateAtById(request.sample!!.id!!, request.service!!.id!!)
-                        .then(updateSampleBarcodeAndCreateAtById(request.sample.id!!, request.sample.patient!!.organization!!.user!!.branchSerial!!))
+                        .then(updateSampleBarcodeAndCreateAtById(request.sample.id!!, request.user!!.branchSerial!!))
                         .then(selectRequestById(request.sample.id!!, request.service.id!!))
                 }
             }
@@ -63,6 +63,7 @@ class Handler(val dslContext: DSLContext ) :
             trx.dsl().run {
                 Flux.fromArray(requests).flatMap { request ->
                         deleteRequest(request)
+                            .then(deleteRequestGroup(request.requestGroup!!.id!!))
                             .then(deleteSampleExtensionBySampleId(request.sample!!.id!!))
                             .then(deleteSampleById(request.sample.id!!))
                             .then(deletePatientById(request.user?.id!!, request.sample.patient!!))

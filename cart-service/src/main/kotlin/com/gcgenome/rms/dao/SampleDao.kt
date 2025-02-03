@@ -39,6 +39,7 @@ interface SampleDao {
         ).map { it.into(SampleDTO::class.java) }
     }
     fun DSLContext.updateSampleBarcodeAndCreateAtById(sampleId: UUID, branchSerial: String): Mono<SampleDTO> {
+        println("====================updateSampleBarcodeAndCreateAt")
         val ofPattern = DateTimeFormatter.ofPattern("yyyyMMdd")
         val currentDate = LocalDateTime.now().format(ofPattern)
         val serialPrefix = currentDate + branchSerial
