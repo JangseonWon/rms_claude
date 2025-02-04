@@ -20,6 +20,9 @@ interface RequestDao: QueryDao{
                 .set(REQUEST.DEPARTMENT, request.department)
                 .set(REQUEST.WARD, request.ward)
                 .set(REQUEST.PHYSICIAN, request.physician)
+                .set(REQUEST.USER_ID, request.user!!.id)
+                .set(REQUEST.REQUEST_GROUP_ID, request.requestGroup!!.id)
+                .set(REQUEST.REQUEST_RELATION_ID, request.requestRelation!!.id)
                 .set(REQUEST.CREATE_AT, request.status.takeIf { it == Status.UNCONFIRMED_ORDER }?.let { LocalDateTime.now() })
                 .set(REQUEST.CART_AT, request.status.takeIf { it == Status.CART }?.let { LocalDateTime.now() })
                 .set(REQUEST.LAST_MODIFY_AT, LocalDateTime.now())
@@ -73,6 +76,9 @@ interface RequestDao: QueryDao{
             REQUEST.SPECIFIED_AT.`as`("specified_at"),
             REQUEST.RESAMPLE_AT.`as`("resample_at"),
             jsonObject(
+                key("id").value(REQUEST.REQUEST_GROUP_ID)
+            ).`as`("request_group"),
+            jsonObject(
                 key("id").value(SERVICE.ID),
                 key("name").value(SERVICE.NAME)
             ).`as`("service"),
@@ -123,7 +129,7 @@ interface RequestDao: QueryDao{
             ).`as`("reports")
         )
         val groupByFields = listOf(
-            REQUEST.USER_SERVICE_ID, REQUEST.STATUS, REQUEST.PHYSICIAN, REQUEST.REPORTED_AT, REQUEST.SPECIFIED_AT, REQUEST.RESAMPLE_AT,
+            REQUEST.USER_SERVICE_ID, REQUEST.STATUS, REQUEST.PHYSICIAN, REQUEST.REPORTED_AT, REQUEST.SPECIFIED_AT, REQUEST.RESAMPLE_AT, REQUEST.REQUEST_GROUP_ID,
             SERVICE.ID,
             USER.ID,
             SAMPLE.ID,
@@ -145,8 +151,12 @@ interface RequestDao: QueryDao{
                 REQUEST.PHYSICIAN,
                 REQUEST.CART_AT,
                 jsonObject(
+                    key("id").value(REQUEST.REQUEST_GROUP_ID)
+                ).`as`("request_group"),
+                jsonObject(
                     key("id").value(USER.ID),
-                    key("name").value(USER.NAME)
+                    key("name").value(USER.NAME),
+                    key("branch_serial").value(USER.BRANCH_SERIAL)
                 ).`as`("user"),
                 jsonObject(
                     key("id").value(SERVICE.ID),
@@ -157,7 +167,6 @@ interface RequestDao: QueryDao{
                     key("user_sample_id").value(SAMPLE.USER_SAMPLE_ID),
                     key("quantity").value(SAMPLE.QUANTITY),
                     key("age").value(SAMPLE.AGE),
-                    key("sampling_on").value(SAMPLE.SAMPLING_ON),
                     key("create_at").value(SAMPLE.CREATE_AT),
                     key("sample_type").value(jsonObject(
                         key("id").value(SAMPLE_TYPE.ID),

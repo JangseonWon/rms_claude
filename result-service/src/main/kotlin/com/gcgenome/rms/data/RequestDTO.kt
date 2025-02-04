@@ -39,5 +39,9 @@ data class RequestDTO(
     var service: ServiceDTO? = null,
     var sample: SampleDTO? = null,
     var reports: List<ReportDTO>? = null,
-    var user: UserDTO? = null
+    var user: UserDTO? = null,
+    @JsonProperty("request_group")
+    var requestGroup: RequestGroupDTO? = null,
+    @JsonProperty("request_relation")
+    var requestRelation: RequestRelationDTO? = null
 )

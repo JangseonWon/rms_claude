@@ -23,7 +23,7 @@ class RequestRouter (
     fun route() = router {
         GET("/w-api/result-service/requests", :: getRequestById)
         PUT("/w-api/result-service/requests", ::saveResampleRequest)
-        POST("/w-api/result-service/requests/search", ::selectRequests)
+        POST("/w-api/result-service/requests/search", ::searchRequests)
         PATCH("/w-api/result-service/requests", :: updateRequests)
     }
     private fun getRequestById(request: ServerRequest): Mono<ServerResponse> {
@@ -43,10 +43,10 @@ class RequestRouter (
             .flatMap { requestHandler.saveResampleRequest(it) }
             .then(ServerResponse.ok().build())
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}") }
-            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Error: ${e.cause}") }
+            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Error: ${e.stackTraceToString()}") }
     }
 
-    private fun selectRequests(request: ServerRequest): Mono<ServerResponse> {
+    private fun searchRequests(request: ServerRequest): Mono<ServerResponse> {
         return Mono.zip(authenticationHandler.principal(request), request.bodyToMono(Query::class.java))
             .flatMap { requestHandler.selectRequests(it.t1, it.t2) }
             .flatMap { ServerResponse.ok()

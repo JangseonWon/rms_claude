@@ -64,6 +64,7 @@ class RequestHandler(
 
     fun saveSampleExtensions(dsl: DSLContext, sampleId: UUID, extensions: List<ExtensionDTO>): Flux<ExtensionDTO>{
         return Flux.fromIterable(extensions)
+            .filter{ extension -> extension.value != null}
             .flatMap { extension ->
                 dsl.insertSampleExtension(SampleExtensionDTO(sampleId = sampleId, extensionId = extension.id, value = extension.value))
             }
