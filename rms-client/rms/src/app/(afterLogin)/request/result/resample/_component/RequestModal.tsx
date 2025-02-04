@@ -8,21 +8,16 @@ import React, {useEffect} from "react";
 import {Request} from "@/model/Request"
 import InputBox from "@/app/_component/InputBox";
 import Loading from "@/app/(afterLogin)/_component/Loading";
-import {postRequests} from "@/app/(afterLogin)/request/result/resample/_api/postRequests";
 import { useRequestStore } from '@/store/useRequestStore';
-import {Query} from "@/model/Query";
 import {format} from "date-fns";
 import DatePickerBox from "@/app/_component/DatePickerBox";
 import TextBox from "@/app/_component/TextBox";
 import BlueButton from "@/app/_component/BlueButton";
-import GreenButton from "@/app/_component/GreenButton";
 import ExtensionInputComponent from "@/app/(afterLogin)/request/result/resample/_component/ExtensionInputComponent";
 import {putRequest} from "@/app/(afterLogin)/request/result/resample/_api/putRequest";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 import {Status} from "@/model/Status";
 import {getRequest} from "@/app/(afterLogin)/request/result/resample/_api/getRequest";
-import {update} from "next-auth/lib/actions";
-import {updateRequest} from "@/app/(afterLogin)/request/cart/_api/updateRequest";
 
 type Props = {
     propRequest: Request | undefined
