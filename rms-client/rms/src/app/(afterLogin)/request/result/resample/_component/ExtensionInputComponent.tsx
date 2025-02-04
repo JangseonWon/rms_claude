@@ -63,11 +63,18 @@ export default function ExtensionInputComponent({ serviceId }: ExtensionInputCom
     const fetchExtensions = async () => {
         const response = await fetchServiceExtensions(serviceId);
         if(response.ok){
-            setExtensions(await response.json() as Extension[]);
+            const data: Extension[] = await response.json()
+            setExtensions(data);
+            setRequest((prevState) => ({
+                ...prevState,
+                sample: {
+                    ...prevState?.sample,
+                    extensions: data
+                }
+            }));
         }else{
             showAlert("Error!")
         }
-
     };
 
     const renderExtensionComponent = (extension: Extension) => {
@@ -77,7 +84,6 @@ export default function ExtensionInputComponent({ serviceId }: ExtensionInputCom
                 return <SelectBox
                     key={extension.id}
                     label={extension.name!}
-                    value={(request?.sample?.extensions as Extension[])?.find((ext) => ext.id == extension.id)?.value}
                     options={selectList}
                     required={extension.required}
                     onChange={(selectedOption) => handleRequestChange("sample.extensions", { id: extension.id, value: selectedOption.value })}
@@ -91,7 +97,6 @@ export default function ExtensionInputComponent({ serviceId }: ExtensionInputCom
                 return <SelectBox
                     key={extension.id}
                     label={extension.name!}
-                    value={(request?.sample?.extensions as Extension[])?.find((ext) => ext.id == extension.id)?.value}
                     options={booleanList}
                     required={extension.required}
                     onChange={(selectedOption) => handleRequestChange("sample.extensions", { id: extension.id, value: selectedOption.value })}
@@ -103,14 +108,12 @@ export default function ExtensionInputComponent({ serviceId }: ExtensionInputCom
                 return <InputBox
                     key={extension.id}
                     label={extension.name}
-                    value={(request?.sample?.extensions as Extension[])?.find((ext) => ext.id == extension.id)?.value}
                     required={extension.required}
                     onChange={(value) => handleRequestChange("sample.extensions", { id: extension.id, value: value })}
                 />;
             case ExtensionType.TEXT:
                 return <TextBox
                     key={extension.id}
-                    value={(request?.sample?.extensions as Extension[])?.find((ext) => ext.id == extension.id)?.value}
                     label={extension.name!}
                     onChange={(value) => handleRequestChange("sample.extensions", { id: extension.id, value: value })}
                 />;

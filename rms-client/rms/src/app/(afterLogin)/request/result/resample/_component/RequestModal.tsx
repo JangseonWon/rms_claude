@@ -21,6 +21,8 @@ import {putRequest} from "@/app/(afterLogin)/request/result/resample/_api/putReq
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 import {Status} from "@/model/Status";
 import {getRequest} from "@/app/(afterLogin)/request/result/resample/_api/getRequest";
+import {update} from "next-auth/lib/actions";
+import {updateRequest} from "@/app/(afterLogin)/request/cart/_api/updateRequest";
 
 type Props = {
     propRequest: Request | undefined
@@ -39,7 +41,13 @@ export default function RequestModal({propRequest, closeModal,refreshData}: Prop
         }));
     };
     const handleOrderNow = async() =>{
-        const updatedRequest = { ...request, status: Status.UNCONFIRMED_ORDER };
+        const updatedRequest: Request = {
+            ...request,
+            status: Status.UNCONFIRMED_ORDER,
+            request_relation: {
+                id:2
+            }
+        };
         const response = await putRequest(updatedRequest!)
         if(response.ok){
             closeModal();
@@ -47,16 +55,6 @@ export default function RequestModal({propRequest, closeModal,refreshData}: Prop
             showAlert("success!")
         }else{
             showAlert("fail!")
-        }
-    }
-    const handleCart = async() =>{
-        const updatedRequest = { ...request, status: Status.CART };
-        const response = await putRequest(updatedRequest!)
-        if(response.ok){
-            closeModal();
-            refreshData();
-        }else{
-            showAlert("fail!!")
         }
     }
 
@@ -99,6 +97,25 @@ export default function RequestModal({propRequest, closeModal,refreshData}: Prop
     useEffect(() => {
         fetchRequest()
     }, []);
+
+    const isAllRequiredFilled = () => {
+        const sample = request?.sample;
+        if (!sample) return false;
+        const requiredFields = [
+            sample?.patient?.organization?.id,
+            sample?.patient?.name,
+            sample?.patient?.serial,
+            sample?.patient?.sex,
+            sample?.sample_type?.id,
+            sample?.sampling_on,
+            sample?.quantity,
+        ];
+        if (requiredFields.some(field => typeof field !== 'string' || field.trim() === '')) return false;
+        return (sample.extensions || []).every(
+            extension =>
+                !extension.required || (extension.value != null && extension.value !== '')
+        );
+    };
 
     return (
         <div className={globalModalStyle.modalBackground}>
@@ -204,12 +221,14 @@ export default function RequestModal({propRequest, closeModal,refreshData}: Prop
                         <TextBox
                             label={'Memo'}
                             value={request.memo}
-                            required={true}
                             onChange={(value) => handleRequestChange('memo', value)}
                         />
                         <div className={style.flexEndContainer}>
-                            <GreenButton name={'Add to cart'} onClick={() => handleCart()}/>
-                            <BlueButton name={"Order now"} onClick={() => handleOrderNow()}/>
+                            <BlueButton
+                                name={"Order now"}
+                                disabled={!isAllRequiredFilled()}
+                                onClick={() => handleOrderNow()}
+                            />
                         </div>
                     </>
                 ) : <Loading/>}

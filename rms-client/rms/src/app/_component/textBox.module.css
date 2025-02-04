@@ -17,6 +17,7 @@
     width: 100%;
     border-radius: 15px;
     padding: 10px 20px;
+    margin-bottom: 10px;
     box-shadow: 0 2px 2px #F3F6F9;
 }
 .memo:focus {
