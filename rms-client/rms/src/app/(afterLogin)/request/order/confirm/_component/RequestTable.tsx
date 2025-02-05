@@ -22,6 +22,7 @@ import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 import CellTooltip from "@/app/_component/CellToolTip";
 import style from "@/css/qna/qnaTable.module.css";
 import {GrPowerReset} from "react-icons/gr";
+import {putRequest} from "@/app/(afterLogin)/request/cart/_api/putRequest";
 
 export interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -65,38 +66,40 @@ export default function RequestTable() {
     };
     const handleAirWaybillClick = () => {
         const selected = requestData.filter((request) => request.isSelected);
+        if(selected.length == 0) {
+            showAlert("No selected.")
+            return
+        }
         setSelectedRequests(selected);
         setAirWaybillModal(true);
     }
     const handleConfirmClick = async () => {
         const selected = requestData.filter((request) => request.isSelected);
+        if(selected.length == 0) {
+            showAlert("No selected.")
+            return
+        }
         const hasMissingInfo = selected.some(
             (request) => !request.awb_number || !request.courier_company
         );
-
         if (hasMissingInfo) {
             showAlert("There is no AirWaybill or Global Courier information entered.");
             return;
         }
-
         const updatedRequests = selected.map((request) => ({
             sample: { id: request.sample?.id },
             service: { id: request.service?.id },
             status: Status.COMPLETED_ORDER.valueOf(),
         }));
 
-        try {
-            const response = await patchRequests(updatedRequests);
-            if(response.ok) {
-                showAlert("Success")
-                await fetchData(updatedSearch());
-            } else {
-                console.error("Failed to confirm requests:", response.statusText);
-            }
-        } catch (error) {
-            console.error("Failed to confirm requests:", error);
+        const response = await patchRequests(updatedRequests);
+        if(response.ok) {
+            showAlert("Success")
+            await fetchData(updatedSearch());
+        } else {
+            console.error("Failed to confirm requests:", response.statusText);
         }
-    };
+    }
 
     const closeModal = () => {
         setInfoModalOpen(false);
