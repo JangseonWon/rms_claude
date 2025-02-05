@@ -110,31 +110,11 @@ spec:
                 secretKeyRef:
                   name: rms-s3-credentials
                   key: bucket
-            - name: kafka.gemini
+            - name: kafka.test
               valueFrom:
                 secretKeyRef:
                   name: kafka
-                  key: gemini
-            - name: kafka.pisces
-              valueFrom:
-                secretKeyRef:
-                  name: kafka
-                  key: pisces
-            - name: kafka.aries
-              valueFrom:
-                secretKeyRef:
-                  name: kafka
-                  key: aries
-            - name: kafka.taurus
-              valueFrom:
-                secretKeyRef:
-                  name: kafka
-                  key: taurus
-            - name: kafka.libra
-              valueFrom:
-                secretKeyRef:
-                  name: kafka
-                  key: libra
+                  key: test
             - name: TZ
               value: Asia/Seoul
           ports:
