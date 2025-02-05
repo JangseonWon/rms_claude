@@ -77,6 +77,7 @@ class Handler(val dslContext: DSLContext ) :
             ?.takeIf { it.isNotEmpty() }
             ?.let {
                 Flux.fromIterable(it)
+                    .filter { extension -> !extension.value.isNullOrBlank() }
                     .flatMap { extension ->
                         trx.dsl().updateSampleExtensionBySampleId(sampleId, extension)
                     }

@@ -178,16 +178,18 @@ interface RequestDao: QueryDao {
                     key("extensions").value(
                         select(
                             jsonArrayAgg(jsonObject(
-                                key("id").value(EXTENSION.ID),
-                                key("name").value(EXTENSION.NAME),
-                                key("value").value(SAMPLE_EXTENSION.VALUE),
-                                key("regex").value(EXTENSION.REGEX),
-                                key("type").value(EXTENSION.TYPE)
-                            ))
-
-                        ).from(SAMPLE_EXTENSION)
-                            .join(EXTENSION).on(SAMPLE_EXTENSION.EXTENSION_ID.eq(EXTENSION.ID))
-                            .where(SAMPLE_EXTENSION.SAMPLE_ID.eq(sampleId))
+                                    key("id").value(EXTENSION.ID),
+                                    key("name").value(EXTENSION.NAME),
+                                    key("value").value(SAMPLE_EXTENSION.VALUE),
+                                    key("regex").value(EXTENSION.REGEX),
+                                    key("type").value(EXTENSION.TYPE)
+                                ))
+                        ).from(EXTENSION)
+                            .join(SERVICE_EXTENSION).on(SERVICE_EXTENSION.EXTENSION_ID.eq(EXTENSION.ID))
+                            .leftJoin(SAMPLE_EXTENSION)
+                            .on(SAMPLE_EXTENSION.EXTENSION_ID.eq(EXTENSION.ID))
+                            .and(SAMPLE_EXTENSION.SAMPLE_ID.eq(sampleId))
+                            .where(SERVICE_EXTENSION.SERVICE_ID.eq(serviceId))
                     )
                 ).`as`("sample")
             ).from(REQUEST)
