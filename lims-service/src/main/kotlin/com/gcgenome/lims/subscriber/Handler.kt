@@ -26,11 +26,11 @@ class Handler(
 ) : SampleDao, ReportDao, RequestDao {
     fun updateRequest(message: WorkflowMessage): Mono<Request> {
         return Mono.from(dslContext.run {
-            if(message.process  == "SPECIFIED" && message.type == "COMPLETE"){
+            if(message.process  == LimsStatus.SPECIFIED.name && message.type == LimsStatus.COMPLETE.name){
                 selectSampleByBarcode(message.request.samples[0].id.toString())
                     .switchIfEmpty(Mono.error(NotFoundBarcodeException("not found barcode: ${message.request.samples[0].id}")))
                     .flatMap { sample -> selectRequestBySampleIdAndServiceId(sample.id!!, message.request.service.id) }
-                    .flatMap { request -> updateRequestStatusById(request.orderId!!, request.serviceId!!, request.sampleId!!, "INPROGRESS") }
+                    .flatMap { request -> updateRequestStatusById(request.serviceId!!, request.sampleId!!, Status.IN_PROGRESS.name) }
             }else{
                 Mono.error(InvalidWorkflowException("It is not in specified & complete - barcode: ${message.request.samples[0].id}, service: ${message.request.service.id}, status: ${message.process}, type: ${message.type}"))
             }
@@ -41,7 +41,7 @@ class Handler(
             selectSampleByBarcode(message.sample.toString())
                 .switchIfEmpty(Mono.error(NotFoundBarcodeException("not found barcode: ${message.sample}")))
                 .flatMap { sample -> selectRequestBySampleIdAndServiceId(sample.id!!, message.service!!) }
-                .flatMap { request -> updateRequestStatusById(request.orderId!!, request.serviceId!!, request.sampleId!!, "DELIVERED") }
+                .flatMap { request -> updateRequestStatusById(request.serviceId!!, request.sampleId!!, Status.TEST_FAILED.name) }
                 .flatMap { request ->
                     val barcode = message.sample.toString()
                     val year = barcode.substring(0, 4)
@@ -50,7 +50,7 @@ class Handler(
                     val now = LocalDateTime.now()
                     val timestamp = now.toInstant(ZoneOffset.UTC).toEpochMilli()
 
-                    updateReportIsLatestBySampleIdAndServiceId(request.orderId!!, request.sampleId!!, request.serviceId!!)
+                    updateReportIsLatestBySampleIdAndServiceId(request.sampleId!!, request.serviceId!!)
                         .then(
                             insertReport(Report(
                                 id = UUID.randomUUID(),
@@ -59,7 +59,6 @@ class Handler(
                                 createAt = now,
                                 reportedAt = null,
                                 isLatest = true,
-                                orderId = request.orderId,
                                 serviceId = request.serviceId,
                                 sampleId = request.sampleId)
                             )

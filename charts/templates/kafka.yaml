@@ -19,4 +19,4 @@ data:
               group: rms-test-subscriber
           kafka:
             binder:
-              brokers: ${kafka.gemini}, ${kafka.pisces}, ${kafka.aries}, ${kafka.taurus}, ${kafka.libra}
+              brokers: ${kafka.test}

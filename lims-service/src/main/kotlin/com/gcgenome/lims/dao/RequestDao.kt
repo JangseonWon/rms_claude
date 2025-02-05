@@ -15,13 +15,11 @@ interface RequestDao {
         ).map { it.into(Request::class.java) }
     }
 
-    fun DSLContext.updateRequestStatusById(orderId: UUID, serviceId: String, sampleId: UUID, status: String): Mono<Request> {
+    fun DSLContext.updateRequestStatusById(serviceId: String, sampleId: UUID, status: String): Mono<Request> {
         return Mono.from(
             update(REQUEST)
                 .set(REQUEST.STATUS, status)
-                .where(REQUEST.ORDER_ID.eq(orderId))
-                .and(REQUEST.SERVICE_ID.eq(serviceId))
-                .and(REQUEST.SAMPLE_ID.eq(sampleId))
+                .where(REQUEST.SERVICE_ID.eq(serviceId),REQUEST.SAMPLE_ID.eq(sampleId))
                 .returning()
         ).map { it.into(Request::class.java) }
     }

@@ -4,7 +4,6 @@ import java.time.LocalDateTime
 import java.util.*
 
 data class Request(
-    var orderId: UUID? = null,
     var sampleId: UUID? = null,
     var serviceId: String? = null,
     var cartAt: LocalDateTime? = null,

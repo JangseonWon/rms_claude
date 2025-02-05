@@ -15,20 +15,20 @@ interface ReportDao {
                 .set(REPORT.VALUE, report.value)
                 .set(REPORT.CREATE_AT, report.createAt)
                 .set(REPORT.IS_LATEST, report.isLatest)
-                .set(REPORT.ORDER_ID, report.orderId)
                 .set(REPORT.SERVICE_ID, report.serviceId)
                 .set(REPORT.SAMPLE_ID, report.sampleId)
                 .returning()
         ).map { it.into(Report::class.java) }
     }
-    fun DSLContext.updateReportIsLatestBySampleIdAndServiceId(orderId: UUID, sampleId: UUID, serviceId: String): Mono<Report>{
+    fun DSLContext.updateReportIsLatestBySampleIdAndServiceId(sampleId: UUID, serviceId: String): Mono<Report>{
         return Mono.from(
             update(REPORT)
                 .set(REPORT.IS_LATEST, false)
-                .where(REPORT.ORDER_ID.eq(orderId))
-                .and(REPORT.SAMPLE_ID.eq(sampleId))
-                .and(REPORT.SERVICE_ID.eq(serviceId))
-                .and(REPORT.TYPE.eq("PDF"))
+                .where(
+                    REPORT.SAMPLE_ID.eq(sampleId),
+                    REPORT.SERVICE_ID.eq(serviceId),
+                    REPORT.TYPE.eq("PDF")
+                )
                 .returning()
         ).map { it.into(Report::class.java) }
     }

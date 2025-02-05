@@ -10,7 +10,6 @@ data class Report(
     var createAt: LocalDateTime?,
     var reportedAt: LocalDateTime?,
     var isLatest: Boolean?,
-    var orderId: UUID?,
     var serviceId: String?,
     var sampleId: UUID?
     )
