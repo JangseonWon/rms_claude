@@ -15,9 +15,12 @@ interface SampleExtensionDao {
 
     fun DSLContext.updateSampleExtensionBySampleId(sampleId: UUID, extension: ExtensionDTO): Mono<ExtensionDTO> {
         return Mono.from(
-            update(SAMPLE_EXTENSION)
+            insertInto(SAMPLE_EXTENSION)
+                .set(SAMPLE_EXTENSION.SAMPLE_ID, sampleId)
+                .set(SAMPLE_EXTENSION.EXTENSION_ID, extension.id)
                 .set(SAMPLE_EXTENSION.VALUE, extension.value)
-                .where(SAMPLE_EXTENSION.SAMPLE_ID.eq(sampleId).and(SAMPLE_EXTENSION.EXTENSION_ID.eq(extension.id)))
+                .onDuplicateKeyUpdate()
+                .set(SAMPLE_EXTENSION.VALUE, extension.value)
                 .returning()
         ).map { it.into(ExtensionDTO::class.java) }
     }
