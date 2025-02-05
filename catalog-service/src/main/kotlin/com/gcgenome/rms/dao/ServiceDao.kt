@@ -17,7 +17,7 @@ interface ServiceDao  {
     fun DSLContext.selectServices(user: User): Flux<ServiceDTO> {
         val condition = if (user.role == Role.USER.name) USER_SERVICE.USER_ID.eq(user.id) else null
         return Flux.from(
-            select(SERVICE)
+            selectDistinct(SERVICE)
                 .from(SERVICE)
                 .leftJoin(USER_SERVICE).on(SERVICE.ID.eq(USER_SERVICE.SERVICE_ID))
                 .where(condition)
