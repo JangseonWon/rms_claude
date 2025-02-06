@@ -3,6 +3,9 @@ body{
     background-color: #EBECEE;
     overflow-y: scroll;
 }
+textarea {
+    font-family: inherit;
+}
 
 /*react-datepicker*/
 .react-datepicker{
