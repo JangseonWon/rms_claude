@@ -25,25 +25,35 @@ class Handler(
     @Value("\${aws.s3.bucket}") private val bucketName: String
 ) : SampleDao, ReportDao, RequestDao {
     fun updateRequest(message: WorkflowMessage): Mono<Request> {
+        val barcode = message.request.samples[0].id.toString()
+        val serviceId = message.request.service.id
+
         return Mono.from(dslContext.run {
-            if(message.process  == LimsStatus.SPECIFIED.name && message.type == LimsStatus.COMPLETE.name){
-                selectSampleByBarcode(message.request.samples[0].id.toString())
-                    .switchIfEmpty(Mono.error(NotFoundBarcodeException("not found barcode: ${message.request.samples[0].id}")))
-                    .flatMap { sample -> selectRequestBySampleIdAndServiceId(sample.id!!, message.request.service.id) }
-                    .flatMap { request -> updateRequestStatusById(request.serviceId!!, request.sampleId!!, Status.IN_PROGRESS.name) }
-            }else{
-                Mono.error(InvalidWorkflowException("It is not in specified & complete - barcode: ${message.request.samples[0].id}, service: ${message.request.service.id}, status: ${message.process}, type: ${message.type}"))
-            }
+            selectSampleByBarcode(barcode)
+                .switchIfEmpty(Mono.error(NotFoundBarcodeException("not found barcode: $barcode")))
+                .flatMap { sample -> selectRequestBySampleIdAndServiceId(sample.id!!, serviceId) }
+                .flatMap { request ->
+                    when{
+                        message.process == LimsStatus.SPECIFIED.name && message.type == LimsStatus.COMPLETE.name ->
+                            updateRequestStatusById(request.serviceId!!, request.sampleId!!, Status.IN_PROGRESS.name)
+                        message.process == LimsStatus.RESAMPLED.name && message.type == LimsStatus.COMPLETE.name ->
+                            updateRequestStatusById(request.serviceId!!, request.sampleId!!, Status.TEST_FAILED.name)
+                        else -> Mono.error(InvalidWorkflowException("Invalid workflow: barcode=$barcode, service=$serviceId, process=${message.process}, type=${message.type}"))
+                    }
+                }
         })
     }
     fun saveReport(message: ReportMessage): Mono<Report> {
+        val barcode = message.sample.toString()
+        val serviceId = message.service!!
+        val institution = message.institution
+        val reportBytes = message.report ?: byteArrayOf()
+
         return Mono.from(dslContext.run {
-            selectSampleByBarcode(message.sample.toString())
-                .switchIfEmpty(Mono.error(NotFoundBarcodeException("not found barcode: ${message.sample}")))
-                .flatMap { sample -> selectRequestBySampleIdAndServiceId(sample.id!!, message.service!!) }
-                .flatMap { request -> updateRequestStatusById(request.serviceId!!, request.sampleId!!, Status.TEST_FAILED.name) }
+            selectSampleByBarcode(barcode)
+                .switchIfEmpty(Mono.error(NotFoundBarcodeException("not found barcode: $barcode")))
+                .flatMap { sample -> selectRequestBySampleIdAndServiceId(sample.id!!, serviceId) }
                 .flatMap { request ->
-                    val barcode = message.sample.toString()
                     val year = barcode.substring(0, 4)
                     val month = barcode.substring(4, 6)
                     val day = barcode.substring(6, 8)
@@ -55,7 +65,7 @@ class Handler(
                             insertReport(Report(
                                 id = UUID.randomUUID(),
                                 type = "PDF",
-                                value = "reports/${message.institution}/${year}/${month}/${day}/${barcode}/${barcode}_${message.service}_${timestamp}.pdf",
+                                value = "reports/$institution/$year/$month/$day/$barcode/${barcode}_${serviceId}_${timestamp}.pdf",
                                 createAt = now,
                                 reportedAt = null,
                                 isLatest = true,
@@ -70,7 +80,7 @@ class Handler(
                         .key(report.value)
                         .contentType("application/pdf")
                         .build()
-                    val requestBody = AsyncRequestBody.fromBytes(message.report ?: byteArrayOf())
+                    val requestBody = AsyncRequestBody.fromBytes(reportBytes)
                     Mono.fromFuture { s3Client.putObject(putObjectRequest, requestBody) }
                         .then(Mono.just(report))
                 }
