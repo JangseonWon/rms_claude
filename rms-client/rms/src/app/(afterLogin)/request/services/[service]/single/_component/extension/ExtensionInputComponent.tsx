@@ -104,6 +104,11 @@ export default function ExtensionInputComponent({serviceId}: ExtensionInputCompo
         else showAlert("Please choose the institution")
     }
 
+    const validateInput = (value: string, regex: string) => {
+        const pattern = new RegExp(`^${regex.replace(/\\\\/g, '\\')}$`);
+        return pattern.test(value);
+    };
+
     const renderExtensionComponent = (extension: Extension) => {
         switch (extension.type) {
             case ExtensionType.LIST:
@@ -136,7 +141,12 @@ export default function ExtensionInputComponent({serviceId}: ExtensionInputCompo
                     key={extension.id}
                     label={extension.name}
                     required={extension.required}
-                    onChange={(value) => handleRequestChange("sample.extensions", { id: extension.id, value: value })}
+                    regex = {extension.regex}
+                    onChange={(value) => {
+                        if (validateInput(value, extension.regex || '.*')) {
+                        handleRequestChange("sample.extensions", { id: extension.id, value: value });
+                    }
+                }}
                 />;
             case ExtensionType.TEXT:
                 return <TextBox

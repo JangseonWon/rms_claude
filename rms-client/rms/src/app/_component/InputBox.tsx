@@ -6,21 +6,37 @@ import {ChangeEventHandler, useEffect, useState} from "react";
 type Props = {
     label?: string
     value?: any
+    regex?: string
     disabled?: boolean
     onChange?: (value: string) => void
     required?: boolean;
     type?: string;
     placeHolder?: string;
 }
-export default function InputBox({label, value, disabled=false, onChange, required=false, type="text", placeHolder}: Props) {
+export default function InputBox({label, value, regex, disabled=false, onChange, required=false, type="text", placeHolder}: Props) {
     const [inputValue, setInputValue] = useState('');
     const [hasError, setHasError] = useState(false);
 
+    const defaultRegex = /^[a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣0-9\s~`!@#$%^&*()-_=+[\]{}\\|;:'",.<>/?]*$/;
+
+    const getSafeRegex = () => {
+        if (!regex) return defaultRegex;
+        try {
+            return new RegExp(`^${regex}$`);
+        } catch {
+            return defaultRegex;
+        }
+    };
+
+    const validateInput = (value: string) => {
+        const pattern = getSafeRegex();
+        return pattern.test(value);
+    };
+
     const onChangeValue: ChangeEventHandler<HTMLInputElement> = (e) => {
         const { value } = e.target;
-        const regex = /^[a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣0-9\s~`!@#$%^&*()-_=+[\]{}\\|;:'",.<>/?]*$/;
 
-        if (regex.test(value)) {
+        if (validateInput(value)) {
             if (onChange) onChange(value);
             setInputValue(value);
             setHasError(!value && required);
