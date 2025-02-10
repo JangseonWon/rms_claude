@@ -29,6 +29,7 @@ export default function InputBox({label, value, regex, disabled=false, onChange,
     };
 
     const validateInput = (value: string) => {
+        if (value === "") return true;
         const pattern = getSafeRegex();
         return pattern.test(value);
     };
@@ -40,6 +41,10 @@ export default function InputBox({label, value, regex, disabled=false, onChange,
             if (onChange) onChange(value);
             setInputValue(value);
             setHasError(!value && required);
+        } else if (value === "") {
+            setInputValue("");
+            if (onChange) onChange("");
+            setHasError(required);
         }
     };
 
