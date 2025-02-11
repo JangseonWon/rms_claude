@@ -38,7 +38,7 @@ jooq {
                 logging = Logging.WARN
                 jdbc.apply {
                     driver = "org.postgresql.Driver"
-                    url = "jdbc:postgresql://${System.getenv("POSTGRES_URL")}/report_service"
+                    url = System.getenv("POSTGRES_URL")
                     user = System.getenv("POSTGRES_USERNAME")
                     password = System.getenv("POSTGRES_PASSWORD")
                 }
@@ -47,7 +47,7 @@ jooq {
                     database.apply {
                         name = "org.jooq.meta.postgres.PostgresDatabase"
                         schemata = listOf(
-                            SchemaMappingType().withInputSchema("rms_dev")
+                            SchemaMappingType().withInputSchema(System.getenv("POSTGRES_SCHEMA"))
                         )
                     }
                     generate.apply {
