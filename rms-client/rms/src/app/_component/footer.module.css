@@ -34,7 +34,7 @@
 }
 .footerCertificate img {
     width: 130px;
-    height: 40px;
+    height: auto;
 }
 .avatarIcon {
     cursor: pointer;

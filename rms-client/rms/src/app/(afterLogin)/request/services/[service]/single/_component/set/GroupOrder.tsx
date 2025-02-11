@@ -16,16 +16,16 @@ import BlueButton from "@/app/_component/BlueButton";
 import {putRequest} from "@/app/(afterLogin)/request/services/[service]/single/_api/putRequest";
 import {format} from "date-fns";
 import {usePathname} from "next/navigation";
-import ExtensionInputComponent
-    from "@/app/(afterLogin)/request/services/[service]/single/_component/extension/ExtensionInputComponent";
 import TextBox from "@/app/_component/TextBox";
 import genomeImg from "@/../public/GCgenome_white.png";
 import logo from "@/css/orderGenomeLogo.module.css";
 import Image from "next/image";
 import {Service} from "@/model/Service";
 import {getServiceGroup} from "@/app/(afterLogin)/request/services/[service]/single/_api/getServiceGroup";
-import {setAge, setNestedValue} from './GroupOrderUtils';
+import {formatExtensionValue, setAge, setNestedValue} from './GroupOrderUtils';
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
+import ExtensionGroupInputComponent
+    from "@/app/(afterLogin)/request/services/[service]/single/_component/extension/ExtensionGroupInputComponent";
 
 export default function GroupOrder() {
     const [organizationOptions, setOrganizationOptions] = useState<SelectBoxOption[]>([])
@@ -159,33 +159,62 @@ export default function GroupOrder() {
         });
     };
 
+    const handleExtensionChange = (index: number, id: string, value: any): void => {
+        setRequests((prevRequests) => {
+            const updatedRequests = { ...prevRequests };
+            const currentRequest = { ...updatedRequests[index] };
+            const existingExtensions = currentRequest.sample?.extensions || [];
+
+            const existingExtensionIndex = existingExtensions.findIndex((ext) => ext.id === id);
+            let updatedExtensions;
+
+            if (existingExtensionIndex > -1) {
+                updatedExtensions = [...existingExtensions];
+                updatedExtensions[existingExtensionIndex] = { id, value: formatExtensionValue(value) };
+            } else {
+                updatedExtensions = [...existingExtensions, { id, value: formatExtensionValue(value) }];
+            }
+
+            currentRequest.sample = {
+                ...currentRequest.sample,
+                extensions: updatedExtensions,
+            };
+
+            updatedRequests[index] = currentRequest;
+            return updatedRequests;
+        });
+    };
+
     const transformOrganizationToOptions = (data: Organization[]): SelectBoxOption[] =>
         data.map((org) => ({ value: org.id, name: org.name }));
 
     const transformSampleTypeToOptions = (data: SampleType[]): SelectBoxOption[] =>
         data.map((type) => ({ value: type.id, name: type.name }));
 
-
-
     const isAllRequiredFilled = () => {
-        if (Object.keys(requests).length === 0) {
+        if (Object.keys(requests).length !== serviceGroup.length) {
             return false;
         }
 
         return Object.values(requests).every((req) => {
+            const sample = req.sample!;
             if (!selectedOrganization) return false
             if (!req.sample?.patient?.name) return false;
             if (!req.sample.patient?.serial) return false;
             if (!req.sample.sample_type?.id) return false;
             if (!req.sample.sampling_on) return false;
             if (!req.sample.patient.sex) return false;
-            return req.sample.quantity;
+            if (!req.sample.quantity) return false;
+
+            return (sample.extensions || []).every(
+                extension => extension.value != null && extension.value !== ''
+            );
         });
     };
 
     const groupOrderDiv = (service: Service, index:number) => {
         return (
-            <div className={style.groupContainer}>
+            <div key={service.id || index} className={style.groupContainer}>
                 <p className={style.title}>{service.name}</p>
                 <p className={style.mainName}>Patient Info.</p>
                 <div className={style.section}>
@@ -303,7 +332,7 @@ export default function GroupOrder() {
                     />
                 </div>
                 <div className={style.extensionSection}>
-                    <ExtensionInputComponent serviceId={service.id!}/>
+                    <ExtensionGroupInputComponent serviceId={service.id!} onChange={(id, value) => handleExtensionChange(index, id, value)}/>
                 </div>
                 <div className={style.memoSection}>
                     <TextBox
