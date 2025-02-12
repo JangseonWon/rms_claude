@@ -55,7 +55,7 @@ export default function SearchProbandModal({ closeModal }: Props) {
 
     const [requests, setRequests] = useState<Request[]>([]);
     const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
-    const [search, setSearch] = useState<Query>({size:10, page:1});
+    const [search, setSearch] = useState<Query>({size:5, page:1});
     const [searchFilter, setSearchFilter] = useState<Filter | undefined>(undefined);
     const [totalPage, setTotalPage] = useState<number>(0);
     const [selectedRequest, setSelectedRequest] = useState<Request>({});
@@ -110,9 +110,7 @@ export default function SearchProbandModal({ closeModal }: Props) {
                     table: "sample",
                     column: "barcode"
                 }
-            ],
-            size:10,
-            page:1
+            ]
         }
         fetchRequests(updateSearch);
     }, [search, searchFilter]);

@@ -110,7 +110,7 @@ export default function ExtensionInputComponent({serviceId}: ExtensionInputCompo
                 const selectList = generateSelectList(extension.regex || '');
                 return <SelectBox
                     key={extension.id}
-                    label={extension.name!}
+                    label={`${extension.name}${extension.required ? ' *' : ''}`}
                     options={selectList}
                     required={extension.required}
                     onChange={(selectedOption) => handleRequestChange("sample.extensions", { id: extension.id, value: selectedOption.value })}
@@ -123,7 +123,7 @@ export default function ExtensionInputComponent({serviceId}: ExtensionInputCompo
                 ];
                 return <SelectBox
                     key={extension.id}
-                    label={extension.name!}
+                    label={`${extension.name}${extension.required ? ' *' : ''}`}
                     options={booleanList}
                     required={extension.required}
                     onChange={(selectedOption) => handleRequestChange("sample.extensions", { id: extension.id, value: selectedOption.value })}
@@ -134,7 +134,7 @@ export default function ExtensionInputComponent({serviceId}: ExtensionInputCompo
             case ExtensionType.STRING:
                 return <InputBox
                     key={extension.id}
-                    label={extension.name}
+                    label={`${extension.name}${extension.required ? ' *' : ''}`}
                     required={extension.required}
                     regex = {extension.regex}
                     onChange={(value) => handleRequestChange("sample.extensions", { id: extension.id, value: value })}
@@ -146,6 +146,46 @@ export default function ExtensionInputComponent({serviceId}: ExtensionInputCompo
                     required={extension.required}
                     onChange={(value) => handleRequestChange("sample.extensions", { id: extension.id, value: value })}
                 />;
+            case ExtensionType.RELATION:
+                if(extension.id === 'TA0028'){
+                    return <SelectBox
+                        key={'relationship'}
+                        label={extension.name!}
+                        options={relationOptions}
+                        required={true}
+                        width="200px"
+                        onChange={(selectedOption) => {
+                            setRequest((prevState) => ({
+                                ...prevState,
+                                request_relation: {
+                                    id: selectedOption.value
+                                }
+                            }));
+                            handleRequestChange("sample.extensions", {
+                                id: extension.id,
+                                value: selectedOption.name
+                            })
+                        }}
+                    />
+                }else if(extension.id === 'TA0029') {
+                    return <div className={style.probandInput}>
+                        <InputBox
+                            key={'probandInput'}
+                            label={`${extension.name}*`}
+                            required={true}
+                            disabled={true}
+                            value={probandRequest?.sample?.patient?.serial}
+                            onChange={(value) => {
+                                handleRequestChange("sample.extensions", {
+                                    id: extension.id,
+                                    value: value
+                                })
+                            }
+                            }
+                        />
+                    </div>
+                }
+                return null
             default:
                 return null;
         }
@@ -157,10 +197,6 @@ export default function ExtensionInputComponent({serviceId}: ExtensionInputCompo
         fetchRequestGroup()
     }, []);
     useEffect(() => {
-        handleRequestChange("sample.extensions", {
-            id: "TEST01",
-            value: probandRequest?.sample?.barcode
-        })
         setRequest((prevState) => ({
             ...prevState,
             request_group: {
@@ -200,34 +236,11 @@ export default function ExtensionInputComponent({serviceId}: ExtensionInputCompo
                 <div>
                     <p className={style.title}>Proband Info.</p>
                     <div className={style.proband}>
-                        <SelectBox
-                            key={'relationship'}
-                            label={'RelationShip*'}
-                            options={relationOptions}
-                            required={true}
-                            onChange={(selectedOption) => {
-                                setRequest((prevState) => ({
-                                    ...prevState,
-                                    request_relation: {
-                                        id: selectedOption.value
-                                    }
-                                }));
-                                handleRequestChange("sample.extensions", {
-                                    id: "TEST02",
-                                    value: selectedOption.name
-                                })
-                            }}
-                            width="200px"
-                        />
-                        <div className={style.probandInput}>
-                            <InputBox
-                                key={'probandInput'}
-                                label={'Proband Number*'}
-                                required={true}
-                                disabled={true}
-                                value={probandRequest?.sample?.barcode}
-                            />
-                        </div>
+                        {probandComponent.map((extension => (
+                            <div key={extension.id}>
+                                {renderExtensionComponent(extension)}
+                            </div>
+                        )))}
                         <button className={style.button} onClick={probandModalOpen}>Click here to find proband</button>
                     </div>
                 </div>

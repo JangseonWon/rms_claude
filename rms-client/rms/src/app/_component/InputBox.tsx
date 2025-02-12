@@ -14,10 +14,10 @@ type Props = {
     placeHolder?: string;
 }
 export default function InputBox({label, value, regex, disabled=false, onChange, required=false, type="text", placeHolder}: Props) {
-    const [inputValue, setInputValue] = useState('');
-    const [hasError, setHasError] = useState(false);
+    const [inputValue, setInputValue] = useState(value || '');
+    const [hasError, setHasError] = useState(!value && required);
 
-    const defaultRegex = /^[a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣0-9\s~`!@#$%^&*()-_=+[\]{}\\|;:'",.<>/?]*$/;
+    const defaultRegex = /^[a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣0-9\s~`!@#$%^&*()-_=+\[\]{}\\|;:'",.<>/?]*$/;
 
     const getSafeRegex = () => {
         if (!regex) return defaultRegex;
@@ -38,8 +38,8 @@ export default function InputBox({label, value, regex, disabled=false, onChange,
         const { value } = e.target;
 
         if (validateInput(value)) {
-            if (onChange) onChange(value);
             setInputValue(value);
+            if (onChange) onChange(value);
             setHasError(!value && required);
         } else if (value === "") {
             setInputValue("");
@@ -49,9 +49,12 @@ export default function InputBox({label, value, regex, disabled=false, onChange,
     };
 
     useEffect(() => {
-        setInputValue(value !== undefined && value !== null ? value : '');
-        setHasError(!value && required)
-    }, [required, value]);
+        if (value !== undefined && value !== null && value !== inputValue) {
+            setInputValue(value);
+            setHasError(!value && required);
+            if (onChange) onChange(value); // onChange 호출 추가
+        }
+    }, [value, required]);
 
     return (
         <div className={`${style.inputBox} ${hasError ? style.error : ""}`}>
