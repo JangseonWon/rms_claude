@@ -58,10 +58,12 @@ jobs:
             export POSTGRES_URL=$DATABASE_URL_TEST
             export POSTGRES_USERNAME=$DATABASE_USERNAME_TEST
             export POSTGRES_PASSWORD=$DATABASE_PASSWORD_TEST
+            export POSTGRES_SCHEMA=$DATABASE_SCHEMA_TEST
           else 
             export POSTGRES_URL=$DATABASE_URL_DEPLOY
             export POSTGRES_USERNAME=$DATABASE_USERNAME_DEPLOY
             export POSTGRES_PASSWORD=$DATABASE_PASSWORD_DEPLOY
+            export POSTGRES_SCHEMA=$DATABASE_SCHEMA_DEPLOY
           fi
           gradle $SUBMODULE:test
       - name: Deploy
