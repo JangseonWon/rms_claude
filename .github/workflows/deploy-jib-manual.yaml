@@ -17,6 +17,7 @@ jobs:
         SUBMODULE: ${{ fromJson(github.event.inputs.submodules) }}
     env:
       DATABASE_URL_TEST: ${{ secrets.DATABASE_URL_TEST }}
+      DATABASE_SCHEMA_TEST: ${{ secrets.DATABASE_SCHEMA_TEST }}
       DATABASE_USERNAME_TEST: ${{ secrets.DATABASE_USERNAME_TEST }}
       DATABASE_PASSWORD_TEST: ${{ secrets.DATABASE_PASSWORD_TEST }}
       IMAGE_REGISTRY_TEST: ${{ secrets.IMAGE_REGISTRY_TEST }}
