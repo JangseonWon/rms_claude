@@ -162,9 +162,9 @@ interface RequestDao: QueryDao {
                                 key("id").value(EXTENSION.ID),
                                 key("name").value(EXTENSION.NAME),
                                 key("value").value(SAMPLE_EXTENSION.VALUE),
-                                key("regex").value(EXTENSION.REGEX)
+                                key("regex").value(EXTENSION.REGEX),
+                                key("type").value(EXTENSION.TYPE)
                             ))
-
                         ).from(SAMPLE_EXTENSION)
                             .join(EXTENSION).on(SAMPLE_EXTENSION.EXTENSION_ID.eq(EXTENSION.ID))
                             .where(SAMPLE_EXTENSION.SAMPLE_ID.eq(sampleId))
