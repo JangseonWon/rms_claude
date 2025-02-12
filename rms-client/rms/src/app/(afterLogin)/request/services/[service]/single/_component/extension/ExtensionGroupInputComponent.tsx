@@ -116,7 +116,7 @@ export default function ExtensionGroupInputComponent({ serviceId, onChange, onVa
                 const selectList = generateSelectList(extension.regex || '');
                 return <SelectBox
                     key={extension.id}
-                    label={extension.name!}
+                    label={`${extension.name}${extension.required ? ' *' : ''}`}
                     value={value}
                     options={selectList}
                     required={extension.required}
@@ -130,7 +130,7 @@ export default function ExtensionGroupInputComponent({ serviceId, onChange, onVa
                 ];
                 return <SelectBox
                     key={extension.id}
-                    label={extension.name!}
+                    label={`${extension.name}${extension.required ? ' *' : ''}`}
                     value={value}
                     options={booleanList}
                     required={extension.required}
@@ -142,7 +142,7 @@ export default function ExtensionGroupInputComponent({ serviceId, onChange, onVa
             case ExtensionType.STRING:
                 return <InputBox
                     key={extension.id}
-                    label={extension.name}
+                    label={`${extension.name}${extension.required ? ' *' : ''}`}
                     value={value}
                     required={extension.required}
                     regex = {extension.regex}
@@ -151,7 +151,7 @@ export default function ExtensionGroupInputComponent({ serviceId, onChange, onVa
             case ExtensionType.TEXT:
                 return <TextBox
                     key={extension.id}
-                    label={extension.name!}
+                    label={`${extension.name}${extension.required ? ' *' : ''}`}
                     value={value}
                     required={extension.required}
                     onChange={(inputValue) => handleInputChange(extension.id!, inputValue, extension.required!)}
