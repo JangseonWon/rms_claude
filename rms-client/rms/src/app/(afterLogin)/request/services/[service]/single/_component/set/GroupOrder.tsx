@@ -207,7 +207,12 @@ export default function GroupOrder() {
             if (!req.sample.quantity) return false;
 
             return (sample.extensions || []).every(
-                extension => extension.value != null && extension.value !== ''
+                (extension) => {
+                    if (extension.required) {
+                        return extension.value != null && extension.value !== '';
+                    }
+                    return true;
+                }
             );
         });
     };
