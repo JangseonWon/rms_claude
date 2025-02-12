@@ -4,7 +4,6 @@ import React from "react";
 import style from './requestExtensionComponent.module.css';
 import {Extension, ExtensionType} from "@/model/Extension";
 import InputBox from "@/app/_component/InputBox";
-import SelectBox from "@/app/_component/SelectBox";
 import TextBox from "@/app/_component/TextBox";
 
 interface ExtensionComponentProps {
@@ -12,47 +11,10 @@ interface ExtensionComponentProps {
 }
 
 export default function RequestInfoExtensionComponent({ extensions }: ExtensionComponentProps) {
-
-    const generateSelectList = (regex: string): { name: string, value: string }[] => {
-        if (regex.includes("|")) {
-            return regex
-                .replace(/\\b|\b/g, '')
-                .replace(/\\|\(|\)|\?:/g, '')
-                .split('|')
-                .filter(value => value.trim() !== '')
-                .map(value => ({
-                    name: value.toUpperCase(),
-                    value: value.toLowerCase()
-                }));
-        }
-        return [];
-    };
-
     const renderExtensionComponent = (extension: Extension) => {
         switch (extension.type) {
             case ExtensionType.LIST:
-                const selectList = generateSelectList(extension.regex || '');
-                return <SelectBox
-                    key={extension.id}
-                    label={extension.name!}
-                    value={extension.value}
-                    options={selectList}
-                    required={extension.required}
-                    width="200px"
-                />;
             case ExtensionType.BOOLEAN:
-                const booleanList = [
-                    {name: "TRUE", value: true},
-                    {name: "FALSE", value: false}
-                ];
-                return <SelectBox
-                    key={extension.id}
-                    label={extension.name!}
-                    value={extension.value}
-                    options={booleanList}
-                    required={extension.required}
-                    width="200px"
-                />;
             case ExtensionType.INTEGER:
             case ExtensionType.FLOAT:
             case ExtensionType.STRING:
