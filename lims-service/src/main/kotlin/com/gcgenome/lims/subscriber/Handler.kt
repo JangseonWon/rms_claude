@@ -36,6 +36,8 @@ class Handler(
                     when{
                         message.process == LimsStatus.SPECIFIED.name && message.type == LimsStatus.COMPLETE.name ->
                             updateRequestStatusById(request.serviceId!!, request.sampleId!!, Status.IN_PROGRESS.name)
+                        message.process == LimsStatus.FINISHED .name && message.type == LimsStatus.COMPLETE.name ->
+                            updateRequestStatusById(request.serviceId!!, request.sampleId!!, Status.DELIVERED.name)
                         message.process == LimsStatus.RESAMPLED.name && message.type == LimsStatus.COMPLETE.name ->
                             updateRequestStatusById(request.serviceId!!, request.sampleId!!, Status.TEST_FAILED.name)
                         else -> Mono.error(InvalidWorkflowException("Invalid workflow: barcode=$barcode, service=$serviceId, process=${message.process}, type=${message.type}"))
