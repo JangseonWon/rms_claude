@@ -181,7 +181,7 @@ export default function Order() {
                             handleRequestChange('sample.patient.organization.id', value.value)
                             handleRequestChange('sample.patient.organization.name', value.name)
                         }}
-                        width="200px"
+                        width="300px"
                     />
                 </div>
             </div>

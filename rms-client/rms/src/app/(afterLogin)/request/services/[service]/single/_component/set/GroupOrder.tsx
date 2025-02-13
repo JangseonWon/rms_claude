@@ -389,7 +389,7 @@ export default function GroupOrder() {
                         onChange={(value) => {
                             setSelectedOrganization(value);
                         }}
-                        width="200px"
+                        width="300px"
                     />
                 </div>
             </div>
