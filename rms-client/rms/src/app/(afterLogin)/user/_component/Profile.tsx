@@ -51,16 +51,6 @@ export default function Profile() {
         }));
     };
 
-    const handlePhoneChange = (value: string) => {
-        let phoneNumber = value;
-
-        if (!phoneNumber.startsWith(selectOption?.value)) {
-            phoneNumber = `${selectOption?.value || "+1"}/${phoneNumber}`;
-        }
-
-        handleChange('phone_number', phoneNumber);
-    };
-
     const setUserKeyValue = (obj: any, path: string, value: any) => {
         const newObj = { ...obj };
         newObj[path] = value;
@@ -80,19 +70,29 @@ export default function Profile() {
         }
     }
 
+    const loadCountries = async () => {
+        try {
+            const countryData = await fetchCountryCodes();
+            if (!Array.isArray(countryData) || countryData.length === 0) {
+                setSelectBoxOptions([]);
+                return;
+            }
+            setSelectBoxOptions(countryData);
+        } catch (error) {
+            console.error("Error fetching country codes:", error);
+            setSelectBoxOptions([]);
+        }
+    };
+
     useEffect(() => {
         fetchUser();
-        const loadCountries = async () => {
-            const countryData = await fetchCountryCodes();
-            setSelectBoxOptions(countryData);
-            if (countryData.length > 0) {
-                setSelectOption(countryData[0]);
-            }
-        };
         loadCountries();
     }, [fetchUser, fetchCountryCodes]);
 
     useEffect(() => {
+        if (selectBoxOptions.length > 0 && !selectOption) {
+            setSelectOption(selectBoxOptions[0]);
+        }
         if (user?.phone_number) {
             const phoneParts = user.phone_number.split('/');
             const countryCode = phoneParts[0];
@@ -103,7 +103,7 @@ export default function Profile() {
                 setSelectOption(selectedOption);
             }
         }
-    }, [user?.phone_number, selectBoxOptions]);
+    }, [selectBoxOptions]);
 
 
     return (
@@ -139,18 +139,18 @@ export default function Profile() {
                             </div>
                             <div className={style.phone}>
                                 <SelectBox
-                                    width={"180px"}
-                                    value={selectOption ? `${selectOption.name} / ${selectOption.value}` : "Please Refresh"}
+                                    width={"200px"}
+                                    value={selectOption ? `${selectOption.name}/ ${selectOption.value}` : "Please Refresh"}
                                     options={selectBoxOptions}
                                     label={"PHONE-NUMBER"}
                                     onChange={(option) => {
                                         setSelectOption(option);
-                                        handleChange('phone_number', '');
+                                        handleChange('phone_number', `${option.value}/ `);
                                     }}
                                 />
                                 <div className={style.phoneNumber}>
                                     <InputBox value={user?.phone_number} placeHolder={"Enter Phone-Number"}
-                                        onChange={(value) => handlePhoneChange(value)}
+                                        onChange={(value) => handleChange('phone_number', value)}
                                     />
                                 </div>
                             </div>
