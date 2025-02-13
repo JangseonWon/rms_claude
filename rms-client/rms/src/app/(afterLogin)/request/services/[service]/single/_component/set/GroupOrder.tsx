@@ -26,6 +26,7 @@ import {formatExtensionValue, setAge, setNestedValue} from './GroupOrderUtils';
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 import ExtensionGroupInputComponent
     from "@/app/(afterLogin)/request/services/[service]/single/_component/extension/ExtensionGroupInputComponent";
+import {useSession} from "next-auth/react";
 
 export default function GroupOrder() {
     const [organizationOptions, setOrganizationOptions] = useState<SelectBoxOption[]>([])
@@ -36,6 +37,7 @@ export default function GroupOrder() {
     const [selectedSex, setSelectedSex] = useState<{ [index: number]: string }>({});
     const [publishStatus, setPublishStatus] = useState<string | null>(null);
     const [isFilled, setIsFilled] = useState(false);
+    const { data: session } = useSession();
     const pathname = usePathname();
     const pathSegments = pathname.split('/');
     const serviceId = decodeURIComponent(pathSegments[pathSegments.length - 2]);
@@ -186,7 +188,10 @@ export default function GroupOrder() {
     };
 
     const transformOrganizationToOptions = (data: Organization[]): SelectBoxOption[] =>
-        data.map((org) => ({ value: org.id, name: org.name }));
+        data.map((org) => ({
+            value: org.id,
+            name: session?.user.role !== "USER" ? `${org.user_id}/${org.name}` : org.name
+        }));
 
     const transformSampleTypeToOptions = (data: SampleType[]): SelectBoxOption[] =>
         data.map((type) => ({ value: type.id, name: type.name }));

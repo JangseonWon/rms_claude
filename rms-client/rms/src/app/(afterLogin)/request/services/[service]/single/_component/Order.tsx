@@ -24,11 +24,13 @@ import {useProbandModalOpen, useSetProbandModalOpen} from "@/app/(afterLogin)/re
 import {useRequestStore} from "@/store/useRequestStore";
 import {putRequest} from "@/app/(afterLogin)/request/services/[service]/single/_api/putRequest";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
+import {useSession} from "next-auth/react";
 
 export default function Order() {
     const [organizationOptions, setOrganizationOptions] = useState<SelectBoxOption[]>([])
     const [sampleTypeOptions, setSampleTypeOptions] = useState<SelectBoxOption[]>([])
     const { request, setRequest } = useRequestStore();
+    const { data: session } = useSession();
     const pathname = usePathname();
     const pathSegments = pathname.split('/');
     const serviceId = decodeURIComponent(pathSegments[pathSegments.length - 2]);
@@ -109,7 +111,7 @@ export default function Order() {
     const transformOrganizationToOptions = (data: Organization[]): SelectBoxOption[] => {
         return data.map(value => ({
             value: value.id,
-            name: value.name
+            name: session?.user.role !== "USER" ? `${value.user_id}/${value.name}` : value.name
         }));
     };
 
