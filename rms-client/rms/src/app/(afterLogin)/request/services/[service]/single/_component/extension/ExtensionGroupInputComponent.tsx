@@ -11,7 +11,7 @@ import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 
 interface ExtensionGroupInputComponentProps {
-    onChange: (path: string, value: any) => void;
+    onChange: (id: string, value: any, required: boolean) => void;
     serviceId: string;
     onValidationChange?: (isValid: boolean) => void;
 }
@@ -27,7 +27,7 @@ export default function ExtensionGroupInputComponent({ serviceId, onChange, onVa
             const initialValues: { [key: string]: any } = {};
             extensions.forEach((extension) => {
                 initialValues[extension.id!] = "";
-                onChange(extension.id!, "");
+                onChange(extension.id!, "", extension.required ?? false);
             });
             setValues(initialValues);
         }
@@ -35,7 +35,7 @@ export default function ExtensionGroupInputComponent({ serviceId, onChange, onVa
 
     const handleInputChange = (id: string, value: any, required: boolean) => {
         setValues(prevValues => ({ ...prevValues, [id]: value }));
-        onChange(id, value);
+        onChange(id, value, required);
 
         if (required) {
             setValidationState((prevState) => ({
@@ -47,7 +47,7 @@ export default function ExtensionGroupInputComponent({ serviceId, onChange, onVa
 
     const handleSelectChange = (id: string, option: SelectBoxOption, required: boolean) => {
         setValues(prevValues => ({ ...prevValues, [id]: option.name }));
-        onChange(id, option.value);
+        onChange(id, option.value, required);
 
         if (required) {
             setValidationState((prevState) => ({

@@ -161,7 +161,7 @@ export default function GroupOrder() {
         });
     };
 
-    const handleExtensionChange = (index: number, id: string, value: any): void => {
+    const handleExtensionChange = (index: number, id: string, value: any, required: boolean): void => {
         setRequests((prevRequests) => {
             const updatedRequests = { ...prevRequests };
             const currentRequest = { ...updatedRequests[index] };
@@ -172,9 +172,9 @@ export default function GroupOrder() {
 
             if (existingExtensionIndex > -1) {
                 updatedExtensions = [...existingExtensions];
-                updatedExtensions[existingExtensionIndex] = { id, value: formatExtensionValue(value) };
+                updatedExtensions[existingExtensionIndex] = { id, value: formatExtensionValue(value), required };
             } else {
-                updatedExtensions = [...existingExtensions, { id, value: formatExtensionValue(value) }];
+                updatedExtensions = [...existingExtensions, { id, value: formatExtensionValue(value), required }];
             }
 
             currentRequest.sample = {
@@ -201,25 +201,29 @@ export default function GroupOrder() {
             return false;
         }
 
-        return Object.values(requests).every((req) => {
-            const sample = req.sample!;
-            if (!selectedOrganization) return false
-            if (!req.sample?.patient?.name) return false;
-            if (!req.sample.patient?.serial) return false;
-            if (!req.sample.sample_type?.id) return false;
-            if (!req.sample.sampling_on) return false;
-            if (!req.sample.patient.sex) return false;
-            if (!req.sample.quantity) return false;
-
-            return (sample.extensions || []).every(
-                (extension) => {
-                    if (extension.required) {
-                        return extension.value != null && extension.value !== '';
+        return Object.values(requests).every((request) => {
+                const sample = request?.sample;
+                if (!sample) return false;
+                if (!selectedOrganization) return false
+                const requiredFields = [
+                    sample?.patient?.name,
+                    sample?.patient?.serial,
+                    sample?.patient?.sex,
+                    sample?.sample_type?.id,
+                    sample?.sampling_on,
+                    sample?.quantity,
+                ];
+                if (requiredFields.some(field => typeof field !== 'string' || field.trim() === '')) return false;
+                return (sample.extensions || []).every(
+                    (extension) => {
+                        if (extension.required) {
+                            return extension.value != null && extension.value !== '';
+                        }
+                        return true;
                     }
-                    return true;
-                }
-            );
-        });
+                );
+            }
+        );
     };
 
     const groupOrderDiv = (service: Service, index:number) => {
@@ -342,7 +346,9 @@ export default function GroupOrder() {
                     />
                 </div>
                 <div className={style.extensionSection}>
-                    <ExtensionGroupInputComponent serviceId={service.id!} onChange={(id, value) => handleExtensionChange(index, id, value)}/>
+                    <ExtensionGroupInputComponent
+                        serviceId={service.id!}
+                        onChange={(id, value, required) => handleExtensionChange(index, id, value, required)}/>
                 </div>
                 <div className={style.memoSection}>
                     <TextBox
