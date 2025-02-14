@@ -38,7 +38,7 @@ const defaultQuery: Query = {
     sorts: [
         {
             table: "user",
-            column: "id"
+            column: "state"
         }
     ],
     size:10,
