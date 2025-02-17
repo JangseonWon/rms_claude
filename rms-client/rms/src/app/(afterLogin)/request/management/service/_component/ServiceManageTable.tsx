@@ -60,9 +60,12 @@ export default function ServiceManageTable() {
         setSelectedService(undefined);
         setServiceModalOpen(false);
     }
+
     const refreshData = () => {
-        fetchData(search);
-    }
+        setSearch(prevSearch => {
+            return {...prevSearch};
+        });
+    };
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage =>({
