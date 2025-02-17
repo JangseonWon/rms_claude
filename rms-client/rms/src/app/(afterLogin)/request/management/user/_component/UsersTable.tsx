@@ -217,6 +217,7 @@ export default function UsersTable() {
                             <td>{row.role}</td>
                             <td>
                                 <FontAwesomeIcon
+                                    className={globalTableStyle.icon}
                                     icon={faMagnifyingGlass}
                                     onClick={() => handleInstitutionIconClick(row.id, row.name)}
                                 />

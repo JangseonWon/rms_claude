@@ -248,3 +248,9 @@
     white-space: nowrap;
     text-overflow: ellipsis;
 }
+.icon {
+    cursor: pointer;
+}
+.icon:hover {
+    color: #90BA2D;
+}
