@@ -19,6 +19,7 @@
     padding: 20px 40px;
     position: relative;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    max-height: 800px;
 }
 .modalTitle {
     font-size: 20px;
@@ -104,4 +105,7 @@
     align-items: center;
     justify-content: center;
     animation: blink 1s infinite;
+}
+.wrapper {
+    padding: 0 10px;
 }
