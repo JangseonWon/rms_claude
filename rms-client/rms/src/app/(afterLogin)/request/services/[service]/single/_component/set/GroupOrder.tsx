@@ -11,7 +11,6 @@ import {Request} from "@/model/Request";
 import DatePickerBox from "@/app/_component/DatePickerBox";
 import {SampleType} from "@/model/SampleType";
 import {getSampleType} from "@/app/(afterLogin)/request/services/_api/getSampleType"
-import GreenButton from "@/app/_component/GreenButton";
 import BlueButton from "@/app/_component/BlueButton";
 import {putRequest} from "@/app/(afterLogin)/request/services/[service]/single/_api/putRequest";
 import {format} from "date-fns";
@@ -365,15 +364,6 @@ export default function GroupOrder() {
         <div className={style.container}>
             <Image className={logo.genomeImg} src={genomeImg} alt={"genome"}/>
             <div className={style.buttonSection}>
-                <GreenButton
-                    name={"Add to Cart"}
-                    disabled={!isFilled}
-                    onClick={() => {
-                        handleOrganizationChange(selectedOrganization?.value, selectedOrganization?.name);
-                        setPublishStatus("CART");
-                    }
-                }
-                />
                 <BlueButton
                     name={"Order Now"}
                     disabled={!isFilled}

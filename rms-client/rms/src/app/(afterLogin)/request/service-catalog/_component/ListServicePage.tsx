@@ -86,7 +86,7 @@ export default function ListServicePage() {
     }
     const mapServiceToOption = (service: Service): Option => ({
         id: service.id!,
-        label: service.name!,
+        label: `${service.id}: ${service.name}`,
     });
 
     const fetchServiceData = async (categoryId: string) => {
