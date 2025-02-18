@@ -240,17 +240,17 @@ export default function Table() {
                 <tbody>
                 {requestData && requestData.length > 0 ? ( requestData.map((request) => (
                     <tr key={`${request.service!.id}${request.sample!.id}`}>
-                        <td className={globalTableStyle.shortColumn}>{request.create_at ? format(new Date(request.create_at), "dd-MM-yyyy") : '-'}</td>
-                        <td className={globalTableStyle.shortColumn}>{request.sample!.barcode}</td>
+                        <td className={globalTableStyle.shortColumn}><CellTooltip text={request.create_at ? format(new Date(request.create_at), "dd-MM-yyyy") : '-'}/></td>
+                        <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample!.barcode}/></td>
                         <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample!.patient!.organization!.user!.name}/></td>
                         <td className={globalTableStyle.shortColumn}><CellTooltip text={request.sample!.patient!.organization!.id}/></td>
                         <td className={globalTableStyle.middleColumn}><CellTooltip text={request.service!.name}/></td>
                         <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample!.patient!.name}/></td>
                         <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample!.patient!.serial}/></td>
-                        <td className={globalTableStyle.shortColumn}>{request.sample?.patient ?
-                            formatDate(request.sample.patient.birth_year, request.sample.patient.birth_month, request.sample.patient.birth_day) : '-'}
+                        <td className={globalTableStyle.shortColumn}><CellTooltip text={request.sample?.patient ?
+                            formatDate(request.sample.patient.birth_year, request.sample.patient.birth_month, request.sample.patient.birth_day) : '-'}/>
                         </td>
-                        <td className={globalTableStyle.shortColumn}>{request.status}</td>
+                        <td className={globalTableStyle.shortColumn}><CellTooltip text={request.status}/></td>
                     </tr>
                 ))
                 ) : (
