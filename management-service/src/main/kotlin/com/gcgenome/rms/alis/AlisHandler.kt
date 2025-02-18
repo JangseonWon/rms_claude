@@ -1,9 +1,6 @@
 package com.gcgenome.rms.alis
 
-import com.gcgenome.rms.dao.ExtensionDao
-import com.gcgenome.rms.dao.SampleTypeDao
-import com.gcgenome.rms.dao.ServiceDao
-import com.gcgenome.rms.dao.UserDao
+import com.gcgenome.rms.dao.*
 import com.gcgenome.rms.data.*
 import com.gcgenome.rms.history.UserHistoryHandler
 import org.jooq.DSLContext
@@ -17,7 +14,7 @@ class AlisHandler(
     val dslContext: DSLContext,
     val encoder: BCryptPasswordEncoder,
     val userHistoryHandler: UserHistoryHandler
-):ServiceDao, SampleTypeDao,ExtensionDao, UserDao {
+):ServiceDao, SampleTypeDao,ExtensionDao, UserDao, OrganizationDao {
     private val webClient = WebClient.builder().baseUrl("https://rms-test.gcgenome.com").build()
 
     fun updateUsers(userId: String, query: Query): Mono<Page<UserDTO>> {
@@ -25,7 +22,7 @@ class AlisHandler(
             .uri("/w-api/alis-api/organizations")
             .retrieve()
             .bodyToFlux(AlisOrganization::class.java)
-            .concatMap { alisOrganization ->
+            .flatMap { alisOrganization ->
                 dslContext.transactionPublisher { trx ->
                     trx.dsl().run {
                         val pwd = encoder.encode("GCGenome00!")
@@ -33,6 +30,7 @@ class AlisHandler(
                             if (isDifferent) {
                                 upsertUsers(alisOrganization, pwd)
                                     .flatMap { userHistoryHandler.logUserChanges(trx.dsl(), userId, it) }
+                                    .flatMap { insertOrganization(alisOrganization) }
                             } else {
                                 Mono.empty()
                             }
