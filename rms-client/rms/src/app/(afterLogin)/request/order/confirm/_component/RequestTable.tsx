@@ -22,7 +22,6 @@ import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 import CellTooltip from "@/app/_component/CellToolTip";
 import style from "@/css/qna/qnaTable.module.css";
 import {GrPowerReset} from "react-icons/gr";
-import {putRequest} from "@/app/(afterLogin)/request/cart/_api/putRequest";
 
 export interface RequestWithSelected extends Request {
     isSelected?: boolean;
