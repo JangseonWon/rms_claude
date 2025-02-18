@@ -44,7 +44,6 @@ export default function Statistics() {
     ];
 
     const handleLearnMoreClick = (status: Status) => {
-        // router.push(`/dashboard/${status}`);
         showAlert(`${status} Learn More`);
     };
 

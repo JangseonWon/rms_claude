@@ -11,8 +11,6 @@ interface RequestDao: QueryDao {
     fun DSLContext.selectRequestsWithPage(query: Query, userDto: User): Mono<Page<RequestDTO>> {
         val joins = listOf(
             QueryDao.JoinInfo(SAMPLE, REQUEST.SAMPLE_ID.eq(SAMPLE.ID), QueryDao.JoinType.INNER),
-            QueryDao.JoinInfo(REPORT, REQUEST.SERVICE_ID.eq(REPORT.SERVICE_ID)
-                    .and(REQUEST.SAMPLE_ID.eq(REPORT.SAMPLE_ID)), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(PATIENT, SAMPLE.PATIENT_SERIAL.eq(PATIENT.SERIAL)
                 .and(SAMPLE.ORGANIZATION_ID.eq(PATIENT.ORGANIZATION_ID))
                 .and(SAMPLE.USER_ID.eq(PATIENT.USER_ID)), QueryDao.JoinType.INNER),
@@ -97,15 +95,7 @@ interface RequestDao: QueryDao {
                         )
                     ).from(SAMPLE_EXTENSION).where(SAMPLE.ID.eq(SAMPLE_EXTENSION.SAMPLE_ID))
                 )
-            ).`as`("sample"),
-            jsonObject(
-                key("id").value(REPORT.ID),
-                key("type").value(REPORT.TYPE),
-                key("value").value(REPORT.VALUE),
-                key("create_at").value(REPORT.CREATE_AT),
-                key("download_at").value(REPORT.DOWNLOADED_AT),
-                key("is_latest").value(REPORT.IS_LATEST)
-            ).`as`("report")
+            ).`as`("sample")
         )
 
         val baseCondition = REQUEST.SAMPLE_ID.eq(SAMPLE.ID)

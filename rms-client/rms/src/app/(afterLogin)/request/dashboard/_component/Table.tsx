@@ -52,7 +52,6 @@ export default function Table() {
         { table: "service", column: "name", name: "Service" },
         { table: "patient", column: "serial", name: "MRN" },
         { table: "patient", column: "birth_year", name: "Patient BOD" },
-        { table: "request", column: "report_at", name: "Report Date" },
         { table: "user", column: "name", name: "User Name" },
     ];
 
@@ -67,6 +66,7 @@ export default function Table() {
     },[]);
 
     useEffect(() => {
+        setRequestData([]);
         fetchData(search)
     }, [search]);
 
@@ -234,7 +234,6 @@ export default function Table() {
                     <th>MRN</th>
                     <th>Patient BOD<br/>(DD-MM-YYYY)</th>
                     <th>Current Status</th>
-                    <th>Report Date<br/>(DD-MM-YYYY)</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -251,11 +250,6 @@ export default function Table() {
                             formatDate(request.sample.patient.birth_year, request.sample.patient.birth_month, request.sample.patient.birth_day) : '-'}
                         </td>
                         <td>{request.status}</td>
-                        <td>
-                            {request.report?.create_at && !isNaN(new Date(request.report.create_at).getTime())
-                                ? format(new Date(request.report.create_at), "dd-MM-yyyy")
-                                : '-'}
-                        </td>
                     </tr>
                 ))
                 ) : (
