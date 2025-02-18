@@ -66,7 +66,6 @@ export default function Table() {
     },[]);
 
     useEffect(() => {
-        setRequestData([]);
         fetchData(search)
     }, [search]);
 
