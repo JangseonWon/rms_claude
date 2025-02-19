@@ -67,9 +67,9 @@ export default function Order() {
                 const index = headers.indexOf(header);
                 return index !== -1 ? row[index] : undefined;
             };
-            const extensionFields = headers.slice(11);
+            const extensionFields = headers.slice(10);
             const extensions = extensionFields.reduce((acc: Record<string, string | number | boolean>, field: string, idx: number) => {
-                const value = row[11 + idx];
+                const value = row[10 + idx];
                 acc[field] = value === false || value ? value : '';
                 return acc;
             }, {});
@@ -78,11 +78,11 @@ export default function Order() {
                 return new Date(excelBaseDate.getTime() + excelDate * 86400000);
             };
 
-            const birth = mapByHeader("Date of Birth (DD-MM-YYYY)")
-                ? format(excelToDate(mapByHeader("Date of Birth (DD-MM-YYYY)")), 'dd-MM-yyyy')
+            const birth = mapByHeader("Date of Birth (YYYY-MM-DD)")
+                ? format(excelToDate(mapByHeader("Date of Birth (YYYY-MM-DD)")), 'yyyy-MM-dd')
                 : '-';
-            const collectionDate = mapByHeader("Collection Date (DD-MM-YYYY)")
-                ? format(excelToDate(mapByHeader("Collection Date (DD-MM-YYYY)")), 'dd-MM-yyyy')
+            const collectionDate = mapByHeader("Collection Date (YYYY-MM-DD)")
+                ? format(excelToDate(mapByHeader("Collection Date (YYYY-MM-DD)")), 'yyyy-MM-dd')
                 : '-';
             return {
                 sampleType: mapByHeader("Sample Type"),

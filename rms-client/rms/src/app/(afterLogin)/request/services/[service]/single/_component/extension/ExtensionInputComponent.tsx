@@ -130,13 +130,20 @@ export default function ExtensionInputComponent({serviceId}: ExtensionInputCompo
                     width="200px"
                 />;
             case ExtensionType.INTEGER:
-            case ExtensionType.FLOAT:
             case ExtensionType.STRING:
                 return <InputBox
                     key={extension.id}
                     label={`${extension.name}${extension.required ? ' *' : ''}`}
                     required={extension.required}
                     regex = {extension.regex}
+                    onChange={(value) => handleRequestChange("sample.extensions", { id: extension.id, value: value })}
+                />;
+            case ExtensionType.FLOAT:
+                return <InputBox
+                    key={extension.id}
+                    label={`${extension.name}${extension.required ? ' *' : ''}`}
+                    required={extension.required}
+                    regex = {"float"}
                     onChange={(value) => handleRequestChange("sample.extensions", { id: extension.id, value: value })}
                 />;
             case ExtensionType.TEXT:

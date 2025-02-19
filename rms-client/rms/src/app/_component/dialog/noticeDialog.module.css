@@ -30,39 +30,44 @@
     border: none;
     border-top: 1px solid #eee;
 }
+
 .cancelButton {
     width: 120px;
-    padding: 5px 40px;
-    border-radius: 15px;
+    padding: 8px 20px;
+    border-radius: 20px;
     background-color: #ffffff;
-    border: solid 1px #ba2d2d;
-    color: #b6b146;
+    border: 2px solid #5f8a3e;
+    color: #5f8a3e;
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
+    transition: all 0.2s ease-in-out;
 }
+
 .cancelButton:hover {
-    background: linear-gradient(135deg, #b8706a, #e8bac5);
+    background-color: #5f8a3e;
     color: #ffffff;
-    border: solid 1px #dae8ba;
 }
+
 .okButton {
     margin-left: 20px;
     width: 120px;
-    padding: 5px 40px;
-    border-radius: 15px;
-    background-color: #ffffff;
-    border: solid 1px #90BA2D;
-    color: #002b49;
+    padding: 8px 20px;
+    border-radius: 20px;
+    background: linear-gradient(to right, #023a60, #5676a2);
+    border: 2px solid #024873;
+    color: #ffffff;
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
+    transition: all 0.2s ease-in-out;
 }
+
 .okButton:hover {
-    background: linear-gradient(135deg, #a1b86a, #dae8ba);
-    color: #ffffff;
-    border: solid 1px #dae8ba;
+    background-color: #023a60;
+    border: 2px solid #023a60;
 }
+
 .message {
     font-size: 15px;
     min-height: 50px;

@@ -47,7 +47,7 @@ class Handler(
                     .flatMap { changePasswordByUserId(it.id!!, password = encodedPassword) }
                     .then(
                         if (user.password == null) {
-                            insertUserUpdateLog(user, encodedPassword).then(sendEmail(user.email!!, newPassword))
+                            insertUserUpdateLog(user, encodedPassword).then(sendEmail(user.email!!, user.id!!, newPassword))
                         } else {
                             Mono.empty()
                         }
@@ -81,12 +81,21 @@ class Handler(
         return containsUpper && containsLower && containsSpecial && isLongEnough
     }
 
-    fun sendEmail(to: String, password: String): Mono<String> {
+    fun sendEmail(to: String, id: String, password: String): Mono<String> {
         return try {
             val message = SimpleMailMessage()
             message.setTo(to)
-            message.subject = "We will issue you a temporary password for GCGenome."
-            message.text = "Here is your temporary password: $password"
+            message.subject = "[G-Portal] Login Information"
+            message.text = """
+            Your password has been sent via an automated message.
+            Click the link below to log in.
+
+            ID: $id
+            PW: $password
+
+            ※ This is an automated email. Replies will not be received.
+            For inquiries, please contact info@gcgenome.com or your account manager.
+        """.trimIndent()
             message.from = "noreply@gcgenome.com"
             mailSender.send(message)
 

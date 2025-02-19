@@ -52,27 +52,24 @@ export default function QnaWritingPage({ category }: QnaWritingPageProps) {
             return;
         }
 
-        const confirmed = window.confirm('Would you like to register your inquiry?');
-        if (confirmed) {
-            setIsLoading(true);
-            try {
-                const postData: Post = {
-                    title: title,
-                    post_category: {
-                        id: categoryUUID(category)
-                    },
-                    content: content
-                };
+        setIsLoading(true);
+        try {
+            const postData: Post = {
+                title: title,
+                post_category: {
+                    id: categoryUUID(category)
+                },
+                content: content
+            };
 
-                await putPost(postData, selectedFiles)
-                if (category === 'Q&A') {
-                    await fetchSendToJandi(session?.user.name!, 0, 'qna', postData);
-                }
-            } finally {
-                showAlert('Registered successfully.');
-                setIsLoading(false);
-                route.push('/qna');
+            await putPost(postData, selectedFiles)
+            if (category === 'Q&A') {
+                await fetchSendToJandi(session?.user.name!, 0, 'qna', postData);
             }
+        } finally {
+            showAlert('Registered successfully.');
+            setIsLoading(false);
+            route.push('/qna');
         }
     };
 
