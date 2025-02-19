@@ -19,6 +19,12 @@ import RequestModal from "@/app/(afterLogin)/request/result/resample/_component/
 import CellTooltip from "@/app/_component/CellToolTip";
 import style from "@/css/qna/qnaTable.module.css";
 import {GrPowerReset} from "react-icons/gr";
+import {
+    useOkNotice,
+    useOpenNoticeDialog,
+    useSetMessageNoticeDialog,
+    useSetOkNotice
+} from "@/store/useNoticeDialogStore";
 
 const selectBoxOptions: SelectBoxOption[] = [
     { table: "user", column: "name", name: "User Name" },
@@ -39,6 +45,11 @@ const defaultFilter: Filter = {
 
 
 export default function ReSampleTable() {
+    const setShowNoticeDialog = useOpenNoticeDialog();
+    const setNoticeMessage = useSetMessageNoticeDialog();
+    const okNotice = useOkNotice();
+    const setOkNotice = useSetOkNotice();
+    const [cancelRequest, setCancelRequest] = useState<Request | undefined>(undefined);
     const [requestData, setRequestData] = useState<Request[]>([]);
     const [totalPage, setTotalPage] = useState<number>(0);
     const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
@@ -71,30 +82,35 @@ export default function ReSampleTable() {
             page: 1
         }));
     };
-    const handleCancel = async (request: Request) => {
-        const result = confirm("취소하시겠습니까?")
+
+    const handleCancelToResampleClick = (request: Request) => {
+        setCancelRequest(request);
+        setShowNoticeDialog(true);
+        setNoticeMessage('If you cancle the re-sample request, no further test will be performed. Would you still want to cancle?');
+    };
+
+    const handleResampleCancel = async (request: Request) => {
         const updateRequest: Request = {
             sample: {id: request.sample?.id},
             service: {id: request.service?.id},
             status: Status.COMPLETED.valueOf()
         }
-        if (result){
-            const response = await patchRequests([updateRequest])
-            if(response.ok){
-                const updatedSearch = {
-                    ...search,
-                    filter_groups: [
-                        ...(orderDateFilter ? [orderDateFilter] : []),
-                        {
-                            filters: [
-                                defaultFilter,
-                                ...(searchFilter ? [searchFilter] : []),
-                            ],
-                        }
-                    ],
-                };
-                fetchData(updatedSearch);
-            }
+        const response = await patchRequests([updateRequest])
+        if(response.ok){
+            const updatedSearch = {
+                ...search,
+                filter_groups: [
+                    ...(orderDateFilter ? [orderDateFilter] : []),
+                    {
+                        filters: [
+                            defaultFilter,
+                            ...(searchFilter ? [searchFilter] : []),
+                        ],
+                    }
+                ],
+            };
+            fetchData(updatedSearch);
+            setCancelRequest(undefined);
         }
     }
     const refreshData = () => {
@@ -149,6 +165,12 @@ export default function ReSampleTable() {
         fetchData(updatedSearch);
     }, [search,searchFilter,orderDateFilter]);
 
+    useEffect(() => {
+        if (cancelRequest && okNotice) {
+            handleResampleCancel(cancelRequest);
+            setOkNotice(false);
+        }
+    }, [okNotice]);
 
     return (
         <>
@@ -236,7 +258,7 @@ export default function ReSampleTable() {
                                 <td>Reason</td>
                                 <td className={globalTableStyle.middleColumn}>{request.resample_at ? new Date(request.resample_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
                                 <td className={globalTableStyle.underlineBlue} onClick={() => handleRequestClick(request)}>Request</td>
-                                <td className={globalTableStyle.underlineRed} onClick={() => handleCancel(request)}>Cancel</td>
+                                <td className={globalTableStyle.underlineRed} onClick={() => handleCancelToResampleClick(request)}>Cancel</td>
                             </tr>
                         ))
                         ) : (

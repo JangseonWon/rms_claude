@@ -122,9 +122,7 @@ export default function Profile() {
                                 <InputBox disabled={true} label={"ID"} value={user?.id}/>
                             </div>
                             <div>
-                                <InputBox label={"NAME"}
-                                          value={user?.name || ""}
-                                          onChange={(value) => handleChange('name', value)}/>
+                                <InputBox disabled={true} label={"NAME"} value={user?.name || ""}/>
                             </div>
                         </div>
                     </section>

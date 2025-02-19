@@ -1,8 +1,5 @@
 package com.gcgenome.rms.catalog.request
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.ArrayNode
-import com.fasterxml.jackson.databind.node.ObjectNode
 import com.gcgenome.rms.auth.AuthenticationHandler
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.RequestDTO
@@ -33,9 +30,7 @@ class RequestRouter (
             .flatMap { requestHandler.saveRequest(it.t1.user, it.t2, isGroup).collectList() }
             .flatMap { ServerResponse.ok().build() }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume { e ->
-                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: ${e.javaClass.name}\n메시지: ${e.message}\n스택 트레이스:\n${e.stackTraceToString()}")
-            }.doOnError { e -> println("오류 발생: ${e.message}") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome") }
     }
     private fun searchRequests(request: ServerRequest): Mono<ServerResponse> {
         return Mono.zip(authenticationHandler.principal(request), request.bodyToMono(Query::class.java))
@@ -49,7 +44,7 @@ class RequestRouter (
                 .body(Mono.just(it.data), RequestDTO::class.java) }
             .switchIfEmpty(ServerResponse.status(HttpStatus.NO_CONTENT).build())
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}") }
-            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Error: ${e.stackTraceToString()}") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome") }
     }
 }
 

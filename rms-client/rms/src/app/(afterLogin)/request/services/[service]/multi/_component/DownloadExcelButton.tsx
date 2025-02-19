@@ -29,15 +29,15 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
             "Institution Name", //List
             "Patient Name",
             "MRN",
-            "Date of Birth", // Date
+            "Date of Birth (DD-MM-YYYY)", // Date
             "Gender", // List
             "Sample Type",
-            "Collection Date", // Date
+            "Collection Date (DD-MM-YYYY)", // Date
             "Quantity", // Decimal
             "Medical Department",
             "Physician Name",
-            "Memo",
             ...extensions.map(extension => extension.name),
+            "Memo",
         ];
         const today = new Date();
         const year = today.getFullYear();
@@ -58,7 +58,7 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
         const sampleTypeSheet = workbook.addWorksheet('SampleTypes');
 
         institutionList?.forEach((institution, index) => {
-            institutionSheet.getCell(`A${index + 1}`).value = `${institution.id}/${institution.name}`;
+            institutionSheet.getCell(`A${index + 1}`).value = `${institution.user_id}/${institution.id}/${institution.name}`;
         });
 
         sampleTypeList?.forEach((sampleType, index) => {
@@ -81,12 +81,13 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
                 };
             }
 
+            worksheet.getCell(rowIndex, 4).numFmt = 'DD-MM-YYYY';
             worksheet.getCell(rowIndex, 4).dataValidation = {
                 type: 'date',
                 allowBlank: true,
                 showErrorMessage: true,
                 errorTitle: 'Invalid Date',
-                error: 'Please enter a valid date (YYYY/MM/DD).',
+                error: 'Please enter a valid date (DD-MM-YYYY).',
                 formulae: [new Date(1900, 0, 1), new Date(2100, 11, 31)]
             };
 
@@ -110,12 +111,13 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
                 };
             }
 
+            worksheet.getCell(rowIndex, 7).numFmt = 'DD-MM-YYYY';
             worksheet.getCell(rowIndex, 7).dataValidation = {
                 type: 'date',
                 allowBlank: true,
                 showErrorMessage: true,
                 errorTitle: 'Invalid Date',
-                error: 'Please enter a valid date (YYYY/MM/DD).',
+                error: 'Please enter a valid date (DD-MM-YYYY).',
                 formulae: [new Date(1900, 0, 1), new Date(2100, 11, 31)]
             };
 

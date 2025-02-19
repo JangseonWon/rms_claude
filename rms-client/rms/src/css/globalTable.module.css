@@ -50,6 +50,8 @@
 }
 .table thead tr th:first-child {
     border-radius: 20px 0 0 0;
+    z-index: 2;
+    box-shadow: -10px -10px 0 10px white;
 }
 .table thead tr th:last-child {
     border-radius: 0 20px 0 0;
@@ -203,27 +205,40 @@
     color: gray;
     font-weight: 700;
 }
-.stickyColumnHeader {
+.stickyColumnHeaderCheckBox {
     position: sticky;
     left: 0;
+    background: #023a60;
+    z-index: 2;
+    clip-path: inset(0px -10px 0px 0px);
+}
+.stickyColumnHeader {
+    position: sticky;
+    left: 38px;
     background: #023a60;
     z-index: 1;
 }
 .stickyColumnHeaderSecond {
     position: sticky;
-    left: 150px;
+    left: 204px;
     background: linear-gradient(to right, #023a60, #31446D);
     z-index: 1;
 }
-.stickyColumn {
+.stickyColumnCheckBox {
     position: sticky;
     left: 0;
     background-color: white;
     z-index: 1;
 }
-.stickyColumnSecond {
+.stickyColumnFirstColumn {
     position: sticky;
-    left: 150px;
+    left: 38px;
+    background-color: white;
+    z-index: 1;
+}
+.stickyColumnSecondColumn {
+    position: sticky;
+    left: 204px;
     background-color: white;
     z-index: 1;
 }

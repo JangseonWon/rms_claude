@@ -78,11 +78,11 @@ export default function Order() {
                 return new Date(excelBaseDate.getTime() + excelDate * 86400000);
             };
 
-            const birth = mapByHeader("Date of Birth")
-                ? format(excelToDate(mapByHeader("Date of Birth")), 'yyyy-MM-dd')
+            const birth = mapByHeader("Date of Birth (DD-MM-YYYY)")
+                ? format(excelToDate(mapByHeader("Date of Birth (DD-MM-YYYY)")), 'dd-MM-yyyy')
                 : '-';
-            const collectionDate = mapByHeader("Collection Date")
-                ? format(excelToDate(mapByHeader("Collection Date")), 'yyyy-MM-dd')
+            const collectionDate = mapByHeader("Collection Date (DD-MM-YYYY)")
+                ? format(excelToDate(mapByHeader("Collection Date (DD-MM-YYYY)")), 'dd-MM-yyyy')
                 : '-';
             return {
                 sampleType: mapByHeader("Sample Type"),
@@ -266,7 +266,7 @@ export default function Order() {
             handleConfirmedAddToCart();
             setOkNotice(false);
         }
-    }, [okNotice, handleConfirmedAddToCart, setOkNotice]);
+    }, [okNotice, setOkNotice]);
 
     const formatNotes = (text: string | undefined) => {
         if (!text) return '';
@@ -304,10 +304,10 @@ export default function Order() {
                         <th className={style.header100}>Quantity</th>
                         <th className={style.header150}>Medical Department</th>
                         <th className={style.header150}>Physician Name</th>
-                        <th className={style.notesHeader}>Memo</th>
                         {extensions.map((extension, index) => (
                             <th className={style.header100} key={index}>{extension.name}</th>
                         ))}
+                        <th className={style.notesHeader}>Memo</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -324,7 +324,6 @@ export default function Order() {
                                 <td>{item.quantity || '-'}</td>
                                 <td>{item.medicalDepartment || '-'}</td>
                                 <td>{item.physician || '-'}</td>
-                                <td dangerouslySetInnerHTML={{__html: formatNotes(item.memo)}}/>
                                 {extensions.map((extension, extIndex) => (
                                     <td key={extIndex}>
                                         {item.extensions && item.extensions[extension.name!] !== undefined
@@ -332,10 +331,11 @@ export default function Order() {
                                             : '-'}
                                     </td>
                                 ))}
+                                <td dangerouslySetInnerHTML={{__html: formatNotes(item.memo)}}/>
                             </tr>
                         ))) : (
                         <tr>
-                            <td colSpan={7} className={globalTableStyle.noData}>
+                        <td colSpan={7} className={globalTableStyle.noData}>
                                 There are no data.
                             </td>
                         </tr>

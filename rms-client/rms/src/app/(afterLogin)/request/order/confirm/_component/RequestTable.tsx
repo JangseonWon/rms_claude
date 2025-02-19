@@ -22,6 +22,12 @@ import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 import CellTooltip from "@/app/_component/CellToolTip";
 import style from "@/css/qna/qnaTable.module.css";
 import {GrPowerReset} from "react-icons/gr";
+import {
+    useOkNotice,
+    useOpenNoticeDialog,
+    useSetMessageNoticeDialog,
+    useSetOkNotice
+} from "@/store/useNoticeDialogStore";
 
 export interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -55,6 +61,10 @@ export default function RequestTable() {
     const [infoModalOpen, setInfoModalOpen] = useState<boolean>(false);
     const [infoRequest, setInfoRequest] = useState<Request>();
     const showAlert = CallAlertDialog();
+    const setShowNoticeDialog = useOpenNoticeDialog();
+    const setNoticeMessage = useSetMessageNoticeDialog();
+    const okNotice = useOkNotice();
+    const setOkNotice = useSetOkNotice();
 
     const handleSelectChange = (rowIndex: number, isSelected: boolean) => {
         setRequestData((prevData) => {
@@ -72,7 +82,13 @@ export default function RequestTable() {
         setSelectedRequests(selected);
         setAirWaybillModal(true);
     }
-    const handleConfirmClick = async () => {
+
+    const handleConfirmClick = () => {
+        setShowNoticeDialog(true);
+        setNoticeMessage('Are you sure you want to confirm?');
+    };
+
+    const handleConfirm = async () => {
         const selected = requestData.filter((request) => request.isSelected);
         if(selected.length == 0) {
             showAlert("No selected.")
@@ -82,7 +98,7 @@ export default function RequestTable() {
             (request) => !request.awb_number || !request.courier_company
         );
         if (hasMissingInfo) {
-            showAlert("There is no AirWaybill or Global Courier information entered.");
+            showAlert("Air Waybill information is incomplete.");
             return;
         }
         const updatedRequests = selected.map((request) => ({
@@ -146,6 +162,13 @@ export default function RequestTable() {
     useEffect(() => {
         fetchData(updatedSearch());
     }, [searchFilter,orderDateFilter]);
+
+    useEffect(() => {
+        if (okNotice) {
+            handleConfirm();
+            setOkNotice(false);
+        }
+    }, [okNotice]);
 
     return (
         <>
@@ -211,7 +234,7 @@ export default function RequestTable() {
                 <table className={globalTableStyle.table}>
                     <thead>
                     <tr>
-                        <th>
+                        <th className={globalTableStyle.stickyColumnHeaderCheckBox}>
                             <label form="agree" className={globalTableStyle.checkbox}>
                                 <input
                                     type="checkbox"
@@ -238,7 +261,7 @@ export default function RequestTable() {
                     <tbody>
                     {requestData && requestData.length > 0 ? (requestData.map((request, rowIndex) => (
                             <tr key={`${request.service!.id}${request.sample!.id}`}>
-                                <td onClick={(e) => e.stopPropagation()}>
+                                <td className={globalTableStyle.stickyColumnCheckBox} onClick={(e) => e.stopPropagation()}>
                                     <label form="agree" className={globalTableStyle.checkbox}>
                                         <input
                                             type="checkbox"
@@ -249,8 +272,8 @@ export default function RequestTable() {
                                         <span className={globalTableStyle.checkmark}></span>
                                     </label>
                                 </td>
-                                <td className={`${globalTableStyle.longColumn} ${globalTableStyle.stickyColumn}`}>{request.courier_company}</td>
-                                <td className={`${globalTableStyle.longColumn} ${globalTableStyle.stickyColumnSecond}`}>{request.awb_number}</td>
+                                <td className={`${globalTableStyle.longColumn} ${globalTableStyle.stickyColumnFirstColumn}`}>{request.courier_company}</td>
+                                <td className={`${globalTableStyle.longColumn} ${globalTableStyle.stickyColumnSecondColumn}`}>{request.awb_number}</td>
                                 <td className={globalTableStyle.middleColumn}>{request.create_at ? new Date(request.create_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
                                 <td className={globalTableStyle.longColumn}><CellTooltip text={request.user?.name}/></td>
                                 <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample?.patient?.organization?.name}/></td>

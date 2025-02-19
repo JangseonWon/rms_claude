@@ -20,6 +20,12 @@ import InputBox from "@/app/_component/InputBox";
 import CartInfo from "@/app/(afterLogin)/request/cart/_component/CartInfo";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 import CellTooltip from "@/app/_component/CellToolTip";
+import {
+    useOkNotice,
+    useOpenNoticeDialog,
+    useSetMessageNoticeDialog,
+    useSetOkNotice
+} from "@/store/useNoticeDialogStore";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -45,6 +51,10 @@ const defaultFilter: Filter = {
 
 export default function CartTable() {
     const showAlert = CallAlertDialog();
+    const setShowNoticeDialog = useOpenNoticeDialog();
+    const setNoticeMessage = useSetMessageNoticeDialog();
+    const okNotice = useOkNotice();
+    const setOkNotice = useSetOkNotice();
     const [requestData, setRequestData] = useState<RequestWithSelected[]>([])
     const [search, setSearch] = useState<Query>(defaultSearch);
     const [updateSearch, setUpdateSearch] = useState<Query>({});
@@ -129,7 +139,13 @@ export default function CartTable() {
         fetchData(updateSearch);
     }
 
+    const handleDeleteToCartClick = () => {
+        setShowNoticeDialog(true);
+        setNoticeMessage('Are you sure you want to delete?');
+    };
+
     const handleDeleteCart = async () => {
+        setShowNoticeDialog(false);
         const selectedRequests = requestData.filter(request => request.isSelected);
         if( selectedRequests.length === 0) {
             showAlert("No selected.");
@@ -161,11 +177,18 @@ export default function CartTable() {
         return "-";
     };
 
+    useEffect(() => {
+        if (okNotice) {
+            handleDeleteCart();
+            setOkNotice(false);
+        }
+    }, [okNotice]);
+
     return (
         <div className={globalTableStyle.container}>
             <section>
                 <div className={globalTableStyle.formGroupRight}>
-                    <GreenButton name={"Delete"} onClick={handleDeleteCart}/>
+                    <GreenButton name={"Delete"} onClick={handleDeleteToCartClick}/>
                     <BlueButton name={"Save & Order"} onClick={handleCartToOrder}/>
                 </div>
                 <div className={globalTableStyle.formGroupRight}>
