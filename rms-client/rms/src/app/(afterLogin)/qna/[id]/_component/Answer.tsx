@@ -27,14 +27,25 @@ import {PostComment} from "@/model/PostComment";
 import {putPostReadChangeNew} from "@/app/(afterLogin)/qna/_api/putPostReadChangeNew";
 import {putPostReadByUserId} from "@/app/(afterLogin)/qna/_api/putPostReadByUserId";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
+import {
+    useOkNotice,
+    useOpenNoticeDialog,
+    useSetMessageNoticeDialog,
+    useSetOkNotice
+} from "@/store/useNoticeDialogStore";
 
 export default function Answer() {
     const [postData, setPostData] = useState<Post>();
     const [commentData, setCommentData] = useState<Comment>();
     const [writerCheck, setWriterCheck] = useState(false);
+    const [deletePostId, setDeletePostId] = useState<number>();
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const showAlert = CallAlertDialog();
+    const setShowNoticeDialog = useOpenNoticeDialog();
+    const setNoticeMessage = useSetMessageNoticeDialog();
+    const okNotice = useOkNotice();
+    const setOkNotice = useSetOkNotice();
     const route = useRouter();
     const {data: session} = useSession();
 
@@ -63,35 +74,35 @@ export default function Answer() {
 
     const editButtonClick = async () => {
         if (writerCheck) {
-            const confirmed = window.confirm('Are you sure you want to edit this?');
-            if (confirmed) {
-                setIsLoading(true);
-                try {
-                    await updatePost(postData!, selectedFiles);
-                    await putPostReadChangeNew(postId);
-                    await fetchSendToJandi(session?.user?.name!, postId, "update", postData!);
-                    showAlert('It has been corrected properly.');
-                    route.push('/qna');
-                } finally {
-                    setIsLoading(false);
-                }
+            setIsLoading(true);
+            try {
+                await updatePost(postData!, selectedFiles);
+                await putPostReadChangeNew(postId);
+                await fetchSendToJandi(session?.user?.name!, postId, "update", postData!);
+                showAlert('It has been corrected properly.');
+                route.push('/qna');
+            } finally {
+                setIsLoading(false);
             }
         } else {
             showAlert('Modification is not possible.');
         }
     }
 
+    const handleDeleteButtonClick = (postId: number) => {
+        setDeletePostId(postId);
+        setShowNoticeDialog(true);
+        setNoticeMessage('Are you sure you want to delete it?');
+    };
+
     const deleteButtonClick = async (postId: number) => {
-        const confirmed = window.confirm('Are you sure you want to delete it?');
-        if (confirmed) {
-            setIsLoading(true);
-            try {
-                await deletePostById(postId);
-            } finally {
-                showAlert('Deletion has been completed.');
-                setIsLoading(false);
-                route.push('/qna');
-            }
+        setIsLoading(true);
+        try {
+            await deletePostById(postId);
+        } finally {
+            showAlert('Deletion has been completed.');
+            setIsLoading(false);
+            route.push('/qna');
         }
     }
 
@@ -207,6 +218,13 @@ export default function Answer() {
         fetchData();
     }, []);
 
+    useEffect(() => {
+        if (deletePostId && okNotice) {
+            deleteButtonClick(deletePostId);
+            setOkNotice(false);
+        }
+    }, [okNotice]);
+
     return (
         <div className={style.container}>
             {isLoading && <QnaLoading/>}
@@ -217,7 +235,7 @@ export default function Answer() {
                 {writerCheck && (
                     <section className={style.buttonContainer}>
                         <BlueButton name={"EDIT"} onClick={editButtonClick}/>
-                        <GreenButton name={"DELETE"} onClick={() => deleteButtonClick(postData?.id!)}/>
+                        <GreenButton name={"DELETE"} onClick={() => handleDeleteButtonClick(postData?.id!)}/>
                     </section>
                 )}
                     <section className={style.userAndTitleContainer}>

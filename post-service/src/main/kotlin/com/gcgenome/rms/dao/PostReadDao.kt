@@ -33,6 +33,12 @@ interface PostReadDao {
         ).map { it.into(PostRead::class.java) }
     }
 
+    fun DSLContext.deletePostRead(id: Long): Mono<PostRead> {
+        return Mono.from(
+            deleteFrom(POST_READ).where(POST_READ.POST_ID.eq(id)).returning()
+        ).map { it.into(PostRead::class.java) }
+    }
+
     fun DSLContext.changeNullPostRead(id: Long, userId: String?): Mono<PostRead> {
         return Mono.from(
             update(POST_READ)

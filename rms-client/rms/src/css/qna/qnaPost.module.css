@@ -19,6 +19,7 @@
     margin: 0 40px;
     display: flex;
     justify-content: flex-end;
+    gap: 10px;
 }
 .userContainer, .titleContainer, .contentContainer, .fileContainer {
     display: grid;

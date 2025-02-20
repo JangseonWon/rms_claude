@@ -35,7 +35,7 @@ class OrganizationRouter (
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(it.data), OrganizationDTO::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error: ${it.cause}") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome") }
     }
 
     private fun insertOrganization(request: ServerRequest): Mono<ServerResponse> {
@@ -46,7 +46,7 @@ class OrganizationRouter (
             .flatMap { organizationHandler.insertOrganization(it.apply { this.userId = userId; this.id = organizationId}) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build() }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error : ${it.cause}") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome") }
     }
 
     private fun updateOrganization(request: ServerRequest): Mono<ServerResponse> {
@@ -57,7 +57,7 @@ class OrganizationRouter (
             .flatMap { organizationHandler.updateOrganization(it.apply { id = organizationId; this.userId = userId }) }
             .flatMap { ServerResponse.status(HttpStatus.OK).build() }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error : ${it.cause}") }
+            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome") }
     }
 }
 

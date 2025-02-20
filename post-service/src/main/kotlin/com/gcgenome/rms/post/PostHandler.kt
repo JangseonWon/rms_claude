@@ -158,6 +158,7 @@ class PostHandler(
                             .build()
                         Mono.fromFuture { s3Client.deleteObject(deleteObjectRequest) }
                     }.then(deleteCommentByPostId(postId))
+                    .then(deletePostRead(postId))
                     .then(deletePostByPostId(postId))
             }
         })

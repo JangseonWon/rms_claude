@@ -266,7 +266,7 @@ export default function Order() {
             handleConfirmedAddToCart();
             setOkNotice(false);
         }
-    }, [okNotice, setOkNotice]);
+    }, [okNotice]);
 
     const formatNotes = (text: string | undefined) => {
         if (!text) return '';
