@@ -42,18 +42,22 @@ class Handler(
             Mono.error(IllegalArgumentException("Password must be at least 10 characters long and include uppercase, lowercase, and special characters."))
         } else {
             Mono.from(dslContext.transactionPublisher { trx ->
-                trx.dsl().run { checkUserByIdAndMail(user)
-                    .switchIfEmpty(Mono.error(UserNotFoundException()))
-                    .flatMap { changePasswordByUserId(it.id!!, password = encodedPassword) }
-                    .then(
-                        if (user.password == null) {
-                            insertUserUpdateLog(user, encodedPassword).then(sendEmail(user.email!!, user.id!!, newPassword))
-                        } else {
-                            Mono.empty()
+                trx.dsl().run {
+                    checkUserByIdAndMail(user)
+                        .switchIfEmpty(Mono.error(UserNotFoundException()))
+                        .flatMap { foundUser ->
+                            changePasswordByUserId(foundUser.id!!, encodedPassword)
+                                .then(
+                                    if (user.password == null) {
+                                        insertUserUpdateLog(user, encodedPassword)
+                                            .then(sendEmail(user.email!!, user.id!!, newPassword))
+                                    } else {
+                                        Mono.empty()
+                                    }
+                                )
                         }
-                    )
                 }
-            })
+            }).onErrorResume { Mono.error(it) }
         }
     }
 
