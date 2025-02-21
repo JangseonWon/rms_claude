@@ -18,6 +18,8 @@ import {putRequest} from "@/app/(afterLogin)/request/result/resample/_api/putReq
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 import {Status} from "@/model/Status";
 import {getRequest} from "@/app/(afterLogin)/request/result/resample/_api/getRequest";
+import classNames from "classnames";
+import scroll from "@/css/scrollBar.module.css";
 
 type Props = {
     propRequest: Request | undefined
@@ -122,7 +124,7 @@ export default function RequestModal({propRequest, closeModal,refreshData}: Prop
                     </button>
                 </div>
                 {request ? (
-                    <>
+                    <div className={classNames(style.wrapper, scroll.default)}>
                         <p className={style.contentTitle}>Institution name</p>
                         <div className={style.flexStartContainer}>
                             <InputBox
@@ -225,7 +227,7 @@ export default function RequestModal({propRequest, closeModal,refreshData}: Prop
                                 onClick={() => handleOrderNow()}
                             />
                         </div>
-                    </>
+                    </div>
                 ) : <Loading/>}
             </div>
         </div>

@@ -144,16 +144,22 @@ export default function BarcodeModal({requests, closeModal}: Props) {
                             <th>Speciment type</th>
                         </tr>
                         </thead>
-                        <tbody style={{height: "300px"}}>
+                        <tbody>
                         {requests && requests.map(request => {
                             const requestKey = `${request.sample?.id}:${request.service?.id}`
                             return (
                                 <tr key={requestKey}>
                                     <td style={{width: "90px"}}>
                                         <div className={style.roundButtonContainer}>
-                                            <button onClick={() => {handleChangeCopies(requestKey, (copyCounts[requestKey] || 1) - 1)}} className={style.roundButton}>-</button>
+                                            <button onClick={() => {
+                                                handleChangeCopies(requestKey, (copyCounts[requestKey] || 1) - 1)
+                                            }} className={style.roundButton}>-
+                                            </button>
                                             <span className={style.countText}>{copyCounts[requestKey] || 1}</span>
-                                            <button onClick={() => {handleChangeCopies(requestKey, (copyCounts[requestKey] || 1) + 1)}} className={style.roundButton}>+</button>
+                                            <button onClick={() => {
+                                                handleChangeCopies(requestKey, (copyCounts[requestKey] || 1) + 1)
+                                            }} className={style.roundButton}>+
+                                            </button>
                                         </div>
                                     </td>
                                     <td>{request.sample?.patient?.organization?.name}</td>
@@ -163,7 +169,8 @@ export default function BarcodeModal({requests, closeModal}: Props) {
                                     <td>{request.sample?.patient?.serial}</td>
                                     <td>{request.sample?.sample_type?.name}</td>
                                 </tr>
-                            )})}
+                            )
+                        })}
                         </tbody>
                     </table>
                 </div>

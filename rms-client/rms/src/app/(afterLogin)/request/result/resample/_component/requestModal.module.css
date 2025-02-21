@@ -48,3 +48,8 @@
 .memo:focus {
     outline: none;
 }
+.wrapper {
+    margin: 10px;
+    padding: 10px;
+    overflow-y: scroll;
+}
