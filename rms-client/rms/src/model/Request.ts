@@ -16,10 +16,11 @@ export interface Request {
     sample?: Sample
     create_at?: Date
     cart_at?: Date
-    specified_at?: Date
-    complete_at?: Date
-    resample_at?: Date
-    reported_at?: Date
+    confirmed_at?: Date,
+    lims_received_at?: Date,
+    lims_resample_at?: Date,
+    lims_completed_at?: Date,
+    lims_resample_reason?: string,
     courier_company?: string
     awb_number?: string
     report?: Report

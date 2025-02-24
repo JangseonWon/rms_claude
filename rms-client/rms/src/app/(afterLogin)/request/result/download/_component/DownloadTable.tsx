@@ -192,13 +192,13 @@ export default function DownloadTable() {
                                     filters: [
                                         {
                                             table: "request",
-                                            column: "specified_at",
+                                            column: "create_at",
                                             value: from?.toLocaleDateString('en-CA'),
                                             operator: ">="
                                         },
                                         {
                                             table: "request",
-                                            column: "specified_at",
+                                            column: "create_at",
                                             value: to.toLocaleDateString('en-CA'),
                                             operator: "<="
                                         }
@@ -250,7 +250,7 @@ export default function DownloadTable() {
                                 <span className={globalTableStyle.checkmark}></span>
                             </label>
                         </th>
-                        <th className={globalTableStyle.middleColumn}>Specified At<br/>(DD-MM-YYYY)</th>
+                        <th className={globalTableStyle.middleColumn}>Order Date<br/>(DD-MM-YYYY)</th>
                         <th className={globalTableStyle.longColumn}>User Name</th>
                         <th className={globalTableStyle.middleColumn}>Institution</th>
                         <th className={globalTableStyle.longColumn}>Registration ID</th>
@@ -276,14 +276,14 @@ export default function DownloadTable() {
                                     <span className={globalTableStyle.checkmark}></span>
                                 </label>
                             </td>
-                            <td className={globalTableStyle.middleColumn}>{request.specified_at ? new Date(request.specified_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
+                            <td className={globalTableStyle.middleColumn}>{request.create_at ? new Date(request.create_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
                             <td className={globalTableStyle.longColumn}><CellTooltip text={request.user?.name}/></td>
                             <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample?.patient?.organization?.name}/></td>
                             <td className={globalTableStyle.longColumn}>{request.sample?.barcode}</td>
                             <td className={globalTableStyle.longColumn}><CellTooltip text={request.service?.name}/></td>
                             <td className={globalTableStyle.longColumn}><CellTooltip text={request.sample?.patient?.name}/></td>
                             <td className={globalTableStyle.longColumn}>{request.sample?.patient?.serial}</td>
-                            <td className={globalTableStyle.middleColumn}>{request.reported_at ? new Date(request.reported_at).toLocaleDateString() : '-'}</td>
+                            <td className={globalTableStyle.middleColumn}>{request.lims_completed_at ? new Date(request.lims_completed_at).toLocaleDateString() : '-'}</td>
                             <td className={globalTableStyle.middleColumn}>{request.status}</td>
                             <td className={globalTableStyle.middleColumn}>
                                 {(request.reports as Report[])?.filter((report: Report) => report.type === 'PDF').map((report) => (

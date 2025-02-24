@@ -42,7 +42,7 @@ const defaultFilterGroup: FilterGroup = {
             },
             {
                 table: "request",
-                column: "specified_at",
+                column: "confirmed_at",
                 operator: "<=",
                 value: getTenDaysAgo()
             }
@@ -122,13 +122,13 @@ export default function NonArrivedTable() {
                                     filters: [
                                         {
                                             table: "request",
-                                            column: "specified_at",
+                                            column: "confirmed_at",
                                             value: from.toLocaleDateString('en-CA'),
                                             operator: ">="
                                         },
                                         {
                                             table: "request",
-                                            column: "specified_at",
+                                            column: "confirmed_at",
                                             value: to.toLocaleDateString('en-CA'),
                                             operator: "<="
                                         }
@@ -181,7 +181,7 @@ export default function NonArrivedTable() {
                     <tbody>
                     {requestData && requestData.length > 0 ? ( requestData.map((request, rowIndex) => (
                         <tr key={rowIndex}>
-                            <td>{request.specified_at ? new Date(request.specified_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
+                            <td>{request.confirmed_at ? new Date(request.confirmed_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
                             <td>{request.sample?.barcode}</td>
                             <td>{request.user?.name}</td>
                             <td>{request.sample?.patient?.organization?.name}</td>

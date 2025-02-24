@@ -185,13 +185,13 @@ export default function ReSampleTable() {
                                         filters: [
                                             {
                                                 table: "request",
-                                                column: "specified_at",
+                                                column: "create_at",
                                                 value: from?.toLocaleDateString('en-CA'),
                                                 operator: ">="
                                             },
                                             {
                                                 table: "request",
-                                                column: "specified_at",
+                                                column: "create_at",
                                                 value: to.toLocaleDateString('en-CA'),
                                                 operator: "<="
                                             }
@@ -232,7 +232,7 @@ export default function ReSampleTable() {
                     <table className={globalTableStyle.table}>
                         <thead>
                         <tr>
-                            <th className={globalTableStyle.middleColumn}>Specified At<br/>(DD-MM-YYYY)</th>
+                            <th className={globalTableStyle.middleColumn}>Order At<br/>(DD-MM-YYYY)</th>
                             <th className={globalTableStyle.longColumn}>User Name</th>
                             <th className={globalTableStyle.middleColumn}>Institution</th>
                             <th className={globalTableStyle.longColumn}>Registration ID</th>
@@ -248,15 +248,15 @@ export default function ReSampleTable() {
                         <tbody>
                         {requestData && requestData.length > 0 ? ( requestData.map((request) => (
                             <tr key={`${request!.service!.id!}${request!.sample!.id!}`}>
-                                <td className={globalTableStyle.middleColumn}>{request.specified_at ? new Date(request.specified_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
+                                <td className={globalTableStyle.middleColumn}>{request.create_at ? new Date(request.create_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
                                 <td className={globalTableStyle.longColumn}><CellTooltip text={request.user?.name}/></td>
                                 <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample?.patient?.organization?.name}/></td>
                                 <td className={globalTableStyle.longColumn}>{request.sample?.barcode}</td>
                                 <td className={globalTableStyle.longColumn}><CellTooltip text={request.service?.name}/></td>
                                 <td className={globalTableStyle.longColumn}><CellTooltip text={request.sample?.patient?.name}/></td>
                                 <td className={globalTableStyle.longColumn}>{request.sample?.patient?.serial}</td>
-                                <td>Reason</td>
-                                <td className={globalTableStyle.middleColumn}>{request.resample_at ? new Date(request.resample_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
+                                <td className={globalTableStyle.longColumn}>{request.lims_resample_reason}</td>
+                                <td className={globalTableStyle.middleColumn}>{request.lims_resample_at ? new Date(request.lims_resample_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
                                 <td className={globalTableStyle.underlineBlue} onClick={() => handleRequestClick(request)}>Request</td>
                                 <td className={globalTableStyle.underlineRed} onClick={() => handleCancelToResampleClick(request)}>Cancel</td>
                             </tr>
