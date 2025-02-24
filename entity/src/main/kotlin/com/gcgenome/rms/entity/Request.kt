@@ -31,16 +31,19 @@ data class Request(
     val createAt: LocalDateTime,
     @Column(name = "cart_at", nullable = true)
     val cartAt: LocalDateTime,
-    @Column(name = "specified_at", nullable = true)
-    val specifiedAt: LocalDateTime,
-    @Column(name = "complete_at", nullable = true)
-    val completeAt: LocalDateTime,
-    @Column(name =" reported_at", nullable = true)
-    val reportedAt: LocalDateTime,
-    @Column(name = "resample_at", nullable = true)
-    val resampleAt: LocalDateTime,
-    @Column(name = "last_modify_at", nullable = false)
-    val lastModifyAt: LocalDateTime,
+    @Column(name = "confirmed_at", nullable = true)
+    val confirmedAt: LocalDateTime,
+    @Column(name = "lims_received_at", nullable = true)
+    val limsReceivedAt: LocalDateTime,
+    @Column(name = "lims_resample_at", nullable = true)
+    val limsResampleAt: LocalDateTime,
+    @Column(name = "lims_completed_at", nullable = true)
+    val limsCompletedAt: LocalDateTime,
+    @Column(name = "lims_resample_reason", nullable = true)
+    val limsResampleReason: LocalDateTime,
+
+
+
 
     @OneToMany(mappedBy = "requestId")
     val report: List<Report>,
