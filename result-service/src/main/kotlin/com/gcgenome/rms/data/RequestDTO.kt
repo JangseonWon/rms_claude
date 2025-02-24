@@ -22,20 +22,6 @@ data class RequestDTO(
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("cart_at")
     var cartAt: LocalDateTime? = null,
-    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
-    @JsonSerialize(using = LocalDateTimeSerializer::class)
-    @JsonProperty("last_modify_at")
-    var lastModifyAt: LocalDateTime? = null,
-    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
-    @JsonSerialize(using = LocalDateTimeSerializer::class)
-    @JsonProperty("reported_at")
-    var reportedAt: LocalDateTime? = null,
-    @JsonProperty("specified_at")
-    var specifiedAt: LocalDateTime? = null,
-    @JsonProperty("resample_at")
-    var resampleAt: LocalDateTime? = null,
-    @JsonProperty("complete_at")
-    var completeAt: LocalDateTime? = null,
     var service: ServiceDTO? = null,
     var sample: SampleDTO? = null,
     var reports: List<ReportDTO>? = null,

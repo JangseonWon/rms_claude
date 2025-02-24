@@ -25,7 +25,6 @@ interface RequestDao: QueryDao{
                 .set(REQUEST.REQUEST_RELATION_ID, request.requestRelation!!.id)
                 .set(REQUEST.CREATE_AT, request.status.takeIf { it == Status.UNCONFIRMED_ORDER }?.let { LocalDateTime.now() })
                 .set(REQUEST.CART_AT, request.status.takeIf { it == Status.CART }?.let { LocalDateTime.now() })
-                .set(REQUEST.LAST_MODIFY_AT, LocalDateTime.now())
                 .returning()
         ).map { it.into(RequestDTO::class.java) }
     }
@@ -34,7 +33,6 @@ interface RequestDao: QueryDao{
         return Mono.from(
             update(REQUEST)
                 .set(REQUEST.STATUS, Status.COMPLETED.name)
-                .set(REQUEST.COMPLETE_AT, LocalDateTime.now())
                 .where(
                     REQUEST.SAMPLE_ID.eq(request.sample!!.id),
                     REQUEST.SERVICE_ID.eq(request.service!!.id)
@@ -72,9 +70,6 @@ interface RequestDao: QueryDao{
             REQUEST.USER_SERVICE_ID.`as`("user_service_id"),
             REQUEST.STATUS.`as`("status"),
             REQUEST.PHYSICIAN.`as`("physician"),
-            REQUEST.REPORTED_AT.`as`("reported_at"),
-            REQUEST.SPECIFIED_AT.`as`("specified_at"),
-            REQUEST.RESAMPLE_AT.`as`("resample_at"),
             jsonObject(
                 key("id").value(REQUEST.REQUEST_GROUP_ID)
             ).`as`("request_group"),
@@ -129,7 +124,7 @@ interface RequestDao: QueryDao{
             ).`as`("reports")
         )
         val groupByFields = listOf(
-            REQUEST.USER_SERVICE_ID, REQUEST.STATUS, REQUEST.PHYSICIAN, REQUEST.REPORTED_AT, REQUEST.SPECIFIED_AT, REQUEST.RESAMPLE_AT, REQUEST.REQUEST_GROUP_ID,
+            REQUEST.USER_SERVICE_ID, REQUEST.STATUS, REQUEST.PHYSICIAN, REQUEST.REQUEST_GROUP_ID,
             SERVICE.ID,
             USER.ID,
             SAMPLE.ID,
@@ -213,7 +208,6 @@ interface RequestDao: QueryDao{
         return Mono.from(
             update(REQUEST)
                 .set(REQUEST.STATUS, Status.COMPLETED.toString())
-                .set(REQUEST.COMPLETE_AT, LocalDateTime.now())
                 .where(
                     REQUEST.SERVICE_ID.eq(request.service!!.id)
                         .and(REQUEST.SAMPLE_ID.eq(request.sample!!.id))
