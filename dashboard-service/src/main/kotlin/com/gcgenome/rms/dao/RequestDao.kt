@@ -30,10 +30,6 @@ interface RequestDao: QueryDao {
             REQUEST.PHYSICIAN,
             REQUEST.CREATE_AT,
             REQUEST.CART_AT,
-            REQUEST.SPECIFIED_AT,
-            REQUEST.COMPLETE_AT,
-            REQUEST.RESAMPLE_AT,
-            REQUEST.LAST_MODIFY_AT,
             jsonObject(
                 key("id").value(USER.ID),
                 key("name").value(USER.NAME)
