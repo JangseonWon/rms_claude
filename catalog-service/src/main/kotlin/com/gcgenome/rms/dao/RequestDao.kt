@@ -23,7 +23,6 @@ interface RequestDao : QueryDao{
                 .set(REQUEST.PHYSICIAN, request.physician)
                 .set(REQUEST.CREATE_AT, request.status.takeIf { it != "CART" }?.let { LocalDateTime.now() })
                 .set(REQUEST.CART_AT, request.status.takeIf { it == "CART" }?.let { LocalDateTime.now() })
-                .set(REQUEST.LAST_MODIFY_AT, LocalDateTime.now())
                 .set(REQUEST.USER_ID, request.user!!.id)
                 .set(REQUEST.REQUEST_GROUP_ID, request.requestGroup!!.id)
                 .set(REQUEST.REQUEST_RELATION_ID, request.requestRelation!!.id)
@@ -64,9 +63,6 @@ interface RequestDao : QueryDao{
             REQUEST.USER_SERVICE_ID.`as`("user_service_id"),
             REQUEST.STATUS.`as`("status"),
             REQUEST.PHYSICIAN.`as`("physician"),
-            REQUEST.REPORTED_AT.`as`("reported_at"),
-            REQUEST.SPECIFIED_AT.`as`("specified_at"),
-            REQUEST.RESAMPLE_AT.`as`("resample_at"),
             DSL.jsonObject(
                 DSL.key("id").value(REQUEST_GROUP.ID)
             ).`as`("request_group"),
@@ -130,7 +126,7 @@ interface RequestDao : QueryDao{
             ).`as`("reports")
         )
         val groupByFields = listOf(
-            REQUEST.USER_SERVICE_ID, REQUEST.STATUS, REQUEST.PHYSICIAN, REQUEST.REPORTED_AT, REQUEST.SPECIFIED_AT, REQUEST.RESAMPLE_AT,
+            REQUEST.USER_SERVICE_ID, REQUEST.STATUS, REQUEST.PHYSICIAN,
             REQUEST_GROUP.ID, REQUEST_RELATION.ID,
             SERVICE.ID,
             USER.ID,

@@ -36,26 +36,6 @@ data class RequestDTO(
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("cart_at")
     var cartAt: LocalDateTime?,
-    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
-    @JsonSerialize(using = LocalDateTimeSerializer::class)
-    @JsonProperty("specified_at")
-    var specifiedAt: LocalDateTime?,
-    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
-    @JsonSerialize(using = LocalDateTimeSerializer::class)
-    @JsonProperty("complete_at")
-    var completeAt: LocalDateTime?,
-    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
-    @JsonSerialize(using = LocalDateTimeSerializer::class)
-    @JsonProperty("resample_at")
-    var resampleAt: LocalDateTime?,
-    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
-    @JsonSerialize(using = LocalDateTimeSerializer::class)
-    @JsonProperty("reported_at")
-    var reportedAt: LocalDateTime?,
-    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
-    @JsonSerialize(using = LocalDateTimeSerializer::class)
-    @JsonProperty("last_modify_at")
-    var lastModifyAt: LocalDateTime?,
     @JsonProperty("user")
     var user: UserDTO? = UserDTO(),
     @JsonProperty("request_group")
