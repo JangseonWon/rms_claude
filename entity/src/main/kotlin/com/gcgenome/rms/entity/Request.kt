@@ -15,7 +15,7 @@ data class Request(
     @Column(name = "status", length = 64, nullable = false)
     @Enumerated(EnumType.STRING)
     val status: RequestStatus,
-    @Column(name = "memo", nullable = true)
+    @Column(name = "memo", columnDefinition = "TEXT", nullable = true)
     val memo: String,
     @Column(name = "department", length = 64, nullable = true)
     val department: String,
@@ -39,8 +39,8 @@ data class Request(
     val limsResampleAt: LocalDateTime,
     @Column(name = "lims_completed_at", nullable = true)
     val limsCompletedAt: LocalDateTime,
-    @Column(name = "lims_resample_reason", nullable = true)
-    val limsResampleReason: LocalDateTime,
+    @Column(name = "lims_resample_reason", length = 128, nullable = true)
+    val limsResampleReason: String,
 
 
 
