@@ -144,9 +144,14 @@ interface QueryDao {
                 val filterCondition = when (filter.operator) {
                     "=" -> {
                         if (isUUID(filter.value)) field.eq(UUID.fromString(filter.value))
+                        else if(isBoolean(filter.value)) field.eq(filter.value.toBoolean())
                         else field.eq(filter.value)
                     }
-                    "!=" -> field.ne(filter.value)
+                    "!=" -> {
+                        if (isUUID(filter.value)) field.eq(UUID.fromString(filter.value))
+                        else if(isBoolean(filter.value)) field.eq(filter.value.toBoolean())
+                        else field.eq(filter.value)
+                    }
                     ">" -> field.gt(filter.value)
                     "<" -> field.lt(filter.value)
                     ">=" -> if (isTimestampColumn(column)) {
@@ -182,6 +187,9 @@ interface QueryDao {
             sortFields.add(sortField)
         }
         return sortFields
+    }
+    private fun isBoolean(value: String): Boolean {
+        return value.equals("true", ignoreCase = true) || value.equals("false", ignoreCase = true)
     }
     private fun isTimestampColumn(column: String): Boolean {
         return column.contains("_at", ignoreCase = true)

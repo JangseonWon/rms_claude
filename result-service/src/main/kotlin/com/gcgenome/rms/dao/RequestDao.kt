@@ -129,6 +129,7 @@ interface RequestDao: QueryDao{
         )
         val groupByFields = listOf(
             REQUEST.USER_SERVICE_ID, REQUEST.STATUS, REQUEST.PHYSICIAN, REQUEST.REQUEST_GROUP_ID,
+            REQUEST.CREATE_AT, REQUEST.LIMS_COMPLETED_AT, REQUEST.LIMS_RESAMPLE_AT, REQUEST.LIMS_RESAMPLE_REASON,
             SERVICE.ID,
             USER.ID,
             SAMPLE.ID,

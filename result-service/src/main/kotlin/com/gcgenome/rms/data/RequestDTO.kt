@@ -22,6 +22,16 @@ data class RequestDTO(
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("cart_at")
     var cartAt: LocalDateTime? = null,
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonProperty("lims_completed_at")
+    var limsCompletedAt: LocalDateTime? = null,
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonProperty("lims_resample_at")
+    var limsResampleAt: LocalDateTime? = null,
+    @JsonProperty("lims_resample_reason")
+    var limsResampleReason: String? = null,
     var service: ServiceDTO? = null,
     var sample: SampleDTO? = null,
     var reports: List<ReportDTO>? = null,
