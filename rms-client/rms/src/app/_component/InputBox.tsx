@@ -18,7 +18,7 @@ export default function InputBox({label, value, regex, disabled=false, onChange,
     const [hasError, setHasError] = useState(!value && required);
 
     const defaultRegex = /^[a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣0-9\s~`!@#$%^&*()-_=+\[\]{}\\|;:'",.<>/?]*$/;
-    const floatRegex = /^-?\d*(\.\d*)?$/;
+    const floatRegex = /^[0-9]+(\.[0-9]*)?$/;
 
     const getSafeRegex = () => {
         if (regex === "float") return floatRegex;
