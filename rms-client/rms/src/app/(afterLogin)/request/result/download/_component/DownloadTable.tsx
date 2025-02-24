@@ -48,6 +48,12 @@ const completedFilter: Filter = {
     operator: "=",
     value: Status.COMPLETED.valueOf()
 }
+const reportFilter: Filter = {
+    table: "report",
+    column: "is_latest",
+    operator: "=",
+    value: "true"
+}
 
 export default function DownloadTable() {
     const [requestData, setRequestData] = useState<RequestWithSelected[]>([]);
@@ -112,6 +118,7 @@ export default function DownloadTable() {
                     filters: [
                         deliveredFilter,
                         completedFilter,
+                        reportFilter
                     ],
                 },
                 {
@@ -257,7 +264,7 @@ export default function DownloadTable() {
                         <th className={globalTableStyle.longColumn}>Service</th>
                         <th className={globalTableStyle.longColumn}>Patient(s) Name</th>
                         <th className={globalTableStyle.longColumn}>MRN</th>
-                        <th className={globalTableStyle.middleColumn}>Report Date<br/>(YYYY/MM/DD)</th>
+                        <th className={globalTableStyle.middleColumn}>Report Date<br/>(DD-MM-YYYY)</th>
                         <th className={globalTableStyle.middleColumn}>Status</th>
                         <th className={globalTableStyle.middleColumn}>Report Download</th>
                     </tr>
@@ -283,7 +290,7 @@ export default function DownloadTable() {
                             <td className={globalTableStyle.longColumn}><CellTooltip text={request.service?.name}/></td>
                             <td className={globalTableStyle.longColumn}><CellTooltip text={request.sample?.patient?.name}/></td>
                             <td className={globalTableStyle.longColumn}>{request.sample?.patient?.serial}</td>
-                            <td className={globalTableStyle.middleColumn}>{request.lims_completed_at ? new Date(request.lims_completed_at).toLocaleDateString() : '-'}</td>
+                            <td className={globalTableStyle.middleColumn}>{request.lims_completed_at ? new Date(request.lims_completed_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
                             <td className={globalTableStyle.middleColumn}>{request.status}</td>
                             <td className={globalTableStyle.middleColumn}>
                                 {(request.reports as Report[])?.filter((report: Report) => report.type === 'PDF').map((report) => (

@@ -240,7 +240,6 @@ export default function ReSampleTable() {
                             <th className={globalTableStyle.longColumn}>Patient(s) Name</th>
                             <th className={globalTableStyle.longColumn}>MRN</th>
                             <th className={globalTableStyle.longColumn}>Reason</th>
-                            <th className={globalTableStyle.longColumn}>Resample Notice</th>
                             <th className={globalTableStyle.middleColumn}>Request</th>
                             <th className={globalTableStyle.middleColumn}>Cancel</th>
                         </tr>
@@ -256,7 +255,6 @@ export default function ReSampleTable() {
                                 <td className={globalTableStyle.longColumn}><CellTooltip text={request.sample?.patient?.name}/></td>
                                 <td className={globalTableStyle.longColumn}>{request.sample?.patient?.serial}</td>
                                 <td className={globalTableStyle.longColumn}>{request.lims_resample_reason}</td>
-                                <td className={globalTableStyle.middleColumn}>{request.lims_resample_at ? new Date(request.lims_resample_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
                                 <td className={globalTableStyle.underlineBlue} onClick={() => handleRequestClick(request)}>Request</td>
                                 <td className={globalTableStyle.underlineRed} onClick={() => handleCancelToResampleClick(request)}>Cancel</td>
                             </tr>
