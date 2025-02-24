@@ -36,26 +36,6 @@ data class RequestDTO(
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("cart_at")
     var cartAt: LocalDateTime?,
-    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
-    @JsonSerialize(using = LocalDateTimeSerializer::class)
-    @JsonProperty("specified_at")
-    val specifiedAt: LocalDateTime?,
-    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
-    @JsonSerialize(using = LocalDateTimeSerializer::class)
-    @JsonProperty("complete_at")
-    val completeAt: LocalDateTime?,
-    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
-    @JsonSerialize(using = LocalDateTimeSerializer::class)
-    @JsonProperty("resample_at")
-    val resampleAt: LocalDateTime?,
-    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
-    @JsonSerialize(using = LocalDateTimeSerializer::class)
-    @JsonProperty("reported_at")
-    val reportedAt: LocalDateTime?,
-    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
-    @JsonSerialize(using = LocalDateTimeSerializer::class)
-    @JsonProperty("last_modify_at")
-    val lastModifyAt: LocalDateTime?,
     @JsonProperty("user")
     val user: UserDTO?,
     @JsonProperty("request_group")

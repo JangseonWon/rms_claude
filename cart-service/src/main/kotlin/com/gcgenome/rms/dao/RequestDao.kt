@@ -44,10 +44,6 @@ interface RequestDao: QueryDao {
             REQUEST.PHYSICIAN,
             REQUEST.CREATE_AT,
             REQUEST.CART_AT,
-            REQUEST.SPECIFIED_AT,
-            REQUEST.COMPLETE_AT,
-            REQUEST.RESAMPLE_AT,
-            REQUEST.LAST_MODIFY_AT,
             jsonObject(
                 key("id").value(SAMPLE.ID),
                 key("barcode").value(SAMPLE.BARCODE),
@@ -116,7 +112,6 @@ interface RequestDao: QueryDao {
                 .set(REQUEST.DEPARTMENT, coalesce(`val`(request.department), REQUEST.DEPARTMENT))
                 .set(REQUEST.WARD, coalesce(`val`(request.ward), REQUEST.WARD))
                 .set(REQUEST.PHYSICIAN, coalesce(`val`(request.physician), REQUEST.PHYSICIAN))
-                .set(REQUEST.LAST_MODIFY_AT, LocalDateTime.now())
                 .where(
                     REQUEST.SAMPLE_ID.eq(request.sample!!.id),
                     REQUEST.SERVICE_ID.eq(request.service!!.id)
