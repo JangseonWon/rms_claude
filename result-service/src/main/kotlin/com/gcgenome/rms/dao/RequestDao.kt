@@ -67,6 +67,10 @@ interface RequestDao: QueryDao{
             )
         )
         val fields = listOf(
+            REQUEST.CREATE_AT.`as`("create_at"),
+            REQUEST.LIMS_COMPLETED_AT.`as`("lims_completed_at"),
+            REQUEST.LIMS_RESAMPLE_AT.`as`("lims_resample_at"),
+            REQUEST.LIMS_RESAMPLE_REASON.`as`("lims_resample_reason"),
             REQUEST.USER_SERVICE_ID.`as`("user_service_id"),
             REQUEST.STATUS.`as`("status"),
             REQUEST.PHYSICIAN.`as`("physician"),
