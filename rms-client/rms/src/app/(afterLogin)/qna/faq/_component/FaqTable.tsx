@@ -17,6 +17,7 @@ import {format} from "date-fns";
 import {useSession} from "next-auth/react";
 import globalTableStyle from "@/css/globalTable.module.css";
 import {GrPowerReset} from "react-icons/gr";
+import {Role} from "@/model/Role";
 
 export default function FaqTable() {
     const router = useRouter();
@@ -215,7 +216,7 @@ export default function FaqTable() {
                     )}
                     </tbody>
                 </table>
-                {session?.user.role !== 'USER' && (
+                {session?.user.role !== Role.USER.valueOf() && (
                     <button className={style.addButton} onClick={faqAddButtonClick}>
                         FAQ
                     </button>

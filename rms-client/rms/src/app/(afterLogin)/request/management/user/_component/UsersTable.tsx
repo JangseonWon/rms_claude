@@ -22,6 +22,7 @@ import LoadingFullScreen from "@/app/_component/LoadingFullScreen";
 import ManagerAddModal from "@/app/(afterLogin)/request/management/user/_component/ManagerAddModal";
 import {useSession} from "next-auth/react";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
+import {Role} from "@/model/Role";
 
 interface UserWithSelected extends User {
     isSelected?: boolean;
@@ -165,7 +166,7 @@ export default function UsersTable() {
             {isLoading && <LoadingFullScreen/>}
             <section className={managementStyle.filterContainer}>
                 <div className={managementStyle.filterContainerAlis}>
-                    {session?.user.role === 'ADMIN' && (
+                    {session?.user.role === Role.ADMIN.valueOf() && (
                         <div className={managementStyle.alisSyncButton}>
                             <BlueButton name={"Manager Add"} onClick={() => handleManagerAddClick()}/>
                         </div>

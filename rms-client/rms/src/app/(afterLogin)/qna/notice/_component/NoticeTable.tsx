@@ -18,6 +18,7 @@ import {format} from "date-fns";
 import {useSession} from "next-auth/react";
 import {putPostReadByUserId} from "@/app/(afterLogin)/qna/_api/putPostReadByUserId";
 import {GrPowerReset} from "react-icons/gr";
+import {Role} from "@/model/Role";
 
 export default function NoticeTable() {
     const router = useRouter();
@@ -221,7 +222,7 @@ export default function NoticeTable() {
                     )}
                     </tbody>
                 </table>
-                {session?.user.role !== 'USER' && (
+                {session?.user.role !== Role.USER.valueOf() && (
                     <button className={style.addButton} onClick={noticeAddButtonClick}>
                         Notice
                     </button>

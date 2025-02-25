@@ -10,6 +10,7 @@ import {signOut, useSession} from "next-auth/react";
 import ProfileAlarm from "@/app/(afterLogin)/_component/alarm/ProfileAlarm";
 import {getAlarmCountByUser} from "@/app/(afterLogin)/_api/getAlarmCountByUser";
 import {useAlarmCount, useSetAlarmCount} from "@/app/(afterLogin)/_component/alarm/store/useAlarmCountStore";
+import {Role} from "@/model/Role";
 
 export default function ProfileButton() {
     const { data: session } = useSession();
@@ -109,7 +110,7 @@ export default function ProfileButton() {
                          onMouseLeave={handleUserMouseLeave}>
                         <ul>
                             <li onClick={onProfile}>My profile</li>
-                            { session?.user.role === 'ADMIN'&& <li onClick={onManager}>Maneging Service</li>}
+                            { session?.user.role === Role.ADMIN.valueOf()&& <li onClick={onManager}>Maneging Service</li>}
                             <li onClick={onLogout}>Logout</li>
                         </ul>
                     </div>

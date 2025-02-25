@@ -15,6 +15,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React, {useState} from "react";
 import {usePathname, useSelectedLayoutSegment} from "next/navigation";
 import {useSession} from "next-auth/react";
+import {Role} from "@/model/Role";
 
 export default function NavMenu() {
     const segment = useSelectedLayoutSegment();
@@ -58,35 +59,42 @@ export default function NavMenu() {
                         </div>
                     </Link>
                 </li>
-                <li>
-                    <Link href={"/request/service-catalog"}>
+                {session?.user.role === Role.USER.valueOf() && (
+                    <li>
+                        <Link href={"/request/service-catalog"}>
+                            <div className={style.navItem}>
+                                <FontAwesomeIcon
+                                    className={segment === '/request/service-catalog' ? style.clickIcon : style.icon}
+                                    icon={faList}/>
+                                <span
+                                    className={segment === 'service-catalog' ? style.clickSpan : ''}>Service Catalog</span>
+                            </div>
+                        </Link>
+                    </li>
+                )}
+                {session?.user.role === Role.USER.valueOf() && (
+                    <li>
+                        <Link href={"/request/cart"}>
+                            <div className={style.navItem}>
+                                <FontAwesomeIcon
+                                    className={segment === 'cart' ? style.clickIcon : style.icon}
+                                    icon={faPlus}/>
+                                <span className={segment === 'cart' ? style.clickSpan : ''}>Cart</span>
+                            </div>
+                        </Link>
+                    </li>
+                )}
+                {session?.user.role === Role.USER.valueOf() && (
+                    <li onClick={toggleRequestOrderDropdown}>
                         <div className={style.navItem}>
                             <FontAwesomeIcon
-                                className={segment === '/request/service-catalog' ? style.clickIcon : style.icon}
-                                icon={faList}/>
-                            <span className={segment === 'service-catalog' ? style.clickSpan : ''}>Service Catalog</span>
+                                className={segment === 'order' ? style.clickIcon : style.icon}
+                                icon={faGripLines}/>
+                            <span className={segment === 'order' ? style.clickSpan : ''}>Request Order</span>
                         </div>
-                    </Link>
-                </li>
-                <li>
-                    <Link href={"/request/cart"}>
-                        <div className={style.navItem}>
-                            <FontAwesomeIcon
-                                className={segment === 'cart' ? style.clickIcon : style.icon}
-                                icon={faPlus}/>
-                            <span className={segment === 'cart' ? style.clickSpan : ''}>Cart</span>
-                        </div>
-                    </Link>
-                </li>
-                <li onClick={toggleRequestOrderDropdown}>
-                    <div className={style.navItem}>
-                        <FontAwesomeIcon
-                            className={segment === 'order' ? style.clickIcon : style.icon}
-                            icon={faGripLines}/>
-                        <span className={segment === 'order' ? style.clickSpan : ''}>Request Order</span>
-                    </div>
-                </li>
-                {showRequestOrder && (
+                    </li>
+                )}
+                {showRequestOrder && session?.user.role === Role.USER.valueOf() &&(
                     <>
                         <ol>
                             <Link href={"/request/order/barcode"}>
@@ -137,7 +145,7 @@ export default function NavMenu() {
                         </ol>
                     </>
                 )}
-                {session?.user.role !== 'USER' && (
+                {session?.user.role !== Role.USER.valueOf() && (
                     <li onClick={toggleManagementDropdown}>
                         <div className={style.navItem}>
                             <FontAwesomeIcon
@@ -147,7 +155,7 @@ export default function NavMenu() {
                         </div>
                     </li>
                     )}
-                {showManagementDropdown && session?.user.role !== 'USER' && (
+                {showManagementDropdown && session?.user.role !== Role.USER.valueOf() && (
                     <>
                         <ol>
                             <Link href={"/request/management/user"}>
