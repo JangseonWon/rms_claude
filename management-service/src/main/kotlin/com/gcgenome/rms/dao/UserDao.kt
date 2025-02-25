@@ -24,6 +24,7 @@ interface UserDao : QueryDao{
                 .set(USER.BRANCH_SERIAL, alisOrganization.compMngBeginNo)
                 .set(USER.BRANCH_NAME, alisOrganization.compMngName)
                 .set(USER.CREATE_AT, LocalDateTime.now())
+                .set(USER.LAST_PASSWORD_CHANGED_AT, LocalDateTime.now())
                 .onConflict(USER.ID)
                 .doUpdate()
                 .set(USER.NAME, alisOrganization.compName)
