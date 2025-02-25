@@ -4,6 +4,7 @@ import java.time.LocalDateTime
 
 data class WorkflowMessage(
     var request: WorkflowRequest,
+    var param: Param? = null,
     var process: String,
     var type: String
 )
@@ -15,6 +16,9 @@ data class WorkflowRequest(
 )
 data class WorkflowRequester(
     var code: String
+)
+data class Param(
+    var reason: String? = null
 )
 data class WorkflowService(
     var id: String

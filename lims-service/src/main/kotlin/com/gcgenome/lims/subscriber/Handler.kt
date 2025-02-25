@@ -35,11 +35,11 @@ class Handler(
                 .flatMap { request ->
                     when{
                         message.process == LimsStatus.SPECIFIED.name && message.type == LimsStatus.COMPLETE.name ->
-                            updateRequestStatusById(request.serviceId!!, request.sampleId!!, Status.IN_PROGRESS.name)
+                            updateRequestStatusById(request.serviceId!!, request.sampleId!!, message, Status.IN_PROGRESS)
                         message.process == LimsStatus.FINISHED .name && message.type == LimsStatus.COMPLETE.name ->
-                            updateRequestStatusById(request.serviceId!!, request.sampleId!!, Status.DELIVERED.name)
+                            updateRequestStatusById(request.serviceId!!, request.sampleId!!, message, Status.DELIVERED)
                         message.process == LimsStatus.RESAMPLED.name && message.type == LimsStatus.COMPLETE.name ->
-                            updateRequestStatusById(request.serviceId!!, request.sampleId!!, Status.TEST_FAILED.name)
+                            updateRequestStatusById(request.serviceId!!, request.sampleId!!, message, Status.TEST_FAILED)
                         else -> Mono.error(InvalidWorkflowException("Invalid workflow: barcode=$barcode, service=$serviceId, process=${message.process}, type=${message.type}"))
                     }
                 }
