@@ -30,8 +30,12 @@ data class User(
     val branchSerial: String,
     @Column(name = "branch_name", length = 64, nullable = false)
     val branchName: String,
+    @Column(name = "employee_department", length = 64, nullable = true)
+    val employeeDepartment: String,
     @Column(name = "create_at", nullable = false)
     val createAt: LocalDateTime,
+    @Column(name = "last_password_changed_at", nullable = false)
+    val lastPasswordChangedAt: LocalDateTime,
 
     @OneToMany(mappedBy = "userId")
     val organizations: List<Organization>,
