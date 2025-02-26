@@ -26,9 +26,9 @@ data class User(
     val key: UUID,
     @Column(name = "state", length = 64, nullable = false)
     val state: String,
-    @Column(name = "branch_serial", length = 64, nullable = false)
+    @Column(name = "branch_serial", length = 64, nullable = true)
     val branchSerial: String,
-    @Column(name = "branch_name", length = 64, nullable = false)
+    @Column(name = "branch_name", length = 64, nullable = true)
     val branchName: String,
     @Column(name = "employee_department", length = 64, nullable = true)
     val employeeDepartment: String,
