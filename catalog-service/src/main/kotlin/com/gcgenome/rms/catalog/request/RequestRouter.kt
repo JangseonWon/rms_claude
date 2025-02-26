@@ -4,6 +4,8 @@ import com.gcgenome.rms.auth.AuthenticationHandler
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.RequestDTO
 import com.gcgenome.rms.exceptions.AuthenticationNotFoundException
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
@@ -23,6 +25,8 @@ class RequestRouter (
         PUT("/w-api/catalog-service/requests", :: saveRequests)
         POST("/w-api/catalog-service/requests/search", ::searchRequests)
     }
+    private val logger: Logger = LoggerFactory.getLogger(RequestRouter::class.java)
+
     private fun saveRequests(request: ServerRequest): Mono<ServerResponse> {
         val isGroup: Boolean? = request.queryParam("is_group").orElse(null)?.toBoolean()
         return authenticationHandler.principal(request)
@@ -30,7 +34,10 @@ class RequestRouter (
             .flatMap { requestHandler.saveRequest(it.t1.user, it.t2, isGroup).collectList() }
             .flatMap { ServerResponse.ok().build() }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome") }
+            .onErrorResume { e ->
+                logger.error(e.stackTraceToString())
+                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome")
+            }
     }
     private fun searchRequests(request: ServerRequest): Mono<ServerResponse> {
         return Mono.zip(authenticationHandler.principal(request), request.bodyToMono(Query::class.java))
