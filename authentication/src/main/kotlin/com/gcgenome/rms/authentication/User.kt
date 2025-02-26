@@ -26,8 +26,17 @@ data class User(
     val state: String?,
     @JsonProperty("type")
     val type: String?,
+    @JsonProperty("key")
+    val key: String?,
+    @JsonProperty("employee_department")
+    val employeeDepartment: String?,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("create_at")
-    val createAt: LocalDateTime?
+    val createAt: LocalDateTime?,
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonProperty("last_password_changed_at")
+    val lastPasswordChangedAt: LocalDateTime?
+
 )
