@@ -28,6 +28,7 @@ type RequestData = {
     gender: string;              // 성별
     physician: string;        // 의사 이름
     medicalDepartment: string;// 병원명
+    ward: string                // 병동
     collectionDate: string;   // 채취일자
     mrn: string;              // MRN
     quantity: number;         // 샘플 수
@@ -93,6 +94,7 @@ export default function Order() {
                 gender: mapByHeader("Gender"),
                 physician: mapByHeader("Physician Name"),
                 medicalDepartment: mapByHeader("Medical Department"),
+                ward: mapByHeader("Ward"),
                 collectionDate: collectionDate,
                 code: mapByHeader("Code"),
                 quantity: mapByHeader("Quantity"),
@@ -166,6 +168,7 @@ export default function Order() {
                     physician: item.physician,
                     status: status,
                     department: item.medicalDepartment,
+                    ward: item.ward,
                     sample: {
                         quantity: item.quantity,
                         age: age.toString(),
@@ -303,6 +306,7 @@ export default function Order() {
                         <th className={style.header150}>Collection Date</th>
                         <th className={style.header100}>Quantity</th>
                         <th className={style.header150}>Medical Department</th>
+                        <th className={style.header150}>Ward</th>
                         <th className={style.header150}>Physician Name</th>
                         {extensions.map((extension, index) => (
                             <th className={style.header100} key={index}>{extension.name}</th>
@@ -323,6 +327,7 @@ export default function Order() {
                                 <td>{item.collectionDate || '-'}</td>
                                 <td>{item.quantity || '-'}</td>
                                 <td>{item.medicalDepartment || '-'}</td>
+                                <td>{item.ward || '-'}</td>
                                 <td>{item.physician || '-'}</td>
                                 {extensions.map((extension, extIndex) => (
                                     <td key={extIndex}>

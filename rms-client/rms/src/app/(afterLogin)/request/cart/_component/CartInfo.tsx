@@ -268,6 +268,11 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
                                 onChange={(value) => handleRequestChange('department', value)}
                             />
                             <InputBox
+                                label={"Ward"}
+                                value={request.ward}
+                                onChange={(value) => handleRequestChange('ward', value)}
+                            />
+                            <InputBox
                                 label={"Physician Name"}
                                 value={request.physician}
                                 onChange={(value) => handleRequestChange('physician', value)}
