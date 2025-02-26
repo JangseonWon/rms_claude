@@ -1,8 +1,11 @@
 package com.gcgenome.rms.catalog.service
 
 import com.gcgenome.rms.auth.AuthenticationHandler
+import com.gcgenome.rms.catalog.requestrelation.RequestRelationRouter
 import com.gcgenome.rms.data.*
 import com.gcgenome.rms.exceptions.AuthenticationNotFoundException
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
@@ -26,6 +29,7 @@ class ServiceRouter (
         GET("/w-api/catalog-service/services/{serviceId}/extensions", ::serviceExtensions)
         GET("/w-api/catalog-service/services/{service-id}", ::findService)
     }
+    private val logger: Logger = LoggerFactory.getLogger(ServiceRouter::class.java)
 
     private fun getServices(request: ServerRequest): Mono<ServerResponse> {
         val categoryId = request.queryParam("category_id").map { UUID.fromString(it) }.orElse(null)
@@ -36,7 +40,10 @@ class ServiceRouter (
             }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), ServiceDTO::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
+            .onErrorResume { e ->
+                logger.error(e.stackTraceToString())
+                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome")
+            }
     }
 
     private fun getSampleTypeByServiceId(request: ServerRequest): Mono<ServerResponse> {
@@ -45,7 +52,10 @@ class ServiceRouter (
             .flatMap { serviceHandler.getSampleTypes(serviceId).collectList() }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), SampleTypeDTO::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
+            .onErrorResume { e ->
+                logger.error(e.stackTraceToString())
+                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome")
+            }
     }
 
     private fun serviceExtensions(request: ServerRequest): Mono<ServerResponse> {
@@ -54,7 +64,10 @@ class ServiceRouter (
             .flatMap { serviceHandler.extensionByServiceId(serviceId).collectList() }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), ServiceExtensionDTO::class.java)}
             .onErrorResume (AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume (ServiceNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
+            .onErrorResume { e ->
+                logger.error(e.stackTraceToString())
+                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome")
+            }
     }
 
     private fun findService(request: ServerRequest): Mono<ServerResponse> {
@@ -66,8 +79,10 @@ class ServiceRouter (
                 .body(Mono.just(it), ServiceDTO::class.java)
             }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
-            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
+            .onErrorResume { e ->
+                logger.error(e.stackTraceToString())
+                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome")
+            }
     }
 }
 

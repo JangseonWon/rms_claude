@@ -51,7 +51,10 @@ class RequestRouter (
                 .body(Mono.just(it.data), RequestDTO::class.java) }
             .switchIfEmpty(ServerResponse.status(HttpStatus.NO_CONTENT).build())
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}") }
-            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome") }
+            .onErrorResume { e ->
+                logger.error(e.stackTraceToString())
+                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome")
+            }
     }
 }
 
