@@ -4,6 +4,8 @@ import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.data.*
 import com.gcgenome.rms.exceptions.AuthenticationNotFoundException
 import com.gcgenome.rms.exceptions.OrderNotFoundException
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
@@ -29,6 +31,8 @@ class Router (
         DELETE("/w-api/cart-service/requests", :: deleteCart)
     }
 
+    private val logger: Logger = LoggerFactory.getLogger(Router::class.java)
+
     private fun searchRequests(request: ServerRequest): Mono<ServerResponse> {
         return principal(request)
             .zipWith(request.bodyToMono(Query::class.java))
@@ -41,7 +45,10 @@ class Router (
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(it.data), RequestDTO::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e / ${e.stackTraceToString()}")}
+            .onErrorResume { e ->
+                logger.error(e.stackTraceToString())
+                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome")
+            }
     }
     private fun cartInfo(request: ServerRequest): Mono<ServerResponse> {
         val sampleId = UUID.fromString(request.pathVariable("sample_id"))
@@ -50,7 +57,11 @@ class Router (
             .flatMap { handler.getCartInfo(sampleId, serviceId) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), RequestDTO::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume(OrderNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message} ${e.stackTraceToString()}") }
+            .onErrorResume(OrderNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
+            .onErrorResume { e ->
+                logger.error(e.stackTraceToString())
+                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome")
+            }
     }
     private fun organizations(request: ServerRequest): Mono<ServerResponse> {
         val userId = request.queryParam("user_id").get()
@@ -58,7 +69,10 @@ class Router (
             .flatMap { handler.organizations(userId).collectList() }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), OrganizationDTO::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
+            .onErrorResume { e ->
+                logger.error(e.stackTraceToString())
+                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome")
+            }
     }
     private fun cartToOrder(request: ServerRequest): Mono<ServerResponse> {
         return principal(request)
@@ -66,7 +80,10 @@ class Router (
             .flatMap { handler.cartToOrder(it).collectList() }
             .flatMap { ServerResponse.ok().build()}
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: ${e.stackTraceToString()}")}
+            .onErrorResume { e ->
+                logger.error(e.stackTraceToString())
+                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome")
+            }
     }
 
     private fun updateRequest(request: ServerRequest): Mono<ServerResponse> {
@@ -82,7 +99,10 @@ class Router (
             ) }
             .flatMap { ServerResponse.ok().bodyValue(it)}
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("오류코드: $e")}
+            .onErrorResume { e ->
+                logger.error(e.stackTraceToString())
+                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome")
+            }
     }
     private fun sampleTypes(request: ServerRequest): Mono<ServerResponse> {
         val serviceId = request.queryParam("service_id").get()
@@ -91,6 +111,10 @@ class Router (
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), SampleTypeDTO::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(OrderNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
+            .onErrorResume { e ->
+                logger.error(e.stackTraceToString())
+                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome")
+            }
     }
     private fun deleteCart(request: ServerRequest): Mono<ServerResponse> {
         return principal(request)
@@ -99,6 +123,10 @@ class Router (
             .then(ServerResponse.ok().build())
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(OrderNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
+            .onErrorResume { e ->
+                logger.error(e.stackTraceToString())
+                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome")
+            }
     }
     private fun principal(request: ServerRequest): Mono<UserAuthentication> {
         return request.principal().switchIfEmpty(Mono.error(AuthenticationNotFoundException()))
