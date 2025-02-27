@@ -163,22 +163,22 @@ export default function UserHistoryPage() {
                                 <thead>
                                 <tr>
                                     <th>Changed Date</th>
-                                    <th>Changed By</th>
+                                    <th>User ID</th>
                                     <th>Field Name</th>
                                     <th>New Value</th>
                                     <th>Old Value</th>
-                                    <th>User ID</th>
+                                    <th>Changed By</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 {userHistoryData && userHistoryData.length > 0 && userHistoryData.map((history) => (
                                     <tr key={`${history.id}`}>
                                         <td>{history.changed_at ? new Date(history.changed_at).toLocaleDateString().replace(/\//g, '-') : ''}</td>
-                                        <td>{history.changed_by}</td>
+                                        <td>{history.user_id}</td>
                                         <td>{history.field_name}</td>
                                         <td>{history.new_value}</td>
                                         <td>{history.old_value}</td>
-                                        <td>{history.user_id}</td>
+                                        <td>{history.changed_by}</td>
                                     </tr>
                                 ))}
                                 </tbody>
