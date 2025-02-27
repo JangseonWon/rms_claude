@@ -55,14 +55,15 @@ export default function ExtensionInputComponent({serviceId}: ExtensionInputCompo
     const generateSelectList = (regex: string): { name: string, value: string }[] => {
         if (regex.includes("|")) {
             return regex
-                .replace(/^\b|\b$/g, '')
                 .replace(/^\\b|\b$/g, '')
                 .replace(/^\(\?:|\)$/g, '')
+                .replace(/\\b/g, '')
                 .split('|')
-                .filter(value => value.trim() !== '')
+                .map(value => value.trim())
+                .filter(value => value !== '')
                 .map(value => ({
-                    name: value,
-                    value: value.toLowerCase()
+                    name: value.replace(/^\(|\)$/g, ''),
+                    value: value.replace(/^\(|\)$/g, '').toLowerCase()
                 }));
         }
         return [];
