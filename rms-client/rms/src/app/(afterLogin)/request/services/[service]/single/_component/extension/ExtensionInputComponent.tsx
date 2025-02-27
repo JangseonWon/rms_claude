@@ -56,14 +56,16 @@ export default function ExtensionInputComponent({serviceId}: ExtensionInputCompo
         if (regex.includes("|")) {
             return regex
                 .replace(/^\\b|\b$/g, '')
-                .replace(/^\(\?:|\)$/g, '')
+                .replace(/^\\b|\b$/g, '')
+                .replace(/^\(\?:/, '')
+                .replace(/\)\\b$/, '')
                 .replace(/\\b/g, '')
                 .split('|')
                 .map(value => value.trim())
                 .filter(value => value !== '')
                 .map(value => ({
-                    name: value.replace(/^\(|\)$/g, ''),
-                    value: value.replace(/^\(|\)$/g, '').toLowerCase()
+                    name: value,
+                    value: value.toLowerCase()
                 }));
         }
         return [];
