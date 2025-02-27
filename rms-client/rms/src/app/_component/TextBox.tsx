@@ -4,11 +4,12 @@ import style from '@/app/_component/textBox.module.css';
 type Props = {
     label: string
     value?: any
+    disabled?: boolean
     onChange?: (value: string) => void
     required?: boolean;
 }
 
-export default function TextBox({ label, value, onChange, required=false }: Props) {
+export default function TextBox({ label, value, disabled = false, onChange, required=false }: Props) {
     const [inputValue, setInputValue] = useState('');
     const [hasError, setHasError] = useState(false);
 
@@ -31,10 +32,11 @@ export default function TextBox({ label, value, onChange, required=false }: Prop
         <div className={`${style.content} ${hasError ? style.error : ""}`}>
             <p>{label}</p>
             <textarea
-                className={style.memo}
+                className={`${style.memo} ${disabled ? style.disable : ""}`}
                 rows={8}
                 value={inputValue}
                 onChange={handleChange}
+                disabled={disabled}
             />
         </div>
     );

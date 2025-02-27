@@ -26,3 +26,6 @@
 .content.error textarea{
     border: 1px solid #90BA2D;
 }
+.disable {
+    background-color: #EFEFEF4D;
+}

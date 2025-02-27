@@ -17,7 +17,7 @@ import {
 } from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
 
 interface ExtensionComponentProps {
-    extensions: Extension[];
+    extensions: Extension[] | undefined;
     onChange: (updatedExtensions: Extension[]) => void;
 }
 
@@ -47,7 +47,7 @@ export default function CartInfoExtensionComponent({ extensions, onChange }: Ext
     };
 
     const updateExtensionValue = (id: string, value: any) => {
-        const updatedExtensions = extensions.map(extension => {
+        const updatedExtensions = (extensions ?? []).map(extension => {
             if (extension.id === id) {
                 return { ...extension, value };
             }
@@ -122,9 +122,9 @@ export default function CartInfoExtensionComponent({ extensions, onChange }: Ext
         }
     };
 
-    const textComponents = extensions.filter(extension => extension.type === ExtensionType.TEXT);
-    const otherComponents = extensions.filter(extension => extension.type !== ExtensionType.TEXT);
-    const probandComponent = extensions.filter(extension => extension.type === ExtensionType.RELATION);
+    const textComponents = (extensions ?? []).filter(extension => extension.type === ExtensionType.TEXT);
+    const otherComponents = (extensions ?? []).filter(extension => extension.type !== ExtensionType.TEXT);
+    const probandComponent = (extensions ?? []).filter(extension => extension.type === ExtensionType.RELATION);
 
     return (
         <div className={style.section}>

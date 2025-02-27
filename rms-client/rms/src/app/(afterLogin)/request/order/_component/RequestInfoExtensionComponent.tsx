@@ -7,7 +7,7 @@ import InputBox from "@/app/_component/InputBox";
 import TextBox from "@/app/_component/TextBox";
 
 interface ExtensionComponentProps {
-    extensions: Extension[]
+    extensions: Extension[] | undefined
 }
 
 export default function RequestInfoExtensionComponent({ extensions }: ExtensionComponentProps) {
@@ -38,8 +38,8 @@ export default function RequestInfoExtensionComponent({ extensions }: ExtensionC
         }
     };
 
-    const textComponents = extensions.filter(extension => extension.type === ExtensionType.TEXT);
-    const otherComponents = extensions.filter(extension => extension.type !== ExtensionType.TEXT);
+    const textComponents = (extensions ?? []).filter(extension => extension.type === ExtensionType.TEXT);
+    const otherComponents = (extensions ?? []).filter(extension => extension.type !== ExtensionType.TEXT);
 
     return (
         <div className={style.section}>

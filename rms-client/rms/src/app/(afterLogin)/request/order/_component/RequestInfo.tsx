@@ -12,6 +12,7 @@ import {getRequestOrderInfo} from "@/app/(afterLogin)/request/order/_api/getRequ
 import classNames from "classnames";
 import scroll from "@/css/scrollBar.module.css";
 import RequestInfoExtensionComponent from "@/app/(afterLogin)/request/order/_component/RequestInfoExtensionComponent";
+import TextBox from "@/app/_component/TextBox";
 
 type Props = {
     serviceId: string;
@@ -74,58 +75,74 @@ export default function RequestInfo({serviceId, sampleId, closeModal}: Props) {
                     <FontAwesomeIcon icon={faXmark} onClick={closeModal} className={globalStyle.modalCloseButton}/>
                 </div>
                 {request ? (
-                    <div className={classNames(style.wrapper, scroll.default)}>
+                    <div className={classNames(style.modalContent, scroll.default)}>
+                        <div className={style.content}>
+                            <p className={style.title}>Institution name</p>
+                            <InputBox
+                                label={"Institution"}
+                                value={request.sample?.patient?.organization?.name}
+                                disabled={true}
+                            />
+                        </div>
+                        <div className={style.content}>
+                            <p className={style.title}>Service Info.</p>
+                            <InputBox
+                                label={"Service"}
+                                value={request.service?.name}
+                                disabled={true}
+                            />
+                        </div>
+                        <p className={style.mainName}>Patient Info.</p>
+                        <div className={style.section}>
+                            <InputBox
+                                label={"Name*"}
+                                value={request.sample?.patient?.name}
+                                onChange={(value) => handleRequestChange('sample.patient.name', value)}
+                                disabled={true}
+                            />
+                            <InputBox
+                                label={"MRN*"}
+                                value={request.sample?.patient?.serial}
+                                onChange={(value) => handleRequestChange('sample.patient.serial', value)}
+                                disabled={true}
+                            />
+                            <InputBox
+                                label={"Age"}
+                                value={request.sample?.age}
+                                disabled={true}
+                            />
+                            <InputBox
+                                label={"Date of Birth"}
+                                value={getDateFromComponents(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}
+                                disabled={true}
+                            />
+                        </div>
+                        <div className={style.section}>
+                            <InputBox
+                                label={"Gender"}
+                                value={request.sample?.patient?.sex}
+                                disabled={true}
+                            />
+                        </div>
+                        <div className={style.content}>
+                            <p className={style.title}>Specimen/.Sample Info.</p>
+                            <InputBox
+                                label={"Type*"}
+                                value={request.sample?.sample_type?.name}
+                                disabled={true}
+                            />
+                            <InputBox
+                                label={"Collection Date*"}
+                                value={request.sample?.sampling_on}
+                                disabled={true}
+                            />
+                            <InputBox
+                                label={"Quantity*"}
+                                value={request.sample?.quantity?.toString()}
+                                disabled={true}
+                            />
+                        </div>
                         <div className={style.modalContent}>
-                            <div className={style.headerContent}>
-                                <div className={style.firstContent}>
-                                    <p className={style.firstTitle}>Institution name</p>
-                                    <InputBox
-                                        label={"Institution"}
-                                        value={request.sample?.patient?.organization?.name}
-                                        disabled={true}
-                                    />
-                                </div>
-                                <div className={style.firstContent}>
-                                    <p className={style.firstTitle}>Service Info.</p>
-                                    <InputBox
-                                        label={"Service"}
-                                        value={request.service?.name}
-                                        disabled={true}
-                                    />
-                                </div>
-                            </div>
-                            <p className={style.title}>Patient Info.</p>
-                            <div className={style.section}>
-                                <InputBox
-                                    label={"Name*"}
-                                    value={request.sample?.patient?.name}
-                                    onChange={(value) => handleRequestChange('sample.patient.name', value)}
-                                    disabled={true}
-                                />
-                                <InputBox
-                                    label={"MRN*"}
-                                    value={request.sample?.patient?.serial}
-                                    onChange={(value) => handleRequestChange('sample.patient.serial', value)}
-                                    disabled={true}
-                                />
-                                <InputBox
-                                    label={"Age"}
-                                    value={request.sample?.age}
-                                    disabled={true}
-                                />
-                                <InputBox
-                                    label={"Date of Birth"}
-                                    value={getDateFromComponents(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}
-                                    disabled={true}
-                                />
-                            </div>
-                            <div className={style.section}>
-                                <InputBox
-                                    label={"Gender"}
-                                    value={request.sample?.patient?.sex === "M" ? "Male" : "Female"}
-                                    disabled={true}
-                                />
-                            </div>
                             <div className={style.content}>
                                 <p className={style.title}>Additional Info.</p>
                                 <InputBox
@@ -139,34 +156,14 @@ export default function RequestInfo({serviceId, sampleId, closeModal}: Props) {
                                     disabled={true}
                                 />
                             </div>
-                            <div className={style.content}>
-                                <p className={style.title}>Specimen/.Sample Info.</p>
-                                <InputBox
-                                    label={"Type*"}
-                                    value={request.sample?.sample_type?.name}
-                                    disabled={true}
-                                />
-                                <InputBox
-                                    label={"Collection Date*"}
-                                    value={request.sample?.sampling_on}
-                                    disabled={true}
-                                />
-                                <InputBox
-                                    label={"Quantity*"}
-                                    value={request.sample?.quantity?.toString()}
-                                    disabled={true}
-                                />
-                            </div>
                             {request.sample?.extensions && (
                                 <RequestInfoExtensionComponent extensions={request.sample?.extensions}/>
                             )}
-                            <div className={style.content}>
-                                <p className={style.title}>Memo</p>
-                                <textarea
-                                    className={style.memo}
-                                    rows={8}
+                            <div className={style.memoSection}>
+                                <TextBox
+                                    label={'Memo'}
                                     value={request.memo}
-                                    readOnly={true}
+                                    disabled={true}
                                 />
                             </div>
                         </div>

@@ -1,3 +1,28 @@
+.modalBackground {
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.4);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+}
+.modal {
+    background: #ffffff;
+    position: absolute;
+    top: 10%;
+    max-width: 1600px;
+    max-height: 800px;
+    min-width: 1000px;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    padding: 30px;
+    z-index: 3;
+}
 .modalTitle {
     display: flex;
     justify-content: space-between;
@@ -17,7 +42,7 @@
     background-color: #C8C9CB;
 }
 .modalContent {
-    height: 600px;
+    padding: 5px;
 }
 .content {
     display: flex;
@@ -33,43 +58,25 @@
 .modalContent .content > * {
     padding-right: 20px;
 }
-.modalBottom {
-    padding: 0 20px;
-    display: flex;
-    justify-content: flex-end;
-}
-.headerContent {
-    display: flex;
-}
-.firstContent {
-    margin: 20px 20px 5px 0;
-}
-.firstTitle {
-    color: #002b49;
-    font-size: 18px;
-    font-weight: 700;
-}
 .section {
     padding-top: 10px;
     display: flex;
-    margin: 20px 0 5px 0;
 }
 .section > * {
     padding-right: 20px;
 }
-.memo {
-    border: solid 1px #EBEDF4;
-    background: #FAFAFA;
-    width: 100%;
-    border-radius: 15px;
-    padding: 10px 20px;
-    box-shadow: 0 2px 2px #F3F6F9;
+.memoSection {
+    width: 98.5%;
 }
-.memo:focus {
-    outline: none;
+.modalBottom {
+    margin-top: 5px;
+    padding: 0 20px;
+    display: flex;
+    justify-content: flex-end;
 }
-.wrapper {
-    margin: 10px;
-    padding: 10px;
-    overflow-y: scroll;
+.mainName {
+    margin: 10px 0 0 0;
+    color: #002b49;
+    font-weight: 700;
+    font-size: 18px;
 }
