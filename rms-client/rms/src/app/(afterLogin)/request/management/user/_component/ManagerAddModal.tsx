@@ -8,23 +8,14 @@ import InputBox from "@/app/_component/InputBox";
 import {User} from "@/model/User";
 import GreenButton from "@/app/_component/GreenButton";
 import BlueButton from "@/app/_component/BlueButton";
-import SelectBox from "@/app/_component/SelectBox";
-import {SelectBoxOption} from "@/model/SelectBoxOption";
 import {addManager} from "@/app/(afterLogin)/request/management/user/_api/addManager";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
+import {Role} from "@/model/Role";
 
 
 type Props = {
     closeModal: () => void;
 }
-
-const selectBoxOptions: SelectBoxOption[] = [
-    { table: "organization", column: "name", name: "LIMS", value: "123" },
-    { table: "organization", column: "name", name: "해외사업팀", value: "124" },
-    { table: "organization", column: "name", name: "영업본부", value: "125" },
-    { table: "organization", column: "name", name: "분석본부", value: "126" },
-    { table: "organization", column: "name", name: "기타", value: "127" },
-];
 
 export default function ManagerAddModal({closeModal}: Props) {
     const [user, setUser] = useState<User>({
@@ -32,10 +23,8 @@ export default function ManagerAddModal({closeModal}: Props) {
         name: "",
         password: "",
         email: "",
-        branch_name: "LIMS",
-        branch_serial: "123"
+        employee_department: ""
     });
-    const [selectOption, setSelectOption] = useState<SelectBoxOption>({ table: "organization", column: "name", name: "LIMS", value: "123" });
     const [message, setMessage] = useState<string | null>(null);
     const showAlert = CallAlertDialog();
 
@@ -72,10 +61,8 @@ export default function ManagerAddModal({closeModal}: Props) {
         return (
             user.id &&
             user.name &&
-            user.password &&
             user.email &&
-            user.branch_name &&
-            user.branch_serial
+            user.employee_department
         );
     };
 
@@ -96,20 +83,13 @@ export default function ManagerAddModal({closeModal}: Props) {
                 </div>
                 <div className={style.formGroup}>
                     <InputBox
-                        label={"Password"}
-                        type="password"
-                        onChange={(value) => handleChange("password", value)}
+                        label={"Role"}
+                        disabled={true}
+                        value={"MANAGER"}
                     />
-                    <SelectBox
-                        width={'200px'}
-                        value={selectOption.name}
-                        options={selectBoxOptions}
+                    <InputBox
                         label={"Institution"}
-                        onChange={(selectedOption) => {
-                            setSelectOption(selectedOption);
-                            handleChange("branch_name", selectedOption.name);
-                            handleChange("branch_serial", selectedOption.value);
-                        }}
+                        onChange={(value) => handleChange("employee_department", value)}
                     />
                 </div>
                 <div className={style.formGroup}>

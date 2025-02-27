@@ -38,7 +38,7 @@ class AlisHandler(
                     }
                 }
             }
-            .then(dslContext.selectUsersWithPage(query))
+            .then(dslContext.selectUsersWithPage(query, "ADMIN"))
     }
 
     fun checkDeferByAlis(dsl: DSLContext, alisUser: AlisOrganization): Mono<Boolean> {

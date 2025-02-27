@@ -54,7 +54,7 @@ export default function InputBox({label, value, regex, disabled=false, onChange,
         if (value !== undefined && value !== null && value !== inputValue) {
             setInputValue(value);
             setHasError(!value && required);
-            if (onChange) onChange(value); // onChange 호출 추가
+            if (onChange) onChange(value);
         }
     }, [value, required]);
 

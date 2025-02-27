@@ -55,12 +55,13 @@ export default function ExtensionInputComponent({serviceId}: ExtensionInputCompo
     const generateSelectList = (regex: string): { name: string, value: string }[] => {
         if (regex.includes("|")) {
             return regex
-                .replace(/\\b|\b/g, '')
-                .replace(/\\|\(|\)|\?:/g, '')
+                .replace(/^\b|\b$/g, '')
+                .replace(/^\\b|\b$/g, '')
+                .replace(/^\(\?:|\)$/g, '')
                 .split('|')
                 .filter(value => value.trim() !== '')
                 .map(value => ({
-                    name: value.toUpperCase(),
+                    name: value,
                     value: value.toLowerCase()
                 }));
         }

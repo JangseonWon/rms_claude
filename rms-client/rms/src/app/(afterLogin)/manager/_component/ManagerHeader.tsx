@@ -10,6 +10,7 @@ export default function ManagerHeader({ setManagerPage }: Props) {
     return (
         <div className={style.headerTag}>
             <div className={style.tag} onClick={() => setManagerPage('OrderDelete')}>Order Delete</div>
+            <div className={style.tag} onClick={() => setManagerPage('UserHistory')}>User History</div>
         </div>
     );
 }

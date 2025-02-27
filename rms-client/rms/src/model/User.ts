@@ -12,5 +12,6 @@ export interface User {
     phone_number?: string
     branch_serial?: string
     branch_name?: string
+    employee_department?: string
     services?: Service[]
 }

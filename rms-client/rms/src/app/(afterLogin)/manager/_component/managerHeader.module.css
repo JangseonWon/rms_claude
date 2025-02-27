@@ -13,6 +13,9 @@
     font-weight: 100;
     cursor: pointer;
 }
+.tag:hover {
+    font-weight: 500;
+}
 .setting {
     margin-left: auto;
 }

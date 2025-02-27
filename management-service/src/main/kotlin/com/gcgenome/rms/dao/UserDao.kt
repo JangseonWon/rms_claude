@@ -45,15 +45,20 @@ interface UserDao : QueryDao{
                 .set(USER.EMAIL, dto.email)
                 .set(USER.KEY, UUID.randomUUID())
                 .set(USER.STATE, "ACTIVE")
-                .set(USER.BRANCH_SERIAL, dto.branchSerial)
-                .set(USER.BRANCH_NAME, dto.branchName)
+                .set(USER.EMPLOYEE_DEPARTMENT, dto.employeeDepartment)
                 .set(USER.PHONE_NUMBER, dto.phoneNumber)
                 .set(USER.CREATE_AT, LocalDateTime.now())
+                .set(USER.LAST_PASSWORD_CHANGED_AT, LocalDateTime.now())
                 .returning()
         ).map { it.into(UserDTO::class.java) }
     }
-    fun DSLContext.selectUsersWithPage(query: Query): Mono<Page<UserDTO>> {
-        return selectPage(mainTable = USER, query = query) { record ->
+    fun DSLContext.selectUsersWithPage(query: Query, role: String): Mono<Page<UserDTO>> {
+        val where = if (role == "MANAGER") {
+            USER.ROLE.notIn("ADMIN", "MANAGER")
+        } else {
+            noCondition()
+        }
+        return selectPage(mainTable = USER, query = query, where = where) { record ->
             record.into(UserDTO::class.java)
         }
     }
@@ -71,6 +76,8 @@ interface UserDao : QueryDao{
                 USER.BRANCH_SERIAL,
                 USER.BRANCH_NAME,
                 USER.CREATE_AT,
+                USER.LAST_PASSWORD_CHANGED_AT,
+                USER.EMPLOYEE_DEPARTMENT,
                 jsonArrayAgg(
                     `when`(SERVICE.ID.isNotNull,
                             jsonObject(

@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import kotlin.random.Random
 
 @Component
 class UserHandler(
@@ -22,8 +23,10 @@ class UserHandler(
     fun selectUser(userId: String): Mono<UserDTO> {
         return Mono.from(dslContext.selectUserById(userId))
     }
-    fun selectUsers(query: Query): Mono<Page<UserDTO>> {
-        return dslContext.selectUsersWithPage(query)
+
+    fun selectUsers(userAuthentication: UserAuthentication, query: Query): Mono<Page<UserDTO>> {
+        val role = userAuthentication.user.role ?: "MANAGER"
+        return dslContext.selectUsersWithPage(query, role)
     }
 
     fun selectUserOrganizations(userId: String): Flux<OrganizationDTO> {
@@ -58,7 +61,7 @@ class UserHandler(
             selectUserServices(userId)
                 .collectList()
                 .flatMap { existingServices ->
-                    val existingServiceIds = existingServices.map { it.serviceId } ?: emptyList()
+                    val existingServiceIds = existingServices.map { it.serviceId }
                     val servicesToDelete = existingServiceIds - serviceIds
                     val servicesToInsert = serviceIds - existingServiceIds
 
@@ -77,25 +80,66 @@ class UserHandler(
     }
 
     fun insertManager(hostId: String, user: User): Mono<UserHistory>{
-        return if (!isPasswordValid(user.password!!)) {
-            Mono.error(IllegalArgumentException("Password does not meet the required criteria."))
-        } else {
-            Mono.from(dslContext.transactionPublisher { trx ->
+        return Mono.from(dslContext.transactionPublisher { trx ->
                 trx.dsl().run {
-                    insertManager(user.apply { password = encoder.encode(user.password) })
+                    insertManager(user.apply { password = encoder.encode(temporaryPassword()) })
                         .flatMap { manager ->
                             userHistoryHandler.logUserChanges(dsl(), hostId, manager)
                         }
                 }
-            })
-        }
+            }
+        )
     }
 
-    fun isPasswordValid(password: String): Boolean {
-        val containsUpper = password.any { it.isUpperCase() }
-        val containsLower = password.any { it.isLowerCase() }
-        val containsSpecial = password.any { "!@#$%^&*()_+-=[]{}|;:',.<>?/".contains(it) }
-        val isLongEnough = password.length >= 10
-        return containsUpper && containsLower && containsSpecial && isLongEnough
+    fun temporaryPassword(): String {
+        val minLength = 8
+        val maxLength = 20
+
+        val upperCaseChars = ('A'..'Z').toList()
+        val lowerCaseChars = ('a'..'z').toList()
+        val digitChars = ('0'..'9').toList()
+        val specialChars = listOf('@', '#', '$', '%', '^', '&', '*')
+        val allChars = upperCaseChars + lowerCaseChars + digitChars + specialChars
+
+        fun containsUpper(password: String) = password.any { it in upperCaseChars }
+        fun containsLower(password: String) = password.any { it in lowerCaseChars }
+        fun containsDigit(password: String) = password.any { it in digitChars }
+        fun containsSpecial(password: String) = password.any { it in specialChars }
+        fun hasConsecutiveChars(password: String): Boolean {
+            for (i in 0 until password.length - 2) {
+                if (password[i] == password[i + 1] && password[i] == password[i + 2]) {
+                    return true
+                }
+            }
+            return false
+        }
+
+        fun containsCommonWords(password: String): Boolean {
+            val commonWords = listOf("password", "admin", "welcome", "123456", "qwerty")
+            return commonWords.any { password.contains(it, ignoreCase = true) }
+        }
+
+        fun isValid(password: String): Boolean {
+            return password.length in minLength..maxLength &&
+                    containsUpper(password) &&
+                    containsLower(password) &&
+                    containsDigit(password) &&
+                    containsSpecial(password) &&
+                    !hasConsecutiveChars(password) &&
+                    !containsCommonWords(password) &&
+                    !password.contains(" ")
+        }
+
+        fun generateRandomPassword(): String {
+            val passwordLength = Random.nextInt(minLength, maxLength + 1)
+            return List(passwordLength) { allChars.random() }.joinToString("")
+        }
+
+        var password: String
+        do {
+            password = generateRandomPassword()
+        } while (!isValid(password))
+
+        return password
     }
 }

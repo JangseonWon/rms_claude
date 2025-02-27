@@ -21,6 +21,8 @@ data class UserDTO(
     var phoneNumber: String? = null,
     var key: UUID? = null,
     var state: String? = null,
+    @JsonProperty("employee_department")
+    var employeeDepartment:String? = null,
     @JsonProperty("branch_serial")
     var branchSerial:String? = null,
     @JsonProperty("branch_name")
@@ -29,5 +31,9 @@ data class UserDTO(
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("create_at")
     var createAt: LocalDateTime? = null,
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonProperty("last_password_changed_at")
+    var lastPasswordChangeAt: LocalDateTime? = null,
     var services: Array<ServiceDTO>? = null
 )

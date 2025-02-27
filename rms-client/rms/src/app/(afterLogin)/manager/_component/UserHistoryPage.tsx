@@ -12,56 +12,42 @@ import InputBox from "@/app/_component/InputBox";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
-import {Status} from "@/model/Status";
-import {postRequests} from "@/app/(afterLogin)/manager/_api/postRequests"
-import type {Request} from "@/model/Request";
-import BlueButton from "@/app/_component/BlueButton";
-import {deleteOrder} from "@/app/(afterLogin)/manager/_api/deleteOrder";
 import {format} from "date-fns";
-import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
-
-interface RequestWithSelected extends Request {
-    isSelected?: boolean;
-}
+import {UserHistory} from "@/model/UserHistory";
+import {postUserHistory} from "@/app/(afterLogin)/manager/_api/postUserHistory";
 
 const selectBoxOptions: SelectBoxOption[] = [
-    { table: "user", column: "id", name: "User ID" },
-    { table: "user", column: "name", name: "User Name" },
-    { table: "organization", column: "name", name: "Institution" },
-    { table: "sample", column: "barcode", name: "Registration ID" },
-    { table: "service", column: "name", name: "Service" },
-    { table: "request", column: "status", name: "Status"},
-    { table: "patient", column: "name", name: "Patient(s) Name" },
-    { table: "patient", column: "serial", name: "MRN" }
+    { table: "user_history", column: "field_name", name: "Field Name" },
+    { table: "user_history", column: "changed_by", name: "Changed By" },
+    { table: "user_history", column: "new_value", name: "New Value" },
+    { table: "user_history", column: "old_value", name: "Old Value" },
+    { table: "user_history", column: "user_id", name: "User ID" }
 ];
-const defaultSearch: Query = {size:10, page:1}
+const defaultSearch: Query = {
+    sorts: [
+        {
+            "table": "user_history",
+            "column": "id",
+            "asc": false
+        }
+    ],
+    size:10,
+    page:1,
+    sort_by: "changed_at"
+}
 
-export default function OrderDeletePage() {
-    const [requestData, setRequestData] = useState<RequestWithSelected[]>([]);
+export default function UserHistoryPage() {
+    const [userHistoryData, setUserHistoryData] = useState<UserHistory[]>([]);
     const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
     const [totalPage, setTotalPage] = useState<number>(0);
     const [search, setSearch] = useState<Query>(defaultSearch);
-    const isSelectedAll = requestData.length > 0 && requestData.every((row) => row.isSelected);
-    const showAlert = CallAlertDialog();
-
-    const handleOnClickOrderDelete = async () => {
-        const selectedRequests = requestData.filter(request => request.isSelected);
-        if( selectedRequests.length === 0) {
-            showAlert("No selected.");
-            return;
-        }
-        const response = await deleteOrder(selectedRequests)
-        if(response.ok) showAlert("deleted!")
-        else showAlert("fail");
-        fetchData(search);
-    }
 
     const addDateFilter = (from: Date | null, to: Date | null) => {
         if (!from || !to) return;
 
         setSearch((prevSearch) => {
             const updatedFilters = (prevSearch.filter_groups || []).filter(group =>
-                !group.filters?.some(filter => filter.column === "create_at")
+                !group.filters?.some(filter => filter.column === "changed_at")
             ) || [];
 
             return {
@@ -72,14 +58,14 @@ export default function OrderDeletePage() {
                         condition_type: "AND",
                         filters: [
                             {
-                                table: "request",
-                                column: "create_at",
+                                table: "user_history",
+                                column: "changed_at",
                                 value: format(from, "yyyy-MM-dd"),
                                 operator: ">="
                             },
                             {
-                                table: "request",
-                                column: "create_at",
+                                table: "user_history",
+                                column: "changed_at",
                                 value: format(to, "yyyy-MM-dd"),
                                 operator: "<="
                             }
@@ -106,16 +92,10 @@ export default function OrderDeletePage() {
                     {
                         condition_type: "AND",
                         filters: [
-                            newFilter,
-                            ...([{
-                                table: "request",
-                                column: "status",
-                                operator: "!=",
-                                value: Status.TOTAL.valueOf()
-                            }])
+                            newFilter
                         ]
                     },
-                    ...(prevSearch.filter_groups || []).filter(group => group.filters?.some(filter => filter.column === "create_at"))
+                    ...(prevSearch.filter_groups || []).filter(group => group.filters?.some(filter => filter.column === "changed_at"))
                 ],
                 page: 1
             };
@@ -129,30 +109,16 @@ export default function OrderDeletePage() {
         }));
     };
 
-    const handleSelectAll = (isSelected: boolean) => {
-        setRequestData((prevData) =>
-            prevData.map((row) => ({ ...row, isSelected }))
-        );
-    };
-
-    const handleSelectChange = (rowIndex: number, isSelected: boolean) => {
-        setRequestData((prevData) => {
-            const updatedData = [...prevData];
-            updatedData[rowIndex].isSelected = isSelected;
-            return updatedData;
-        });
-    };
-
     const fetchData = async (search: Query) => {
         try {
-            const response = await postRequests(search);
+            const response = await postUserHistory(search);
             const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
             const data = await response.json();
-            setRequestData(data as Request[]);
+            setUserHistoryData(data as UserHistory[]);
             setTotalPage(totalPage);
         }
         catch {
-            setRequestData([]);
+            setUserHistoryData([]);
         }
     };
 
@@ -164,10 +130,7 @@ export default function OrderDeletePage() {
         <>
             <div className={style.container}>
                 <div className={style.header}>
-                    Order Delete Page
-                </div>
-                <div className={style.buttonSection}>
-                    <BlueButton name={"DELETE"} onClick={handleOnClickOrderDelete}/>
+                    User History Page
                 </div>
                 <section className={style.section}>
                     <div className={globalTableStyle.container}>
@@ -199,51 +162,23 @@ export default function OrderDeletePage() {
                             <table className={requestStyle.table}>
                                 <thead>
                                 <tr>
-                                    <th>
-                                        <label form="agree" className={style.checkbox}>
-                                            <input
-                                                type="checkbox"
-                                                checked={isSelectedAll}
-                                                onChange={() => handleSelectAll(!isSelectedAll)}
-                                                className={style.checkbox}
-                                            />
-                                            <span className={style.checkmark}></span>
-                                        </label>
-                                    </th>
-                                    <th>Order Date<br/>(DD-MM-YYYY)</th>
+                                    <th>Changed Date</th>
+                                    <th>Changed By</th>
+                                    <th>Field Name</th>
+                                    <th>New Value</th>
+                                    <th>Old Value</th>
                                     <th>User ID</th>
-                                    <th>User Name</th>
-                                    <th>Institution</th>
-                                    <th>Registration ID</th>
-                                    <th>Service</th>
-                                    <th>Status</th>
-                                    <th>Patient(s) Name</th>
-                                    <th>MRN</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {requestData && requestData.length > 0 && requestData.map((request, rowIndex) => (
-                                    <tr key={`${request.service!.id}${request.sample!.id}`}>
-                                        <td onClick={(e) => e.stopPropagation()}>
-                                            <label form="agree" className={style.checkbox}>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={request.isSelected || false}
-                                                    onChange={() => handleSelectChange(rowIndex, !request.isSelected)}
-                                                    className={style.checkbox}
-                                                />
-                                                <span className={style.checkmark}></span>
-                                            </label>
-                                        </td>
-                                        <td>{request.create_at ? new Date(request.create_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
-                                        <td>{request.user?.id}</td>
-                                        <td>{request.user?.name}</td>
-                                        <td>{request.sample?.patient?.organization?.name}</td>
-                                        <td>{request.sample?.barcode}</td>
-                                        <td>{request.service?.name}</td>
-                                        <td>{request.status}</td>
-                                        <td>{request.sample?.patient?.name}</td>
-                                        <td>{request.sample?.patient?.serial}</td>
+                                {userHistoryData && userHistoryData.length > 0 && userHistoryData.map((history) => (
+                                    <tr key={`${history.id}`}>
+                                        <td>{history.changed_at ? new Date(history.changed_at).toLocaleDateString().replace(/\//g, '-') : ''}</td>
+                                        <td>{history.changed_by}</td>
+                                        <td>{history.field_name}</td>
+                                        <td>{history.new_value}</td>
+                                        <td>{history.old_value}</td>
+                                        <td>{history.user_id}</td>
                                     </tr>
                                 ))}
                                 </tbody>
