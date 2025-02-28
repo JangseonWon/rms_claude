@@ -23,7 +23,7 @@ const selectBoxOptions: SelectBoxOption[] = [
     { table: "service", column: "name", name: "Service" },
     { table: "patient", column: "serial", name: "MRN" },
     { table: "request", column: "courier_company", name: "Global courier" },
-    { table: "request", column: "airwaybill_number", name: "Airwaybill" },
+    { table: "request", column: "awb_number", name: "Airwaybill" },
 ];
 
 const getTenDaysAgo = () => {
@@ -122,13 +122,13 @@ export default function NonArrivedTable() {
                                     filters: [
                                         {
                                             table: "request",
-                                            column: "confirmed_at",
+                                            column: "create_at",
                                             value: from.toLocaleDateString('en-CA'),
                                             operator: ">="
                                         },
                                         {
                                             table: "request",
-                                            column: "confirmed_at",
+                                            column: "create_at",
                                             value: to.toLocaleDateString('en-CA'),
                                             operator: "<="
                                         }
@@ -167,6 +167,7 @@ export default function NonArrivedTable() {
                     <thead>
                     <tr>
                         <th>Order Date<br/>(DD-MM-YYYY)</th>
+                        <th>Confirmed Date<br/>(DD-MM-YYYY)</th>
                         <th>Registration ID</th>
                         <th>User Name</th>
                         <th>Institution</th>
@@ -181,6 +182,7 @@ export default function NonArrivedTable() {
                     <tbody>
                     {requestData && requestData.length > 0 ? ( requestData.map((request, rowIndex) => (
                         <tr key={rowIndex}>
+                            <td>{request.create_at ? new Date(request.create_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
                             <td>{request.confirmed_at ? new Date(request.confirmed_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
                             <td>{request.sample?.barcode}</td>
                             <td>{request.user?.name}</td>
@@ -188,13 +190,13 @@ export default function NonArrivedTable() {
                             <td>{request.sample?.patient?.name}</td>
                             <td>{request.service?.name}</td>
                             <td>{request.sample?.patient?.serial}</td>
-                            <td>birth</td>
-                            <td>global courire</td>
-                            <td>airwaybill</td>
+                            <td>{request.sample?.patient?.birth_day}-{request.sample?.patient?.birth_month}-{request.sample?.patient?.birth_year}</td>
+                            <td>{request.courier_company}</td>
+                            <td>{request.awb_number}</td>
                         </tr>
-                    ))): (
+                    ))) : (
                         <tr>
-                        <td colSpan={10} className={globalTableStyle.noData}>
+                            <td colSpan={11} className={globalTableStyle.noData}>
                     The searched data does not exist
                     </td>
                 </tr>
