@@ -14,10 +14,18 @@ data class RequestDTO(
     var department: String? = null,
     var ward: String? = null,
     var physician: String? = null,
+    @JsonProperty("courier_company")
+    var courierCompany: String? = null,
+    @JsonProperty("awb_number")
+    var awbNumber: String? = null,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("create_at")
     var createAt: LocalDateTime? = null,
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonProperty("confirmed_at")
+    var confirmedAt: LocalDateTime? = null,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("cart_at")

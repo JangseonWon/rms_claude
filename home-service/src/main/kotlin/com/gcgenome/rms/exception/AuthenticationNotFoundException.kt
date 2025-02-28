@@ -2,5 +2,5 @@ package com.gcgenome.rms.exception
 
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException
 
-class AuthenticationNotFoundException(): AuthenticationCredentialsNotFoundException("인증되지 않은 사용자입니다.") {
+class AuthenticationNotFoundException(): AuthenticationCredentialsNotFoundException("Access denied. Authentication failed or insufficient permissions.") {
 }
