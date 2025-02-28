@@ -158,6 +158,7 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
     const handleExtensionAddClick = async () => {
         if(selectedExtension){
             setService((prev) => {
+                const extensions = prev?.extensions || [];
                 const isAlreadyAdded = prev?.extensions?.some(
                     (extension) => extension.id === selectedExtension?.id
                 );
@@ -169,12 +170,12 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
                     return {
                         ...prev,
                         extensions: [
-                            ...(prev?.extensions || [] ),
+                            ...extensions,
                             {
                                 id: selectedExtension?.id,
                                 name: selectedExtension?.label,
                                 required: required.value,
-                                sort_extension: service?.extensions?.length+1
+                                sort_extension: extensions.length+1
                             }
                         ]
                     };
@@ -189,7 +190,7 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
         setService((prev) => {
             const updatedExtensions = (prev?.extensions || [])
                 .filter((extension) => extension.id !== extensionId) // 삭제
-                .sort((a, b) => a.sort_extension - b.sort_extension)
+                .sort((a, b) => (a.sort_extension ?? 0) - (b.sort_extension ?? 0))
                 .map((extension, index) => ({
                     ...extension,
                     sort_extension: index + 1 // 1부터 다시 번호 부여
@@ -349,7 +350,7 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
                             </tr>
                             </thead>
                             <tbody>
-                            {service?.extensions?.slice().sort((a, b) => a.sort_extension - b.sort_extension).map((extension, index) => (
+                            {service?.extensions?.slice().sort((a, b) => (a.sort_extension ?? 0) - (b.sort_extension ?? 0)).map((extension, index) => (
                                 <tr key={index}>
                                     <td>{extension.sort_extension}</td>
                                     <td>{extension.id}</td>
