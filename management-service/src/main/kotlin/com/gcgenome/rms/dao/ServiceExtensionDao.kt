@@ -13,6 +13,7 @@ interface ServiceExtensionDao{
                 .set(SERVICE_EXTENSION.SERVICE_ID, serviceExtension.serviceId)
                 .set(SERVICE_EXTENSION.EXTENSION_ID, serviceExtension.extensionId)
                 .set(SERVICE_EXTENSION.REQUIRED, serviceExtension.required)
+                .set(SERVICE_EXTENSION.SORT_EXTENSION, serviceExtension.sortExtension)
                 .onDuplicateKeyIgnore()
                 .returning()
         ).map { it.into(ServiceExtensionDTO::class.java) }

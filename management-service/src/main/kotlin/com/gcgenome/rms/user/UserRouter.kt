@@ -4,8 +4,11 @@ import com.gcgenome.rms.auth.AuthenticationHandler
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.UserDTO
 import com.gcgenome.rms.exception.*
+import com.gcgenome.rms.extension.ExtensionRouter
 import com.gcgenome.rms.tables.pojos.User
 import org.jooq.exception.DataAccessException
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
@@ -30,6 +33,7 @@ class UserRouter(
         PATCH("/w-api/management-service/users/{user-id}", ::updateUser)
         GET("/w-api/management-service/users/{user-id}/organizations", :: findUserOrganizations)
     }
+    private val logger: Logger = LoggerFactory.getLogger(UserRouter::class.java)
 
     private fun findUser(request: ServerRequest): Mono<ServerResponse> {
         val userId = request.pathVariable("user-id")
@@ -37,7 +41,10 @@ class UserRouter(
             .flatMap { userHandler.selectUser(userId) }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), UserDTO::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome") }
+            .onErrorResume { e ->
+                logger.error(e.stackTraceToString())
+                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome")
+            }
     }
 
     private fun findUsers(request: ServerRequest): Mono<ServerResponse> {
@@ -53,7 +60,10 @@ class UserRouter(
                 .header("X-Current-Page", it.currentPage.toString())
                 .body(Flux.fromIterable(it.data), UserDTO::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome") }
+            .onErrorResume { e ->
+                logger.error(e.stackTraceToString())
+                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome")
+            }
     }
 
     private fun insertManager(request: ServerRequest): Mono<ServerResponse> {
@@ -63,7 +73,10 @@ class UserRouter(
             .onErrorResume (ServerWebInputException::class.java) { ServerResponse.status(HttpStatus.UNPROCESSABLE_ENTITY).bodyValue(WebInputException().message.toString()) }
             .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.FORBIDDEN).bodyValue("${e.message}")}
             .onErrorResume (DataAccessException::class.java) { ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("A duplicate ID exists.") }
-            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome") }
+            .onErrorResume { e ->
+                logger.error(e.stackTraceToString())
+                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome")
+            }
     }
 
     private fun findUserOrganizations(request: ServerRequest): Mono<ServerResponse> {
@@ -76,7 +89,10 @@ class UserRouter(
             .onErrorResume(UserNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
             .onErrorResume(DataAccessException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue(ColumnNotFoundException(e).message) }
             .onErrorResume(IllegalArgumentException::class.java) { ServerResponse.status(HttpStatus.FORBIDDEN).bodyValue(FilterOperatorNotFoundException().message.toString())}
-            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome") }
+            .onErrorResume { e ->
+                logger.error(e.stackTraceToString())
+                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome")
+            }
     }
 
     private fun updateUser(request: ServerRequest): Mono<ServerResponse> {
@@ -88,7 +104,10 @@ class UserRouter(
             .onErrorResume(MatchUserException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}") }
             .onErrorResume (ServerWebInputException::class.java) { ServerResponse.status(HttpStatus.UNPROCESSABLE_ENTITY).bodyValue(WebInputException().message.toString()) }
             .onErrorResume(UserNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
-            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome") }
+            .onErrorResume { e ->
+                logger.error(e.stackTraceToString())
+                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome")
+            }
     }
 }
 

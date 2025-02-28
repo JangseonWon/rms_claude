@@ -24,7 +24,7 @@ class ServiceHandler(
                         .then(deleteServiceExtensionByServiceId(service.id!!))
                         .thenMany(Flux.fromIterable(service.extensions ?: emptyList())
                             .flatMap { extension ->
-                                insertServiceExtension(ServiceExtensionDTO(serviceId = service.id, extensionId = extension.id, required = extension.required))
+                                insertServiceExtension(ServiceExtensionDTO(serviceId = service.id, extensionId = extension.id, required = extension.required, sortExtension = extension.sortExtension))
                             })
                         .then()
                 }

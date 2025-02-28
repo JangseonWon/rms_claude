@@ -94,7 +94,8 @@ interface ServiceDao : QueryDao{
                             key("id").value(EXTENSION.ID),
                             key("name").value(EXTENSION.NAME),
                             key("required").value(SERVICE_EXTENSION.REQUIRED),
-                            key("regex").value(EXTENSION.REGEX)
+                            key("regex").value(EXTENSION.REGEX),
+                            key("sort_extension").value(SERVICE_EXTENSION.SORT_EXTENSION)
                         )
                     )
                 ).`as`("extensions")

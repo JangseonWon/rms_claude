@@ -4,6 +4,9 @@ import com.gcgenome.rms.auth.AuthenticationHandler
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.UserHistoryDTO
 import com.gcgenome.rms.exception.AuthenticationNotFoundException
+import com.gcgenome.rms.extension.ExtensionRouter
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
@@ -24,6 +27,8 @@ class UserHistoryRouter(
         POST("/w-api/management-service/users-history/search", :: findUserChangedHistory)
     }
 
+    private val logger: Logger = LoggerFactory.getLogger(UserHistoryRouter::class.java)
+
     private fun findUserChangedHistory(request: ServerRequest): Mono<ServerResponse> {
         return authenticationHandler.chkManager(request)
             .flatMap { request.bodyToMono(Query::class.java).defaultIfEmpty(Query()) }
@@ -36,7 +41,10 @@ class UserHistoryRouter(
                 .header("X-Current-Page", it.currentPage.toString())
                 .body(Flux.fromIterable(it.data), UserHistoryDTO::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
-            .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome") }
+            .onErrorResume { e ->
+                logger.error(e.stackTraceToString())
+                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome")
+            }
     }
 }
 
