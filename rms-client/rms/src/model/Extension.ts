@@ -5,6 +5,7 @@ export interface Extension {
     name_kr?: string
     required?: boolean
     regex?: string
+    sort_extension?: number
     type?: ExtensionType
 }
 

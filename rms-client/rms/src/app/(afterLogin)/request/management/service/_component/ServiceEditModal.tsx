@@ -173,7 +173,8 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
                             {
                                 id: selectedExtension?.id,
                                 name: selectedExtension?.label,
-                                required: required.value
+                                required: required.value,
+                                sort_extension: service?.extensions?.length+1
                             }
                         ]
                     };
@@ -186,11 +187,16 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
 
     const handleExtensionDeleteClick = async (extensionId: string) => {
         setService((prev) => {
+            const updatedExtensions = (prev?.extensions || [])
+                .filter((extension) => extension.id !== extensionId) // 삭제
+                .sort((a, b) => a.sort_extension - b.sort_extension)
+                .map((extension, index) => ({
+                    ...extension,
+                    sort_extension: index + 1 // 1부터 다시 번호 부여
+                }));
             return {
                 ...prev,
-                extensions: (prev?.extensions || []).filter(
-                    (extension) => extension.id !== extensionId
-                )
+                extensions: updatedExtensions
             };
         });
     }
@@ -331,13 +337,11 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
                                 name={'Add'}
                                 onClick={handleExtensionAddClick}
                             />
-                            {/*<SelectSearchBox type={'extension'} onSelect={setSelectedExtension} width={'220px'}/>
-
-                            <button className={style.addButton} onClick={() => handleExtensionAddClick()}>Add</button>*/}
                         </div>
                         <table className={style.table}>
                             <thead>
                             <tr>
+                                <th>Sort</th>
                                 <th>Code</th>
                                 <th>Name</th>
                                 <th>Required</th>
@@ -345,8 +349,9 @@ export default function ServiceEditModal({serviceId, closeModal, refreshData}: P
                             </tr>
                             </thead>
                             <tbody>
-                            {service?.extensions?.map((extension, index) => (
+                            {service?.extensions?.slice().sort((a, b) => a.sort_extension - b.sort_extension).map((extension, index) => (
                                 <tr key={index}>
+                                    <td>{extension.sort_extension}</td>
                                     <td>{extension.id}</td>
                                     <td>{extension.name}</td>
                                     <td>{extension.required ? "Yes" : "No"}</td>
