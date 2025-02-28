@@ -10,6 +10,8 @@ data class ServiceExtension(
     val pk: ServiceExtensionPK,
     @Column(name = "required", nullable = false)
     val required: Boolean,
+    @Column(name = "sort_extension", nullable = false)
+    val sortExtension: Int,
 
     @ManyToOne
     @JoinColumn(name = "service_id", insertable = false, updatable = false)
