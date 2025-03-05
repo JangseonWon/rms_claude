@@ -5,7 +5,12 @@
 }
 .filterContainerRight {
     display: flex;
+    gap: 10px
 }
 .filterContainerLeft {
     display: flex;
+}
+.addButton {
+    margin-top: 7px;
+    height: 10px;
 }

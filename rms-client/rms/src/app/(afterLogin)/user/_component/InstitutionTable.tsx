@@ -114,7 +114,9 @@ export default function InstitutionTable() {
                 <div className={institutionStyle.filterContainerLeft}>
                 </div>
                 <div className={institutionStyle.filterContainerRight}>
-                    <BlueButton name={"Institution Add"} onClick={openInstitutionAddModal}/>
+                    <div className={institutionStyle.addButton}>
+                        <BlueButton name={"Institution Add"} onClick={openInstitutionAddModal}/>
+                    </div>
                     <SelectBox
                         value={selectOption.name}
                         options={selectBoxOptions}
