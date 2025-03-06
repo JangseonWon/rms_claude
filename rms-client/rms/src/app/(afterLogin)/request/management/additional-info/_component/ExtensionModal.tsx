@@ -29,8 +29,9 @@ const extensionOptions: SelectBoxOption[] = [
     {value: '.*', name: ExtensionType.TEXT},
     {value: '-?\\d+', name: ExtensionType.INTEGER},
     {value: '-?\\d+(\\.\\d+)?', name: ExtensionType.FLOAT},
-    {name: ExtensionType.RELATION},
-    {name: ExtensionType.LIST}
+    {name: ExtensionType.LIST},
+    {name: ExtensionType.PROBAND_SEARCH},
+    {name: ExtensionType.PROBAND_LIST},
 ];
 export default function ExtensionModal({extensionId, closeModal, refreshTable}: Props) {
     const [extension, setExtension] = useState<Extension>()
@@ -48,7 +49,7 @@ export default function ExtensionModal({extensionId, closeModal, refreshTable}: 
 
     useEffect(() => {
         fetchExtension(extensionId).then( (extension) => {
-            if (extension?.type === ExtensionType.LIST && extension.regex) {
+            if ((extension?.type === ExtensionType.LIST || extension?.type === ExtensionType.PROBAND_LIST) && extension.regex) {
                 const splitRegex = extension.regex.replace(/\\b\(\?:|\)\\b/g, '').split('|');
                 setListInputs(splitRegex);
             }
@@ -141,7 +142,7 @@ export default function ExtensionModal({extensionId, closeModal, refreshTable}: 
                         }}
                     />
                 </div>
-                    {extension?.type === ExtensionType.LIST && (
+                {(extension?.type === ExtensionType.LIST || extension?.type === ExtensionType.PROBAND_LIST) && (
                         <div className={scrollbar.wrapper}>
                             <div className={classNames(style.content, scrollbar.default)}>
                                 <div className={style.contentTitle}>

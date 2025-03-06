@@ -18,7 +18,7 @@ export default function RequestInfoExtensionComponent({ extensions }: ExtensionC
             case ExtensionType.INTEGER:
             case ExtensionType.FLOAT:
             case ExtensionType.STRING:
-            case ExtensionType.RELATION:
+            case ExtensionType.PROBAND_SEARCH:
                 return <InputBox
                     disabled={true}
                     key={extension.id}

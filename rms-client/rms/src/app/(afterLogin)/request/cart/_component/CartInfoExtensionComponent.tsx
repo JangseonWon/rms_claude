@@ -124,7 +124,7 @@ export default function CartInfoExtensionComponent({ extensions, onChange }: Ext
 
     const textComponents = (extensions ?? []).filter(extension => extension.type === ExtensionType.TEXT);
     const otherComponents = (extensions ?? []).filter(extension => extension.type !== ExtensionType.TEXT);
-    const probandComponent = (extensions ?? []).filter(extension => extension.type === ExtensionType.RELATION);
+    const probandComponent = (extensions ?? []).filter(extension => extension.type === ExtensionType.PROBAND_SEARCH);
 
     return (
         <div className={style.section}>

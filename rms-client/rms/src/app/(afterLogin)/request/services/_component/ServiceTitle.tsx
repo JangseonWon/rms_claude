@@ -23,7 +23,7 @@ export default function ServiceTitle({serviceData}: Props) {
             </div>
             <div className={style.changeButton}>
                 {!(serviceData?.type === ServiceType.SET ||
-                    serviceData?.extensions?.some(extension => extension.type === ExtensionType.RELATION)) && (
+                    serviceData?.extensions?.some(extension => extension.type === ExtensionType.PROBAND_SEARCH)) && (
                     <SingleMultiChangeButton />
                 )}
             </div>

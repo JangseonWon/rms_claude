@@ -29,7 +29,7 @@ import {useSession} from "next-auth/react";
 export default function Order() {
     const [organizationOptions, setOrganizationOptions] = useState<SelectBoxOption[]>([])
     const [sampleTypeOptions, setSampleTypeOptions] = useState<SelectBoxOption[]>([])
-    const { request, setRequest } = useRequestStore();
+    const { request, setRequest, resetRequest } = useRequestStore();
     const { data: session } = useSession();
     const pathname = usePathname();
     const pathSegments = pathname.split('/');
@@ -64,6 +64,7 @@ export default function Order() {
     }
 
     useEffect(() => {
+        resetRequest();
         fetchOrganizations();
         fetchSampleType(serviceId);
         handleRequestChange('service.id', serviceId);
@@ -143,7 +144,9 @@ export default function Order() {
             sample?.sampling_on,
             sample?.quantity,
         ];
-        if (requiredFields.some(field => typeof field !== 'string' || field.trim() === '')) return false;
+        if (requiredFields.some(field => typeof field !== 'string' || field.trim() === '')) {
+            return false;
+        }
         return (sample.extensions || []).every(
             extension =>
                 !extension.required || (extension.value != null && extension.value !== '')
@@ -205,6 +208,7 @@ export default function Order() {
                 <div className={style.dateBox}>
                     <DatePickerBox
                         label={"Date of Birth"}
+                        required={false}
                         onChange={(date) => {
                             if (date) {
                                 handleRequestChange('sample.patient.birth_year', date.getFullYear());

@@ -7,12 +7,12 @@ import {Extension, ExtensionType} from "@/model/Extension";
 import InputBox from "@/app/_component/InputBox";
 import SelectBox from "@/app/_component/SelectBox";
 import TextBox from "@/app/_component/TextBox";
-import {useProbandRequest, useSetProbandModalOpen} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
+import {
+    useProbandRequest,
+    useSetProbandModalOpen
+} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 import {useRequestStore} from "@/store/useRequestStore";
-import {getRequestRelations} from "@/app/(afterLogin)/request/services/[service]/single/_api/getRequestRelations";
-import {RequestRelation} from "@/model/RequestRelation";
-import {SelectBoxOption} from "@/model/SelectBoxOption";
 
 interface ExtensionInputComponentProps {
     serviceId: string;
@@ -23,7 +23,6 @@ export default function ExtensionInputComponent({serviceId}: ExtensionInputCompo
     const setProbandModal = useSetProbandModalOpen();
     const [extensions, setExtensions] = useState<Extension[]>([]);
     const probandRequest = useProbandRequest()
-    const [relationOptions, setRelationOptions] = useState<SelectBoxOption[]>([])
     const showAlert = CallAlertDialog();
 
     const handleRequestChange = (path: string, value: any) => {
@@ -87,31 +86,15 @@ export default function ExtensionInputComponent({serviceId}: ExtensionInputCompo
             showAlert("Error!")
         }
     };
-    const fetchRequestGroup = async () => {
-        const response = await getRequestRelations()
-        if (response.ok) {
-            const data = await response.json();
-            setRelationOptions(transformRequestRelationToOptions(data as RequestRelation[]));
-        }
-    }
-    const transformRequestRelationToOptions = (data: RequestRelation[]): SelectBoxOption[] => {
-        return data
-            .filter(value => value.id !==1)
-            .map(value => ({
-                value: value.id,
-                name: value.name
-            }));
-    };
-
     const probandModalOpen = () => {
         if(request?.sample?.patient?.organization) setProbandModal(true);
         else showAlert("Please choose the institution")
     }
 
     const renderExtensionComponent = (extension: Extension) => {
+        const selectList = generateSelectList(extension.regex || '');
         switch (extension.type) {
             case ExtensionType.LIST:
-                const selectList = generateSelectList(extension.regex || '');
                 return <SelectBox
                     key={extension.id}
                     label={`${extension.name}${extension.required ? ' *' : ''}`}
@@ -157,46 +140,56 @@ export default function ExtensionInputComponent({serviceId}: ExtensionInputCompo
                     required={extension.required}
                     onChange={(value) => handleRequestChange("sample.extensions", { id: extension.id, value: value })}
                 />;
-            case ExtensionType.RELATION:
-                if(extension.id === 'TA0028'){
-                    return <SelectBox
-                        key={'relationship'}
-                        label={extension.name!}
-                        options={relationOptions}
+            case ExtensionType.PROBAND_LIST:
+                return <SelectBox
+                    key={'relationship'}
+                    label={extension.name!}
+                    options={selectList}
+                    required={true}
+                    width="200px"
+                    onChange={(selectedOption) => {
+                        setRequest((prevState) => ({
+                            ...prevState,
+                            request_relation: {
+                                id: 3
+                            }
+                        }));
+                        handleRequestChange("sample.extensions", {
+                            id: extension.id,
+                            value: selectedOption.name
+                        })
+                    }}
+                />
+            case ExtensionType.PROBAND_SEARCH:
+                return <div className={style.probandInput}>
+                    <InputBox
+                        label={`Registration ID`}
                         required={true}
-                        width="200px"
-                        onChange={(selectedOption) => {
+                        disabled={true}
+                        value={probandRequest?.sample?.barcode}
+                    />
+                    <InputBox
+                        label={`${extension.name}*`}
+                        required={true}
+                        disabled={true}
+                        value={probandRequest?.sample?.patient?.serial}
+                        onChange={(value) => {
                             setRequest((prevState) => ({
                                 ...prevState,
                                 request_relation: {
-                                    id: selectedOption.value
+                                    id: 3
                                 }
                             }));
                             handleRequestChange("sample.extensions", {
                                 id: extension.id,
-                                value: selectedOption.name
+                                value: value
                             })
                         }}
                     />
-                }else if(extension.id === 'TA0029') {
-                    return <div className={style.probandInput}>
-                        <InputBox
-                            key={'probandInput'}
-                            label={`${extension.name}*`}
-                            required={true}
-                            disabled={true}
-                            value={probandRequest?.sample?.patient?.serial}
-                            onChange={(value) => {
-                                handleRequestChange("sample.extensions", {
-                                    id: extension.id,
-                                    value: value
-                                })
-                            }
-                            }
-                        />
-                    </div>
-                }
-                return null
+                    <button className={style.button} onClick={probandModalOpen}>
+                        Click here to find proband
+                    </button>
+                </div>
             default:
                 return null;
         }
@@ -205,7 +198,6 @@ export default function ExtensionInputComponent({serviceId}: ExtensionInputCompo
 
     useEffect(() => {
         fetchExtensions();
-        fetchRequestGroup()
     }, []);
     useEffect(() => {
         setRequest((prevState) => ({
@@ -216,43 +208,37 @@ export default function ExtensionInputComponent({serviceId}: ExtensionInputCompo
         }));
     }, [probandRequest]);
 
-    const textComponents = extensions.filter(extension => extension.type === ExtensionType.TEXT);
-    const excludedTypes = [ExtensionType.TEXT, ExtensionType.RELATION];
-    const otherComponents = extensions.filter(extension => !excludedTypes.includes(extension.type!));
-    const probandComponent = extensions.filter(extension => extension.type === ExtensionType.RELATION);
-
     return (
         <>
             <div className={style.section}>
-                {otherComponents.length > 0 && (
-                    <div className={style.gridContainer}>
-                        {otherComponents.map((extension) => (
-                            <div key={extension.id} className={style.gridItem}>
-                                {renderExtensionComponent(extension)}
-                            </div>
-                        ))}
-                    </div>
-                )}
-                {textComponents.length > 0 && (
-                    <div>
-                        {textComponents.map(extension => (
-                            <div key={extension.id}>
-                                {renderExtensionComponent(extension)}
-                            </div>
-                        ))}
-                    </div>
-                )}
+                <div className={style.gridContainer}>
+                    {extensions
+                        .sort((a, b) => (a.sort_extension ?? 0) - (b.sort_extension ?? 0))
+                        .map((extension) =>
+                            extension.type === ExtensionType.TEXT ? (
+                                <div key={extension.id}>
+                                    {renderExtensionComponent(extension)}
+                                </div>
+                            ) : (extension.type === ExtensionType.PROBAND_SEARCH || extension.type === ExtensionType.PROBAND_LIST) ? null : (
+                                <div key={extension.id} className={style.gridItem}>
+                                    {renderExtensionComponent(extension)}
+                                </div>
+                            )
+                        )}
+                </div>
             </div>
-            {probandComponent.length > 0 && (
+            {extensions.some((ext) => (ext.type === ExtensionType.PROBAND_SEARCH || ext.type === ExtensionType.PROBAND_LIST)) && (
                 <div>
                     <p className={style.title}>Proband Info.</p>
                     <div className={style.proband}>
-                        {probandComponent.map((extension => (
-                            <div key={extension.id}>
-                                {renderExtensionComponent(extension)}
-                            </div>
-                        )))}
-                        <button className={style.button} onClick={probandModalOpen}>Click here to find proband</button>
+                        {extensions
+                            .filter((ext) => (ext.type === ExtensionType.PROBAND_SEARCH || ext.type === ExtensionType.PROBAND_LIST))
+                            .sort((a, b) => (a.sort_extension ?? 0) - (b.sort_extension ?? 0))
+                            .map((extension) => (
+                                <div key={extension.id}>
+                                    {renderExtensionComponent(extension)}
+                                </div>
+                            ))}
                     </div>
                 </div>
             )}
