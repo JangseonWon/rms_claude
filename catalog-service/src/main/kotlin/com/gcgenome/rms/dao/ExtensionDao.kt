@@ -22,7 +22,7 @@ interface ExtensionDao {
                 )).from(EXTENSION)
                 .join(SERVICE_EXTENSION).on(EXTENSION.ID.eq(SERVICE_EXTENSION.EXTENSION_ID))
                 .join(SERVICE).on(SERVICE_EXTENSION.SERVICE_ID.eq(SERVICE.ID))
-                .where(SERVICE.ID.eq(serviceId))
+                .where(SERVICE.ID.eq(serviceId)).orderBy(SERVICE_EXTENSION.SORT_EXTENSION.asc())
         ).map { it.into(ServiceExtensionDTO::class.java) }
     }
 }
