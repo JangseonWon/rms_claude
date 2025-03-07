@@ -9,9 +9,9 @@ import {Service} from "@/model/Service";
 import {Categories} from "@/model/Categories";
 import {useRouter} from "next/navigation";
 import QnaLoading from "@/app/(afterLogin)/qna/_component/QnaLoading";
-import {getCategories} from "@/app/(afterLogin)/_api/getCategories";
 import SearchSelectBox, {Option} from "@/app/_component/SearchSelectBox";
 import {getServices} from "@/app/(afterLogin)/request/service-catalog/_api/getServices";
+import {getCategories} from "@/app/(afterLogin)/request/service-catalog/_api/getCategories";
 
 export default function ListServicePage() {
     const router = useRouter();

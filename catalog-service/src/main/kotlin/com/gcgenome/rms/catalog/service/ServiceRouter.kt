@@ -1,8 +1,9 @@
 package com.gcgenome.rms.catalog.service
 
 import com.gcgenome.rms.auth.AuthenticationHandler
-import com.gcgenome.rms.catalog.requestrelation.RequestRelationRouter
-import com.gcgenome.rms.data.*
+import com.gcgenome.rms.data.SampleTypeDTO
+import com.gcgenome.rms.data.ServiceDTO
+import com.gcgenome.rms.data.ServiceExtensionDTO
 import com.gcgenome.rms.exceptions.AuthenticationNotFoundException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -15,7 +16,6 @@ import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.router
 import reactor.core.publisher.Mono
 import java.util.*
-import javax.management.ServiceNotFoundException
 
 @Configuration
 class ServiceRouter (
@@ -27,7 +27,8 @@ class ServiceRouter (
         GET("/w-api/catalog-service/services", :: getServices)
         GET("/w-api/catalog-service/sample_types", :: getSampleTypeByServiceId)
         GET("/w-api/catalog-service/services/{serviceId}/extensions", ::serviceExtensions)
-        GET("/w-api/catalog-service/services/{service-id}", ::findService)
+        GET("/w-api/catalog-service/services/{service-id}", ::findServices)
+        GET("/w-api/catalog-service/service/{service-id}", ::findService)
     }
     private val logger: Logger = LoggerFactory.getLogger(ServiceRouter::class.java)
 
@@ -70,10 +71,25 @@ class ServiceRouter (
             }
     }
 
+    private fun findServices(request: ServerRequest): Mono<ServerResponse> {
+        val serviceId = request.pathVariable("service-id")
+        return authenticationHandler.principal(request)
+            .flatMap { serviceHandler.selectServices(serviceId).collectList() }
+            .flatMap { ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(it), ServiceDTO::class.java)
+            }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume { e ->
+                logger.error(e.stackTraceToString())
+                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome")
+            }
+    }
+
     private fun findService(request: ServerRequest): Mono<ServerResponse> {
         val serviceId = request.pathVariable("service-id")
         return authenticationHandler.principal(request)
-            .flatMap { serviceHandler.selectService(serviceId).collectList() }
+            .flatMap { serviceHandler.selectServiceById(serviceId) }
             .flatMap { ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(it), ServiceDTO::class.java)

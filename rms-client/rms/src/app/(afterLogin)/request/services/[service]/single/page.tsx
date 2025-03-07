@@ -7,8 +7,8 @@ import OrderSteps from "@/app/(afterLogin)/_component/OrderSteps";
 import {usePathname} from "next/navigation";
 import GroupOrder from "@/app/(afterLogin)/request/services/[service]/single/_component/set/GroupOrder";
 import {useEffect, useState} from "react";
-import {getService} from "@/app/(afterLogin)/_api/getService";
 import {Service} from "@/model/Service";
+import {getService} from "@/app/(afterLogin)/request/services/[service]/single/_api/getService";
 
 export default function Page() {
     const pathname = usePathname();

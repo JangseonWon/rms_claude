@@ -36,7 +36,7 @@ class ServiceHandler(val dslContext: DSLContext): ServiceDao, SampleTypeDao, Ext
         }
     }
 
-    fun selectService(serviceId: String): Flux<ServiceDTO> {
+    fun selectServices(serviceId: String): Flux<ServiceDTO> {
         return Flux.from(
             dslContext.selectServiceById(serviceId)
                 .flatMapMany { service ->
@@ -49,5 +49,9 @@ class ServiceHandler(val dslContext: DSLContext): ServiceDao, SampleTypeDao, Ext
                     dslContext.selectServiceInfoById(relatedService.id!!)
                 }
         )
+    }
+
+    fun selectServiceById(serviceId: String): Mono<ServiceDTO> {
+        return Mono.from(dslContext.selectServiceInfoById(serviceId))
     }
 }
