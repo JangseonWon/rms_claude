@@ -5,7 +5,7 @@ interface ProbandState {
     proband: string;
     setProband: (newProband: string) => void;
     probandRequest: Request | null;
-    setProbandRequest: (probandRequest: Request) => void;
+    setProbandRequest: (probandRequest: Request | null) => void;
     relationship: string;
     setRelationship: (newRelationship: string) => void;
     probandModalOpen: boolean;
@@ -16,7 +16,7 @@ const useProbandStore = create<ProbandState>((set: SetState<ProbandState>) => ({
     proband: '',
     setProband: (newProband: string) => set({ proband: newProband }),
     probandRequest: null,
-    setProbandRequest: (probandRequest: Request) => set({probandRequest}),
+    setProbandRequest: (probandRequest: Request | null) => set({probandRequest}),
     relationship: '',
     setRelationship: (newRelationship: string) => set({ relationship: newRelationship }),
     probandModalOpen: false,

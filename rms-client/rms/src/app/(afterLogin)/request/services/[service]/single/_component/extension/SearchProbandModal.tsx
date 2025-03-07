@@ -183,7 +183,7 @@ export default function SearchProbandModal({ closeModal }: Props) {
                             </tr>
                             </thead>
                             <tbody>
-                            {requests?.map((request, index) => (
+                            {requests && requests.length > 0 ? ( requests?.map((request, index) => (
                                 <tr key={index}
                                     onClick={() => handleRowClick(request)}
                                     className={`${tableStyle.selectRow} ${selectedRequest.sample?.barcode === request.sample?.barcode ? tableStyle.selected : ''}`}
@@ -195,7 +195,14 @@ export default function SearchProbandModal({ closeModal }: Props) {
                                     <td>{request.sample?.patient?.serial}</td>
                                     <td>{formatDate(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}</td>
                                 </tr>
-                            ))}
+                            ))
+                            ) : (
+                                <tr>
+                                    <td colSpan={6} className={globalTableStyle.noData}>
+                                        The searched data does not exist
+                                    </td>
+                                </tr>
+                            )}
                             </tbody>
                         </table>
                     </div>

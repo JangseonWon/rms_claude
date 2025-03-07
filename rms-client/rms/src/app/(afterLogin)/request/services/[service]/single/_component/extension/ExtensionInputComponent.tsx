@@ -9,7 +9,7 @@ import SelectBox from "@/app/_component/SelectBox";
 import TextBox from "@/app/_component/TextBox";
 import {
     useProbandRequest,
-    useSetProbandModalOpen
+    useSetProbandModalOpen, useSetProbandReqeust
 } from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 import {useRequestStore} from "@/store/useRequestStore";
@@ -22,8 +22,13 @@ export default function ExtensionInputComponent({serviceId}: ExtensionInputCompo
     const { request, setRequest } = useRequestStore();
     const setProbandModal = useSetProbandModalOpen();
     const [extensions, setExtensions] = useState<Extension[]>([]);
-    const probandRequest = useProbandRequest()
+    const probandRequest = useProbandRequest();
+    const setProbandRequest = useSetProbandReqeust();
     const showAlert = CallAlertDialog();
+
+    useEffect(() => {
+        setProbandRequest(null);
+    }, []);
 
     const handleRequestChange = (path: string, value: any) => {
         setRequest((prevState) => ({
@@ -199,6 +204,7 @@ export default function ExtensionInputComponent({serviceId}: ExtensionInputCompo
     useEffect(() => {
         fetchExtensions();
     }, []);
+
     useEffect(() => {
         setRequest((prevState) => ({
             ...prevState,
