@@ -103,7 +103,7 @@ export default function FaqPage() {
                     <input
                         className={style.inputTitle}
                         name={'title'}
-                        value={postData?.title || ''}
+                        value={postData?.post_category?.name?.toUpperCase() || ''}
                         readOnly={true}
                     />
                 </div>

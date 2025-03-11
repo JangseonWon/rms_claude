@@ -70,6 +70,14 @@ interface PostDao: QueryDao{
                 field(
                     select(
                         jsonObject(
+                            key("name").value(POST_CATEGORY.NAME),
+                        )
+                    ).from(POST_CATEGORY)
+                        .where(POST_CATEGORY.ID.eq(POST.POST_CATEGORY_ID))
+                ).`as`("post_category"),
+                field(
+                    select(
+                        jsonObject(
                             key("id").value(USER.ID),
                             key("name").value(USER.NAME),
                             key("role").value(USER.ROLE),

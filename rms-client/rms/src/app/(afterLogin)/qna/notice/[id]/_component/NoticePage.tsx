@@ -104,7 +104,12 @@ export default function NoticePage() {
                     <input
                         className={style.inputTitle}
                         name={'title'}
-                        value={postData?.title || ''}
+                        value={
+                            postData?.post_category?.name
+                                ? postData.post_category.name.charAt(0).toUpperCase() +
+                                postData.post_category.name.slice(1).toLowerCase()
+                                : ''
+                        }
                         readOnly={true}
                     />
                 </div>
