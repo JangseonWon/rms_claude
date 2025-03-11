@@ -136,6 +136,9 @@ export default function Order() {
         const sample = request?.sample;
         if (!sample) return false;
         const requiredFields = [
+            sample?.patient?.birth_year,
+            sample?.patient?.birth_month,
+            sample?.patient?.birth_day,
             sample?.patient?.organization?.id,
             sample?.patient?.name,
             sample?.patient?.serial,
@@ -144,7 +147,7 @@ export default function Order() {
             sample?.sampling_on,
             sample?.quantity,
         ];
-        if (requiredFields.some(field => typeof field !== 'string' || field.trim() === '')) {
+        if (requiredFields.some(field => field == null || String(field).trim() === '')) {
             return false;
         }
         return (sample.extensions || []).every(
@@ -207,8 +210,8 @@ export default function Order() {
                 />
                 <div className={style.dateBox}>
                     <DatePickerBox
-                        label={"Date of Birth"}
-                        required={false}
+                        label={"Date of Birth*"}
+                        required={true}
                         onChange={(date) => {
                             if (date) {
                                 handleRequestChange('sample.patient.birth_year', date.getFullYear());
