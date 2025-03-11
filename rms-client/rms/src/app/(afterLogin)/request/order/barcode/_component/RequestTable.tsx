@@ -6,7 +6,7 @@ import React, {useEffect, useState} from "react";
 import type {Request} from "@/model/Request";
 import {faFileLines} from "@fortawesome/free-regular-svg-icons/faFileLines";
 import {postRequests} from "@/app/(afterLogin)/request/order/_api/postRequests";
-import {FilterGroup, Query} from "@/model/Query";
+import {FilterGroup, Query, Sort} from "@/model/Query";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import SelectBox from "@/app/_component/SelectBox";
 import InputBox from "@/app/_component/InputBox";
@@ -55,6 +55,11 @@ const defaultOrderDateFilter: FilterGroup = {
             operator: "<="
         }
     ]
+}
+const defaultSort: Sort = {
+    table: "sample",
+    column: "barcode",
+    asc: false
 }
 
 export default function RequestTable() {
@@ -116,7 +121,7 @@ export default function RequestTable() {
     };
 
     useEffect(() => {
-        const updatedSearch = {
+        const updatedSearch: Query = {
             filter_groups: [
                 ...(orderDateFilter ? [orderDateFilter] : []),
                 {
@@ -126,6 +131,9 @@ export default function RequestTable() {
                     ],
                 },
             ],
+            sorts: [
+                defaultSort
+            ]
         };
         fetchData(updatedSearch);
     }, [searchFilter,orderDateFilter]);
