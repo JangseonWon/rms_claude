@@ -138,9 +138,10 @@ export default function Order() {
 
                 checkMissingField(item.patientName, "patient name");
                 checkMissingField(item.mrn, "mrn");
+                checkMissingField(item.birth, "Date of Birth");
                 checkMissingField(item.gender, "gender");
                 checkMissingField(item.sampleType, "sample type");
-                checkMissingField(item.collectionDate, "date of collection");
+                checkMissingField(item.collectionDate, "Collection Date");
                 checkMissingField(item.quantity, "quantity");
 
                 const extensionData = extensions.map(extension => {

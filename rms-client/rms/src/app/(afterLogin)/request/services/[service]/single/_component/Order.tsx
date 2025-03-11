@@ -273,7 +273,6 @@ export default function Order() {
                                 handleRequestChange('sample.sampling_on', null)
                                 handleRequestChange('sample.age', null);
                             }
-
                         }}
                     />
                 </div>
