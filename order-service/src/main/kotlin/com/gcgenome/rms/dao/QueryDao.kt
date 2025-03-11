@@ -3,8 +3,7 @@ package com.gcgenome.rms.dao
 import com.gcgenome.rms.data.Page
 import com.gcgenome.rms.data.Query
 import org.jooq.*
-import org.jooq.Record
-import org.jooq.impl.DSL
+import org.jooq.impl.DSL.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.time.LocalDate
@@ -23,7 +22,7 @@ interface QueryDao {
         query: Query,
         joinTables: List<JoinInfo> = emptyList(),
         selectFields: List<Field<*>> = listOf(),
-        where: Condition = DSL.noCondition(),
+        where: Condition = noCondition(),
         groupByFields: List<Field<*>> = emptyList(),
         mapper: (Record) -> T
     ): Mono<Page<T>> {
@@ -43,7 +42,7 @@ interface QueryDao {
         query: Query,
         joinTables: List<JoinInfo> = emptyList(),
         selectFields: List<Field<*>> = listOf(),
-        where: Condition = DSL.noCondition(),
+        where: Condition = noCondition(),
         groupByFields: List<Field<*>> = emptyList(),
         mapper: (Record) -> T
     ): Mono<T> {
@@ -132,13 +131,13 @@ interface QueryDao {
     }
 
     private fun condition(query: Query): Condition {
-        var finalCondition = DSL.noCondition()
+        var finalCondition = noCondition()
         query.filterGroups?.forEach { filterGroup ->
-            var groupCondition = DSL.noCondition()
+            var groupCondition = noCondition()
             filterGroup.filters.forEach { filter ->
                 val table = filter.table
                 val column = filter.column
-                val field = DSL.field(DSL.name(table, column))
+                val field = field(name(table, column))
 
                 val filterCondition = when (filter.operator) {
                     "=" -> field.eq(filter.value)
@@ -168,15 +167,17 @@ interface QueryDao {
     }
     private fun orderBy(query: Query): List<SortField<*>> {
         val sortFields = mutableListOf<SortField<*>>()
-        query.sortBy?.let { sortBy ->
-            val field = DSL.field(sortBy)
-            val sortField = if (query.asc == true) {
+
+        query.sorts?.forEach { sort ->
+            val field = field(name(sort.table, sort.column))
+            val sortField = if (sort.asc == true) {
                 field.asc()
             } else {
                 field.desc()
             }
             sortFields.add(sortField)
         }
+
         return sortFields
     }
     private fun isTimestampColumn(column: String): Boolean {
