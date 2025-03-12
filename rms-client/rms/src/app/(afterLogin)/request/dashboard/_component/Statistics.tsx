@@ -1,7 +1,7 @@
 "use client"
 
 import style from "@/app/(afterLogin)/request/dashboard/_component/statistics.module.css"
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {getStatisticsRequest} from "@/app/(afterLogin)/request/dashboard/_api/getStatisticsRequest";
 import type {Statistics} from "@/model/Statistics";
 import Loading from "@/app/(afterLogin)/_component/Loading";
@@ -44,7 +44,28 @@ export default function Statistics() {
     ];
 
     const handleLearnMoreClick = (status: Status) => {
-        showAlert(`${status} Learn More`);
+        showAlert(`${statusTransferMessage(status)}`);
+    };
+
+    const statusTransferMessage = (status: Status) => {
+        switch (status) {
+            case Status.TOTAL:
+                return `This represents the overall status, including all requests regardless of their progress.\nIt serves as a summary of every order, whether it is pending, completed, in progress, or has encountered an issue.`;
+            case Status.UNCONFIRMED_ORDER:
+                return `This status indicates that the request has been placed but has not yet been fully confirmed or processed.\nIt may still require additional verification, approval, or further input from the requesting party\n before proceeding to the next step.`;
+            case Status.COMPLETED_ORDER:
+                return `The request has been successfully processed and finalized.\nAll necessary procedures have been carried out,\n and no further action is required.\nThe case is considered closed unless further\n follow-up is needed.`;
+            case Status.IN_PROGRESS:
+                return `The request is currently undergoing analysis or processing.\nThe required tests are being conducted, and the results have not yet been finalized.`;
+            case Status.TEST_FAILED:
+                return `This status indicates that the requested analysis\n could not be completed successfully due to an issue. Possible reasons may include sample\n contamination, insufficient sample volume, \n technical errors, or equipment malfunctions.\nAdditional steps may be required, such as repeating\n the test or requesting a new sample.`;
+            case Status.DELIVERED:
+                return `The test results are currently being sent\n to the requesting party.\nThe delivery process is in progress, but the results have not yet been officially received or confirmed by the recipient.`;
+            case Status.COMPLETED:
+                return `The final stage of the process, where the test results or reports have been successfully delivered\n and confirmed as received.\nThe request is fully completed, and no further action is needed unless additional follow-up or\n clarification is required.`;
+            default:
+                return `This represents the overall status, including all requests regardless of their progress.\nIt serves as a summary of every order, whether it is pending, completed, in progress, or has encountered an issue.`;
+        }
     };
 
     return (
