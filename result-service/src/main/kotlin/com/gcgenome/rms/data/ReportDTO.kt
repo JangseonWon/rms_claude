@@ -20,6 +20,7 @@ data class ReportDTO(
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("downloaded_at")
     var downloadedAt: LocalDateTime? = null,
+    @JsonProperty("is_latest")
     var isLatest: Boolean? = null,
     var request: RequestDTO? = null
 )

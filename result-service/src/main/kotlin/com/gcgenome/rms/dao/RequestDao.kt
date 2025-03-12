@@ -122,7 +122,8 @@ interface RequestDao: QueryDao{
                         key("id").value(REPORT.ID),
                         key("value").value(REPORT.VALUE),
                         key("type").value(REPORT.TYPE),
-                        key("create_at").value(REPORT.CREATE_AT)
+                        key("create_at").value(REPORT.CREATE_AT),
+                        key("is_latest").value(REPORT.IS_LATEST)
                     )
                 )
             ).`as`("reports")
