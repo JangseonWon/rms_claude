@@ -118,7 +118,7 @@ export default function DownloadTable() {
                     filters: [
                         deliveredFilter,
                         completedFilter,
-                        reportFilter
+                        //reportFilter
                     ],
                 },
                 {
@@ -293,7 +293,8 @@ export default function DownloadTable() {
                             <td className={globalTableStyle.middleColumn}>{request.lims_completed_at ? new Date(request.lims_completed_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
                             <td className={globalTableStyle.middleColumn}>{request.status}</td>
                             <td className={globalTableStyle.middleColumn}>
-                                {(request.reports as Report[])?.filter((report: Report) => report.type === 'PDF').map((report) => (
+                                {(request.reports as Report[])
+                                    ?.filter((report: Report) => report.type === 'PDF' && report.is_latest === true).map((report) => (
                                     <FontAwesomeIcon
                                         key={report.id}
                                         className={downloadStyle.downloadIcon}
