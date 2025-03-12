@@ -48,16 +48,6 @@ export default function FaqPage() {
         try {
             const response = await getPostFile(postFile.id!);
             if (response.ok) {
-                const contentDisposition = response.headers.get('Content-Disposition');
-                let filename = postFile.name;
-
-                if (contentDisposition) {
-                    const filenameMatch = contentDisposition.match(/filename[^;=\n]*[=\s](.*?)(;|$)/);
-                    if (filenameMatch && filenameMatch[1]) {
-                        filename = decodeURIComponent(filenameMatch[1].replace(/"/g, ''));
-                    }
-                }
-
                 const blob = await response.blob();
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
