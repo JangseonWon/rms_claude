@@ -26,18 +26,19 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
 
     const handleDownload = async () => {
         const headers = [
-            "Institution Name", //List
-            "Patient Name",
-            "MRN",
-            "Date of Birth (YYYY-MM-DD)", // Date
-            "Gender", // List
-            "Sample Type",
-            "Collection Date (YYYY-MM-DD)", // Date
-            "Quantity", // Decimal
+            "Institution Name *", //List
+            "Patient Name *",
+            "MRN *",
+            "Date of Birth (YYYY-MM-DD) *", // Date
+            "Gender *", // List
+            "Sample Type *",
+            "Collection Date (YYYY-MM-DD) *", // Date
+            "Quantity *", // Decimal
             "Medical Department",
             "Ward",
             "Physician Name",
-            ...extensions.map(extension => extension.name),
+            // ...extensions.map(extension => extension.name),
+            ...extensions.map(extension => extension.required ? `${extension.name} *` : extension.name),
             "Memo",
         ];
         const today = new Date();
@@ -131,7 +132,8 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
             };
 
             extensions.forEach((extension) => {
-                const columnIndex = headers.indexOf(extension.name) + 1;
+                const headerName = extension.required ? `${extension.name} *` : extension.name
+                const columnIndex = headers.indexOf(headerName) + 1;
                 const cell = worksheet.getCell(rowIndex, columnIndex);
 
                 switch (extension.type) {

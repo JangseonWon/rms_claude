@@ -298,19 +298,21 @@ export default function Order() {
                 <table className={style.table}>
                     <thead>
                     <tr>
-                        <th className={style.header200}>Institution Name</th>
-                        <th className={style.header150}>Patient Name</th>
-                        <th className={style.header100}>MRN</th>
-                        <th className={style.header150}>Date of Birth</th>
-                        <th className={style.header100}>Gender</th>
-                        <th className={style.header150}>Sample Type</th>
-                        <th className={style.header150}>Collection Date</th>
-                        <th className={style.header100}>Quantity</th>
+                        <th className={style.header200}>Institution Name *</th>
+                        <th className={style.header150}>Patient Name *</th>
+                        <th className={style.header100}>MRN *</th>
+                        <th className={style.header150}>Date of Birth *</th>
+                        <th className={style.header100}>Gender *</th>
+                        <th className={style.header150}>Sample Type *</th>
+                        <th className={style.header150}>Collection Date *</th>
+                        <th className={style.header100}>Quantity *</th>
                         <th className={style.header150}>Medical Department</th>
                         <th className={style.header150}>Ward</th>
                         <th className={style.header150}>Physician Name</th>
                         {extensions.map((extension, index) => (
-                            <th className={style.header100} key={index}>{extension.name}</th>
+                            <th className={style.header100} key={index}>
+                                {extension.required ? `${extension.name} *` : extension.name}
+                            </th>
                         ))}
                         <th className={style.notesHeader}>Memo</th>
                     </tr>
