@@ -38,7 +38,9 @@ export default function Answer() {
     const [postData, setPostData] = useState<Post>();
     const [commentData, setCommentData] = useState<Comment>();
     const [writerCheck, setWriterCheck] = useState(false);
-    const [deletePostId, setDeletePostId] = useState<number>();
+    const [deletePostId, setDeletePostId] = useState<string | undefined>();
+    const [deleteCommentId, setDeleteCommentId] = useState<string | undefined>();
+    const [deleteFileId, setDeleteFileId] = useState<string | undefined>();
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const showAlert = CallAlertDialog();
@@ -89,22 +91,36 @@ export default function Answer() {
         }
     }
 
-    const handleDeleteButtonClick = (postId: number) => {
-        setDeletePostId(postId);
+    const handleDeleteClick = (id: string, type: string) => {
+        switch (type) {
+            case 'post':
+                setDeletePostId(id);
+                setNoticeMessage('Are you sure you want to delete it?');
+                break;
+            case 'comment':
+                setDeleteCommentId(id);
+                setNoticeMessage('Are you sure you want to delete your comment?');
+                break;
+            case 'file':
+                setDeleteFileId(id);
+                setNoticeMessage('Are you sure you want to delete the file?');
+                break;
+        }
         setShowNoticeDialog(true);
-        setNoticeMessage('Are you sure you want to delete it?');
     };
 
-    const deleteButtonClick = async (postId: number) => {
+    const deleteItem = async (id: string, type: string) => {
         setIsLoading(true);
         try {
-            await deletePostById(postId);
-        } finally {
+            if (type === 'post') await deletePostById(id);
+            else if (type === 'comment') await deleteCommentById(id);
+            else if (type === 'file') await deletePostFileById(id);
             showAlert('Deletion has been completed.');
+        } finally {
             setIsLoading(false);
-            route.push('/qna');
+            if (type === 'post') route.push('/qna');
         }
-    }
+    };
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -115,16 +131,6 @@ export default function Answer() {
         try {
             const response = await getPostFile(postFile.id!);
             if (response.ok) {
-                const contentDisposition = response.headers.get('Content-Disposition');
-                let filename = postFile.name;
-
-                if (contentDisposition) {
-                    const filenameMatch = contentDisposition.match(/filename[^;=\n]*[=\s](.*?)(;|$)/);
-                    if (filenameMatch && filenameMatch[1]) {
-                        filename = decodeURIComponent(filenameMatch[1].replace(/"/g, ''));
-                    }
-                }
-
                 const blob = await response.blob();
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -137,27 +143,6 @@ export default function Answer() {
             }
         } catch (error) {
             console.error('Error downloading file:', error);
-        }
-    }
-
-    const handleCommentDeleteClick = async (commentId: string) => {
-        const confirmed = window.confirm('Are you sure you want to delete your comment?');
-        if (confirmed) {
-            await deleteCommentById(commentId);
-            fetchData();
-        }
-    }
-
-    const handleFileDeleteClick = async (postFileId: string) => {
-        const confirmed = window.confirm('Are you sure you want to delete the file?');
-        if (confirmed) {
-            setIsLoading(true);
-            try{
-                await deletePostFileById(postFileId);
-            } finally {
-                fetchData();
-                setIsLoading(false);
-            }
         }
     }
 
@@ -197,19 +182,23 @@ export default function Answer() {
     };
 
     const fetchData = useCallback(async () => {
-        const response = await getPostByPostId(postId);
-        const text = await response.text();
-        if (text) {
+        try {
+            const response = await getPostByPostId(postId);
+            if (!response.ok) new Error('Failed to fetch post');
+
+            const text = await response.text();
+            if (!text) new Error('Post not found');
+
             const data = JSON.parse(text);
             setPostData(data as Post);
 
             if (session?.user?.id === data.user.id) {
                 setWriterCheck(true);
             }
-        } else {
-            showAlert('Post not found');
+        } catch (error) {
+            console.error('Error fetching post:', error);
+            showAlert('An error occurred while fetching the post');
             route.push('/qna');
-            return;
         }
     }, [postId, session?.user?.id]);
 
@@ -219,9 +208,25 @@ export default function Answer() {
     }, []);
 
     useEffect(() => {
-        if (deletePostId && okNotice) {
-            deleteButtonClick(deletePostId);
-            setOkNotice(false);
+        if (session?.user?.id) {
+            fetchData();
+        }
+    }, [session?.user?.id]);
+
+    useEffect(() => {
+        if (okNotice) {
+            (async () => {
+                if (deleteCommentId) await deleteItem(deleteCommentId, "comment");
+                if (deleteFileId) await deleteItem(deleteFileId, "file");
+                if (deletePostId) await deleteItem(deletePostId, "post");
+
+                setDeletePostId(undefined);
+                setDeleteCommentId(undefined);
+                setDeleteFileId(undefined);
+
+                await fetchData();
+                setOkNotice(false);
+            })();
         }
     }, [okNotice]);
 
@@ -235,7 +240,7 @@ export default function Answer() {
                 {writerCheck && (
                     <section className={style.buttonContainer}>
                         <BlueButton name={"EDIT"} onClick={editButtonClick}/>
-                        <GreenButton name={"DELETE"} onClick={() => handleDeleteButtonClick(postData?.id!)}/>
+                        <GreenButton name={"DELETE"} onClick={() => handleDeleteClick(postData?.id?.toString()!, 'post')}/>
                     </section>
                 )}
                     <section className={style.userAndTitleContainer}>
@@ -304,7 +309,7 @@ export default function Answer() {
                             {session?.user?.id === postData.user!!.id && (<FontAwesomeIcon
                                 className={answerStyle.fileDelete}
                                 icon={faXmark}
-                                onClick={() => handleFileDeleteClick(file.id!)}
+                                onClick={() => handleDeleteClick(file.id!, 'file')}
                             />)}
                         </div>
                     ))}
@@ -323,7 +328,7 @@ export default function Answer() {
                                     <FontAwesomeIcon
                                         className={answerStyle.commentDelete}
                                         icon={faXmark}
-                                        onClick={() => handleCommentDeleteClick(comment.id!)}
+                                        onClick={() => handleDeleteClick(comment.id!, 'comment')}
                                     />
                                 )}
                             </div>
