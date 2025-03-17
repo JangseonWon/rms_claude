@@ -12,6 +12,6 @@ data:
         password: ${database.password}
         pool:
           initial-size: 2
-          max-size: 10
+          max-size: 50
           max-idle-time: 30m
           validation-query: SELECT 1
