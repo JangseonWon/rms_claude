@@ -7,7 +7,7 @@ import org.jooq.DSLContext
 import reactor.core.publisher.Mono
 
 interface PatientDao {
-    fun DSLContext.insertPatient(userId: String, patient: PatientDTO): Mono<PatientDTO> {
+    fun DSLContext.upsertPatient(userId: String, patient: PatientDTO): Mono<PatientDTO> {
         return Mono.from(
             insertInto(PATIENT)
                 .set(PATIENT.SERIAL, patient.serial)

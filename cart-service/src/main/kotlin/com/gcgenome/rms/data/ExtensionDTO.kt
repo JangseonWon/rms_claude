@@ -14,5 +14,10 @@ data class ExtensionDTO(
     @JsonProperty("type")
     var type: String?,
     @JsonProperty("value")
-    var value: String?
+    var value: String?,
+    @JsonProperty("required")
+    var required: Boolean?,
+    @JsonProperty("sort_extension")
+    var sortExtension: Int?
+
 )

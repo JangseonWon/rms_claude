@@ -2,8 +2,8 @@ package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.Page
 import com.gcgenome.rms.data.Query
+import com.gcgenome.rms.data.TableRegistry
 import org.jooq.*
-import org.jooq.impl.DSL
 import org.jooq.impl.DSL.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -135,16 +135,18 @@ interface QueryDao {
             filterGroup.filters.forEach { filter ->
                 val table = filter.table
                 val column = filter.column
+                val value = filter.value
                 val field = field(name(table, column))
+                val convertTypeValue = TableRegistry.convertTypeValue(table, column, value)
 
                 val filterCondition = when (filter.operator) {
-                    "=" -> field.eq(filter.value)
-                    "!=" -> field.ne(filter.value)
-                    ">" -> field.gt(filter.value)
-                    "<" -> field.lt(filter.value)
-                    ">=" -> field.ge(filter.value)
-                    "<=" -> field.le(filter.value)
-                    "LIKE" -> field.likeIgnoreCase("%${filter.value}%")
+                    "=" -> field.eq(convertTypeValue)
+                    "!=" -> field.ne(convertTypeValue)
+                    ">" -> field.gt(convertTypeValue)
+                    "<" -> field.lt(convertTypeValue)
+                    ">=" -> field.ge(convertTypeValue)
+                    "<=" -> field.le(convertTypeValue)
+                    "LIKE" -> field.likeIgnoreCase("%${convertTypeValue}%")
                     else -> null
                 }
                 filterCondition?.let {
