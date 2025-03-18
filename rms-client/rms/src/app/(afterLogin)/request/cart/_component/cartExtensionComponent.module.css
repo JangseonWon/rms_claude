@@ -45,5 +45,6 @@
     border: 1px solid #9ebce6;
 }
 .probandInput {
-    width: 300px;
+    display: flex;
+    gap: 10px;
 }

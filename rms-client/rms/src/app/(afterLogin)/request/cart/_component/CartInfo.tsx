@@ -23,51 +23,33 @@ import TextBox from "@/app/_component/TextBox";
 import classNames from "classnames";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 import CartInfoExtensionComponent from "@/app/(afterLogin)/request/cart/_component/CartInfoExtensionComponent";
-import {Extension} from "@/model/Extension";
+import {Extension, ExtensionType} from "@/model/Extension";
 import {format} from "date-fns";
+import {useRequestStore} from "@/store/useRequestStore";
+import {useProbandRequest, useSetProbandRequest} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
+import {Query} from "@/model/Query";
+import {searchRequests} from "@/app/(afterLogin)/request/cart/_api/searchRequests";
 
 type Props = {
     serviceId: string;
     sampleId: string;
+    requestGroupId: string;
     userId: string;
     closeModal: () => void;
 }
 
-export default function CartInfo({serviceId, sampleId, userId, closeModal}: Props) {
-    const [request, setRequest] = useState<Request>({});
+export default function CartInfo({serviceId, sampleId, requestGroupId, userId, closeModal}: Props) {
+    const [ requests, setRequests ] = useState<Request[]>([])
+    const { request, setRequest, resetRequest } = useRequestStore();
+    const setProbandRequest = useSetProbandRequest()
     const [organizationOptions, setOrganizationOptions] = useState<SelectBoxOption[]>([])
     const [sampleTypeOptions, setSampleTypeOptions] = useState<SelectBoxOption[]>([]);
     const showAlert = CallAlertDialog();
 
     const sexOption: SelectBoxOption[] = [
-        { value: "M", name: "Male" },
-        { value: "F", name: "Female" }
+        { value: "M", name: "M" },
+        { value: "F", name: "F" }
     ];
-
-    const handleRequestChange = (path: string, value: any) => {
-        setRequest(prevState => ({
-            ...prevState,
-            ...setNestedValue({ ...prevState }, path, value)
-        }));
-    };
-    const setNestedValue = (object: any, nestedPath: string, newValue: any): any => {
-        const [firstKey, ...remainingPathSegments] = nestedPath.split('.');
-        if (remainingPathSegments.length === 0) {
-            return { ...object, [firstKey]: newValue };
-        }
-        if (!object[firstKey]) {
-            object[firstKey] = {};
-        }
-        return {
-            ...object,
-            [firstKey]: setNestedValue(object[firstKey] || {}, remainingPathSegments.join('.'), newValue),
-        };
-    };
-    const fetchRequest = useCallback(async () => {
-        const response = await getRequest(serviceId!, sampleId!)
-        const json = await response.json()
-        setRequest(json as Request)
-    },[serviceId, sampleId]);
 
     const fetchOrganizations = useCallback(async () => {
         const response = await getOrganization(userId!);
@@ -83,6 +65,61 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
         setSampleTypeOptions(transformSampleTypeToOptions(json as SampleType[]))
     },[serviceId])
 
+
+    const handleRequestChange = (path: string, value: any) => {
+        setRequest(prevState => ({
+            ...prevState,
+            ...setNestedValue({ ...prevState }, path, value)
+        }));
+    };
+    const setNestedValue = (object: any, nestedPath: string, newValue: any): any => {
+        const [firstKey, ...remainingPathSegments] = nestedPath.split('.');
+        if (remainingPathSegments.length === 0) {
+            if (newValue === null) {
+                const { [firstKey]: removed, ...rest } = object;
+                return rest;
+            }
+            return { ...object, [firstKey]: newValue };
+        }
+        if (!object[firstKey]) {
+            object[firstKey] = {};
+        }
+        return {
+            ...object,
+            [firstKey]: setNestedValue(object[firstKey] || {}, remainingPathSegments.join('.'), newValue),
+        };
+    };
+    /*const fetchRequest = useCallback(async () => {
+        const response = await getRequest(serviceId!, sampleId!)
+        const json = await response.json()
+        setRequest(json as Request)
+    },[serviceId, sampleId]);*/
+    const fetchRequest = useCallback(async () => {
+        const query: Query = {
+            filter_groups:[
+                {
+                    filters: [
+                        {
+                            table: "request_group",
+                            column: "id",
+                            value: requestGroupId,
+                            operator: "="
+                        }
+                    ]
+                }
+            ]
+        }
+        const response = await searchRequests(query)
+        const json = await response.json()
+        const rootRequest = json.find((req: Request) => req.service?.id === serviceId && req.sample?.id === sampleId);
+        const probandRequest: Request = json.find((req: Request) => req.request_relation?.id === 1);
+        console.log(JSON.stringify(probandRequest, null, 2))
+        setRequests(json as Request[]);
+        setRequest(rootRequest as Request);
+        setProbandRequest(probandRequest ?? null);
+    },[]);
+
+
     const transformOrganizationsToOptions = (organizations: Organization[]): SelectBoxOption[] => {
         return organizations.map(org => ({
             value: org.id,
@@ -96,7 +133,7 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
         }));
     };
     const handleEditClick = async () => {
-        if (validateRequest()) {
+        if (isAllRequiredFilled()) {
             const response = await updateRequest(request!);
             if (response.ok) showAlert("Success update");
             else showAlert("Fail update");
@@ -104,27 +141,34 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
             showAlert("Please fill out all required fields.");
         }
     };
-    const validateRequest = () => {
-        if (!request?.sample?.patient?.name) return false;
-        if (!request?.sample?.patient?.serial) return false;
-        if (!request?.sample?.sample_type?.name) return false;
-        return request?.sample?.quantity;
+    const isAllRequiredFilled = () => {
+        const sample = request?.sample;
+        if (!sample) return false;
+        const requiredFields = [
+            sample?.patient?.birth_year,
+            sample?.patient?.birth_month,
+            sample?.patient?.birth_day,
+            sample?.patient?.organization?.id,
+            sample?.patient?.name,
+            sample?.patient?.serial,
+            sample?.patient?.sex,
+            sample?.sample_type?.id,
+            sample?.sampling_on,
+            sample?.quantity,
+        ];
+        if (requiredFields.some(field => field == null || String(field).trim() === '')) {
+            return false;
+        }
+        return (sample.extensions || []).every(
+            extension =>
+                !extension.required || (extension.value != null && extension.value !== '')
+        );
     };
 
     const getDateFromComponents = (year?: number, month?: number, day?: number): Date | undefined => {
         if (!year || !month || !day) return undefined;
         return new Date(year, month - 1, day);
     }
-
-    const handleExtensionChange = (updatedExtensions: Extension[]) => {
-        setRequest((prevState) => ({
-            ...prevState,
-            sample: {
-                ...prevState.sample,
-                extensions: updatedExtensions,
-            },
-        }));
-    };
 
     const setAge = (birthDate: Date, samplingDate: Date): number => {
         let age = samplingDate.getFullYear() - birthDate.getFullYear();
@@ -136,6 +180,7 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
     };
 
     useEffect(() => {
+        resetRequest();
         fetchRequest()
         fetchOrganizations()
         fetchSampleType()
@@ -199,7 +244,7 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
                                         handleRequestChange('sample.patient.birth_year', date.getFullYear());
                                         handleRequestChange('sample.patient.birth_month', date.getMonth() + 1);
                                         handleRequestChange('sample.patient.birth_day', date.getDate());
-                                        if (request.sample?.sampling_on) {
+                                        if (request?.sample?.sampling_on) {
                                             handleRequestChange('sample.age', setAge(date, new Date(request.sample.sampling_on)));
                                         }
                                     } else {
@@ -241,10 +286,10 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
                                 onChange={(date) => {
                                     if (date) {
                                         handleRequestChange('sample.sampling_on', format(date, "yyyy-MM-dd"))
-                                        if (request.sample?.patient?.birth_year
-                                            && request.sample?.patient?.birth_month
-                                            && request.sample?.patient?.birth_day) {
-                                            handleRequestChange('sample.age', setAge(new Date(`${request.sample.patient.birth_year}-${request.sample.patient.birth_month}-${request.sample.patient.birth_day}`), date));
+                                        if (request?.sample?.patient?.birth_year
+                                            && request?.sample?.patient?.birth_month
+                                            && request?.sample?.patient?.birth_day) {
+                                            handleRequestChange('sample.age', setAge(new Date(`${request?.sample.patient.birth_year}-${request?.sample.patient.birth_month}-${request?.sample.patient.birth_day}`), date));
                                         }
                                     } else {
                                         handleRequestChange('sample.sampling_on', null)
@@ -279,7 +324,7 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
                             />
                         </div>
                         {request.sample?.extensions && (
-                            <CartInfoExtensionComponent extensions={request.sample?.extensions} onChange={handleExtensionChange}/>
+                            <CartInfoExtensionComponent extensions={request.sample.extensions}/>
                         )}
                         <div className={style.memoSection}>
                             <TextBox
@@ -289,7 +334,11 @@ export default function CartInfo({serviceId, sampleId, userId, closeModal}: Prop
                             />
                         </div>
                         <div className={style.modalBottom}>
-                            <GreenButton name={"Edit"} onClick={handleEditClick}/>
+                            <GreenButton
+                                name={"Edit"}
+                                onClick={handleEditClick}
+                                disabled={!isAllRequiredFilled()}
+                            />
                         </div>
                     </div>
                 ) : <Loading/>}
