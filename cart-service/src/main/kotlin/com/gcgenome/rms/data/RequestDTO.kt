@@ -39,6 +39,8 @@ data class RequestDTO(
     @JsonProperty("user")
     val user: UserDTO?,
     @JsonProperty("request_group")
-    val requestGroup: RequestGroupDTO?
+    val requestGroup: RequestGroupDTO?,
+    @JsonProperty("request_relation")
+    val requestRelation: RequestRelationDTO?
 )
 

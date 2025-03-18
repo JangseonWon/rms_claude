@@ -13,7 +13,7 @@ import managementStyle from "@/css/managementTable.module.css";
 import SelectBox from "@/app/_component/SelectBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import {Query} from "@/model/Query";
-import {useSetProbandReqeust} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
+import {useSetProbandRequest} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 import {postRequests} from "@/app/(afterLogin)/request/services/[service]/single/_api/postRequests";
 import {format} from "date-fns";
@@ -59,7 +59,7 @@ export default function SearchProbandModal({ closeModal }: Props) {
     const [searchFilter, setSearchFilter] = useState<Filter | undefined>(undefined);
     const [totalPage, setTotalPage] = useState<number>(0);
     const [selectedRequest, setSelectedRequest] = useState<Request>({});
-    const setProbandRequest = useSetProbandReqeust();
+    const setProbandRequest = useSetProbandRequest();
     const showAlert = CallAlertDialog();
 
     const fetchRequests = async (search: Query) => {

@@ -26,7 +26,7 @@ const useProbandStore = create<ProbandState>((set: SetState<ProbandState>) => ({
 export const useProband = () => useProbandStore((state) => state.proband);
 export const useSetProband = () => useProbandStore((state) => state.setProband);
 export const useProbandRequest = () => useProbandStore((state) => state.probandRequest);
-export const useSetProbandReqeust = () => useProbandStore((state) => state.setProbandRequest)
+export const useSetProbandRequest = () => useProbandStore((state) => state.setProbandRequest)
 
 export const useRelationship = () => useProbandStore((state) => state.relationship);
 export const useSetRelationship = () => useProbandStore((state) => state.setRelationship);

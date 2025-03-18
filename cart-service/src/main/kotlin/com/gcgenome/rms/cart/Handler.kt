@@ -34,7 +34,7 @@ class Handler(val dslContext: DSLContext ) :
             trx.dsl().run {
                 selectRequestById(request.sample!!.id!!, request.service!!.id!!)
                     .flatMap { r->
-                        insertPatient(request.user?.id!!, request.sample.patient!!)
+                        upsertPatient(request.user?.id!!, request.sample.patient!!)
                             .then(updateSample(request.sample))
                             .then(deletePatientById(request.user.id!!, r.sample!!.patient!!))
                             .then(processExtensions(trx, request.sample.id!!, request.sample.extensions))

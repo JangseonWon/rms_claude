@@ -15,6 +15,8 @@ interface RequestDao: QueryDao {
             QueryDao.JoinInfo(USER, REQUEST.USER_ID.eq(USER.ID), QueryDao.JoinType.INNER),
             QueryDao.JoinInfo(SAMPLE, REQUEST.SAMPLE_ID.eq(SAMPLE.ID), QueryDao.JoinType.INNER),
             QueryDao.JoinInfo(SERVICE, REQUEST.SERVICE_ID.eq(SERVICE.ID), QueryDao.JoinType.INNER),
+            QueryDao.JoinInfo(REQUEST_GROUP, REQUEST.REQUEST_GROUP_ID.eq(REQUEST_GROUP.ID), QueryDao.JoinType.INNER),
+            QueryDao.JoinInfo(REQUEST_RELATION, REQUEST.REQUEST_RELATION_ID.eq(REQUEST_RELATION.ID), QueryDao.JoinType.INNER),
             QueryDao.JoinInfo(PATIENT, SAMPLE.PATIENT_SERIAL.eq(PATIENT.SERIAL)
                 .and(SAMPLE.ORGANIZATION_ID.eq(PATIENT.ORGANIZATION_ID))
                 .and(SAMPLE.USER_ID.eq(PATIENT.USER_ID)), QueryDao.JoinType.INNER),
@@ -23,19 +25,6 @@ interface RequestDao: QueryDao {
         )
 
         val fields = listOf(
-            jsonObject(
-                key("id").value(REQUEST.REQUEST_GROUP_ID)
-            ).`as`("request_group"),
-            jsonObject(
-                key("id").value(USER.ID),
-                key("name").value(USER.NAME),
-                key("role").value(USER.ROLE),
-                key("branch_serial").value(USER.BRANCH_SERIAL)
-            ).`as`("user"),
-            jsonObject(
-                key("id").value(SERVICE.ID),
-                key("name").value(SERVICE.NAME)
-            ).`as`("service"),
             REQUEST.USER_SERVICE_ID,
             REQUEST.STATUS,
             REQUEST.MEMO,
@@ -44,6 +33,23 @@ interface RequestDao: QueryDao {
             REQUEST.PHYSICIAN,
             REQUEST.CREATE_AT,
             REQUEST.CART_AT,
+            jsonObject(
+                key("id").value(SERVICE.ID),
+                key("name").value(SERVICE.NAME)
+            ).`as`("service"),
+            jsonObject(
+                key("id").value(USER.ID),
+                key("name").value(USER.NAME),
+                key("role").value(USER.ROLE),
+                key("branch_serial").value(USER.BRANCH_SERIAL)
+            ).`as`("user"),
+            jsonObject(
+                key("id").value(REQUEST_GROUP.ID)
+            ).`as`("request_group"),
+            jsonObject(
+                key("id").value(REQUEST_RELATION.ID),
+                key("name").value(REQUEST_RELATION.NAME)
+            ).`as`("request_relation"),
             jsonObject(
                 key("id").value(SAMPLE.ID),
                 key("barcode").value(SAMPLE.BARCODE),
@@ -77,6 +83,24 @@ interface RequestDao: QueryDao {
                             )
                         )
                     )
+                ),
+                key("extensions").value(
+                    select(
+                        jsonArrayAgg(jsonObject(
+                            key("id").value(EXTENSION.ID),
+                            key("name").value(EXTENSION.NAME),
+                            key("value").value(SAMPLE_EXTENSION.VALUE),
+                            key("regex").value(EXTENSION.REGEX),
+                            key("type").value(EXTENSION.TYPE),
+                            key("required").value(SERVICE_EXTENSION.REQUIRED),
+                            key("sort_extension").value(SERVICE_EXTENSION.SORT_EXTENSION)
+                        ))
+                    ).from(EXTENSION)
+                        .join(SERVICE_EXTENSION).on(SERVICE_EXTENSION.EXTENSION_ID.eq(EXTENSION.ID))
+                        .leftJoin(SAMPLE_EXTENSION)
+                        .on(SAMPLE_EXTENSION.EXTENSION_ID.eq(EXTENSION.ID))
+                        .and(SAMPLE_EXTENSION.SAMPLE_ID.eq(SAMPLE.ID))
+                        .where(SERVICE_EXTENSION.SERVICE_ID.eq(SERVICE.ID))
                 )
             ).`as`("sample")
         )
@@ -112,6 +136,8 @@ interface RequestDao: QueryDao {
                 .set(REQUEST.DEPARTMENT, coalesce(`val`(request.department), REQUEST.DEPARTMENT))
                 .set(REQUEST.WARD, coalesce(`val`(request.ward), REQUEST.WARD))
                 .set(REQUEST.PHYSICIAN, coalesce(`val`(request.physician), REQUEST.PHYSICIAN))
+                .set(REQUEST.REQUEST_GROUP_ID, coalesce(`val`(request.requestGroup?.id), REQUEST.REQUEST_GROUP_ID))
+                .set(REQUEST.REQUEST_RELATION_ID, coalesce(`val`(request.requestRelation?.id), REQUEST.REQUEST_RELATION_ID))
                 .where(
                     REQUEST.SAMPLE_ID.eq(request.sample!!.id),
                     REQUEST.SERVICE_ID.eq(request.service!!.id)
@@ -177,7 +203,9 @@ interface RequestDao: QueryDao {
                                     key("name").value(EXTENSION.NAME),
                                     key("value").value(SAMPLE_EXTENSION.VALUE),
                                     key("regex").value(EXTENSION.REGEX),
-                                    key("type").value(EXTENSION.TYPE)
+                                    key("type").value(EXTENSION.TYPE),
+                                    key("required").value(SERVICE_EXTENSION.REQUIRED),
+                                    key("sort_extension").value(SERVICE_EXTENSION.SORT_EXTENSION)
                                 ))
                         ).from(EXTENSION)
                             .join(SERVICE_EXTENSION).on(SERVICE_EXTENSION.EXTENSION_ID.eq(EXTENSION.ID))
