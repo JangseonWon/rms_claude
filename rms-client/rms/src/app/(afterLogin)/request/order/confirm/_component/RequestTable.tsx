@@ -177,7 +177,7 @@ export default function RequestTable() {
                 <BlueButton name={'Confirm'} onClick={handleConfirmClick}/>
             </div>
             <div className={globalTableStyle.formGroupBetween}>
-                <div>
+                <div style={{ position: "relative", zIndex: 3 }}>
                     <DatePickerRangeBox
                         label={"from-to"}
                         onChange={(from, to) => {
