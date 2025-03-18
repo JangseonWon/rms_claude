@@ -324,7 +324,7 @@ export default function CartInfo({serviceId, sampleId, requestGroupId, userId, c
                             />
                         </div>
                         {request.sample?.extensions && (
-                            <CartInfoExtensionComponent extensions={request.sample.extensions}/>
+                            <CartInfoExtensionComponent/>
                         )}
                         <div className={style.memoSection}>
                             <TextBox
