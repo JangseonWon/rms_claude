@@ -187,7 +187,7 @@ export default function DownloadTable() {
     return (
         <div className={globalTableStyle.container}>
             <div className={globalTableStyle.formGroupRight}>
-                <BlueButton name={"Batch Download"} onClick={handleBatchDownloadClick}/>
+                <BlueButton name={"Bulk Download"} onClick={handleBatchDownloadClick}/>
             </div>
             <div className={globalTableStyle.formGroupBetween}>
                 <div>
