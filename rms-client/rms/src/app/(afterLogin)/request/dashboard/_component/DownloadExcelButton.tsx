@@ -37,22 +37,6 @@ export default function DownloadExcelButton({ search, status }: DownloadExcelBut
             .join(' ');
     };
 
-    const formatDate = (year: number | undefined, month: number | undefined, day: number | undefined) => {
-        const parts = [];
-
-        if (year !== undefined) {
-            parts.push(year.toString());
-        }
-        if (month !== undefined) {
-            parts.push(format(new Date(year ?? 0, month - 1, 1), "MMM"));
-        }
-        if (day !== undefined) {
-            parts.push(day.toString());
-        }
-
-        return parts.length > 0 ? parts.join('-') : '-';
-    };
-
     const downloadExcel = async () => {
         const requestData = await fetchData(search);
 
@@ -62,7 +46,7 @@ export default function DownloadExcelButton({ search, status }: DownloadExcelBut
         }
 
         const headers = [
-            "Order Date\n(DD-MM-YYYY)",
+            "Order Date\n(YYYY-MM-DD)",
             "Registration ID",
             "User Name",
             "Institution",
@@ -71,11 +55,10 @@ export default function DownloadExcelButton({ search, status }: DownloadExcelBut
             "MRN",
             "Patient BOD",
             "Current Status",
-            "Report Date\n(DD-MM-YYYY)",
         ];
 
         const data = requestData.map(row => ({
-            "Order Date\n(DD-MM-YYYY)": row.create_at ? format(new Date(row.create_at), "dd-MM-yyyy") : '-',
+            "Order Date\n(YYYY-MM-DD)": row.create_at ? format(new Date(row.create_at), "yyyy-MM-dd") : '-',
             "Registration ID": row.sample!.barcode,
             "User Name": row.sample!.patient!.organization!.user!.id,
             "Institution": row.sample!.patient!.organization!.id,
@@ -83,10 +66,8 @@ export default function DownloadExcelButton({ search, status }: DownloadExcelBut
             "Patient(s) Name": row.sample!.patient!.name,
             "MRN": row.sample!.patient!.serial,
             "Patient BOD": row.sample?.patient ?
-                formatDate(row.sample.patient.birth_year, row.sample.patient.birth_month, row.sample.patient.birth_day) : '-',
-            "Current Status": formatStatus(row.status!),
-            "Report Date\n(DD-MM-YYYY)": row.report?.create_at && !isNaN(new Date(row.report.create_at).getTime()) ?
-                format(new Date(row.report.create_at!), "dd-MM-yyyy") : '-'
+                `${row.sample.patient.birth_year}-${row.sample.patient.birth_month}-${row.sample.patient.birth_day}` : '-',
+            "Current Status": formatStatus(row.status!)
         }));
 
         const worksheet = XLSX.utils.json_to_sheet(data, { header: headers });

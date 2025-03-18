@@ -8,7 +8,11 @@ import SelectBox from "@/app/_component/SelectBox";
 import TextBox from "@/app/_component/TextBox";
 import SearchProbandModal
     from "@/app/(afterLogin)/request/services/[service]/single/_component/extension/SearchProbandModal";
-import {useProbandModalOpen, useSetProbandModalOpen, useProbandRequest} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
+import {
+    useProbandModalOpen,
+    useProbandRequest,
+    useSetProbandModalOpen
+} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
 import {useRequestStore} from "@/store/useRequestStore";
 
 

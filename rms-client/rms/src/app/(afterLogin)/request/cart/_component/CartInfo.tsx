@@ -7,7 +7,6 @@ import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import SelectBox from "@/app/_component/SelectBox"
 import React, {useCallback, useEffect, useState} from "react";
-import {getRequest} from "@/app/(afterLogin)/request/cart/_api/getRequest";
 import {Request} from "@/model/Request"
 import InputBox from "@/app/_component/InputBox";
 import Loading from "@/app/(afterLogin)/_component/Loading";
@@ -23,12 +22,14 @@ import TextBox from "@/app/_component/TextBox";
 import classNames from "classnames";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 import CartInfoExtensionComponent from "@/app/(afterLogin)/request/cart/_component/CartInfoExtensionComponent";
-import {Extension, ExtensionType} from "@/model/Extension";
 import {format} from "date-fns";
 import {useRequestStore} from "@/store/useRequestStore";
-import {useProbandRequest, useSetProbandRequest} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
+import {useSetProbandRequest} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
 import {Query} from "@/model/Query";
 import {searchRequests} from "@/app/(afterLogin)/request/cart/_api/searchRequests";
+import {getDateFromComponents} from "@/app/_component/DateUtil";
+
+
 
 type Props = {
     serviceId: string;
@@ -164,11 +165,6 @@ export default function CartInfo({serviceId, sampleId, requestGroupId, userId, c
                 !extension.required || (extension.value != null && extension.value !== '')
         );
     };
-
-    const getDateFromComponents = (year?: number, month?: number, day?: number): Date | undefined => {
-        if (!year || !month || !day) return undefined;
-        return new Date(year, month - 1, day);
-    }
 
     const setAge = (birthDate: Date, samplingDate: Date): number => {
         let age = samplingDate.getFullYear() - birthDate.getFullYear();

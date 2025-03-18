@@ -32,7 +32,7 @@ const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(
                 readOnly={true}
                 onChange={onChange}
                 ref={ref}
-                placeholder="DD-MM-YYYY"
+                placeholder="YYYY-MM-DD"
             />
             <FontAwesomeIcon icon={faCalendarDays} className={style.icon} />
         </div>
@@ -86,7 +86,7 @@ export default function DatePickerBox({label, value, onChange, disable=false, re
                 disabled={disable}
                 selected={selectedDate}
                 onChange={handleDateChange}
-                dateFormat={"dd-MM-yyyy"}
+                dateFormat={"yyyy-MM-dd"}
                 showPopperArrow={false}
                 customInput={<CustomInput disabled={disable}/>}
                 renderCustomHeader={({

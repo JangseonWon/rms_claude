@@ -16,6 +16,7 @@ import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import {format} from "date-fns";
 import globalTableStyle from "@/css/globalTable.module.css";
 import {GrPowerReset} from "react-icons/gr";
+import {formatDateLocal} from "@/app/_component/DateUtil";
 
 export default function QuestionTable() {
     const router = useRouter();
@@ -200,7 +201,7 @@ export default function QuestionTable() {
                                     {row.comment_count}
                                 </td>
                                 <td>{row.user?.name}</td>
-                                <td>{row.create_at ? format(new Date(row.create_at), "dd-MM-yyyy") : '-'}</td>
+                                <td>{row.create_at ? formatDateLocal(new Date(row.create_at)) : '-'}</td>
                             </tr>
                         );
                     })) : (

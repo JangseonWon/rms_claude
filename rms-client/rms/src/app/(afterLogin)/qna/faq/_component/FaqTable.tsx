@@ -18,6 +18,7 @@ import {useSession} from "next-auth/react";
 import globalTableStyle from "@/css/globalTable.module.css";
 import {GrPowerReset} from "react-icons/gr";
 import {Role} from "@/model/Role";
+import {formatDateLocal} from "@/app/_component/DateUtil";
 
 export default function FaqTable() {
     const router = useRouter();
@@ -204,7 +205,7 @@ export default function FaqTable() {
                                     {row.comment_count}
                                 </td>
                                 <td>{row.user?.name}</td>
-                                <td>{row.create_at ? format(new Date(row.create_at), "dd-MM-yyyy") : '-'}</td>
+                                <td>{row.create_at ? formatDateLocal(new Date(row.create_at)) : '-'}</td>
                             </tr>
                         );
                     }) ) : (

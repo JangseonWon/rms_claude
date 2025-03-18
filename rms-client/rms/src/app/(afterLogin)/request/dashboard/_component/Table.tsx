@@ -5,7 +5,6 @@ import style from "@/app/(afterLogin)/request/dashboard/_component/table.module.
 import globalTableStyle from "@/css/globalTable.module.css";
 import type {Request} from "@/model/Request";
 import {postRequests} from "@/app/(afterLogin)/request/dashboard/_api/postRequests";
-import {format} from "date-fns";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
@@ -18,6 +17,7 @@ import {Status} from "@/model/Status";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import {GrPowerReset} from "react-icons/gr";
 import CellTooltip from "@/app/_component/CellToolTip";
+import {formatDateLocal, getStringDateFromComponents} from "@/app/_component/DateUtil";
 
 export default function Table() {
     const [requestData, setRequestData] = useState<Request[]>([]);
@@ -136,14 +136,6 @@ export default function Table() {
         setSearchValue(value);
     };
 
-    const formatDate = (year: number | undefined, month: number | undefined, day: number | undefined) => {
-        if (year !== undefined && month !== undefined && day !== undefined) {
-            const date = new Date(year, month - 1, day);
-            return format(date, "dd-MM-yyyy");
-        }
-        return "-";
-    };
-
     const addDateFilter = (from: Date | null, to: Date | null) => {
         if (!from || !to) return;
 
@@ -162,13 +154,13 @@ export default function Table() {
                             {
                                 table: "request",
                                 column: "create_at",
-                                value: format(from, "yyyy-MM-dd"),
+                                value: formatDateLocal(from),
                                 operator: ">="
                             },
                             {
                                 table: "request",
                                 column: "create_at",
-                                value: format(to, "yyyy-MM-dd"),
+                                value: formatDateLocal(to),
                                 operator: "<="
                             }
                         ]
@@ -226,21 +218,21 @@ export default function Table() {
             <table className={style.table}>
                 <thead>
                 <tr>
-                    <th>Order Date<br/>(DD-MM-YYYY)</th>
+                    <th>Order Date<br/>(YYYY-MM-DD)</th>
                     <th>Registration ID</th>
                     <th>User Name</th>
                     <th>Institution</th>
                     <th>Service</th>
                     <th>Patient(s) Name</th>
                     <th>MRN</th>
-                    <th>Patient BOD<br/>(DD-MM-YYYY)</th>
+                    <th>Patient BOD<br/>(YYYY-MM-DD)</th>
                     <th>Current Status</th>
                 </tr>
                 </thead>
                 <tbody>
                 {requestData && requestData.length > 0 ? ( requestData.map((request) => (
                     <tr key={`${request.service!.id}${request.sample!.id}`}>
-                        <td className={globalTableStyle.shortColumn}><CellTooltip text={request.create_at ? format(new Date(request.create_at), "dd-MM-yyyy") : '-'}/></td>
+                        <td className={globalTableStyle.shortColumn}><CellTooltip text={request.create_at ? formatDateLocal(new Date(request.create_at)) : '-'}/></td>
                         <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample!.barcode}/></td>
                         <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample!.patient!.organization!.user!.name}/></td>
                         <td className={globalTableStyle.shortColumn}><CellTooltip text={request.sample!.patient!.organization!.id}/></td>
@@ -248,7 +240,7 @@ export default function Table() {
                         <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample!.patient!.name}/></td>
                         <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample!.patient!.serial}/></td>
                         <td className={globalTableStyle.shortColumn}><CellTooltip text={request.sample?.patient ?
-                            formatDate(request.sample.patient.birth_year, request.sample.patient.birth_month, request.sample.patient.birth_day) : '-'}/>
+                            getStringDateFromComponents(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day) : '-'}/>
                         </td>
                         <td className={globalTableStyle.shortColumn}><CellTooltip text={request.status}/></td>
                     </tr>

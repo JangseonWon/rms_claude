@@ -9,7 +9,8 @@ import SelectBox from "@/app/_component/SelectBox";
 import TextBox from "@/app/_component/TextBox";
 import {
     useProbandRequest,
-    useSetProbandModalOpen, useSetProbandRequest
+    useSetProbandModalOpen,
+    useSetProbandRequest
 } from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 import {useRequestStore} from "@/store/useRequestStore";

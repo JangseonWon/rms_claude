@@ -11,14 +11,14 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faArrowLeft, faArrowUpFromBracket, faTimes} from "@fortawesome/free-solid-svg-icons";
 import BlueButton from "@/app/_component/BlueButton";
 import {
+    categoryUUID,
     handleDragLeave,
     handleDragOver,
     handleDrop,
     handleFileChange,
     handleUploadClick,
     removeFile,
-    renderFileIcon,
-    categoryUUID
+    renderFileIcon
 } from "@/app/(afterLogin)/qna/_component/QnaUtils";
 import {fetchSendToJandi} from "@/app/(afterLogin)/qna/_api/fetchSendToJandi";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";

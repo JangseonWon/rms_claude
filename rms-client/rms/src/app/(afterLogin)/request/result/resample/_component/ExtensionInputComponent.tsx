@@ -7,7 +7,7 @@ import {Extension, ExtensionType} from "@/model/Extension";
 import InputBox from "@/app/_component/InputBox";
 import SelectBox from "@/app/_component/SelectBox";
 import TextBox from "@/app/_component/TextBox";
-import { useRequestStore } from '@/store/useRequestStore';
+import {useRequestStore} from '@/store/useRequestStore';
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 interface ExtensionInputComponentProps {

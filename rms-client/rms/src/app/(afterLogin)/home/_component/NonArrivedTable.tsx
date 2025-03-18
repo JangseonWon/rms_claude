@@ -14,6 +14,8 @@ import {Status} from "@/model/Status";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import SelectBox from "@/app/_component/SelectBox";
 import InputBox from "@/app/_component/InputBox";
+import {formatDateLocal, getStringDateFromComponents} from "@/app/_component/DateUtil";
+
 
 const selectBoxOptions: SelectBoxOption[] = [
     { table: "sample", column: "barcode", name: "Registration ID" },
@@ -123,13 +125,13 @@ export default function NonArrivedTable() {
                                         {
                                             table: "request",
                                             column: "create_at",
-                                            value: from.toLocaleDateString('en-CA'),
+                                            value: formatDateLocal(from) ,
                                             operator: ">="
                                         },
                                         {
                                             table: "request",
                                             column: "create_at",
-                                            value: to.toLocaleDateString('en-CA'),
+                                            value: formatDateLocal(to) ,
                                             operator: "<="
                                         }
                                     ]
@@ -166,15 +168,15 @@ export default function NonArrivedTable() {
                 <table className={globalTableStyle.table}>
                     <thead>
                     <tr>
-                        <th>Order Date<br/>(DD-MM-YYYY)</th>
-                        <th>Confirmed Date<br/>(DD-MM-YYYY)</th>
+                        <th>Order Date<br/>(YYYY-MM-DD)</th>
+                        <th>Confirmed Date<br/>(YYYY-MM-DD)</th>
                         <th>Registration ID</th>
                         <th>User Name</th>
                         <th>Institution</th>
                         <th>Patient(s) Name</th>
                         <th>Service</th>
                         <th>MRN</th>
-                        <th>Patient BOD<br/>(DD-MM-YYYY)</th>
+                        <th>Patient BOD<br/>(YYYY-MM-DD)</th>
                         <th>Global<br/>courier</th>
                         <th>Airwaybill</th>
                     </tr>
@@ -182,15 +184,15 @@ export default function NonArrivedTable() {
                     <tbody>
                     {requestData && requestData.length > 0 ? ( requestData.map((request, rowIndex) => (
                         <tr key={rowIndex}>
-                            <td>{request.create_at ? new Date(request.create_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
-                            <td>{request.confirmed_at ? new Date(request.confirmed_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
+                            <td>{request.create_at ? formatDateLocal(new Date(request.create_at))  : ''}</td>
+                            <td>{request.confirmed_at ? formatDateLocal(new Date(request.confirmed_at))  : ''}</td>
                             <td>{request.sample?.barcode}</td>
                             <td>{request.user?.name}</td>
                             <td>{request.sample?.patient?.organization?.name}</td>
                             <td>{request.sample?.patient?.name}</td>
                             <td>{request.service?.name}</td>
                             <td>{request.sample?.patient?.serial}</td>
-                            <td>{request.sample?.patient?.birth_day}-{request.sample?.patient?.birth_month}-{request.sample?.patient?.birth_year}</td>
+                            <td>{getStringDateFromComponents(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}</td>
                             <td>{request.courier_company}</td>
                             <td>{request.awb_number}</td>
                         </tr>

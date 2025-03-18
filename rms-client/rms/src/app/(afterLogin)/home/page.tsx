@@ -4,7 +4,6 @@ import NavMenu from "@/app/(afterLogin)/_component/NavMenu";
 import style from './page.module.css';
 import {auth} from "@/auth";
 import NonArrivedTable from "@/app/(afterLogin)/home/_component/NonArrivedTable";
-import OrderBoard from "@/app/(afterLogin)/home/_component/OrderBoard";
 import Statistics from "@/app/(afterLogin)/home/_component/Statistics";
 
 export default async function Page() {

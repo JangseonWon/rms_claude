@@ -7,7 +7,6 @@ import type {Statistics} from "@/model/Statistics";
 import {getStatisticsRequest} from "@/app/(afterLogin)/home/_api/getStatisticsRequest";
 import Loading from "@/app/(afterLogin)/_component/Loading";
 import classNames from "classnames";
-import {Alarm} from "@/model/Alarm";
 
 
 export default function OrderBoard() {

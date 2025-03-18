@@ -26,6 +26,7 @@ import {
     useSetMessageNoticeDialog,
     useSetOkNotice
 } from "@/store/useNoticeDialogStore";
+import {formatDateLocal} from "@/app/_component/DateUtil";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -172,7 +173,7 @@ export default function CartTable() {
     const formatDate = (year: number | undefined, month: number | undefined, day: number | undefined) => {
         if (year !== undefined && month !== undefined && day !== undefined) {
             const date = new Date(year, month - 1, day);
-            return format(date, "dd-MM-yyyy");
+            return format(date, "yyyy-MM-dd");
         }
         return "-";
     };
@@ -235,10 +236,10 @@ export default function CartTable() {
                         <th className={globalTableStyle.middleColumn}>Institution</th>
                         <th className={globalTableStyle.longColumn}>Patient(s) Name</th>
                         <th className={globalTableStyle.longColumn}>Service</th>
-                        <th className={globalTableStyle.middleColumn}>Patient BOD<br/>(DD-MM-YYYY)</th>
+                        <th className={globalTableStyle.middleColumn}>Patient BOD<br/>(YYYY-MM-DD)</th>
                         <th className={globalTableStyle.shortColumn}>Gender</th>
                         <th className={globalTableStyle.longColumn}>MRN</th>
-                        <th className={globalTableStyle.middleColumn}>Collection Date<br/>(DD-MM-YYYY)</th>
+                        <th className={globalTableStyle.middleColumn}>Collection Date<br/>(YYYY-MM-DD)</th>
                         <th className={globalTableStyle.shortColumn}>Info</th>
                     </tr>
                     </thead>
@@ -264,7 +265,7 @@ export default function CartTable() {
                                 </td>
                                 <td className={globalTableStyle.shortColumn}>{request.sample!.patient!.sex}</td>
                                 <td className={globalTableStyle.longColumn}>{request.sample!.patient!.serial}</td>
-                                <td className={globalTableStyle.middleColumn}>{request.sample?.sampling_on! ? format(new Date(request.sample?.sampling_on!), "dd-MM-yyyy") : '-'}</td>
+                                <td className={globalTableStyle.middleColumn}>{request.sample?.sampling_on! ? formatDateLocal(new Date(request.sample?.sampling_on)) : '-'}</td>
                                 <td className={globalTableStyle.shortColumn}>
                                     <FontAwesomeIcon
                                         icon={faFileLines}

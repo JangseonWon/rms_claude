@@ -22,6 +22,7 @@ import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 import CellTooltip from "@/app/_component/CellToolTip";
 import style from "@/css/qna/qnaTable.module.css";
 import {GrPowerReset} from "react-icons/gr";
+import {formatDateLocal} from "@/app/_component/DateUtil";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -200,13 +201,13 @@ export default function DownloadTable() {
                                         {
                                             table: "request",
                                             column: "create_at",
-                                            value: from?.toLocaleDateString('en-CA'),
+                                            value: formatDateLocal(from),
                                             operator: ">="
                                         },
                                         {
                                             table: "request",
                                             column: "create_at",
-                                            value: to.toLocaleDateString('en-CA'),
+                                            value: formatDateLocal(to),
                                             operator: "<="
                                         }
                                     ]
@@ -257,14 +258,14 @@ export default function DownloadTable() {
                                 <span className={globalTableStyle.checkmark}></span>
                             </label>
                         </th>
-                        <th className={globalTableStyle.middleColumn}>Order Date<br/>(DD-MM-YYYY)</th>
+                        <th className={globalTableStyle.middleColumn}>Order Date<br/>(YYYY-MM-DD)</th>
                         <th className={globalTableStyle.longColumn}>User Name</th>
                         <th className={globalTableStyle.middleColumn}>Institution</th>
                         <th className={globalTableStyle.longColumn}>Registration ID</th>
                         <th className={globalTableStyle.longColumn}>Service</th>
                         <th className={globalTableStyle.longColumn}>Patient(s) Name</th>
                         <th className={globalTableStyle.longColumn}>MRN</th>
-                        <th className={globalTableStyle.middleColumn}>Report Date<br/>(DD-MM-YYYY)</th>
+                        <th className={globalTableStyle.middleColumn}>Report Date<br/>(YYYY-MM-DD)</th>
                         <th className={globalTableStyle.middleColumn}>Status</th>
                         <th className={globalTableStyle.middleColumn}>Report Download</th>
                     </tr>
@@ -283,14 +284,14 @@ export default function DownloadTable() {
                                     <span className={globalTableStyle.checkmark}></span>
                                 </label>
                             </td>
-                            <td className={globalTableStyle.middleColumn}>{request.create_at ? new Date(request.create_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
+                            <td className={globalTableStyle.middleColumn}>{request.create_at ? formatDateLocal(new Date(request.create_at)) : ''}</td>
                             <td className={globalTableStyle.longColumn}><CellTooltip text={request.user?.name}/></td>
                             <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample?.patient?.organization?.name}/></td>
                             <td className={globalTableStyle.longColumn}>{request.sample?.barcode}</td>
                             <td className={globalTableStyle.longColumn}><CellTooltip text={request.service?.name}/></td>
                             <td className={globalTableStyle.longColumn}><CellTooltip text={request.sample?.patient?.name}/></td>
                             <td className={globalTableStyle.longColumn}>{request.sample?.patient?.serial}</td>
-                            <td className={globalTableStyle.middleColumn}>{request.lims_completed_at ? new Date(request.lims_completed_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
+                            <td className={globalTableStyle.middleColumn}>{request.lims_completed_at ? formatDateLocal(new Date(request.lims_completed_at)) : ''}</td>
                             <td className={globalTableStyle.middleColumn}>{request.status}</td>
                             <td className={globalTableStyle.middleColumn}>
                                 {(request.reports as Report[])

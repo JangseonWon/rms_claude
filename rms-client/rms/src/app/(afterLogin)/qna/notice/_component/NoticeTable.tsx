@@ -19,6 +19,7 @@ import {useSession} from "next-auth/react";
 import {putPostReadByUserId} from "@/app/(afterLogin)/qna/_api/putPostReadByUserId";
 import {GrPowerReset} from "react-icons/gr";
 import {Role} from "@/model/Role";
+import {formatDateLocal} from "@/app/_component/DateUtil";
 
 export default function NoticeTable() {
     const router = useRouter();
@@ -210,7 +211,7 @@ export default function NoticeTable() {
                                     {row.comment_count}
                                 </td>
                                 <td>{row.user?.name}</td>
-                                <td>{row.create_at ? format(new Date(row.create_at), "dd-MM-yyyy") : '-'}</td>
+                                <td>{row.create_at ? formatDateLocal(new Date(row.create_at)) : '-'}</td>
                             </tr>
                         );
                     })): (

@@ -16,9 +16,9 @@ import {Query} from "@/model/Query";
 import {useSetProbandRequest} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 import {postRequests} from "@/app/(afterLogin)/request/services/[service]/single/_api/postRequests";
-import {format} from "date-fns";
 import {useRequestStore} from "@/store/useRequestStore";
 import {Filter} from "@/model/Filter";
+import {getStringDateFromComponents} from "@/app/_component/DateUtil";
 
 type Props = {
     closeModal: () => void;
@@ -115,14 +115,6 @@ export default function SearchProbandModal({ closeModal }: Props) {
         fetchRequests(updateSearch);
     }, [search, searchFilter]);
 
-    const formatDate = (year: number | undefined, month: number | undefined, day: number | undefined) => {
-        if (year !== undefined && month !== undefined && day !== undefined) {
-            const date = new Date(year, month - 1, day);
-            return format(date, "dd-MMM-yyyy");
-        }
-        return "-";
-    };
-
     return (
         <div className={style.modalBackground}>
             <div className={style.modal}>
@@ -193,7 +185,7 @@ export default function SearchProbandModal({ closeModal }: Props) {
                                     <td>{request.sample?.barcode}</td>
                                     <td>{request.sample?.patient?.name}</td>
                                     <td>{request.sample?.patient?.serial}</td>
-                                    <td>{formatDate(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}</td>
+                                    <td>{getStringDateFromComponents(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}</td>
                                 </tr>
                             ))
                             ) : (

@@ -4,7 +4,9 @@ import style from './listServicePage.module.css';
 import {useSelectCategory, useSetSelectCategory} from "@/store/useCategoryStore";
 import React, {useEffect, useState} from "react";
 import Image from "next/image";
-import {getServicesByCategoryId} from "@/app/(afterLogin)/request/services/[service]/single/_api/getServicesByCategoryId";
+import {
+    getServicesByCategoryId
+} from "@/app/(afterLogin)/request/services/[service]/single/_api/getServicesByCategoryId";
 import {Service} from "@/model/Service";
 import {Categories} from "@/model/Categories";
 import {useRouter} from "next/navigation";

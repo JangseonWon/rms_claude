@@ -14,13 +14,18 @@ import GreenButton from "@/app/_component/GreenButton";
 import BlueButton from "@/app/_component/BlueButton";
 import {format} from "date-fns";
 import {usePathname} from "next/navigation";
-import ExtensionInputComponent from "@/app/(afterLogin)/request/services/[service]/single/_component/extension/ExtensionInputComponent";
+import ExtensionInputComponent
+    from "@/app/(afterLogin)/request/services/[service]/single/_component/extension/ExtensionInputComponent";
 import TextBox from "@/app/_component/TextBox";
 import genomeImg from "@/../public/GCgenome_white.png";
 import logo from "@/css/orderGenomeLogo.module.css";
 import Image from "next/image";
-import SearchProbandModal from "@/app/(afterLogin)/request/services/[service]/single/_component/extension/SearchProbandModal";
-import {useProbandModalOpen, useSetProbandModalOpen} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
+import SearchProbandModal
+    from "@/app/(afterLogin)/request/services/[service]/single/_component/extension/SearchProbandModal";
+import {
+    useProbandModalOpen,
+    useSetProbandModalOpen
+} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
 import {useRequestStore} from "@/store/useRequestStore";
 import {putRequest} from "@/app/(afterLogin)/request/services/[service]/single/_api/putRequest";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";

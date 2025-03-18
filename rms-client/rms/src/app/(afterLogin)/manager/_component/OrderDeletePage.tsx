@@ -19,6 +19,7 @@ import BlueButton from "@/app/_component/BlueButton";
 import {deleteOrder} from "@/app/(afterLogin)/manager/_api/deleteOrder";
 import {format} from "date-fns";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
+import {formatDateLocal} from "@/app/_component/DateUtil";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -210,7 +211,7 @@ export default function OrderDeletePage() {
                                             <span className={style.checkmark}></span>
                                         </label>
                                     </th>
-                                    <th>Order Date<br/>(DD-MM-YYYY)</th>
+                                    <th>Order Date<br/>(YYYY-MM-DD)</th>
                                     <th>User ID</th>
                                     <th>User Name</th>
                                     <th>Institution</th>
@@ -235,7 +236,7 @@ export default function OrderDeletePage() {
                                                 <span className={style.checkmark}></span>
                                             </label>
                                         </td>
-                                        <td>{request.create_at ? new Date(request.create_at).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}</td>
+                                        <td>{request.create_at ? formatDateLocal(new Date(request.create_at)) : ''}</td>
                                         <td>{request.user?.id}</td>
                                         <td>{request.user?.name}</td>
                                         <td>{request.sample?.patient?.organization?.name}</td>

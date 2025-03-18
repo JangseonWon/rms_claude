@@ -32,7 +32,7 @@ const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(
                 onClick={onClick}
                 onChange={onChange}
                 ref={ref}
-                placeholder="DD-MM-YYYY~DD-MM-YYYY"
+                placeholder="YYYY-MM-DD~YYYY-MM-DD"
             />
             <FontAwesomeIcon icon={faCalendarDays} className={style.icon} />
         </div>
@@ -124,7 +124,7 @@ export default function DatePickerRangeBox({label, value, onChange, required = f
                 selectsRange={true}
                 startDate={startDate}
                 endDate={endDate}
-                dateFormat={"dd-MM-yyyy"}
+                dateFormat={"yyyy-MM-dd"}
                 showPopperArrow={false}
                 onChange={(update) => {
                     const selectedDates = update as unknown as [Date | null, Date | null];

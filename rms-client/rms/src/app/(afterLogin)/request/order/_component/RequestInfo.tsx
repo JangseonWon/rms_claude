@@ -13,6 +13,7 @@ import classNames from "classnames";
 import scroll from "@/css/scrollBar.module.css";
 import RequestInfoExtensionComponent from "@/app/(afterLogin)/request/order/_component/RequestInfoExtensionComponent";
 import TextBox from "@/app/_component/TextBox";
+import {getStringDateFromComponents} from "@/app/_component/DateUtil";
 
 type Props = {
     serviceId: string;
@@ -49,19 +50,6 @@ export default function RequestInfo({serviceId, sampleId, closeModal}: Props) {
         const json = await response.json()
         setRequest(json as Request)
     },[serviceId, sampleId]);
-
-    const formatDate = (date: Date): string => {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    };
-
-    const getDateFromComponents = (year?: number, month?: number, day?: number): string | undefined => {
-        if (!year || !month || !day) return undefined;
-        const date = new Date(year, month - 1, day);
-        return formatDate(date);
-    };
 
     useEffect(() => {
         fetchRequest()
@@ -113,7 +101,7 @@ export default function RequestInfo({serviceId, sampleId, closeModal}: Props) {
                             />
                             <InputBox
                                 label={"Date of Birth"}
-                                value={getDateFromComponents(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}
+                                value={getStringDateFromComponents(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}
                                 disabled={true}
                             />
                         </div>
