@@ -30,7 +30,7 @@ class Router (
             .flatMap { handler.login(it) }
             .map { token -> ResponseCookie.from("Authorization", token).httpOnly(true).path("/w-api").secure(true).maxAge(duration).build() }
             .flatMap { ServerResponse.ok().cookie(it).build() }
-            .onErrorResume (UserNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
+            .onErrorResume (UserNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}") }
     }
 
     private fun signup(request: ServerRequest): Mono<ServerResponse> {

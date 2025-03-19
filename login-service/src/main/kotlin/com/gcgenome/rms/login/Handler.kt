@@ -3,6 +3,7 @@ package com.gcgenome.rms.login
 import com.gcgenome.rms.authenticate.TokenFactory
 import com.gcgenome.rms.dao.UserDao
 import com.gcgenome.rms.dao.UserHistoryDao
+import com.gcgenome.rms.data.State
 import com.gcgenome.rms.data.UserHistoryDTO
 import com.gcgenome.rms.exceptions.UserNotFoundException
 import com.gcgenome.rms.tables.pojos.User
@@ -24,6 +25,7 @@ class Handler(
 ):UserDao, UserHistoryDao {
     fun login(user: User): Mono<String>{
         return dslContext.dsl().selectUserById(user.id!!)
+            .filter { State.valueOf(it.state!!) == State.ACTIVE }
             .filter { encoder.matches(user.password, it.password) }
             .switchIfEmpty(Mono.error(UserNotFoundException()))
             .map(token::publish)
