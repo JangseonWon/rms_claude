@@ -61,14 +61,15 @@ export default function Order() {
 
     const handleFileUpload = useCallback((data: any[]) => {
         const headers = data[0];
+        const cleanHeaders = headers.map((header: string) => header.replace(/\s*\*$/, ''));
         const bodyData = data.slice(1);
 
         const mappedData = bodyData.map((row: any) => {
             const mapByHeader = (header: string) => {
-                const index = headers.indexOf(header);
+                const index = cleanHeaders.indexOf(header);
                 return index !== -1 ? row[index] : undefined;
             };
-            const extensionFields = headers.slice(10);
+            const extensionFields = cleanHeaders.slice(10);
             const extensions = extensionFields.reduce((acc: Record<string, string | number | boolean>, field: string, idx: number) => {
                 const value = row[10 + idx];
                 acc[field] = value === false || value ? value : '';
