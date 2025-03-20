@@ -1,7 +1,7 @@
 import {Query} from "@/model/Query";
 
-export async function postServices(query: Query) {
-    return await fetch(`/w-api/management-service/services/search`, {
+export async function postRequests(query: Query) {
+    return await fetch(`/w-api/management-service/requests/search`, {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",

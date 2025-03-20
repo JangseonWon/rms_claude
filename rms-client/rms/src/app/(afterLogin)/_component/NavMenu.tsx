@@ -158,6 +158,14 @@ export default function NavMenu() {
                 {showManagementDropdown && session?.user.role !== Role.USER.valueOf() && (
                     <>
                         <ol>
+                            <Link href={"/request/management/request"}>
+                                <span
+                                    className={pathname === "/request/management/request" ? style.activeLink : ""}>
+                                    Request Management
+                                </span>
+                            </Link>
+                        </ol>
+                        <ol>
                             <Link href={"/request/management/user"}>
                                 <span className={pathname === "/request/management/user" ? style.activeLink : ""}>
                                     User Management
@@ -173,14 +181,16 @@ export default function NavMenu() {
                         </ol>
                         <ol>
                             <Link href={"/request/management/additional-info"}>
-                                <span className={pathname === "/request/management/additional-info" ? style.activeLink : ""}>
+                                <span
+                                    className={pathname === "/request/management/additional-info" ? style.activeLink : ""}>
                                     Additional info Management
                                 </span>
                             </Link>
                         </ol>
                         <ol>
                             <Link href={"/request/management/sample-type"}>
-                                <span className={pathname === "/request/management/sample-type" ? style.activeLink : ""}>
+                                <span
+                                    className={pathname === "/request/management/sample-type" ? style.activeLink : ""}>
                                     SampleType Management
                                 </span>
                             </Link>
