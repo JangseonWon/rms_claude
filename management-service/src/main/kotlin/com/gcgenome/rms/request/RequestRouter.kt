@@ -29,7 +29,7 @@ class RequestRouter(
     private val logger: Logger = LoggerFactory.getLogger(RequestRouter::class.java)
 
     private fun searchRequests(request: ServerRequest): Mono<ServerResponse> {
-        return authenticationHandler.chkAdmin(request)
+        return authenticationHandler.chkManager(request)
             .then(request.bodyToMono(Query::class.java))
             .flatMap { query ->  requestHandler.searchRequests(query) }
             .flatMap { ServerResponse.ok()

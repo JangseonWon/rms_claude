@@ -51,6 +51,8 @@ interface RequestDao: QueryDao {
             REQUEST.USER_SERVICE_ID.`as`("user_service_id"),
             REQUEST.STATUS.`as`("status"),
             REQUEST.PHYSICIAN.`as`("physician"),
+            REQUEST.COURIER_COMPANY.`as`("courier_company"),
+            REQUEST.AWB_NUMBER.`as`("awb_number"),
             REQUEST.CREATE_AT.`as`("create_at"),
             jsonObject(
                 key("id").value(REQUEST_GROUP.ID)
@@ -115,7 +117,7 @@ interface RequestDao: QueryDao {
             ).`as`("reports")
         )
         val groupByFields = listOf(
-            REQUEST.USER_SERVICE_ID, REQUEST.STATUS, REQUEST.PHYSICIAN, REQUEST.CREATE_AT,
+            REQUEST.USER_SERVICE_ID, REQUEST.STATUS, REQUEST.PHYSICIAN, REQUEST.CREATE_AT, REQUEST.COURIER_COMPANY, REQUEST.AWB_NUMBER,
             REQUEST_GROUP.ID, REQUEST_RELATION.ID,
             SERVICE.ID,
             USER.ID,
