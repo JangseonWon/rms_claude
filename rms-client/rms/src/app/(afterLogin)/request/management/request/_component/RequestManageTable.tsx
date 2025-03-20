@@ -15,6 +15,10 @@ import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import {format} from "date-fns";
 import {Filter} from "@/model/Filter";
 import {Status} from "@/model/Status";
+import CellTooltip from "@/app/_component/CellToolTip";
+import {GrPowerReset} from "react-icons/gr";
+import DownloadRequestExcelButton
+    from "@/app/(afterLogin)/request/management/request/_component/DownloadRequestExcelButton";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -64,6 +68,8 @@ export default function RequestManageTable() {
     const [requests, setRequests] = useState<RequestWithSelected[]>([]);
     const [totalPage, setTotalPage] = useState<number>(0);
     const [search, setSearch] = useState<Query>(defaultSearch);
+    const [fromDate, setFromDate] = useState<Date | null>(null);
+    const [toDate, setToDate] = useState<Date | null>(null);
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage =>({
@@ -104,8 +110,18 @@ export default function RequestManageTable() {
             };
         });
     };
+
+    const handleReset = () => {
+        setSearch(defaultSearch);
+        addDateFilter(null , null);
+        setFromDate(null);
+        setToDate(null);
+    };
+
     const addDateFilter = (from: Date | null, to: Date | null) => {
         if (!from || !to) return;
+        setFromDate(from);
+        setToDate(to);
 
         setSearch((prevSearch) => {
             const updatedFilters = (prevSearch.filter_groups || []).filter(group =>
@@ -161,12 +177,21 @@ export default function RequestManageTable() {
             <div className={globalTableStyle.container}>
                 <div className={globalTableStyle.formGroupBetween}>
                     <div>
+                        <DownloadRequestExcelButton
+                            from={fromDate}
+                            to={toDate}
+                            search={Object.fromEntries(Object.entries(search).filter(([key]) => !['page', 'size'].includes(key)))}
+                        />
                         <DatePickerRangeBox
                             label={"from-to"}
                             onChange={(from, to) => {
                                 addDateFilter(from, to);
                             }}
+                            maxMonthsRange={3}
                         />
+                        <GrPowerReset
+                            className={globalTableStyle.resetButton}
+                            onClick={handleReset}/>
                     </div>
                     <div>
                         <SelectBox
@@ -195,7 +220,7 @@ export default function RequestManageTable() {
                         <th>환자명</th>
                         <th>생년월일<br/>(YYYY-MM-DD)</th>
                         <th>성별</th>
-                        <th>담담의</th>
+                        <th>담당의</th>
                         <th>검체채취일<br/>(YYYY-MM-DD)</th>
                         <th>의뢰명</th>
                         <th>MRN</th>
@@ -208,19 +233,19 @@ export default function RequestManageTable() {
                     {requests && requests.length > 0 && requests.map((request, rowIndex) => (
                         <tr key={rowIndex}>
                             <td className={globalTableStyle.middleColumn}>{request.create_at ? formatDateLocal(new Date(request.create_at)) : ''}</td>
-                            <td className={globalTableStyle.longColumn}>{request.user?.name}</td>
-                            <td className={globalTableStyle.longColumn}>{request.sample?.patient?.organization?.name}</td>
-                            <td className={globalTableStyle.longColumn}>{request.sample?.barcode}</td>
-                            <td className={globalTableStyle.longColumn}>{request.sample?.patient?.name}</td>
+                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.user?.name}/></td>
+                            <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample?.patient?.organization?.name}/></td>
+                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.sample?.barcode}/></td>
+                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.sample?.patient?.name}/></td>
                             <td className={globalTableStyle.middleColumn}>{getStringDateFromComponents(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}</td>
                             <td className={globalTableStyle.shortColumn}>{request.sample?.patient?.sex}</td>
-                            <td className={globalTableStyle.shortColumn}>{request.physician}</td>
+                            <td className={globalTableStyle.middleColumn}><CellTooltip text={request.physician}/></td>
                             <td className={globalTableStyle.middleColumn}>{request.sample?.sampling_on ? formatDateLocal(new Date(request.sample.sampling_on)) : '-'}</td>
-                            <td className={globalTableStyle.longColumn}>{request.service?.name}</td>
-                            <td className={globalTableStyle.shortColumn}>{request.sample?.patient?.serial}</td>
-                            <td className={globalTableStyle.shortColumn}>{request.service?.id}</td>
-                            <td className={globalTableStyle.shortColumn}>{request.courier_company}</td>
-                            <td className={globalTableStyle.shortColumn}>{request.awb_number}</td>
+                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.service?.name}/></td>
+                            <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample?.patient?.serial}/></td>
+                            <td className={globalTableStyle.shortColumn}><CellTooltip text={request.service?.id}/></td>
+                            <td className={globalTableStyle.shortColumn}><CellTooltip text={request.courier_company}/></td>
+                            <td className={globalTableStyle.middleColumn}><CellTooltip text={request.awb_number}/></td>
                         </tr>
                     ))}
                     </tbody>

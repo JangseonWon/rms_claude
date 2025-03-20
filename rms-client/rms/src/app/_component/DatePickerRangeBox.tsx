@@ -7,7 +7,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import '@/app/globals.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCalendarDays} from "@fortawesome/free-regular-svg-icons";
-import {getMonth, getYear} from "date-fns";
+import {getMonth, getYear, addMonths} from "date-fns";
 import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
 
 type Props = {
@@ -17,6 +17,7 @@ type Props = {
     required?: boolean
     fromDate?: Date | null
     toDate?: Date | null
+    maxMonthsRange?: number
 }
 interface CustomInputProps extends Omit<ReactDatePickerProps, 'onChange'> {
     onClick?(): void;
@@ -48,7 +49,7 @@ const range = (start: number, end: number, step: number) => {
     return output;
 };
 
-export default function DatePickerRangeBox({label, value, onChange, required = false, fromDate, toDate}: Props) {
+export default function DatePickerRangeBox({label, value, onChange, required = false, fromDate, toDate, maxMonthsRange}: Props) {
     const years = range(1900, getYear(new Date()) + 1, 1);
     const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([fromDate || null, toDate || null]);
     const [startDate, endDate] = dateRange;
@@ -66,6 +67,11 @@ export default function DatePickerRangeBox({label, value, onChange, required = f
         "November",
         "December",
     ];
+
+    const maxSelectableDate = (startDate && maxMonthsRange)
+        ? addMonths(startDate, maxMonthsRange)
+        : undefined;
+
     return (
         <div className={style.dateBox}>
             <p>{label}</p>
@@ -124,6 +130,7 @@ export default function DatePickerRangeBox({label, value, onChange, required = f
                 selectsRange={true}
                 startDate={startDate}
                 endDate={endDate}
+                maxDate={maxSelectableDate}
                 dateFormat={"yyyy-MM-dd"}
                 showPopperArrow={false}
                 onChange={(update) => {
