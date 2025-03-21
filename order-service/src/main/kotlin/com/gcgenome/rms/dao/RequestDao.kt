@@ -33,6 +33,7 @@ interface RequestDao: QueryDao {
             QueryDao.JoinInfo(USER, REQUEST.USER_ID.eq(USER.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(SAMPLE, REQUEST.SAMPLE_ID.eq(SAMPLE.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(SAMPLE_TYPE, SAMPLE.SAMPLE_TYPE_ID.eq(SAMPLE_TYPE.ID), QueryDao.JoinType.LEFT),
+            QueryDao.JoinInfo(REQUEST_RELATION, REQUEST.REQUEST_RELATION_ID.eq(REQUEST_RELATION.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(
                 PATIENT,
                 SAMPLE.PATIENT_SERIAL.eq(PATIENT.SERIAL)
@@ -54,6 +55,10 @@ interface RequestDao: QueryDao {
             REQUEST.STATUS.`as`("status"),
             REQUEST.PHYSICIAN.`as`("physician"),
             REQUEST.CREATE_AT.`as`("create_at"),
+            jsonObject(
+                key("id").value(REQUEST_RELATION.ID),
+                key("name").value(REQUEST_RELATION.NAME)
+            ).`as`("request_relation"),
             jsonObject(
                 key("id").value(SERVICE.ID),
                 key("name").value(SERVICE.NAME)
@@ -101,6 +106,7 @@ interface RequestDao: QueryDao {
         val groupByFields = listOf(
             REQUEST.USER_SERVICE_ID, REQUEST.STATUS, REQUEST.PHYSICIAN, REQUEST.CREATE_AT,
             REQUEST.AWB_NUMBER, REQUEST.COURIER_COMPANY,
+            REQUEST_RELATION.ID,
             SERVICE.ID,
             USER.ID,
             SAMPLE.ID, SAMPLE_TYPE.ID,
