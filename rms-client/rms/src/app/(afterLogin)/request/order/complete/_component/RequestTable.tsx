@@ -169,6 +169,7 @@ export default function RequestTable() {
                     <thead>
                     <tr>
                         <th className={globalTableStyle.middleColumn}>Order Date<br/>(YYYY-MM-DD)</th>
+                        <th className={globalTableStyle.middleColumn}>Resample</th>
                         <th className={globalTableStyle.longColumn}>Global courier</th>
                         <th className={globalTableStyle.longColumn}>AirWaybill no.</th>
                         <th className={globalTableStyle.longColumn}>User Name</th>
@@ -183,33 +184,34 @@ export default function RequestTable() {
                     </thead>
                     <tbody>
                     {requestData && requestData.length > 0 ? ( requestData.map((request) => (
-                        <tr key={`${request.service!.id}${request.sample!.id}`}>
-                            <td className={globalTableStyle.middleColumn}>{request.create_at ? formatDateLocal(new Date(request.create_at)) : ''}</td>
-                            <td className={globalTableStyle.longColumn}>{request.courier_company}</td>
-                            <td className={globalTableStyle.longColumn}>{request.awb_number}</td>
-                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.user?.name}/></td>
-                            <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample?.patient?.organization?.name}/></td>
-                            <td className={globalTableStyle.longColumn}>{request.sample?.barcode}</td>
-                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.service?.name}/></td>
-                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.sample?.patient?.name}/></td>
-                            <td className={globalTableStyle.middleColumn}>
-                                {getStringDateFromComponents(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}
-                            </td>
-                            <td className={globalTableStyle.longColumn}>{request.sample?.patient?.serial}</td>
-                            <td className={globalTableStyle.shortColumn}>
-                                <FontAwesomeIcon
-                                    icon={faFileLines}
-                                    className={globalTableStyle.info}
-                                    onClick={(e) => {
-                                        handleInfoClick(request)
-                                        e.stopPropagation();
-                                    }}/>
-                            </td>
-                        </tr>
-                    ))
+                            <tr key={`${request.service!.id}${request.sample!.id}`}>
+                                <td className={globalTableStyle.middleColumn}>{request.create_at ? formatDateLocal(new Date(request.create_at)) : ''}</td>
+                                <td className={globalTableStyle.middleColumn}>{request.request_relation?.id == 2 && request.request_relation.name}</td>
+                                <td className={globalTableStyle.longColumn}>{request.courier_company}</td>
+                                <td className={globalTableStyle.longColumn}>{request.awb_number}</td>
+                                <td className={globalTableStyle.longColumn}><CellTooltip text={request.user?.name}/></td>
+                                <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample?.patient?.organization?.name}/></td>
+                                <td className={globalTableStyle.longColumn}>{request.sample?.barcode}</td>
+                                <td className={globalTableStyle.longColumn}><CellTooltip text={request.service?.name}/></td>
+                                <td className={globalTableStyle.longColumn}><CellTooltip text={request.sample?.patient?.name}/></td>
+                                <td className={globalTableStyle.middleColumn}>
+                                    {getStringDateFromComponents(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}
+                                </td>
+                                <td className={globalTableStyle.longColumn}>{request.sample?.patient?.serial}</td>
+                                <td className={globalTableStyle.shortColumn}>
+                                    <FontAwesomeIcon
+                                        icon={faFileLines}
+                                        className={globalTableStyle.info}
+                                        onClick={(e) => {
+                                            handleInfoClick(request)
+                                            e.stopPropagation();
+                                        }}/>
+                                </td>
+                            </tr>
+                        ))
                     ) : (
                         <tr>
-                            <td colSpan={10} className={globalTableStyle.noData}>
+                        <td colSpan={10} className={globalTableStyle.noData}>
                                 The searched data does not exist
                             </td>
                         </tr>

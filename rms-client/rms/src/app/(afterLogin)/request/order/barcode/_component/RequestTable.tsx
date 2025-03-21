@@ -214,6 +214,7 @@ export default function RequestTable() {
                             </label>
                         </th>
                         <th className={globalTableStyle.middleColumn}>Order Date<br/>(YYYY-MM-DD)</th>
+                        <th className={globalTableStyle.middleColumn}>Resample</th>
                         <th className={globalTableStyle.longColumn}>User Name</th>
                         <th className={globalTableStyle.middleColumn}>Institution</th>
                         <th className={globalTableStyle.longColumn}>Registration ID</th>
@@ -239,6 +240,7 @@ export default function RequestTable() {
                                     </label>
                                 </td>
                                 <td className={globalTableStyle.middleColumn}>{request.create_at ? formatDateLocal(new Date(request.create_at)) : ''}</td>
+                                <td className={globalTableStyle.middleColumn}>{request.request_relation?.id == 2 && request.request_relation.name}</td>
                                 <td className={globalTableStyle.longColumn}><CellTooltip text={request.user?.name}/></td>
                                 <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample?.patient?.organization?.name}/></td>
                                 <td className={globalTableStyle.longColumn}>{request.sample?.barcode}</td>

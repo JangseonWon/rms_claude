@@ -259,6 +259,7 @@ export default function DownloadTable() {
                             </label>
                         </th>
                         <th className={globalTableStyle.middleColumn}>Order Date<br/>(YYYY-MM-DD)</th>
+                        <th className={globalTableStyle.middleColumn}>Resample</th>
                         <th className={globalTableStyle.longColumn}>User Name</th>
                         <th className={globalTableStyle.middleColumn}>Institution</th>
                         <th className={globalTableStyle.longColumn}>Registration ID</th>
@@ -272,42 +273,43 @@ export default function DownloadTable() {
                     </thead>
                     <tbody>
                     {requestData && requestData.length > 0 ? ( requestData.map((request, rowIndex) => (
-                        <tr key={`${request.service!.id}${request.sample!.id}`}>
-                            <td>
-                                <label form="agree" className={globalTableStyle.checkbox}>
-                                    <input
-                                        type="checkbox"
-                                        checked={request.isSelected || false}
-                                        onChange={() => handleSelectChange(rowIndex, !request.isSelected)}
-                                        className={globalTableStyle.checkbox}
-                                    />
-                                    <span className={globalTableStyle.checkmark}></span>
-                                </label>
-                            </td>
-                            <td className={globalTableStyle.middleColumn}>{request.create_at ? formatDateLocal(new Date(request.create_at)) : ''}</td>
-                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.user?.name}/></td>
-                            <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample?.patient?.organization?.name}/></td>
-                            <td className={globalTableStyle.longColumn}>{request.sample?.barcode}</td>
-                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.service?.name}/></td>
-                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.sample?.patient?.name}/></td>
-                            <td className={globalTableStyle.longColumn}>{request.sample?.patient?.serial}</td>
-                            <td className={globalTableStyle.middleColumn}>{request.lims_completed_at ? formatDateLocal(new Date(request.lims_completed_at)) : ''}</td>
-                            <td className={globalTableStyle.middleColumn}>{request.status}</td>
-                            <td className={globalTableStyle.middleColumn}>
-                                {(request.reports as Report[])
-                                    ?.filter((report: Report) => report.type === 'PDF' && report.is_latest === true).map((report) => (
-                                    <FontAwesomeIcon
-                                        key={report.id}
-                                        className={downloadStyle.downloadIcon}
-                                        icon={faFilePdf}
-                                        onClick={() => handleDownloadOnClick(report, request)}/>
-                                ))}
-                            </td>
-                        </tr>
-                    ))
+                            <tr key={`${request.service!.id}${request.sample!.id}`}>
+                                <td>
+                                    <label form="agree" className={globalTableStyle.checkbox}>
+                                        <input
+                                            type="checkbox"
+                                            checked={request.isSelected || false}
+                                            onChange={() => handleSelectChange(rowIndex, !request.isSelected)}
+                                            className={globalTableStyle.checkbox}
+                                        />
+                                        <span className={globalTableStyle.checkmark}></span>
+                                    </label>
+                                </td>
+                                <td className={globalTableStyle.middleColumn}>{request.create_at ? formatDateLocal(new Date(request.create_at)) : ''}</td>
+                                <td className={globalTableStyle.middleColumn}>{request.request_relation?.id == 2 && request.request_relation.name}</td>
+                                <td className={globalTableStyle.longColumn}><CellTooltip text={request.user?.name}/></td>
+                                <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample?.patient?.organization?.name}/></td>
+                                <td className={globalTableStyle.longColumn}>{request.sample?.barcode}</td>
+                                <td className={globalTableStyle.longColumn}><CellTooltip text={request.service?.name}/></td>
+                                <td className={globalTableStyle.longColumn}><CellTooltip text={request.sample?.patient?.name}/></td>
+                                <td className={globalTableStyle.longColumn}>{request.sample?.patient?.serial}</td>
+                                <td className={globalTableStyle.middleColumn}>{request.lims_completed_at ? formatDateLocal(new Date(request.lims_completed_at)) : ''}</td>
+                                <td className={globalTableStyle.middleColumn}>{request.status}</td>
+                                <td className={globalTableStyle.middleColumn}>
+                                    {(request.reports as Report[])
+                                        ?.filter((report: Report) => report.type === 'PDF' && report.is_latest === true).map((report) => (
+                                            <FontAwesomeIcon
+                                                key={report.id}
+                                                className={downloadStyle.downloadIcon}
+                                                icon={faFilePdf}
+                                                onClick={() => handleDownloadOnClick(report, request)}/>
+                                        ))}
+                                </td>
+                            </tr>
+                        ))
                     ) : (
                         <tr>
-                            <td colSpan={11} className={globalTableStyle.noData}>
+                        <td colSpan={11} className={globalTableStyle.noData}>
                                 The searched data does not exist
                             </td>
                         </tr>
