@@ -49,6 +49,7 @@ interface RequestDao: QueryDao{
             QueryDao.JoinInfo(SAMPLE, REQUEST.SAMPLE_ID.eq(SAMPLE.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(SAMPLE_TYPE, SAMPLE.SAMPLE_TYPE_ID.eq(SAMPLE_TYPE.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(SAMPLE_EXTENSION, SAMPLE.ID.eq(SAMPLE_EXTENSION.SAMPLE_ID), QueryDao.JoinType.LEFT),
+            QueryDao.JoinInfo(REQUEST_RELATION, REQUEST.REQUEST_RELATION_ID.eq(REQUEST_RELATION.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(PATIENT,
                 SAMPLE.PATIENT_SERIAL.eq(PATIENT.SERIAL)
                     .and(SAMPLE.ORGANIZATION_ID.eq(PATIENT.ORGANIZATION_ID))
@@ -77,6 +78,10 @@ interface RequestDao: QueryDao{
             jsonObject(
                 key("id").value(REQUEST.REQUEST_GROUP_ID)
             ).`as`("request_group"),
+            jsonObject(
+                key("id").value(REQUEST_RELATION.ID),
+                key("name").value(REQUEST_RELATION.NAME)
+            ).`as`("request_relation"),
             jsonObject(
                 key("id").value(SERVICE.ID),
                 key("name").value(SERVICE.NAME)
@@ -131,6 +136,7 @@ interface RequestDao: QueryDao{
         val groupByFields = listOf(
             REQUEST.USER_SERVICE_ID, REQUEST.STATUS, REQUEST.PHYSICIAN, REQUEST.REQUEST_GROUP_ID,
             REQUEST.CREATE_AT, REQUEST.LIMS_COMPLETED_AT, REQUEST.LIMS_RESAMPLE_AT, REQUEST.LIMS_RESAMPLE_REASON,
+            REQUEST_RELATION.ID,
             SERVICE.ID,
             USER.ID,
             SAMPLE.ID,
