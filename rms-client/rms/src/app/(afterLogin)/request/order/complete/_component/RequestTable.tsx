@@ -15,11 +15,11 @@ import InputBox from "@/app/_component/InputBox";
 import {Filter} from "@/model/Filter";
 import {Status} from "@/model/Status";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
-import RequestInfo from "@/app/(afterLogin)/request/order/_component/RequestInfo";
 import CellTooltip from "@/app/_component/CellToolTip";
 import style from "@/css/qna/qnaTable.module.css";
 import {GrPowerReset} from "react-icons/gr";
 import {formatDateLocal, getStringDateFromComponents} from "@/app/_component/DateUtil";
+import RequestDetailInfo from "@/app/_component/RequestDetailInfo";
 
 export interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -218,9 +218,12 @@ export default function RequestTable() {
                     )}
                     </tbody>
                     {infoModalOpen && (
-                        <RequestInfo
+                        <RequestDetailInfo
+                            disabled={true}
                             serviceId={infoRequest?.service!.id!}
                             sampleId={infoRequest?.sample!.id!}
+                            requestGroupId = {infoRequest?.request_group!.id!}
+                            userId={infoRequest?.user!.id!}
                             closeModal={closeModal}
                         />
                     )}

@@ -17,7 +17,6 @@ import {searchRequests} from "@/app/(afterLogin)/request/cart/_api/searchRequest
 import {Filter} from "@/model/Filter";
 import SelectBox from "@/app/_component/SelectBox";
 import InputBox from "@/app/_component/InputBox";
-import CartInfo from "@/app/(afterLogin)/request/cart/_component/CartInfo";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 import CellTooltip from "@/app/_component/CellToolTip";
 import {
@@ -27,6 +26,7 @@ import {
     useSetOkNotice
 } from "@/store/useNoticeDialogStore";
 import {formatDateLocal} from "@/app/_component/DateUtil";
+import RequestDetailInfo from "@/app/_component/RequestDetailInfo";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -311,7 +311,8 @@ export default function CartTable() {
                 </button>
             </div>
             {modalOpen && (
-                <CartInfo
+                <RequestDetailInfo
+                    disabled={false}
                     serviceId={infoRequest?.service!.id!}
                     sampleId={infoRequest?.sample!.id!}
                     requestGroupId = {infoRequest?.request_group!.id!}

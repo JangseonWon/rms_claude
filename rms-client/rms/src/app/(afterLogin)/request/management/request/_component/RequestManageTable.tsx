@@ -19,6 +19,8 @@ import CellTooltip from "@/app/_component/CellToolTip";
 import {GrPowerReset} from "react-icons/gr";
 import DownloadRequestExcelButton
     from "@/app/(afterLogin)/request/management/request/_component/DownloadRequestExcelButton";
+import RequestDetailInfo from "@/app/_component/RequestDetailInfo";
+import {faFileLines} from "@fortawesome/free-regular-svg-icons/faFileLines";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -66,10 +68,12 @@ const defaultSearch: Query = {
 export default function RequestManageTable() {
     const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
     const [requests, setRequests] = useState<RequestWithSelected[]>([]);
+    const [infoRequest, setInfoRequest] = useState<Request>();
     const [totalPage, setTotalPage] = useState<number>(0);
     const [search, setSearch] = useState<Query>(defaultSearch);
     const [fromDate, setFromDate] = useState<Date | null>(null);
     const [toDate, setToDate] = useState<Date | null>(null);
+    const [modalOpen, setModalOpen] = useState<boolean>(false);
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage =>({
@@ -117,6 +121,16 @@ export default function RequestManageTable() {
         setFromDate(null);
         setToDate(null);
     };
+
+    const handleInfoClick = (row: RequestWithSelected) => {
+        setInfoRequest(row);
+        setModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setInfoRequest(undefined);
+        setModalOpen(false);
+    }
 
     const addDateFilter = (from: Date | null, to: Date | null) => {
         if (!from || !to) return;
@@ -227,6 +241,7 @@ export default function RequestManageTable() {
                         <th>의뢰코드</th>
                         <th>배송업체</th>
                         <th>운송번호</th>
+                        <th>상세정보</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -234,18 +249,32 @@ export default function RequestManageTable() {
                         <tr key={rowIndex}>
                             <td className={globalTableStyle.middleColumn}>{request.create_at ? formatDateLocal(new Date(request.create_at)) : ''}</td>
                             <td className={globalTableStyle.longColumn}><CellTooltip text={request.user?.name}/></td>
-                            <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample?.patient?.organization?.name}/></td>
-                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.sample?.barcode}/></td>
-                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.sample?.patient?.name}/></td>
+                            <td className={globalTableStyle.middleColumn}><CellTooltip
+                                text={request.sample?.patient?.organization?.name}/></td>
+                            <td className={globalTableStyle.longColumn}><CellTooltip text={request.sample?.barcode}/>
+                            </td>
+                            <td className={globalTableStyle.longColumn}><CellTooltip
+                                text={request.sample?.patient?.name}/></td>
                             <td className={globalTableStyle.middleColumn}>{getStringDateFromComponents(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}</td>
                             <td className={globalTableStyle.shortColumn}>{request.sample?.patient?.sex}</td>
                             <td className={globalTableStyle.middleColumn}><CellTooltip text={request.physician}/></td>
                             <td className={globalTableStyle.middleColumn}>{request.sample?.sampling_on ? formatDateLocal(new Date(request.sample.sampling_on)) : '-'}</td>
                             <td className={globalTableStyle.longColumn}><CellTooltip text={request.service?.name}/></td>
-                            <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample?.patient?.serial}/></td>
+                            <td className={globalTableStyle.middleColumn}><CellTooltip
+                                text={request.sample?.patient?.serial}/></td>
                             <td className={globalTableStyle.shortColumn}><CellTooltip text={request.service?.id}/></td>
-                            <td className={globalTableStyle.shortColumn}><CellTooltip text={request.courier_company}/></td>
+                            <td className={globalTableStyle.shortColumn}><CellTooltip text={request.courier_company}/>
+                            </td>
                             <td className={globalTableStyle.middleColumn}><CellTooltip text={request.awb_number}/></td>
+                            <td className={globalTableStyle.shortColumn}>
+                                <FontAwesomeIcon
+                                    icon={faFileLines}
+                                    className={globalTableStyle.info}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleInfoClick(request)
+                                    }}/>
+                            </td>
                         </tr>
                     ))}
                     </tbody>
@@ -272,6 +301,16 @@ export default function RequestManageTable() {
                 ><FontAwesomeIcon icon={faAngleRight}/>
                 </button>
             </div>
+            {modalOpen && (
+                <RequestDetailInfo
+                    disabled={true}
+                    serviceId={infoRequest?.service!.id!}
+                    sampleId={infoRequest?.sample!.id!}
+                    requestGroupId = {infoRequest?.request_group!.id!}
+                    userId={infoRequest?.user!.id!}
+                    closeModal={closeModal}
+                />
+            )}
         </div>
     );
 }

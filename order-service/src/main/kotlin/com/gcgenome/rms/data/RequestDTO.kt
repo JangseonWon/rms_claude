@@ -26,6 +26,8 @@ data class RequestDTO(
     var courierCompany: String? = null,
     @JsonProperty("awb_number")
     var awbNumber: String? = null,
+    @JsonProperty("request_group")
+    val requestGroup: RequestGroupDTO?,
     @JsonProperty("request_relation")
     var requestRelation: RequestRelationDTO? = null,
     var service: ServiceDTO? = null,

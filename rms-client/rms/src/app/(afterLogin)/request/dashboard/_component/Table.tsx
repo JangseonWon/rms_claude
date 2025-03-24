@@ -18,6 +18,12 @@ import {SelectBoxOption} from "@/model/SelectBoxOption";
 import {GrPowerReset} from "react-icons/gr";
 import CellTooltip from "@/app/_component/CellToolTip";
 import {formatDateLocal, getStringDateFromComponents} from "@/app/_component/DateUtil";
+import RequestDetailInfo from "@/app/_component/RequestDetailInfo";
+import {faFileLines} from "@fortawesome/free-regular-svg-icons/faFileLines";
+
+interface RequestWithSelected extends Request {
+    isSelected?: boolean;
+}
 
 export default function Table() {
     const [requestData, setRequestData] = useState<Request[]>([]);
@@ -45,6 +51,8 @@ export default function Table() {
     const [totalPage, setTotalPage] = useState<number>();
     const [pageRange, setPageRange] = useState<{ start: number, end: number }>({ start: 1, end: 5 });
     const [selectOption, setSelectOption] = useState<SelectBoxOption>({ table: "sample", column: "barcode", name: "Registration ID" });
+    const [infoRequest, setInfoRequest] = useState<Request>();
+    const [modalOpen, setModalOpen] = useState<boolean>(false);
     const status = useStatus();
     const setStatus = useSetStatus();
     const selectBoxOptions: SelectBoxOption[] = [
@@ -171,6 +179,16 @@ export default function Table() {
         });
     };
 
+    const handleInfoClick = (row: RequestWithSelected) => {
+        setInfoRequest(row);
+        setModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setInfoRequest(undefined);
+        setModalOpen(false);
+    }
+
     const handleReset = () => {
         setSearch({ sort_by: "create_at", asc: false, size: 5, page: 1 });
         setSearchValue('');
@@ -218,15 +236,16 @@ export default function Table() {
             <table className={style.table}>
                 <thead>
                 <tr>
-                    <th>Order Date<br/>(YYYY-MM-DD)</th>
-                    <th>Registration ID</th>
-                    <th>User Name</th>
-                    <th>Institution</th>
-                    <th>Service</th>
-                    <th>Patient(s) Name</th>
-                    <th>MRN</th>
-                    <th>Patient BOD<br/>(YYYY-MM-DD)</th>
-                    <th>Current Status</th>
+                    <th className={globalTableStyle.middleColumn}>Order Date<br/>(YYYY-MM-DD)</th>
+                    <th className={globalTableStyle.middleColumn}>Registration ID</th>
+                    <th className={globalTableStyle.middleColumn}>User Name</th>
+                    <th className={globalTableStyle.shortColumn}>Institution</th>
+                    <th className={globalTableStyle.shortColumn}>Service</th>
+                    <th className={globalTableStyle.middleColumn}>Patient(s) Name</th>
+                    <th className={globalTableStyle.shortColumn}>MRN</th>
+                    <th className={globalTableStyle.middleColumn}>Patient BOD<br/>(YYYY-MM-DD)</th>
+                    <th className={globalTableStyle.middleColumn}>Current Status</th>
+                    <th className={globalTableStyle.shortColumn}>Info</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -252,9 +271,18 @@ export default function Table() {
                             <td className={globalTableStyle.shortColumn}>
                                 <CellTooltip text={
                                     request.status === 'UNCONFIRMED_ORDER' ? 'Pending Approval' :
-                                    request.status === 'COMPLETED_ORDER' ? 'Approval' :
-                                    request.status
+                                        request.status === 'COMPLETED_ORDER' ? 'Approval' :
+                                            request.status
                                 }/>
+                            </td>
+                            <td className={globalTableStyle.shortColumn}>
+                                <FontAwesomeIcon
+                                    icon={faFileLines}
+                                    className={globalTableStyle.info}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleInfoClick(request)
+                                    }}/>
                             </td>
                         </tr>
                     ))
@@ -270,7 +298,7 @@ export default function Table() {
             <div className={style.pagination}>
                 <span>items per page:</span>
                 <div className={style.select}>
-                    <select onChange={handlePageSizeChange}>
+                <select onChange={handlePageSizeChange}>
                         <option value="5">5</option>
                         <option value="10">10</option>
                         <option value="20">20</option>
@@ -290,6 +318,16 @@ export default function Table() {
                 ><FontAwesomeIcon icon={faAngleRight}/>
                 </button>
             </div>
+            {modalOpen && (
+                <RequestDetailInfo
+                    disabled={true}
+                    serviceId={infoRequest?.service!.id!}
+                    sampleId={infoRequest?.sample!.id!}
+                    requestGroupId = {infoRequest?.request_group!.id!}
+                    userId={infoRequest?.user!.id!}
+                    closeModal={closeModal}
+                />
+            )}
         </div>
     )
 }

@@ -31,6 +31,7 @@ interface RequestDao: QueryDao {
         val joins = listOf(
             QueryDao.JoinInfo(SERVICE, REQUEST.SERVICE_ID.eq(SERVICE.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(USER, REQUEST.USER_ID.eq(USER.ID), QueryDao.JoinType.LEFT),
+            QueryDao.JoinInfo(REQUEST_GROUP, REQUEST.REQUEST_GROUP_ID.eq(REQUEST_GROUP.ID), QueryDao.JoinType.INNER),
             QueryDao.JoinInfo(SAMPLE, REQUEST.SAMPLE_ID.eq(SAMPLE.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(SAMPLE_TYPE, SAMPLE.SAMPLE_TYPE_ID.eq(SAMPLE_TYPE.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(REQUEST_RELATION, REQUEST.REQUEST_RELATION_ID.eq(REQUEST_RELATION.ID), QueryDao.JoinType.LEFT),
@@ -67,6 +68,9 @@ interface RequestDao: QueryDao {
                 key("id").value(USER.ID),
                 key("name").value(USER.NAME)
             ).`as`("user"),
+            jsonObject(
+                key("id").value(REQUEST_GROUP.ID)
+            ).`as`("request_group"),
             jsonObject(
                 key("id").value(SAMPLE.ID),
                 key("barcode").value(SAMPLE.BARCODE),
@@ -106,6 +110,7 @@ interface RequestDao: QueryDao {
         val groupByFields = listOf(
             REQUEST.USER_SERVICE_ID, REQUEST.STATUS, REQUEST.PHYSICIAN, REQUEST.CREATE_AT,
             REQUEST.AWB_NUMBER, REQUEST.COURIER_COMPANY,
+            REQUEST_GROUP.ID,
             REQUEST_RELATION.ID,
             SERVICE.ID,
             USER.ID,

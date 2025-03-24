@@ -1,6 +1,6 @@
 "use client"
 
-import style from "@/app/(afterLogin)/request/cart/_component/cartInfo.module.css";
+import style from "./requestDetailInfo.module.css";
 import globalStyle from '@/css/modal.module.css';
 import scrollbar from "@/css/scrollBar.module.css";
 import {faXmark} from "@fortawesome/free-solid-svg-icons";
@@ -21,17 +21,16 @@ import DatePickerBox from "@/app/_component/DatePickerBox";
 import TextBox from "@/app/_component/TextBox";
 import classNames from "classnames";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
-import CartInfoExtensionComponent from "@/app/(afterLogin)/request/cart/_component/CartInfoExtensionComponent";
 import {format} from "date-fns";
 import {useRequestStore} from "@/store/useRequestStore";
 import {useSetProbandRequest} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
 import {Query} from "@/model/Query";
 import {searchRequests} from "@/app/(afterLogin)/request/cart/_api/searchRequests";
-import {getDateFromComponents} from "@/app/_component/DateUtil";
-
-
+import {getDateFromComponents, getStringDateFromComponents} from "@/app/_component/DateUtil";
+import RequestDetailInfoExtension from "@/app/_component/RequestDetailInfoExtension";
 
 type Props = {
+    disabled: boolean;
     serviceId: string;
     sampleId: string;
     requestGroupId: string;
@@ -39,8 +38,7 @@ type Props = {
     closeModal: () => void;
 }
 
-export default function CartInfo({serviceId, sampleId, requestGroupId, userId, closeModal}: Props) {
-    const [ requests, setRequests ] = useState<Request[]>([])
+export default function RequestDetailInfo({disabled, serviceId, sampleId, requestGroupId, userId, closeModal}: Props) {
     const { request, setRequest, resetRequest } = useRequestStore();
     const setProbandRequest = useSetProbandRequest()
     const [organizationOptions, setOrganizationOptions] = useState<SelectBoxOption[]>([])
@@ -90,11 +88,7 @@ export default function CartInfo({serviceId, sampleId, requestGroupId, userId, c
             [firstKey]: setNestedValue(object[firstKey] || {}, remainingPathSegments.join('.'), newValue),
         };
     };
-    /*const fetchRequest = useCallback(async () => {
-        const response = await getRequest(serviceId!, sampleId!)
-        const json = await response.json()
-        setRequest(json as Request)
-    },[serviceId, sampleId]);*/
+
     const fetchRequest = useCallback(async () => {
         const query: Query = {
             filter_groups:[
@@ -115,7 +109,7 @@ export default function CartInfo({serviceId, sampleId, requestGroupId, userId, c
         const rootRequest = json.find((req: Request) => req.service?.id === serviceId && req.sample?.id === sampleId);
         const probandRequest: Request = json.find((req: Request) => req.request_relation?.id === 1);
         console.log(JSON.stringify(probandRequest, null, 2))
-        setRequests(json as Request[]);
+        // setRequests(json as Request[]);
         setRequest(rootRequest as Request);
         setProbandRequest(probandRequest ?? null);
     },[]);
@@ -175,6 +169,128 @@ export default function CartInfo({serviceId, sampleId, requestGroupId, userId, c
         return age;
     };
 
+    const renderInstitutionName = (organization: string) => {
+        return (
+            <>
+                <SelectBox
+                    disabled={disabled}
+                    label={""}
+                    value={organization}
+                    options={organizationOptions}
+                    onChange={(value) => {
+                        handleRequestChange('sample.patient.organization.id', value.value)
+                        handleRequestChange('sample.patient.organization.name', value.name)
+                    }}
+                    width="200px"
+                />
+            </>
+        );
+    };
+
+    const renderGender = (sex: string) => {
+        return (
+            <>
+                <SelectBox
+                    disabled={disabled}
+                    label={"Gender*"}
+                    value={sex}
+                    options={sexOption}
+                    required={true}
+                    onChange={(value) => {
+                        handleRequestChange('sample.patient.sex', value.value)
+                    }}
+                    width="200px"
+                />
+            </>
+        );
+    };
+
+    const renderSampleType = (sampleType: string) => {
+        return (
+            <>
+                <SelectBox
+                    disabled={disabled}
+                    label={"Type*"}
+                    value={sampleType}
+                    options={sampleTypeOptions}
+                    onChange={(value) => {
+                        handleRequestChange('sample.sample_type.id', value.value)
+                        handleRequestChange('sample.sample_type.name', value.name)
+                    }}
+                    width="200px"
+                />
+            </>
+        );
+    };
+
+    const renderBirth = (request: Request) => {
+        return (
+            <>
+                {disabled ? (
+                    <InputBox
+                        label={"Date of Birth"}
+                        value={getStringDateFromComponents(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}
+                        disabled={true}
+                    />
+                ) : (
+                    <DatePickerBox
+                        label={"Date of Birth"}
+                        value={getDateFromComponents(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}
+                        onChange={(date) => {
+                            if (date) {
+                                handleRequestChange('sample.patient.birth_year', date.getFullYear());
+                                handleRequestChange('sample.patient.birth_month', date.getMonth() + 1);
+                                handleRequestChange('sample.patient.birth_day', date.getDate());
+                                if (request?.sample?.sampling_on) {
+                                    handleRequestChange('sample.age', setAge(date, new Date(request.sample.sampling_on)));
+                                }
+                            } else {
+                                handleRequestChange('sample.patient.birth_year', null);
+                                handleRequestChange('sample.patient.birth_month', null);
+                                handleRequestChange('sample.patient.birth_day', null);
+                                handleRequestChange('sample.age', null);
+                            }
+                        }}
+                    />
+                )}
+            </>
+        );
+    };
+
+    const renderCollectionDate = (request: Request) => {
+        return (
+            <>
+                {disabled ? (
+                    <InputBox
+                        label={"Collection Date"}
+                        value={request.sample?.sampling_on}
+                        disabled={true}
+                    />
+                ) : (
+                    <DatePickerBox
+                        label={"Collection Date*"}
+                        value={request.sample?.sampling_on}
+                        onChange={(date) => {
+                            if (date) {
+                                handleRequestChange('sample.sampling_on', format(date, "yyyy-MM-dd"))
+                                if (request?.sample?.patient?.birth_year
+                                    && request?.sample?.patient?.birth_month
+                                    && request?.sample?.patient?.birth_day) {
+                                    handleRequestChange('sample.age', setAge(new Date(`${request?.sample.patient.birth_year}-${request?.sample.patient.birth_month}-${request?.sample.patient.birth_day}`), date));
+                                }
+                            } else {
+                                handleRequestChange('sample.sampling_on', null)
+                                handleRequestChange('sample.age', null);
+                            }
+
+                        }}
+                    />
+                )}
+            </>
+        );
+    };
+
+
     useEffect(() => {
         resetRequest();
         fetchRequest()
@@ -186,23 +302,14 @@ export default function CartInfo({serviceId, sampleId, requestGroupId, userId, c
         <div className={globalStyle.modalBackground}>
             <div className={globalStyle.modal}>
                 <div className={style.modalTitle}>
-                    <h1>Cart Details</h1>
+                    <h1>Details</h1>
                     <FontAwesomeIcon icon={faXmark} onClick={closeModal} className={globalStyle.modalCloseButton}/>
                 </div>
                 {request ? (
                     <div className={classNames(style.modalContent, scrollbar.default)}>
                         <div className={style.content}>
                             <p className={style.title}>Institution name*</p>
-                            <SelectBox
-                                label={""}
-                                value={request.sample?.patient?.organization?.name}
-                                options={organizationOptions}
-                                onChange={(value) => {
-                                    handleRequestChange('sample.patient.organization.id', value.value)
-                                    handleRequestChange('sample.patient.organization.name', value.name)
-                                }}
-                                width="200px"
-                            />
+                            {renderInstitutionName(request.sample?.patient?.organization?.name!)}
                         </div>
                         <div className={style.content}>
                             <p className={style.title}>Service Info.</p>
@@ -215,12 +322,14 @@ export default function CartInfo({serviceId, sampleId, requestGroupId, userId, c
                         <p className={style.mainName}>Patient Info.</p>
                         <div className={style.section}>
                             <InputBox
+                                disabled={disabled}
                                 label={"Name*"}
                                 value={request.sample?.patient?.name}
                                 onChange={(value) => handleRequestChange('sample.patient.name', value)}
                                 required={true}
                             />
                             <InputBox
+                                disabled={disabled}
                                 label={"MRN*"}
                                 value={request.sample?.patient?.serial}
                                 onChange={(value) => handleRequestChange('sample.patient.serial', value)}
@@ -232,69 +341,17 @@ export default function CartInfo({serviceId, sampleId, requestGroupId, userId, c
                                 disabled={true}
                                 onChange={(value) => handleRequestChange('sample.age', value)}
                             />
-                            <DatePickerBox
-                                label={"Date of Birth"}
-                                value={getDateFromComponents(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}
-                                onChange={(date) => {
-                                    if (date) {
-                                        handleRequestChange('sample.patient.birth_year', date.getFullYear());
-                                        handleRequestChange('sample.patient.birth_month', date.getMonth() + 1);
-                                        handleRequestChange('sample.patient.birth_day', date.getDate());
-                                        if (request?.sample?.sampling_on) {
-                                            handleRequestChange('sample.age', setAge(date, new Date(request.sample.sampling_on)));
-                                        }
-                                    } else {
-                                        handleRequestChange('sample.patient.birth_year', null);
-                                        handleRequestChange('sample.patient.birth_month', null);
-                                        handleRequestChange('sample.patient.birth_day', null);
-                                        handleRequestChange('sample.age', null);
-                                    }
-                                }}
-                            />
+                            {renderBirth(request)}
                         </div>
                         <div className={style.section}>
-                            <SelectBox
-                                label={"Gender*"}
-                                value={request.sample?.patient?.sex}
-                                options={sexOption}
-                                required={true}
-                                onChange={(value) => {
-                                    handleRequestChange('sample.patient.sex', value.value)
-                                }}
-                                width="200px"
-                            />
+                            {renderGender(request.sample?.patient?.sex!)}
                         </div>
                         <div className={style.content}>
                             <p className={style.title}>Specimen/.Sample Info.</p>
-                            <SelectBox
-                                label={"Type*"}
-                                value={request.sample?.sample_type?.name}
-                                options={sampleTypeOptions}
-                                onChange={(value) => {
-                                    handleRequestChange('sample.sample_type.id', value.value)
-                                    handleRequestChange('sample.sample_type.name', value.name)
-                                }}
-                                width="200px"
-                            />
-                            <DatePickerBox
-                                label={"Collection Date*"}
-                                value={request.sample?.sampling_on}
-                                onChange={(date) => {
-                                    if (date) {
-                                        handleRequestChange('sample.sampling_on', format(date, "yyyy-MM-dd"))
-                                        if (request?.sample?.patient?.birth_year
-                                            && request?.sample?.patient?.birth_month
-                                            && request?.sample?.patient?.birth_day) {
-                                            handleRequestChange('sample.age', setAge(new Date(`${request?.sample.patient.birth_year}-${request?.sample.patient.birth_month}-${request?.sample.patient.birth_day}`), date));
-                                        }
-                                    } else {
-                                        handleRequestChange('sample.sampling_on', null)
-                                        handleRequestChange('sample.age', null);
-                                    }
-
-                                }}
-                            />
+                            {renderSampleType(request.sample?.sample_type?.name!)}
+                            {renderCollectionDate(request)}
                             <InputBox
+                                disabled={disabled}
                                 label={"Quantity*"}
                                 value={request.sample?.quantity?.toString()}
                                 required={true}
@@ -304,38 +361,44 @@ export default function CartInfo({serviceId, sampleId, requestGroupId, userId, c
                         <div className={style.content}>
                             <p className={style.title}>Additional Info.</p>
                             <InputBox
+                                disabled={disabled}
                                 label={"Medical Department"}
                                 value={request.department}
                                 onChange={(value) => handleRequestChange('department', value)}
                             />
                             <InputBox
+                                disabled={disabled}
                                 label={"Ward"}
                                 value={request.ward}
                                 onChange={(value) => handleRequestChange('ward', value)}
                             />
                             <InputBox
+                                disabled={disabled}
                                 label={"Physician Name"}
                                 value={request.physician}
                                 onChange={(value) => handleRequestChange('physician', value)}
                             />
                         </div>
                         {request.sample?.extensions && (
-                            <CartInfoExtensionComponent/>
+                            <RequestDetailInfoExtension disabled={disabled}/>
                         )}
                         <div className={style.memoSection}>
                             <TextBox
+                                disabled={disabled}
                                 label={'Memo'}
                                 value={request.memo}
                                 onChange={(value) => handleRequestChange('memo', value)}
                             />
                         </div>
-                        <div className={style.modalBottom}>
-                            <GreenButton
-                                name={"Edit"}
-                                onClick={handleEditClick}
-                                disabled={!isAllRequiredFilled()}
-                            />
-                        </div>
+                        {!disabled && (
+                            <div className={style.modalBottom}>
+                                <GreenButton
+                                    name={"Edit"}
+                                    onClick={handleEditClick}
+                                    disabled={!isAllRequiredFilled()}
+                                />
+                            </div>
+                        )}
                     </div>
                 ) : <Loading/>}
             </div>

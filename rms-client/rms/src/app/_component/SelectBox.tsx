@@ -3,8 +3,10 @@ import React, {useEffect, useRef, useState} from "react";
 import {faChevronDown} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
+import InputBox from "@/app/_component/InputBox";
 
 type Props = {
+    disabled?: boolean
     options: SelectBoxOption[]
     label: string
     value?: any
@@ -13,7 +15,7 @@ type Props = {
     width?: string;
 }
 
-export default function SelectBox({ label, value, options = [], onChange, required=false, width }: Props) {
+export default function SelectBox({ disabled=false, label, value, options = [], onChange, required=false, width }: Props) {
     const [selectedValue, setSelectedValue] = useState<string>('');
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const [hasError, setHasError] = useState<boolean | undefined>(false);
@@ -43,20 +45,30 @@ export default function SelectBox({ label, value, options = [], onChange, requir
     return (
         <div ref={selectBoxRef} className={style.selectContainer} style={{ width }}>
             <section className={`${style.selectSection} ${hasError ? style.error : null}`}>
-                <p className={style.label}>{label}</p>
-                <button className={`${style.btnSelect} ${isOpen ? style.open : ''}`} onClick={toggleList}>
-                    <div>{value || selectedValue || '-'}</div>
-                    <FontAwesomeIcon style={{paddingLeft: '20px'}} icon={faChevronDown} />
-                </button>
-                <ul className={`${style.listMember} ${isOpen ? style.open : ''}`} style={{ width }}>
-                    {options.map((option) => (
-                        <li key={option.name}>
-                            <button onClick={() => handleOptionClick(option)}>
-                                {option.name}
-                            </button>
-                        </li>
-                    ))}
-                </ul>
+                {disabled ? (
+                    <InputBox
+                        label={label}
+                        value={value || selectedValue || '-'}
+                        disabled={true}
+                    />
+                ) : (
+                    <>
+                        <p className={style.label}>{label}</p>
+                        <button className={`${style.btnSelect} ${isOpen ? style.open : ''}`} onClick={toggleList}>
+                            <div>{value || selectedValue || '-'}</div>
+                            <FontAwesomeIcon style={{paddingLeft: '20px'}} icon={faChevronDown}/>
+                        </button>
+                        <ul className={`${style.listMember} ${isOpen ? style.open : ''}`} style={{width}}>
+                            {options.map((option) => (
+                                <li key={option.name}>
+                                    <button onClick={() => handleOptionClick(option)}>
+                                        {option.name}
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    </>
+                )}
             </section>
         </div>
     )

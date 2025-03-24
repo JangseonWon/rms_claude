@@ -10,8 +10,12 @@ export default function Title() {
         return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
     };
 
-    const lastValue = capitalize(decodeURIComponent(pathSegments.pop() || ''));
-    const secondLastValue = capitalize(decodeURIComponent(pathSegments.pop() || ''));
+    let lastValue = capitalize(decodeURIComponent(pathSegments.pop() || ''));
+    const secondLastValue  = capitalize(decodeURIComponent(pathSegments.pop() || ''));
+
+    if (lastValue === 'Complete') {
+        lastValue = 'Approval';
+    }
 
     const displayLastValue = secondLastValue.toLowerCase() === 'management'
         ? `${lastValue} Management`

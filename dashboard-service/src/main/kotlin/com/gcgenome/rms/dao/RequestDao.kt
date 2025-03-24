@@ -10,6 +10,8 @@ import reactor.core.publisher.Mono
 interface RequestDao: QueryDao {
     fun DSLContext.selectRequestsWithPage(query: Query, userDto: User): Mono<Page<RequestDTO>> {
         val joins = listOf(
+            QueryDao.JoinInfo(REQUEST_GROUP, REQUEST.REQUEST_GROUP_ID.eq(REQUEST_GROUP.ID), QueryDao.JoinType.INNER),
+            QueryDao.JoinInfo(REQUEST_RELATION, REQUEST.REQUEST_RELATION_ID.eq(REQUEST_RELATION.ID), QueryDao.JoinType.LEFT),
             QueryDao.JoinInfo(SAMPLE, REQUEST.SAMPLE_ID.eq(SAMPLE.ID), QueryDao.JoinType.INNER),
             QueryDao.JoinInfo(PATIENT, SAMPLE.PATIENT_SERIAL.eq(PATIENT.SERIAL)
                 .and(SAMPLE.ORGANIZATION_ID.eq(PATIENT.ORGANIZATION_ID))
@@ -31,9 +33,16 @@ interface RequestDao: QueryDao {
             REQUEST.CREATE_AT,
             REQUEST.CART_AT,
             jsonObject(
+                key("id").value(REQUEST_RELATION.ID),
+                key("name").value(REQUEST_RELATION.NAME)
+            ).`as`("request_relation"),
+            jsonObject(
                 key("id").value(USER.ID),
                 key("name").value(USER.NAME)
             ).`as`("user"),
+            jsonObject(
+                key("id").value(REQUEST_GROUP.ID)
+            ).`as`("request_group"),
             jsonObject(
                 key("id").value(SERVICE.ID),
                 key("name").value(SERVICE.NAME),

@@ -42,6 +42,10 @@ data class RequestDTO(
     @JsonProperty("report")
     var report: ReportDTO?,
     @JsonProperty("user")
-    var user: UserDTO?
+    var user: UserDTO?,
+    @JsonProperty("request_group")
+    val requestGroup: RequestGroupDTO?,
+    @JsonProperty("request_relation")
+    var requestRelation: RequestRelationDTO? = null,
 )
 

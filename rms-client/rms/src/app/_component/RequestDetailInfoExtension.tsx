@@ -1,7 +1,7 @@
 'use client';
 
 import React, {useEffect} from "react";
-import style from './cartExtensionComponent.module.css';
+import style from './requestDetailInfoExtension.module.css';
 import {Extension, ExtensionType} from "@/model/Extension";
 import InputBox from "@/app/_component/InputBox";
 import SelectBox from "@/app/_component/SelectBox";
@@ -15,8 +15,12 @@ import {
 } from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
 import {useRequestStore} from "@/store/useRequestStore";
 
+type Props = {
+    disabled?: boolean;
+}
 
-export default function CartInfoExtensionComponent() {
+
+export default function RequestDetailInfoExtension({disabled=false}: Props) {
     const { request, setRequest } = useRequestStore();
     const probandRequest = useProbandRequest()
     const probandModal = useProbandModalOpen();
@@ -80,6 +84,7 @@ export default function CartInfoExtensionComponent() {
         switch (extension.type) {
             case ExtensionType.LIST:
                 return <SelectBox
+                    disabled={disabled}
                     key={extension.id}
                     label={`${extension.name}${extension.required ? ' *' : ''}`}
                     value={extension.value}
@@ -94,6 +99,7 @@ export default function CartInfoExtensionComponent() {
                     {name: "FALSE", value: false}
                 ];
                 return <SelectBox
+                    disabled={disabled}
                     key={extension.id}
                     label={`${extension.name}${extension.required ? ' *' : ''}`}
                     value={extension.value}
@@ -105,6 +111,7 @@ export default function CartInfoExtensionComponent() {
             case ExtensionType.INTEGER:
             case ExtensionType.STRING:
                 return <InputBox
+                    disabled={disabled}
                     label={`${extension.name}${extension.required ? ' *' : ''}`}
                     value={extension.value}
                     required={extension.required}
@@ -112,6 +119,7 @@ export default function CartInfoExtensionComponent() {
                 />;
             case ExtensionType.FLOAT:
                 return <InputBox
+                    disabled={disabled}
                     label={`${extension.name}${extension.required ? ' *' : ''}`}
                     value={extension.value}
                     required={extension.required}
@@ -120,6 +128,7 @@ export default function CartInfoExtensionComponent() {
                 />;
             case ExtensionType.TEXT:
                 return <TextBox
+                    disabled={disabled}
                     label={`${extension.name}${extension.required ? ' *' : ''}`}
                     value={extension.value}
                     required={extension.required}
@@ -127,6 +136,7 @@ export default function CartInfoExtensionComponent() {
                 />;
             case ExtensionType.PROBAND_LIST:
                 return <SelectBox
+                    disabled={disabled}
                     label={extension.name!}
                     value={extension.value}
                     options={selectList}

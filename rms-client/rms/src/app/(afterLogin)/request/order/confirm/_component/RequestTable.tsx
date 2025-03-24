@@ -17,7 +17,6 @@ import BlueButton from "@/app/_component/BlueButton";
 import GreenButton from "@/app/_component/GreenButton";
 import AirWaybillModal from "@/app/(afterLogin)/request/order/confirm/_component/AirWaybillModal";
 import {patchRequests} from "@/app/(afterLogin)/request/order/_api/patchRequests";
-import RequestInfo from "@/app/(afterLogin)/request/order/_component/RequestInfo";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 import CellTooltip from "@/app/_component/CellToolTip";
 import style from "@/css/qna/qnaTable.module.css";
@@ -29,6 +28,7 @@ import {
     useSetOkNotice
 } from "@/store/useNoticeDialogStore";
 import {formatDateLocal, getStringDateFromComponents} from "@/app/_component/DateUtil";
+import RequestDetailInfo from "@/app/_component/RequestDetailInfo";
 
 
 export interface RequestWithSelected extends Request {
@@ -308,9 +308,12 @@ export default function RequestTable() {
                 </table>
             </div>
             {infoModalOpen && (
-                <RequestInfo
+                <RequestDetailInfo
+                    disabled={true}
                     serviceId={infoRequest?.service!.id!}
                     sampleId={infoRequest?.sample!.id!}
+                    requestGroupId = {infoRequest?.request_group!.id!}
+                    userId={infoRequest?.user!.id!}
                     closeModal={closeModal}
                 />
             )}
