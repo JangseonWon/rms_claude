@@ -113,7 +113,7 @@ export default function NavMenu() {
                         <ol>
                             <Link href={"/request/order/complete"}>
                                 <span className={pathname === "/request/order/complete" ? style.activeLink : ""}>
-                                    Complete Order
+                                    Approval
                                 </span>
                             </Link>
                         </ol>

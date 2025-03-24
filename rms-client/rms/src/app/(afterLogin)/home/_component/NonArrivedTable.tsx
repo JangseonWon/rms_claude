@@ -113,7 +113,7 @@ export default function NonArrivedTable() {
     return (
         <div>
             <div className={style.line}></div>
-            <h1>Non-arrived (+10days)</h1>
+            <h1>In transit (+10days)</h1>
             <div className={globalTableStyle.formGroupBetween}>
                 <div className={globalTableStyle.formGroupLeft}>
                     <DatePickerRangeBox

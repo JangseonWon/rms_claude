@@ -36,8 +36,8 @@ export default function Statistics() {
         status: Status
     }[] = [
         { label: "Total", value: statisticsData?.total, status: Status.TOTAL },
-        { label: "Unconfirmed Order", value: statisticsData?.unconfirmed_order, status: Status.UNCONFIRMED_ORDER },
-        { label: "Completed Order", value: statisticsData?.completed_order, status: Status.COMPLETED_ORDER },
+        { label: "Pending Approval", value: statisticsData?.unconfirmed_order, status: Status.UNCONFIRMED_ORDER },
+        { label: "Approval", value: statisticsData?.completed_order, status: Status.COMPLETED_ORDER },
         { label: "In progress", value: statisticsData?.in_progress, status: Status.IN_PROGRESS },
         { label: "Test failed", value: statisticsData?.test_failed, status: Status.TEST_FAILED },
         { label: "Delivered", value: statisticsData?.delivered, status: Status.DELIVERED },

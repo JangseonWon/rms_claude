@@ -175,7 +175,7 @@ export default function RequestTable() {
     return (
         <>
             <div className={globalTableStyle.formGroupRight}>
-                <GreenButton name={'Input AirWaybill'} onClick={handleAirWaybillClick}/>
+                <GreenButton name={'AirWaybill'} onClick={handleAirWaybillClick}/>
                 <BlueButton name={'Confirm'} onClick={handleConfirmClick}/>
             </div>
             <div className={globalTableStyle.formGroupBetween}>

@@ -16,7 +16,7 @@ export default function SingleMultiChangeButton() {
         router.push(`/request/services/${serviceId}/${order}`);
     };
 
-    const buttonText = `${order.charAt(0).toUpperCase()}${order.slice(1)} Request`;
+    const buttonText = order === 'single' ? 'Single-case' : 'Multi-cases';
 
     return (
         <button className={style.changeButton} onClick={excelRequest}>

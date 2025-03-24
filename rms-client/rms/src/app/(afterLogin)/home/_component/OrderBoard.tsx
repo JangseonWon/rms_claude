@@ -13,8 +13,8 @@ export default function OrderBoard() {
     const [statisticsData, setStatisticsData] = useState<Statistics>();
 
     const statistics = [
-        { label: "Unconfirmed Order", value: statisticsData?.unconfirmed_order },
-        { label: "Completed Order", value: statisticsData?.completed_order },
+        { label: "Pending Approval", value: statisticsData?.unconfirmed_order },
+        { label: "Approval", value: statisticsData?.completed_order },
         { label: "In progress", value: statisticsData?.in_progress },
         { label: "Test failed", value: statisticsData?.test_failed },
         { label: "Delivered", value: statisticsData?.delivered },
