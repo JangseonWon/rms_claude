@@ -193,7 +193,7 @@ export default function ExtensionInputComponent({serviceId}: ExtensionInputCompo
                         }}
                     />
                     <button className={style.button} onClick={probandModalOpen}>
-                        Click here to find proband
+                        Find Proband
                     </button>
                 </div>
             default:

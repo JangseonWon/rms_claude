@@ -181,9 +181,11 @@ export default function RequestDetailInfoExtension({disabled=false}: Props) {
                             })
                         }}
                     />
-                    <button className={style.button} onClick={probandModalOpen}>
-                        Click here to find proband
-                    </button>
+                    { !disabled && (
+                        <button className={style.button} onClick={probandModalOpen}>
+                            Find Proband
+                        </button>
+                    )}
                 </div>
             default:
                 return null;
