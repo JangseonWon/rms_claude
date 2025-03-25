@@ -29,6 +29,10 @@ data class RequestDTO(
     var ward: String?,
     @JsonProperty("physician")
     var physician: String?,
+    @JsonProperty("courier_company")
+    var courierCompany: String? = null,
+    @JsonProperty("awb_number")
+    var awbNumber: String? = null,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("create_at")

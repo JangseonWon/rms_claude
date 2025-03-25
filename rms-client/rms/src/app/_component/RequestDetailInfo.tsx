@@ -364,13 +364,13 @@ export default function RequestDetailInfo({module='cart', disabled, serviceId, s
                                     disabled={disabled}
                                     label={"Global courier"}
                                     value={request.courier_company ? request.courier_company : '-'}
-                                    onChange={(value) => handleRequestChange('department', value)}
+                                    onChange={(value) => handleRequestChange('courier_company', value)}
                                 />
                                 <InputBox
                                     disabled={disabled}
                                     label={"AirWaybill no."}
                                     value={request.awb_number ? request.awb_number : '-'}
-                                    onChange={(value) => handleRequestChange('ward', value)}
+                                    onChange={(value) => handleRequestChange('awb_number', value)}
                                 />
                             </div>
                         )}
