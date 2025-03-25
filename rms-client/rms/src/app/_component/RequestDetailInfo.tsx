@@ -359,7 +359,7 @@ export default function RequestDetailInfo({module='cart', disabled, serviceId, s
                         </div>
                         { (request.courier_company || request.awb_number) && (
                             <div className={style.content}>
-                                <p className={style.title}>Airway Info.</p>
+                                <p className={style.title}>Aviation Info.</p>
                                 <InputBox
                                     disabled={disabled}
                                     label={"Global courier"}
