@@ -25,11 +25,12 @@ import {format} from "date-fns";
 import {useRequestStore} from "@/store/useRequestStore";
 import {useSetProbandRequest} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
 import {Query} from "@/model/Query";
-import {searchRequests} from "@/app/(afterLogin)/request/cart/_api/searchRequests";
 import {getDateFromComponents, getStringDateFromComponents} from "@/app/_component/DateUtil";
 import RequestDetailInfoExtension from "@/app/_component/RequestDetailInfoExtension";
+import {searchRequests} from "@/app/(afterLogin)/_api/searchRequests";
 
 type Props = {
+    module?: string;
     disabled: boolean;
     serviceId: string;
     sampleId: string;
@@ -38,7 +39,7 @@ type Props = {
     closeModal: () => void;
 }
 
-export default function RequestDetailInfo({disabled, serviceId, sampleId, requestGroupId, userId, closeModal}: Props) {
+export default function RequestDetailInfo({module='cart', disabled, serviceId, sampleId, requestGroupId, userId, closeModal}: Props) {
     const { request, setRequest, resetRequest } = useRequestStore();
     const setProbandRequest = useSetProbandRequest()
     const [organizationOptions, setOrganizationOptions] = useState<SelectBoxOption[]>([])
@@ -104,12 +105,10 @@ export default function RequestDetailInfo({disabled, serviceId, sampleId, reques
                 }
             ]
         }
-        const response = await searchRequests(query)
+        const response = await searchRequests(query, module)
         const json = await response.json()
         const rootRequest = json.find((req: Request) => req.service?.id === serviceId && req.sample?.id === sampleId);
         const probandRequest: Request = json.find((req: Request) => req.request_relation?.id === 1);
-        console.log(JSON.stringify(probandRequest, null, 2))
-        // setRequests(json as Request[]);
         setRequest(rootRequest as Request);
         setProbandRequest(probandRequest ?? null);
     },[]);
@@ -358,6 +357,23 @@ export default function RequestDetailInfo({disabled, serviceId, sampleId, reques
                                 onChange={(value) => handleRequestChange('sample.quantity', value)}
                             />
                         </div>
+                        { (request.courier_company || request.awb_number) && (
+                            <div className={style.content}>
+                                <p className={style.title}>Airway Info.</p>
+                                <InputBox
+                                    disabled={disabled}
+                                    label={"Global courier"}
+                                    value={request.courier_company ? request.courier_company : '-'}
+                                    onChange={(value) => handleRequestChange('department', value)}
+                                />
+                                <InputBox
+                                    disabled={disabled}
+                                    label={"AirWaybill no."}
+                                    value={request.awb_number ? request.awb_number : '-'}
+                                    onChange={(value) => handleRequestChange('ward', value)}
+                                />
+                            </div>
+                        )}
                         <div className={style.content}>
                             <p className={style.title}>Additional Info.</p>
                             <InputBox

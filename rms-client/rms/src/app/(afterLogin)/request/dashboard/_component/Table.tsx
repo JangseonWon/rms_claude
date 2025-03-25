@@ -236,16 +236,16 @@ export default function Table() {
             <table className={style.table}>
                 <thead>
                 <tr>
-                    <th className={globalTableStyle.middleColumn}>Order Date<br/>(YYYY-MM-DD)</th>
-                    <th className={globalTableStyle.middleColumn}>Registration ID</th>
-                    <th className={globalTableStyle.middleColumn}>User Name</th>
-                    <th className={globalTableStyle.shortColumn}>Institution</th>
-                    <th className={globalTableStyle.shortColumn}>Service</th>
-                    <th className={globalTableStyle.middleColumn}>Patient(s) Name</th>
-                    <th className={globalTableStyle.shortColumn}>MRN</th>
-                    <th className={globalTableStyle.middleColumn}>Patient BOD<br/>(YYYY-MM-DD)</th>
-                    <th className={globalTableStyle.middleColumn}>Current Status</th>
-                    <th className={globalTableStyle.shortColumn}>Info</th>
+                    <th>Order Date<br/>(YYYY-MM-DD)</th>
+                    <th>Registration ID</th>
+                    <th>User Name</th>
+                    <th>Institution</th>
+                    <th>Service</th>
+                    <th>Patient(s) Name</th>
+                    <th>MRN</th>
+                    <th>Patient BOD<br/>(YYYY-MM-DD)</th>
+                    <th>Current Status</th>
+                    <th>Info</th>
                 </tr>
                 </thead>
                 <tbody>

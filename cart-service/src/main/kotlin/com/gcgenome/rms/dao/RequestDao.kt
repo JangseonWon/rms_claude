@@ -33,6 +33,8 @@ interface RequestDao: QueryDao {
             REQUEST.PHYSICIAN,
             REQUEST.CREATE_AT,
             REQUEST.CART_AT,
+            REQUEST.AWB_NUMBER,
+            REQUEST.COURIER_COMPANY,
             jsonObject(
                 key("id").value(SERVICE.ID),
                 key("name").value(SERVICE.NAME)
