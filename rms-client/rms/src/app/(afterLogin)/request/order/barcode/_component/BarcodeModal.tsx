@@ -116,8 +116,6 @@ export default function BarcodeModal({requests, closeModal}: Props) {
             }
 
         });
-        //바로저장
-        //doc.save("barcodes.pdf");
         const pdfBlob = doc.output("blob");
         const pdfUrl = URL.createObjectURL(pdfBlob);
         window.open(pdfUrl, "_blank");
@@ -145,7 +143,7 @@ export default function BarcodeModal({requests, closeModal}: Props) {
                         </tr>
                         </thead>
                         <tbody>
-                        {requests && requests.map(request => {
+                        {requests && requests.length > 0 ? (requests && requests.map(request => {
                             const requestKey = `${request.sample?.id}:${request.service?.id}`
                             return (
                                 <tr key={requestKey}>
@@ -170,7 +168,13 @@ export default function BarcodeModal({requests, closeModal}: Props) {
                                     <td>{request.sample?.sample_type?.name}</td>
                                 </tr>
                             )
-                        })}
+                        })) : (
+                            <tr>
+                                <td colSpan={7} className={globalTableStyle.noData}>
+                                    The searched data does not exist
+                                </td>
+                            </tr>
+                        )}
                         </tbody>
                     </table>
                 </div>
