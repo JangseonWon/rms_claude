@@ -252,6 +252,7 @@ export default function GroupOrder() {
                     />
                     <div className={style.dateBox}>
                         <DatePickerBox
+                            required={true}
                             label={"Date of Birth"}
                             onChange={(date) => {
                                 if (date) {
