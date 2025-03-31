@@ -1,9 +1,6 @@
 package com.gcgenome.rms.dao
 
-import com.gcgenome.rms.data.AlisService
-import com.gcgenome.rms.data.Page
-import com.gcgenome.rms.data.Query
-import com.gcgenome.rms.data.ServiceDTO
+import com.gcgenome.rms.data.*
 import com.gcgenome.rms.tables.references.*
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.*
@@ -135,6 +132,7 @@ interface ServiceDao : QueryDao{
             insertInto(SERVICE)
                 .set(SERVICE.ID, alisService.testCode)
                 .set(SERVICE.NAME_KR, alisService.testDisplayName)
+                .set(SERVICE.TYPE, ServiceType.GENERAL.name)
                 .onConflict(SERVICE.ID)
                 .doUpdate()
                 .set(SERVICE.NAME_KR, alisService.testDisplayName)
