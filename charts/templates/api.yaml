@@ -102,7 +102,11 @@ spec:
               mountPath: /app/resources/alis.yaml
               subPath: alis.yaml
           terminationMessagePolicy: File
-          image: 'image-registry.openshift-image-registry.svc:5000/{{ .Release.Namespace }}/api:latest'
+        {{- if index .Values "api" }}
+          image: {{ index .Values "api" "image" "name" }}:{{ index .Values "api" "image" "tag" }}
+        {{- else }}
+          image: image-registry.openshift-image-registry.svc:5000/{{ .Release.Namespace }}/api:latest
+        {{- end }}
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst

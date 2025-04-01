@@ -97,7 +97,11 @@ spec:
               mountPath: /app/resources/authentication.yaml
               subPath: authentication.yaml
           terminationMessagePolicy: File
-          image: 'image-registry.openshift-image-registry.svc:5000/{{ .Release.Namespace }}/management-service:latest'
+        {{- if index .Values "management-service" }}
+          image: {{ index .Values "management-service" "image" "name" }}:{{ index .Values "management-service" "image" "tag" }}
+        {{- else }}
+          image: image-registry.openshift-image-registry.svc:5000/{{ .Release.Namespace }}/management-service:latest
+        {{- end }}
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst

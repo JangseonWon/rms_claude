@@ -115,7 +115,11 @@ spec:
               mountPath: /app/resources/mail.yaml
               subPath: mail.yaml
           terminationMessagePolicy: File
-          image: 'image-registry.openshift-image-registry.svc:5000/{{ .Release.Namespace }}/login-service:latest'
+        {{- if index .Values "login-service" }}
+          image: {{ index .Values "login-service" "image" "name" }}:{{ index .Values "login-service" "image" "tag" }}
+        {{- else }}
+          image: image-registry.openshift-image-registry.svc:5000/{{ .Release.Namespace }}/login-service:latest
+        {{- end }}
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst

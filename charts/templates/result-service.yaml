@@ -125,7 +125,11 @@ spec:
               mountPath: /app/resources/s3.yaml
               subPath: s3.yaml
           terminationMessagePolicy: File
-          image: 'image-registry.openshift-image-registry.svc:5000/{{ .Release.Namespace }}/result-service:latest'
+        {{- if index .Values "result-service" }}
+          image: {{ index .Values "result-service" "image" "name" }}:{{ index .Values "result-service" "image" "tag" }}
+        {{- else }}
+          image: image-registry.openshift-image-registry.svc:5000/{{ .Release.Namespace }}/result-service:latest
+        {{- end }}
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst
