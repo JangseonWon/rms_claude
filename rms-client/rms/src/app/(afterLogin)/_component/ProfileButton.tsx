@@ -110,7 +110,7 @@ export default function ProfileButton() {
                          onMouseLeave={handleUserMouseLeave}>
                         <ul>
                             <li onClick={onProfile}>My profile</li>
-                            { session?.user.role === Role.ADMIN.valueOf()&& <li onClick={onManager}>Maneging Service</li>}
+                            { session?.user.role === Role.ADMIN.valueOf()&& <li onClick={onManager}>Managing Service</li>}
                             <li onClick={onLogout}>Logout</li>
                         </ul>
                     </div>
