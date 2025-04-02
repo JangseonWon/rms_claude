@@ -22,8 +22,9 @@ export default function SearchSelectBox({ options, placeholder, onSelect, value,
     const listRef = useRef<HTMLUListElement>(null);
 
     useEffect(() => {
+        const searchValue = value?.toLowerCase() ?? '';
         const filtered = options.filter(option =>
-            option.label.toLowerCase().includes(value?.toLowerCase() || '')
+            option.label?.toLowerCase().includes(searchValue)
         );
         setFilteredOptions(filtered);
         setHighlightedIndex(-1);
