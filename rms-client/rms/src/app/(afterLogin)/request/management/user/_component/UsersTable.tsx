@@ -40,6 +40,10 @@ const defaultQuery: Query = {
         {
             table: "user",
             column: "state"
+        },
+        {
+            table: "user",
+            column: "id"
         }
     ],
     size:10,
