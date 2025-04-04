@@ -21,7 +21,11 @@ dependencies {
 }
 configurations { all { exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging") } }
 dependencyManagement { imports { mavenBom(libs.spring.cloud.bom.get().toString()) } }
-tasks.processResources { exclude("application.yml") }
+tasks.processResources {
+    doFirst {
+        if (gradle.taskGraph.allTasks.any { it.name == "jib" }) { exclude("application.yml") }
+    }
+}
 jib {
     from { image = "eclipse-temurin:17.0.7_7-jre-jammy" }
     container { environment = mapOf(

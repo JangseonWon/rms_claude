@@ -27,8 +27,8 @@ class TokenFactory(
         val payload = Token(
             nbf = iat,
             exp = iat + duration,
-            iss = "rms-test.gcgenome.com",
-            aud = "rms-test.gcgenome.com",
+            iss = "g-portal.gcgenome.com",
+            aud = "g-portal.gcgenome.com",
             iat = iat,
             jti = UUID.randomUUID().toString(),
             user = user.apply { password = null }

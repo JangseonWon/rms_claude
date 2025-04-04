@@ -13,10 +13,6 @@ const nextConfig = {
                 destination: `${baseUrl}/w-api/management-service/:path*`,
             },
             {
-                source: '/w-api/organization-service/:path*',
-                destination: `${baseUrl}/w-api/organization-service/:path*`,
-            },
-            {
                 source: '/w-api/order-service/:path*',
                 destination: `${baseUrl}/w-api/order-service/:path*`,
             },

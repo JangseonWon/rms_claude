@@ -18,7 +18,7 @@ spring:
         binder:
           brokers: 172.19.208.171, 172.19.208.172, 172.19.208.101, 172.19.208.102, 172.19.208.111
   r2dbc:
-    url: r2dbc:postgresql://${POSTGRES_URL}/report_service?schema=rms_dev
+    url: ${POSTGRES_R2DBC_URL}
     username: ${POSTGRES_USERNAME}
     password: ${POSTGRES_PASSWORD}
     pool:

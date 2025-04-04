@@ -2,13 +2,11 @@ name: 백엔드 배포
 on:
   push:
     branches:
-      - master
-      - deploy
+      - feature/*
     paths:
       - management-service/**
       - login-service/**
       - dashboard-service/**
-      - organization-service/**
       - order-service/**
       - cart-service/**
       - lims-service/**
@@ -40,7 +38,6 @@ jobs:
             [[ "$module_name" == "management-service" || 
           "$module_name" == "login-service" || 
           "$module_name" == "dashboard-service" ||
-          "$module_name" == "organization-service" ||
           "$module_name" == "order-service" ||
           "$module_name" == "cart-service" ||
           "$module_name" == "lims-service" ||
@@ -67,19 +64,13 @@ jobs:
       ALIS_DATABASE_USERNAME: ${{ secrets.ALIS_DATABASE_USERNAME }}
       ALIS_DATABASE_PASSWORD: ${{ secrets.ALIS_DATABASE_PASSWORD }}
       DATABASE_URL_TEST: ${{ secrets.DATABASE_URL_TEST }}
+      DATABASE_R2DBC_URL_TEST: ${{ secrets.DATABASE_R2DBC_URL_TEST }}
       DATABASE_SCHEMA_TEST: ${{ secrets.DATABASE_SCHEMA_TEST }}
       DATABASE_USERNAME_TEST: ${{ secrets.DATABASE_USERNAME_TEST }}
       DATABASE_PASSWORD_TEST: ${{ secrets.DATABASE_PASSWORD_TEST }}
       IMAGE_REGISTRY_TEST: ${{ secrets.IMAGE_REGISTRY_TEST }}
       REGISTRY_USERNAME_TEST: ${{ secrets.REGISTRY_USERNAME_TEST }}
       REGISTRY_PASSWORD_TEST: ${{ secrets.REGISTRY_PASSWORD_TEST }}
-      DATABASE_URL_DEPLOY: ${{ secrets.DATABASE_URL_DEPLOY }}
-      DATABASE_SCHEMA_DEPLOY: ${{ secrets.DATABASE_SCHEMA_DEPLOY }}
-      DATABASE_USERNAME_DEPLOY: ${{ secrets.DATABASE_USERNAME_DEPLOY }}
-      DATABASE_PASSWORD_DEPLOY: ${{ secrets.DATABASE_PASSWORD_DEPLOY }}
-      IMAGE_REGISTRY_DEPLOY: ${{ secrets.IMAGE_REGISTRY_DEPLOY }}
-      REGISTRY_USERNAME_DEPLOY: ${{ secrets.REGISTRY_USERNAME_DEPLOY }}
-      REGISTRY_PASSWORD_DEPLOY: ${{ secrets.REGISTRY_PASSWORD_DEPLOY }}
       BASE_IMAGE: eclipse-temurin:21-jre-ubi9-minimal
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
@@ -102,35 +93,23 @@ jobs:
         uses: gradle/gradle-build-action@v3
         with:
           gradle-version: 8.7
-      - name: Build&Test
-        run: |
-          if [ "$GITHUB_REF_NAME" = "master" ]; then 
-            export POSTGRES_URL=$DATABASE_URL_TEST
-            export POSTGRES_USERNAME=$DATABASE_USERNAME_TEST
-            export POSTGRES_PASSWORD=$DATABASE_PASSWORD_TEST
-            export POSTGRES_SCHEMA=$DATABASE_SCHEMA_TEST
-          else 
-            export POSTGRES_URL=$DATABASE_URL_DEPLOY
-            export POSTGRES_USERNAME=$DATABASE_USERNAME_DEPLOY
-            export POSTGRES_PASSWORD=$DATABASE_PASSWORD_DEPLOY
-            export POSTGRES_SCHEMA=$DATABASE_SCHEMA_DEPLOY
-          fi
-          gradle $SUBMODULE:test
       - name: Deploy
         run: |
-          if [ "$GITHUB_REF_NAME" = "master" ]; then 
+          if [[ "$GITHUB_REF_NAME" == feature/* ]]; then 
             export IMAGE="rms-test/$SUBMODULE"
             export IMAGE_REGISTRY=$IMAGE_REGISTRY_TEST
             export REGISTRY_USERNAME=$REGISTRY_USERNAME_TEST
             export REGISTRY_PASSWORD=$REGISTRY_PASSWORD_TEST
-          else 
-            export IMAGE="rms/$SUBMODULE"
-            export IMAGE_REGISTRY=$IMAGE_REGISTRY_DEPLOY
-            export REGISTRY_USERNAME=$REGISTRY_USERNAME_DEPLOY
-            export REGISTRY_PASSWORD=$REGISTRY_PASSWORD_DEPLOY
+            export POSTGRES_URL=$DATABASE_URL_TEST
+            export POSTGRES_R2DBC_URL=$DATABASE_R2DBC_URL_TEST
+            export POSTGRES_USERNAME=$DATABASE_USERNAME_TEST
+            export POSTGRES_PASSWORD=$DATABASE_PASSWORD_TEST
+            export POSTGRES_SCHEMA=$DATABASE_SCHEMA_TEST
+          else
+            echo "❌ Branch condition NOT met. Current branch: $GITHUB_REF_NAME"
           fi
           TAG="latest" 
-          gradle $SUBMODULE:jib -x generateJooq \
+          gradle $SUBMODULE:jib\
             -Djib.from.image=$BASE_IMAGE \
             -Djib.from.auth.username=$DOCKER_USERNAME \
             -Djib.from.auth.password=$DOCKER_PASSWORD \

@@ -26,9 +26,6 @@ dependencies {
     testImplementation(libs.bundles.test.containers)
     testImplementation(libs.bundles.test.kubernetes)
 }
-tasks.processResources {
-    exclude("application.yml")
-}
 tasks.test {
     useJUnitPlatform()
 }
@@ -39,9 +36,13 @@ jib {
         "TZ" to "Asia/Seoul",
     )}
 }
-
 configurations { all { exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging") } }
 dependencyManagement { imports { mavenBom(libs.spring.cloud.bom.get().toString()) } }
+tasks.processResources {
+    doFirst {
+        if (gradle.taskGraph.allTasks.any { it.name == "jib" }) { exclude("application.yml") }
+    }
+}
 jooq {
     version.set("3.18.2")
     edition.set(JooqEdition.OSS)

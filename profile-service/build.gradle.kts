@@ -26,9 +26,6 @@ dependencies {
     testImplementation(libs.bundles.test.containers)
     testImplementation(libs.bundles.test.kubernetes)
 }
-tasks.processResources {
-    exclude("application.yml")
-}
 tasks.test {
     useJUnitPlatform()
 }
@@ -39,7 +36,11 @@ jib {
         "TZ" to "Asia/Seoul",
     )}
 }
-
+tasks.processResources {
+    doFirst {
+        if (gradle.taskGraph.allTasks.any { it.name == "jib" }) { exclude("application.yml") }
+    }
+}
 configurations { all { exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging") } }
 dependencyManagement { imports { mavenBom(libs.spring.cloud.bom.get().toString()) } }
 jooq {
