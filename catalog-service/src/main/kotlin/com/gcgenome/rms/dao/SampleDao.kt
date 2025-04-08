@@ -31,7 +31,7 @@ interface SampleDao {
 
         if (status != "CART") {
             insertQuery.set(SAMPLE.BARCODE,
-                select(DSL.coalesce(DSL.max(SAMPLE.BARCODE.cast(Long::class.java).plus(1).cast(String::class.java)), "${barcodePrefix}5000"))
+                select(DSL.coalesce(DSL.max(SAMPLE.BARCODE.cast(Long::class.java).plus(1).cast(String::class.java)), "${barcodePrefix}0001"))
                     .from(SAMPLE)
                     .where(SAMPLE.BARCODE.like("$barcodePrefix%")))
         }
