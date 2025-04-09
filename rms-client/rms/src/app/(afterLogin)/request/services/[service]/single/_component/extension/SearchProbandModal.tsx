@@ -16,7 +16,6 @@ import {Query} from "@/model/Query";
 import {useSetProbandRequest} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 import {postRequests} from "@/app/(afterLogin)/request/services/[service]/single/_api/postRequests";
-import {useRequestStore} from "@/store/useRequestStore";
 import {Filter} from "@/model/Filter";
 import {getStringDateFromComponents} from "@/app/_component/DateUtil";
 
@@ -31,14 +30,7 @@ const selectBoxOptions: SelectBoxOption[] = [
     { table: "patient", column: "serial", name: "MRN" }
 ];
 export default function SearchProbandModal({ closeModal }: Props) {
-    const {request} = useRequestStore()
     const defaultFilters: Filter[] = [
-        {
-            table: "organization",
-            column: "id",
-            value: request?.sample?.patient?.organization?.id!!,
-            operator: "="
-        },
         {
             table: "request_relation",
             column: "name",
