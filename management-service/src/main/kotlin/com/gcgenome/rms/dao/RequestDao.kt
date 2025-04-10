@@ -70,6 +70,7 @@ interface RequestDao: QueryDao {
             jsonObject(
                 key("id").value(SAMPLE.ID),
                 key("barcode").value(SAMPLE.BARCODE),
+                key("sampling_on").value(SAMPLE.SAMPLING_ON),
                 key("patient").value(
                     jsonObject(
                         key("serial").value(PATIENT.SERIAL),
