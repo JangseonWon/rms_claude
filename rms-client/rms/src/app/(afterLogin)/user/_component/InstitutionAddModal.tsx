@@ -27,6 +27,12 @@ export default function InstitutionAddModal({open, closeModal}: Props) {
     const { data: session } = useSession();
 
     const handleInstitutionAdd = async () => {
+        const isValidId = /^[A-Za-z0-9]{1,8}$/.test(institutionId);
+        if (!isValidId) {
+            showAlert("Institution ID must be exactly 8 characters long, containing only letters and numbers.");
+            return;
+        }
+
         const organization: Organization = {
             id: institutionId,
             user_id: session?.user?.id,
@@ -58,6 +64,7 @@ export default function InstitutionAddModal({open, closeModal}: Props) {
                                     </button>
                                 </div>
                                 <InputBox
+                                    placeHolder={"8 character limit of alphabet + number"}
                                     required={true}
                                     label={"Institution Id"}
                                     value={institutionId}
