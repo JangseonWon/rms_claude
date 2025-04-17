@@ -9,9 +9,6 @@ jobs:
       IMAGE_REGISTRY_TEST: ${{ secrets.IMAGE_REGISTRY_TEST }}
       REGISTRY_USERNAME_TEST: ${{ secrets.REGISTRY_USERNAME_TEST }}
       REGISTRY_PASSWORD_TEST: ${{ secrets.REGISTRY_PASSWORD_TEST }}
-      IMAGE_REGISTRY_DEPLOY: ${{ secrets.IMAGE_REGISTRY_DEPLOY }}
-      REGISTRY_USERNAME_DEPLOY: ${{ secrets.REGISTRY_USERNAME_DEPLOY }}
-      REGISTRY_PASSWORD_DEPLOY: ${{ secrets.REGISTRY_PASSWORD_DEPLOY }}
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
     steps:
@@ -19,14 +16,13 @@ jobs:
         uses: actions/checkout@v4
       - name: Packaging and push
         run: |
-          if [ "$GITHUB_REF_NAME" = "master" ]; then 
+          if [[ "$GITHUB_REF_NAME" == feature/* ]]; then 
            export IMAGE="rms-test/rms-client"
            export REGISTRY_USERNAME=$REGISTRY_USERNAME_TEST
            export REGISTRY_PASSWORD=$REGISTRY_PASSWORD_TEST
+           export BRANCH=feature
           else 
-           export IMAGE="rms/rms-client"
-           export REGISTRY_USERNAME=$REGISTRY_USERNAME_DEPLOY
-           export REGISTRY_PASSWORD=$REGISTRY_PASSWORD_DEPLOY
+           echo "❌ Branch condition NOT met. Current branch: $GITHUB_REF_NAME"
           fi
           cd rms-client/rms
           chmod +x build-image.sh && \
@@ -34,4 +30,5 @@ jobs:
           -i $IMAGE:latest \
           -r image-registry.apps.gcgenome.com \
           -u $REGISTRY_USERNAME \
-          -p $REGISTRY_PASSWORD
+          -p $REGISTRY_PASSWORD \
+          -b $BRANCH

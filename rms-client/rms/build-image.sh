@@ -18,6 +18,7 @@ USERNAME=""
 PASSWORD=""
 IMAGE_NAME=""
 REGISTRY=""
+BRANCH="default"
 
 # Parse command-line arguments
 shift # Remove the runtime from the arguments
@@ -37,6 +38,10 @@ while [ "$#" -gt 0 ]; do
             ;;
         -r)
             REGISTRY="$2"
+            shift 2
+            ;;
+        -b)
+            BRANCH="$2"
             shift 2
             ;;
         *)
@@ -64,7 +69,7 @@ if [ -n "$USERNAME" ] && [ -n "$PASSWORD" ]; then
 fi
 
 # Build the image
-$RUNTIME build -t "$REGISTRY/$IMAGE_NAME" . || { echo "Build failed"; exit 1; }
+$RUNTIME build --build-arg BRANCH=$BRANCH -t "$REGISTRY/$IMAGE_NAME" . || { echo "Build failed"; exit 1; }
 
 # Push the image to the registry
 $RUNTIME push "$REGISTRY/$IMAGE_NAME" || { echo "Push failed"; exit 1; }
