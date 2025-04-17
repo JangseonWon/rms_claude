@@ -38,14 +38,14 @@ export default function BarcodeModal({requests, closeModal}: Props) {
     const formatShortBarcode = (barcode: string) => {
         const datePart = barcode.slice(0, 8);
 
-        const startDate = new Date(2000, 0, 1);
-        const currentDate = new Date(
+        const startDate = Date.UTC(2000, 0, 1);
+        const currentDate = Date.UTC(
             parseInt(datePart.slice(0, 4)),
             parseInt(datePart.slice(4, 6)) - 1,
             parseInt(datePart.slice(6, 8))
         );
         const dayDifference = Math.floor(
-            (currentDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+            (currentDate - startDate) / (1000 * 60 * 60 * 24)
         );
         const remainingPart = barcode.slice(8);
         return `${dayDifference}${remainingPart}`;
