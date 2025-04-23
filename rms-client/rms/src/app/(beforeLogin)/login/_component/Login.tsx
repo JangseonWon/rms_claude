@@ -34,7 +34,7 @@ export default function Login() {
                 password,
                 redirect: false,
             });
-            if (response?.error !== null || !response.ok) {
+            if (response?.error || !response.ok) {
                 setMessage(
                     'This portal is accessible only to those who have an established contractual relationship with GC Genome.\n'+
                     ' If you are a healthcare professional or distributor, please contact us at the email address below.\n'+

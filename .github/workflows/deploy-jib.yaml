@@ -2,7 +2,7 @@ name: 백엔드 배포
 on:
   push:
     branches:
-      - feature/*
+      - develop
     paths:
       - management-service/**
       - login-service/**
@@ -18,6 +18,7 @@ on:
       - result-service/**
       - home-service/**
 permissions: write-all
+
 jobs:
   extract:
     runs-on: ubi9
@@ -28,32 +29,36 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 10
+
       - name: Extract module names from changed files
         id: extract-modules
         run: |
-          changed_files="$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }})"
+          set -e
+          changed_files="$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})"
           module_names=()
           for file in $changed_files; do
             module_name="${file%%/*}"
-            [[ "$module_name" == "management-service" || 
-          "$module_name" == "login-service" || 
-          "$module_name" == "dashboard-service" ||
-          "$module_name" == "order-service" ||
-          "$module_name" == "cart-service" ||
-          "$module_name" == "lims-service" ||
-          "$module_name" == "api" ||
-          "$module_name" == "post-service" ||
-          "$module_name" == "alis-api" ||
-          "$module_name" == "catalog-service" ||
-          "$module_name" == "result-service" ||
-          "$module_name" == "home-service" ||
-          "$module_name" == "profile-service" ]] && module_names+=("$module_name")
+            case "$module_name" in
+              management-service|login-service|dashboard-service|order-service|cart-service|lims-service|api|post-service|alis-api|catalog-service|result-service|home-service|profile-service)
+                module_names+=("$module_name")
+                ;;
+              *)
+                echo "⏭️ Skip non-module file: $file"
+                ;;
+            esac
           done
-          module_names=($(printf '%s\n' "${module_names[@]}" | sort -u))
-          echo "matrix=[$(printf '"%s",' "${module_names[@]}" | sed 's/,$//')]"
-          echo "matrix=[$(printf '"%s",' "${module_names[@]}" | sed 's/,$//')]" >> $GITHUB_OUTPUT
+
+          if [ ${#module_names[@]} -eq 0 ]; then
+            echo "✅ No module changes detected."
+            echo "matrix=[]" >> $GITHUB_OUTPUT
+          else
+            unique_modules=($(printf '%s\n' "${module_names[@]}" | sort -u))
+            echo "✅ Detected modules: ${unique_modules[*]}"
+            echo "matrix=[$(printf '"%s",' "${unique_modules[@]}" | sed 's/,$//')]" >> $GITHUB_OUTPUT
+          fi
   deploy:
     needs: extract
+    if: ${{ fromJson(needs.extract.outputs.matrix) != '[]' }}
     runs-on: ubi9
     strategy:
       fail-fast: true
@@ -84,31 +89,35 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
+
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v3
         with:
           gradle-version: 8.7
+
       - name: Deploy
         run: |
-          if [[ "$GITHUB_REF_NAME" == feature/* ]]; then 
-            export IMAGE="rms-test/$SUBMODULE"
-            export IMAGE_REGISTRY=$IMAGE_REGISTRY_TEST
-            export REGISTRY_USERNAME=$REGISTRY_USERNAME_TEST
-            export REGISTRY_PASSWORD=$REGISTRY_PASSWORD_TEST
-            export POSTGRES_URL=$DATABASE_URL_TEST
-            export POSTGRES_R2DBC_URL=$DATABASE_R2DBC_URL_TEST
-            export POSTGRES_USERNAME=$DATABASE_USERNAME_TEST
-            export POSTGRES_PASSWORD=$DATABASE_PASSWORD_TEST
-            export POSTGRES_SCHEMA=$DATABASE_SCHEMA_TEST
-          else
-            echo "❌ Branch condition NOT met. Current branch: $GITHUB_REF_NAME"
-          fi
+          set -e
+          echo "🚀 Starting Deploy for module: $SUBMODULE"
+           
+          export IMAGE="rms-test/$SUBMODULE"
+          export IMAGE_REGISTRY=$IMAGE_REGISTRY_TEST
+          export REGISTRY_USERNAME=$REGISTRY_USERNAME_TEST
+          export REGISTRY_PASSWORD=$REGISTRY_PASSWORD_TEST
+          export POSTGRES_URL=$DATABASE_URL_TEST
+          export POSTGRES_R2DBC_URL=$DATABASE_R2DBC_URL_TEST
+          export POSTGRES_USERNAME=$DATABASE_USERNAME_TEST
+          export POSTGRES_PASSWORD=$DATABASE_PASSWORD_TEST
+          export POSTGRES_SCHEMA=$DATABASE_SCHEMA_TEST
+          
           TAG="latest" 
+          
           gradle $SUBMODULE:jib\
             -Djib.from.image=$BASE_IMAGE \
             -Djib.from.auth.username=$DOCKER_USERNAME \

@@ -4,7 +4,6 @@ import com.gcgenome.rms.alis.data.AlisQuery
 import com.gcgenome.rms.exceptions.*
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.codec.DecodingException
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.server.*
@@ -12,11 +11,11 @@ import org.springframework.web.server.ServerWebInputException
 import reactor.core.publisher.Mono
 
 
-@Configuration("com.gcgenome.rms.order.Route")
+@Configuration
 class Router (
     private val handler: Handler
 ){
-    @Bean("com.gcgenome.rms.order.Route.Bean")
+    @Bean
     fun route() = router {
         POST("/api/alis/requests", contentType(MediaType("application", "xml"))) { request ->
             when (request.headers().accept().firstOrNull()) {

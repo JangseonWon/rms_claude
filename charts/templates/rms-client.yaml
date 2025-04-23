@@ -30,6 +30,16 @@ spec:
           env:
             - name: TZ
               value: Asia/Seoul
+            - name: auth.auth-secret
+              valueFrom:
+                secretKeyRef:
+                  name: auth
+                  key: auth-secret
+            - name: url.base-url
+              valueFrom:
+                secretKeyRef:
+                  name: url
+                  key: base-url
           ports:
             - containerPort: 8080
               protocol: TCP

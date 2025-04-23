@@ -40,8 +40,12 @@ while [ "$#" -gt 0 ]; do
             REGISTRY="$2"
             shift 2
             ;;
-        -b)
-            BRANCH="$2"
+        --auth-secret)
+            AUTH_SECRET="$2"
+            shift 2
+            ;;
+          --base-url)
+            BASE_URL="$2"
             shift 2
             ;;
         *)
@@ -69,7 +73,10 @@ if [ -n "$USERNAME" ] && [ -n "$PASSWORD" ]; then
 fi
 
 # Build the image
-$RUNTIME build --build-arg BRANCH=$BRANCH -t "$REGISTRY/$IMAGE_NAME" . || { echo "Build failed"; exit 1; }
+$RUNTIME build \
+--build-arg AUTH_SECRET=$AUTH_SECRET \
+--build-arg BASE_URL=$BASE_URL \
+-t "$REGISTRY/$IMAGE_NAME" . || { echo "Build failed"; exit 1; }
 
 # Push the image to the registry
 $RUNTIME push "$REGISTRY/$IMAGE_NAME" || { echo "Push failed"; exit 1; }

@@ -8,17 +8,12 @@ COPY package.json /app/package.json
 COPY tsconfig.json /app/tsconfig.json
 COPY next.config.mjs /app/next.config.mjs
 COPY .eslintrc.json /app/.eslintrc.json
-COPY .env /app/.env
-COPY .env_dev /app/.env_dev
 
-ARG BRANCH=default
-RUN echo "🔍 BRANCH value is: $BRANCH" && \
-    if [ "$BRANCH" = "feature" ]; then \
-      echo "✅ Using .env_dev for feature branch" && \
-      cp /app/.env_dev /app/.env; \
-    else \
-      true; \
-    fi
+ARG AUTH_SECRET
+ARG BASE_URL
+
+ENV AUTH_SECRET=$AUTH_SECRET
+ENV BASE_URL=$BASE_URL
 
 RUN npm install && npm run build
 

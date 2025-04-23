@@ -40,7 +40,6 @@ class Handler(
     fun checkUser(alisQuery: AlisQuery): Mono<Void>{
         return Mono.zip(decode(alisQuery.account.id), decode(alisQuery.account.pwd))
             .flatMap {
-                println("id: ${it.t1}, pwd: ${it.t2}")
                 if (it.t1 == "alis" && it.t2 == "alis1234") {
                     Mono.empty()
                 } else {

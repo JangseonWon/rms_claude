@@ -2,7 +2,7 @@ import NextAuth, {DefaultSession} from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import JWTParser from "jsonwebtoken"
 import {cookies} from "next/headers";
-import cookie from 'cookie'
+import { parse } from "cookie";
 
 declare module '@auth/core/types' {
     interface Session {
@@ -37,6 +37,7 @@ declare module '@auth/core/jwt' {
 }
 
 export const{handlers: {GET, POST}, auth} = NextAuth({
+    trustHost: true,
     pages:{
         signIn: '/login'
     },
@@ -77,17 +78,22 @@ export const{handlers: {GET, POST}, auth} = NextAuth({
                     return null
                 }
                 const setCookie = authResponse.headers.get('set-cookie')!
-
-                if (setCookie) {
-                    const parsed = cookie.parse(setCookie);
-                    const authorization = parsed['Authorization']
-                    const expires = parsed['Expires'];
-                    const expiresDate = new Date(expires);
-                    const maxAge = Math.floor((expiresDate.getTime() - Date.now()) / 1000);
-
-                    cookies().set('Authorization' as any, authorization as any, {maxAge} as any);
-                    return JWTParser.decode(authorization, {complete:true})?.payload
+                if (!setCookie) {
+                    throw new Error("No set-cookie header received.");
                 }
+
+                const parsed = parse(setCookie);
+                const authorization = parsed['Authorization']
+                const expires = parsed['Expires'];
+                if (!authorization || !expires) {
+                    throw new Error("Authorization or Expires cookie is missing.");
+                }
+                const expiresDate = new Date(expires);
+                const maxAge = Math.floor((expiresDate.getTime() - Date.now()) / 1000);
+
+                cookies().set('Authorization' as any, authorization as any, {maxAge} as any);
+                return JWTParser.decode(authorization, {complete:true})?.payload
+
             }
         })
     ]

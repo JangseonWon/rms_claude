@@ -19,6 +19,7 @@
     "@types/react-datepicker": "^6.2.0",
     "@types/react-slick": "^0.23.13",
     "classnames": "^2.5.1",
+    "cookie": "^1.0.2",
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.11",
     "exceljs": "^4.4.0",
