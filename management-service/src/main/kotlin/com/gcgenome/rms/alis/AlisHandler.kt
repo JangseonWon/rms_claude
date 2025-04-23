@@ -2,7 +2,6 @@ package com.gcgenome.rms.alis
 
 import com.gcgenome.rms.dao.*
 import com.gcgenome.rms.data.*
-import com.gcgenome.rms.history.UserHistoryHandler
 import org.jooq.DSLContext
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Component
@@ -12,8 +11,7 @@ import reactor.core.publisher.Mono
 @Component
 class AlisHandler(
     val dslContext: DSLContext,
-    val encoder: BCryptPasswordEncoder,
-    val userHistoryHandler: UserHistoryHandler
+    val encoder: BCryptPasswordEncoder
 ):ServiceDao, SampleTypeDao,ExtensionDao, UserDao, OrganizationDao {
     private val webClient = WebClient.builder().baseUrl("https://rms-test.gcgenome.com").build()
 
@@ -26,30 +24,11 @@ class AlisHandler(
                 dslContext.transactionPublisher { trx ->
                     trx.dsl().run {
                         val pwd = encoder.encode("GCGenome00!")
-                        checkDeferByAlis(dsl(), alisOrganization).flatMap { isDifferent ->
-                            if (isDifferent) {
-                                upsertUsers(alisOrganization, pwd)
-                                    .flatMap { userHistoryHandler.logUserChanges(trx.dsl(), userId, it) }
-                                    .flatMap { insertOrganization(alisOrganization) }
-                            } else {
-                                Mono.empty()
-                            }
-                        }
+                        upsertUsers(alisOrganization, pwd)
                     }
                 }
             }
             .then(dslContext.selectUsersWithPage(query, "ADMIN"))
-    }
-
-    fun checkDeferByAlis(dsl: DSLContext, alisUser: AlisOrganization): Mono<Boolean> {
-        return Mono.from(
-            dsl.selectUserById(alisUser.compCode).map { user ->
-                val isDifferent = (user.name != alisUser.compName) ||
-                        (user.branchSerial != alisUser.compMngBeginNo) ||
-                        (user.branchName != alisUser.compMngName)
-                isDifferent
-            }.switchIfEmpty(Mono.just(true))
-        )
     }
 
     fun updateServices(query: Query): Mono<Page<ServiceDTO>> {
