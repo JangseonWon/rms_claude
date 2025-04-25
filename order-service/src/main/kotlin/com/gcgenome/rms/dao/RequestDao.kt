@@ -11,6 +11,14 @@ import reactor.core.publisher.Mono
 import java.util.*
 
 interface RequestDao: QueryDao {
+    fun DSLContext.deleteRequest(request: RequestDTO): Mono<RequestDTO> {
+        return Mono.from(
+            deleteFrom(REQUEST).where(
+                REQUEST.SAMPLE_ID.eq(request.sample!!.id),
+                REQUEST.SERVICE_ID.eq(request.service!!.id)
+            ).returning()
+        ).map { it.into(RequestDTO::class.java) }
+    }
     fun DSLContext.updateRequest(request: RequestDTO): Mono<RequestDTO> {
         return Mono.from(
             update(REQUEST)

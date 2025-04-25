@@ -1,7 +1,7 @@
 "use client"
 
 import React, {ChangeEventHandler, FormEventHandler, useState} from "react";
-import {signIn} from "next-auth/react";
+import {signIn, SignInResponse} from "next-auth/react";
 import {useRouter} from "next/navigation";
 import style from "@/app/(beforeLogin)/login/_component/login.module.css";
 import Image from "next/image";
@@ -34,7 +34,7 @@ export default function Login() {
                 password,
                 redirect: false,
             });
-            if (response?.error || !response.ok) {
+            if (response?.error || !response?.ok) {
                 setMessage(
                     'This portal is accessible only to those who have an established contractual relationship with GC Genome.\n'+
                     ' If you are a healthcare professional or distributor, please contact us at the email address below.\n'+

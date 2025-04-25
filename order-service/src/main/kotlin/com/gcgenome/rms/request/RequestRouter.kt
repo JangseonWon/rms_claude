@@ -26,6 +26,7 @@ class RequestRouter(
     fun route() = router {
         POST("/w-api/order-service/requests/search", ::selectRequests)
         PATCH("/w-api/order-service/requests",:: updateRequests)
+        DELETE("/w-api/order-service/requests", :: deleteRequests)
         GET("/w-api/order-service/services/{service_id}/samples/{sample_id}", ::orderInfo)
     }
     private val logger: Logger = LoggerFactory.getLogger(RequestRouter::class.java)
@@ -50,6 +51,17 @@ class RequestRouter(
         return authenticationHandler.principal(request)
             .then (request.bodyToMono(Array<RequestDTO>::class.java))
             .flatMap { requests -> requestHandler.updateRequests(requests.toList()) }
+            .then(ServerResponse.ok().build())
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume { e ->
+                logger.error(e.stackTraceToString())
+                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome")
+            }
+    }
+    private fun deleteRequests(request: ServerRequest) : Mono<ServerResponse> {
+        return authenticationHandler.principal(request)
+            .then (request.bodyToMono(Array<RequestDTO>::class.java))
+            .flatMap { requests -> requestHandler.deleteRequests(requests.toList()) }
             .then(ServerResponse.ok().build())
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume { e ->

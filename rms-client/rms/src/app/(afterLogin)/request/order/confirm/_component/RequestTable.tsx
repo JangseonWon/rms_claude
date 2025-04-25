@@ -21,14 +21,10 @@ import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 import CellTooltip from "@/app/_component/CellToolTip";
 import style from "@/css/qna/qnaTable.module.css";
 import {GrPowerReset} from "react-icons/gr";
-import {
-    useOkNotice,
-    useOpenNoticeDialog,
-    useSetMessageNoticeDialog,
-    useSetOkNotice
-} from "@/store/useNoticeDialogStore";
 import {formatDateLocal, getStringDateFromComponents} from "@/app/_component/DateUtil";
 import RequestDetailInfo from "@/app/_component/RequestDetailInfo";
+import {deleteRequests} from "@/app/(afterLogin)/request/order/_api/deleteRequests";
+import {useConfirmDialog} from "@/app/_component/dialog/useConfirmDialog";
 
 
 export interface RequestWithSelected extends Request {
@@ -63,10 +59,7 @@ export default function RequestTable() {
     const [infoModalOpen, setInfoModalOpen] = useState<boolean>(false);
     const [infoRequest, setInfoRequest] = useState<Request>();
     const showAlert = CallAlertDialog();
-    const setShowNoticeDialog = useOpenNoticeDialog();
-    const setNoticeMessage = useSetMessageNoticeDialog();
-    const okNotice = useOkNotice();
-    const setOkNotice = useSetOkNotice();
+    const {confirm, dialogComponent } = useConfirmDialog()
 
     const handleSelectChange = (rowIndex: number, isSelected: boolean) => {
         setRequestData((prevData) => {
@@ -75,6 +68,29 @@ export default function RequestTable() {
             return updatedData;
         });
     };
+    const fetchData = async (search: Query) => {
+        try {
+            const response = await postRequests(search);
+            const data = await response.json();
+            setRequestData(data as Request[]);
+        }
+        catch {
+            setRequestData([]);
+        }
+    };
+    const handleDeleteClick = async() => {
+        const selectedRequests = requestData.filter(request => request.isSelected);
+        if( selectedRequests.length === 0) {
+            showAlert("No selected.");
+            return;
+        }
+        const ok = await confirm("Confirmation","Are you sure you want to delete this request? \n This action cannot be undone.")
+        if (ok) {
+            const response = await deleteRequests(selectedRequests)
+            await fetchData(updatedSearch())
+            if (response) showAlert("Success")
+        }
+    }
     const handleAirWaybillClick = () => {
         const selected = requestData.filter((request) => request.isSelected);
         if(selected.length == 0) {
@@ -85,38 +101,36 @@ export default function RequestTable() {
         setAirWaybillModal(true);
     }
 
-    const handleConfirmClick = () => {
-        setShowNoticeDialog(true);
-        setNoticeMessage('Are you sure you want to confirm?');
+    const handleConfirmClick = async () => {
+        const ok = await confirm("Confirmation","Are you sure you want to confirm?")
+        if(ok){
+            const selected = requestData.filter((request) => request.isSelected);
+            if(selected.length == 0) {
+                showAlert("No selected.")
+                return
+            }
+            const hasMissingInfo = selected.some(
+                (request) => !request.awb_number || !request.courier_company
+            );
+            if (hasMissingInfo) {
+                showAlert("Air Waybill information is incomplete.");
+                return;
+            }
+            const updatedRequests = selected.map((request) => ({
+                sample: { id: request.sample?.id },
+                service: { id: request.service?.id },
+                status: Status.COMPLETED_ORDER.valueOf(),
+            }));
+
+            const response = await patchRequests(updatedRequests);
+            if(response.ok) {
+                showAlert("Success")
+                await fetchData(updatedSearch());
+            } else {
+                console.error("Failed to confirm requests:", response.statusText);
+            }
+        }
     };
-
-    const handleConfirm = async () => {
-        const selected = requestData.filter((request) => request.isSelected);
-        if(selected.length == 0) {
-            showAlert("No selected.")
-            return
-        }
-        const hasMissingInfo = selected.some(
-            (request) => !request.awb_number || !request.courier_company
-        );
-        if (hasMissingInfo) {
-            showAlert("Air Waybill information is incomplete.");
-            return;
-        }
-        const updatedRequests = selected.map((request) => ({
-            sample: { id: request.sample?.id },
-            service: { id: request.service?.id },
-            status: Status.COMPLETED_ORDER.valueOf(),
-        }));
-
-        const response = await patchRequests(updatedRequests);
-        if(response.ok) {
-            showAlert("Success")
-            await fetchData(updatedSearch());
-        } else {
-            console.error("Failed to confirm requests:", response.statusText);
-        }
-    }
 
     const closeModal = () => {
         setInfoModalOpen(false);
@@ -125,17 +139,6 @@ export default function RequestTable() {
 
     const handleSelectAll = (isSelected: boolean) => {
         setRequestData((prevData) => prevData.map((row) => ({ ...row, isSelected })));
-    };
-
-    const fetchData = async (search: Query) => {
-        try {
-            const response = await postRequests(search);
-            const data = await response.json();
-            setRequestData(data as Request[]);
-        }
-        catch {
-            setRequestData([]);
-        }
     };
 
     const updatedSearch = (): Query => ({
@@ -165,16 +168,11 @@ export default function RequestTable() {
         fetchData(updatedSearch());
     }, [searchFilter,orderDateFilter]);
 
-    useEffect(() => {
-        if (okNotice) {
-            handleConfirm();
-            setOkNotice(false);
-        }
-    }, [okNotice]);
-
     return (
         <>
+            {dialogComponent}
             <div className={globalTableStyle.formGroupRight}>
+                <GreenButton name={'Delete'} onClick={handleDeleteClick}/>
                 <GreenButton name={'AirWaybill'} onClick={handleAirWaybillClick}/>
                 <BlueButton name={'Confirm'} onClick={handleConfirmClick}/>
             </div>
