@@ -13,7 +13,6 @@ export enum ExtensionType {
     BOOLEAN = "BOOLEAN",
     STRING = "STRING",
     INTEGER = "INTEGER",
-    NUMBER = "NUMBER",
     FLOAT = "FLOAT",
     TEXT = "TEXT",
     PROBAND_SEARCH = "PROBAND_SEARCH",

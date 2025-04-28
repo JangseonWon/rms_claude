@@ -33,7 +33,7 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
             "Gender *", // List
             "Sample Type *",
             "Collection Date (YYYY-MM-DD) *", // Date
-            "Quantity *", // Decimal
+            "Number of Specimens *", // Decimal
             "Medical Department",
             "Ward",
             "Physician Name",
@@ -122,7 +122,7 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
             };
 
             worksheet.getCell(rowIndex, 8).dataValidation = {
-                type: 'decimal',
+                type: 'whole',
                 allowBlank: true,
                 operator: 'between',
                 formulae: [0, 200],
@@ -158,7 +158,7 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
                             error: `Please enter a valid integer for ${extension.name}.`,
                         };
                         break;
-                    case ExtensionType.NUMBER:
+                    case ExtensionType.FLOAT:
                         cell.dataValidation = {
                             type: 'decimal',
                             allowBlank: !extension.required,

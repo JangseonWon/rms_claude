@@ -98,7 +98,7 @@ export default function Order() {
                 ward: mapByHeader("Ward"),
                 collectionDate: collectionDate,
                 code: mapByHeader("Code"),
-                quantity: mapByHeader("Quantity"),
+                quantity: mapByHeader("Number of Specimens"),
                 memo: mapByHeader("Memo"),
                 extensions
             };
@@ -306,7 +306,7 @@ export default function Order() {
                         <th className={style.header100}>Gender *</th>
                         <th className={style.header150}>Sample Type *</th>
                         <th className={style.header150}>Collection Date *</th>
-                        <th className={style.header100}>Quantity *</th>
+                        <th className={style.header100}>Number of Specimens *</th>
                         <th className={style.header150}>Medical Department</th>
                         <th className={style.header150}>Ward</th>
                         <th className={style.header150}>Physician Name</th>

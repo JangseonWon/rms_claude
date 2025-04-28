@@ -351,7 +351,8 @@ export default function RequestDetailInfo({module='cart', disabled, serviceId, s
                             {renderCollectionDate(request)}
                             <InputBox
                                 disabled={disabled}
-                                label={"Quantity*"}
+                                label={"Number of Specimens*"}
+                                regex={"-?\\d+"}
                                 value={request.sample?.quantity?.toString()}
                                 required={true}
                                 onChange={(value) => handleRequestChange('sample.quantity', value)}

@@ -282,8 +282,9 @@ export default function Order() {
                     />
                 </div>
                 <InputBox
-                    label={"Quantity*"}
+                    label={"Number of Specimens*"}
                     required={true}
+                    regex={"-?\\d+"}
                     onChange={(value) => handleRequestChange('sample.quantity', value)}
                 />
             </div>

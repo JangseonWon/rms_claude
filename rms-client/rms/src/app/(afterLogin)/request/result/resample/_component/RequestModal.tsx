@@ -181,7 +181,8 @@ export default function RequestModal({propRequest, closeModal,refreshData}: Prop
                                 }}
                             />
                             <InputBox
-                                label={"Quantity*"}
+                                label={"Number of Specimens*"}
+                                regex={"-?\\d+"}
                                 required={true}
                                 onChange={(value) => handleRequestChange('sample.quantity', value)}
                             />
