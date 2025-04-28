@@ -20,6 +20,7 @@ interface ReportDao{
                 REPORT.DOWNLOADED_AT,
                 REPORT.IS_LATEST,
                 jsonObject(
+                    key("status").value(REQUEST.STATUS),
                     key("user").value(jsonObject(
                         key("id").value(REQUEST.USER_ID)
                     )),

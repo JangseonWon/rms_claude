@@ -12,7 +12,7 @@ import downloadStyle from "@/app/(afterLogin)/request/result/download/_component
 import SelectBox from "@/app/_component/SelectBox";
 import InputBox from "@/app/_component/InputBox";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faAngleLeft, faAngleRight} from "@fortawesome/free-solid-svg-icons";
+import {faAngleLeft, faAngleRight, faFilePdf} from "@fortawesome/free-solid-svg-icons";
 import {Status} from "@/model/Status";
 import {patchRequests} from "@/app/(afterLogin)/request/result/download/_api/patchRequests";
 import RequestModal from "@/app/(afterLogin)/request/result/resample/_component/RequestModal";
@@ -26,6 +26,9 @@ import {
     useSetOkNotice
 } from "@/store/useNoticeDialogStore";
 import {formatDateLocal} from "@/app/_component/DateUtil";
+import {Report} from "@/model/Report";
+import {getReportFile} from "@/app/(afterLogin)/request/result/download/_api/getReportFile";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 const selectBoxOptions: SelectBoxOption[] = [
     { table: "user", column: "name", name: "User Name" },
@@ -59,6 +62,7 @@ export default function ReSampleTable() {
     const [orderDateFilter, setOrderDateFilter] = useState<FilterGroup>()
     const [requestModalOpen, setRequestModalOpen] = useState<boolean>(false);
     const [selectedRequest, setSelectedRequest] = useState<Request>();
+    const showAlert = CallAlertDialog();
 
     const handleRequestClick = (request: Request) => {
         setSelectedRequest(request);
@@ -114,6 +118,28 @@ export default function ReSampleTable() {
             setCancelRequest(undefined);
         }
     }
+    const handleDownloadOnClick = async (report: Report, request: Request) => {
+        try {
+            const response = await getReportFile(report.id!);
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob)
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${request.sample?.barcode || 'NA'}_${request.service?.id || 'NA'}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+                //fetchData(updateSearch);
+            } else {
+                showAlert("Download failed")
+            }
+        } catch (error) {
+            showAlert("error");
+        }
+    };
+
     const refreshData = () => {
         const updatedSearch = {
             ...search,
@@ -243,6 +269,7 @@ export default function ReSampleTable() {
                             <th className={globalTableStyle.longColumn}>Reason</th>
                             <th className={globalTableStyle.middleColumn}>Request</th>
                             <th className={globalTableStyle.middleColumn}>Cancel</th>
+                            <th className={globalTableStyle.shortColumn}>Report Download</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -258,8 +285,18 @@ export default function ReSampleTable() {
                                 <td className={globalTableStyle.longColumn}>{request.lims_resample_reason}</td>
                                 <td className={globalTableStyle.underlineBlue} onClick={() => handleRequestClick(request)}>Request</td>
                                 <td className={globalTableStyle.underlineRed} onClick={() => handleCancelToResampleClick(request)}>Cancel</td>
+                                <td className={globalTableStyle.middleColumn}>
+                                    {(request.reports as Report[])
+                                        ?.filter((report: Report) => report.type === 'PDF' && report.is_latest === true).map((report) => (
+                                            <FontAwesomeIcon
+                                                key={report.id}
+                                                className={downloadStyle.downloadIcon}
+                                                icon={faFilePdf}
+                                                onClick={() => handleDownloadOnClick(report, request)}/>
+                                        ))}
+                                </td>
                             </tr>
-                        ))
+                            ))
                         ) : (
                             <tr>
                                 <td colSpan={11} className={globalTableStyle.noData}>
@@ -274,7 +311,7 @@ export default function ReSampleTable() {
                     <span>items per page:</span>
                     <div className={globalTableStyle.select}>
                         <select onChange={handlePageSizeChange}>
-                            <option value="10">10</option>
+                        <option value="10">10</option>
                             <option value="20">20</option>
                             <option value="50">50</option>
                         </select>

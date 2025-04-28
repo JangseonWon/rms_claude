@@ -5,6 +5,7 @@ import com.gcgenome.rms.dao.ReportDao
 import com.gcgenome.rms.dao.RequestDao
 import com.gcgenome.rms.data.RequestDTO
 import com.gcgenome.rms.data.Role
+import com.gcgenome.rms.data.Status
 import com.gcgenome.rms.exception.AuthenticationNotFoundException
 import org.jooq.DSLContext
 import org.springframework.beans.factory.annotation.Value
@@ -75,14 +76,21 @@ class ReportHandler(
                     val isAuthorizedUser = userAuth.user.id == report.request?.user?.id
                     val isAdminOrManager = userAuth.user.role in listOf(Role.ADMIN.toString(), Role.MANAGER.toString())
 
-                    if(isAuthorizedUser){
-                        updateRequestStatusFinish(report.request!!)
-                            .then(updateReportReportedAt(report.id!!))
-                            .then(downloadFileFromS3(report.value!!))
-                    } else if(isAdminOrManager) {
-                        downloadFileFromS3(report.value!!)
-                    } else{
-                        Mono.error(AuthenticationNotFoundException())
+                    when {
+                        isAuthorizedUser -> {
+                            if (report.request!!.status == Status.TEST_FAILED) {
+                                updateReportReportedAt(report.id!!)
+                                    .then(downloadFileFromS3(report.value!!))
+                            } else {
+                                updateRequestStatusFinish(report.request!!)
+                                    .then(updateReportReportedAt(report.id!!))
+                                    .then(downloadFileFromS3(report.value!!))
+                            }
+                        }
+                        isAdminOrManager -> {
+                            downloadFileFromS3(report.value!!)
+                        }
+                        else -> { Mono.error(AuthenticationNotFoundException()) }
                     }
                 }
             }
