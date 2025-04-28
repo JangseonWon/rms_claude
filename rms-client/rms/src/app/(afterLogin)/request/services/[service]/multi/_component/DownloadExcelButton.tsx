@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import ExcelJS from 'exceljs';
+import exceljs from 'exceljs';
 import {Extension, ExtensionType} from "@/model/Extension";
 import style from './downloadExcelButton.module.css'
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -23,6 +23,7 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
     const serviceId = decodeURIComponent(pathSegments[pathSegments.length - 2]);
     const [sampleTypeList, setSampleTypeList] = useState<SampleType[]>();
     const [institutionList, setInstitutionList] = useState<Organization[]>();
+    const { Workbook } = exceljs;
 
     const handleDownload = async () => {
         const headers = [
@@ -35,7 +36,6 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
             "Collection Date (YYYY-MM-DD) *", // Date
             "Number of Specimens *", // Decimal
             "Medical Department",
-            "Ward",
             "Physician Name",
             // ...extensions.map(extension => extension.name),
             ...extensions.map(extension => extension.required ? `${extension.name} *` : extension.name),
@@ -47,7 +47,7 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
         const day = String(today.getDate()).padStart(2, '0');
         const formattedDate = `${year}_${month}_${day}`;
 
-        const workbook = new ExcelJS.Workbook();
+        const workbook = new Workbook();
         const worksheet = workbook.addWorksheet('Sheet1');
 
         worksheet.addRow(headers);
@@ -188,12 +188,12 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
         const buffer = await workbook.xlsx.writeBuffer();
         const blob = new Blob([buffer], { type: "application/octet-stream" });
 
-        const url = window.URL.createObjectURL(blob);
+        const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
         a.download = `${serviceId}_${formattedDate}.xlsx`;
         a.click();
-        window.URL.revokeObjectURL(url);
+        URL.revokeObjectURL(url);
     };
 
     useEffect(() => {
@@ -212,7 +212,7 @@ export default function DownloadExcelButton({ extensions }: DownloadExcelButtonP
     return (
         <button className={style.download} onClick={handleDownload}>
             Download Excel&nbsp;
-            <FontAwesomeIcon className={style.downloadIcon} icon={faDownload} />
+            <FontAwesomeIcon icon={faDownload} />
         </button>
     );
 }

@@ -385,12 +385,6 @@ export default function RequestDetailInfo({module='cart', disabled, serviceId, s
                             />
                             <InputBox
                                 disabled={disabled}
-                                label={"Ward"}
-                                value={request.ward}
-                                onChange={(value) => handleRequestChange('ward', value)}
-                            />
-                            <InputBox
-                                disabled={disabled}
                                 label={"Physician Name"}
                                 value={request.physician}
                                 onChange={(value) => handleRequestChange('physician', value)}

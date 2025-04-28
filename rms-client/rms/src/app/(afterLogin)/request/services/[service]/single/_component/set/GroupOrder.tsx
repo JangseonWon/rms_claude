@@ -338,10 +338,6 @@ export default function GroupOrder() {
                         onChange={(value) => handleRequestChange(index,`department`, value)}
                     />
                     <InputBox
-                        label={"Ward"}
-                        onChange={(value) => handleRequestChange(index,`ward`, value)}
-                    />
-                    <InputBox
                         label={"Physician Name"}
                         onChange={(value) => handleRequestChange(index,`physician`, value)}
                     />
