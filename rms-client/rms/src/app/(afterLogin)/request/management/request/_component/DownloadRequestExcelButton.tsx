@@ -99,7 +99,7 @@ export default function DownloadRequestExcelButton({ search, from, to }: Downloa
             }
         });
 
-        const fileName = `request_${from ? format(from, "yyyyMMdd") : "start"}~${to ? format(to, "yyyyMMdd") : "end"}.xlsx`;
+        const fileName = `RequestManagement_${format(new Date(), "yyMMdd")}.xlsx`;
 
         XLSX.writeFile(workbook, fileName);
     }

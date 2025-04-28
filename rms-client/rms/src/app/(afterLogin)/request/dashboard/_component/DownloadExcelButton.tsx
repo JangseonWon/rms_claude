@@ -96,7 +96,7 @@ export default function DownloadExcelButton({ search, status }: DownloadExcelBut
             }
         });
 
-        const fileName = `dashboard_${status}_${format(new Date(), 'yyyy-MM-dd')}.xlsx`;
+        const fileName = `Dashboard_${format(new Date(), 'yyMMdd')}.xlsx`;
         XLSX.writeFile(workbook, fileName);
     }
 
