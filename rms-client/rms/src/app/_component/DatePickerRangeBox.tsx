@@ -1,7 +1,7 @@
 "use client"
 
 import DatePicker, {ReactDatePickerProps} from "react-datepicker";
-import React, {forwardRef, useState} from "react";
+import React, {forwardRef, useEffect, useState} from "react";
 import style from "@/app/_component/datePickerRange.module.css"
 import "react-datepicker/dist/react-datepicker.css";
 import '@/app/globals.css';
@@ -53,6 +53,11 @@ export default function DatePickerRangeBox({label, value, onChange, required = f
     const years = range(1900, getYear(new Date()) + 1, 1);
     const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([fromDate || null, toDate || null]);
     const [startDate, endDate] = dateRange;
+
+    useEffect(() => {
+        setDateRange([fromDate ?? null, toDate ?? null]);
+    }, [fromDate, toDate]);
+
     const months = [
         "January",
         "February",

@@ -40,7 +40,8 @@
 }
 .table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0 1px;
 }
 .table thead {
     background: linear-gradient(to right, #023a60, #5676a2);
@@ -59,9 +60,6 @@
 .table tbody {
     font-weight: 300;
 }
-.table tbody tr {
-    border-bottom: 1px solid #838689;
-}
 .table tbody tr:nth-child(even) {
     background-color: #ffffff;
 }
@@ -72,10 +70,73 @@
     color: #666666;
     font-size: 12px;
 }
+
 .table th,
 .table td {
     padding: 8px;
     text-align: center;
+    border-bottom: 1px solid #838689;
+}
+.stickyColumnHeaderCheckBox {
+    position: sticky;
+    left: 0.5px;
+    background: #023a60;
+    z-index: 2;
+    clip-path: inset(0px -10px 0px 0px);
+}
+.stickyColumnHeader {
+    position: sticky;
+    left: 38.5px;
+    background: #023a60;
+    z-index: 1;
+}
+.stickyColumnHeaderSecond {
+    position: sticky;
+    left: 204.5px;
+    background: linear-gradient(to right, #023a60, #31446D);
+    z-index: 1;
+}
+.stickyColumnCheckBox {
+    position: sticky;
+    left: 0.5px;
+    background-color: white;
+    z-index: 1;
+}
+.stickyColumnFirstColumn {
+    left: 38.5px;
+    position: sticky;
+    background-color: white;
+    z-index: 1;
+}
+.stickyColumnSecondColumn {
+    position: sticky;
+    left: 204.5px;
+    background-color: white;
+    z-index: 1;
+}
+.stickyColumnLast {
+    border-right: 3px double #838689;
+}
+.longColumn {
+    min-width: 150px;
+    max-width: 150px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.middleColumn {
+    min-width: 100px;
+    max-width: 100px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.shortColumn {
+    min-width: 50px;
+    max-width: 50px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 .underlineRed {
     cursor: pointer;
@@ -211,64 +272,6 @@
     text-align: center;
     color: gray;
     font-weight: 700;
-}
-.stickyColumnHeaderCheckBox {
-    position: sticky;
-    left: 0;
-    background: #023a60;
-    z-index: 2;
-    clip-path: inset(0px -10px 0px 0px);
-}
-.stickyColumnHeader {
-    position: sticky;
-    left: 38px;
-    background: #023a60;
-    z-index: 1;
-}
-.stickyColumnHeaderSecond {
-    position: sticky;
-    left: 204px;
-    background: linear-gradient(to right, #023a60, #31446D);
-    z-index: 1;
-}
-.stickyColumnCheckBox {
-    position: sticky;
-    left: 0;
-    background-color: white;
-    z-index: 1;
-}
-.stickyColumnFirstColumn {
-    position: sticky;
-    left: 38px;
-    background-color: white;
-    z-index: 1;
-}
-.stickyColumnSecondColumn {
-    position: sticky;
-    left: 204px;
-    background-color: white;
-    z-index: 1;
-}
-.longColumn {
-    min-width: 150px;
-    max-width: 150px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-.middleColumn {
-    min-width: 100px;
-    max-width: 100px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-.shortColumn {
-    min-width: 50px;
-    max-width: 50px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
 }
 .icon {
     cursor: pointer;

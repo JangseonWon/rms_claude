@@ -23,6 +23,7 @@ import CellTooltip from "@/app/_component/CellToolTip";
 import style from "@/css/qna/qnaTable.module.css";
 import {GrPowerReset} from "react-icons/gr";
 import {formatDateLocal} from "@/app/_component/DateUtil";
+import {format} from "date-fns";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -36,7 +37,6 @@ const selectBoxOptions: SelectBoxOption[] = [
     { table: "patient", column: "serial", name: "MRN" },
     { table: "request", column: "status", name: "Status" }
 ];
-const defaultSearch: Query = {size:10, page:1}
 const deliveredFilter: Filter = {
     table: "request",
     column: "status",
@@ -49,11 +49,25 @@ const completedFilter: Filter = {
     operator: "=",
     value: Status.COMPLETED.valueOf()
 }
-const reportFilter: Filter = {
-    table: "report",
-    column: "is_latest",
-    operator: "=",
-    value: "true"
+const defaultSearch: Query = {
+    sorts: [
+        {
+            table: "sample",
+            column: "barcode",
+            asc: false
+        }
+    ],
+    filter_groups: [
+        {
+            condition_type: "OR",
+            filters: [
+                deliveredFilter,
+                completedFilter
+            ]
+        }
+    ],
+    size:10,
+    page:1
 }
 
 export default function DownloadTable() {
@@ -62,9 +76,8 @@ export default function DownloadTable() {
     const [totalPage, setTotalPage] = useState<number>(0);
     const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
     const [search, setSearch] = useState<Query>(defaultSearch);
-    const [updateSearch, setUpdateSearch] = useState<Query>({});
-    const [searchFilter, setSearchFilter] = useState<Filter | null>(null);
-    const [orderDateFilter, setOrderDateFilter] = useState<FilterGroup>()
+    const [fromDate, setFromDate] = useState<Date | null>(null);
+    const [toDate, setToDate] = useState<Date | null>(null);
     const showAlert = CallAlertDialog();
 
     const handlePageChange = (newPageNumber: number) => {
@@ -95,6 +108,70 @@ export default function DownloadTable() {
             prevData.map((row) => ({ ...row, isSelected }))
         );
     };
+    const handleSearchChange = (option: SelectBoxOption, value: string) => {
+        setSearch((prevSearch) => {
+            const newFilter = {
+                table: option.table!,
+                column: option.column!,
+                value: value,
+                operator: "LIKE"
+            };
+            return {
+                ...prevSearch,
+                filter_groups: [
+                    {
+                        condition_type: "OR",
+                        filters: [
+                            deliveredFilter,
+                            completedFilter
+                        ]
+                    },
+                    {
+                        filters: [
+                            newFilter
+                        ]
+                    },
+                    ...(prevSearch.filter_groups || []).filter(group => group.filters?.some(filter => filter.column === "create_at"))
+                ],
+                page: 1
+            };
+        });
+    };
+    const addDateFilter = (from: Date | null, to: Date | null) => {
+        if (!from || !to) return;
+        setFromDate(from);
+        setToDate(to);
+        setSearch((prevSearch) => {
+            const updatedFilters = (prevSearch.filter_groups || []).filter(group =>
+                !group.filters?.some(filter => filter.column === "create_at")
+            ) || [];
+
+            return {
+                ...prevSearch,
+                filter_groups: [
+                    ...updatedFilters,
+                    {
+                        condition_type: "AND",
+                        filters: [
+                            {
+                                table: "request",
+                                column: "create_at",
+                                value: format(from, "yyyy-MM-dd"),
+                                operator: ">="
+                            },
+                            {
+                                table: "request",
+                                column: "create_at",
+                                value: format(to, "yyyy-MM-dd"),
+                                operator: "<="
+                            }
+                        ]
+                    }
+                ],
+                page: 1
+            };
+        });
+    };
 
     const fetchData = async (search: Query) => {
         try {
@@ -110,28 +187,8 @@ export default function DownloadTable() {
     }
 
     useEffect(() => {
-        const updatedSearch = {
-            ...search,
-            filter_groups: [
-                ...(orderDateFilter ? [orderDateFilter] : []),
-                {
-                    condition_type: "OR",
-                    filters: [
-                        deliveredFilter,
-                        completedFilter,
-                        //reportFilter
-                    ],
-                },
-                {
-                    filters: [
-                        ...(searchFilter ? [searchFilter] : [])
-                    ]
-                }
-            ],
-        };
-        setUpdateSearch(updatedSearch)
-        fetchData(updatedSearch);
-    }, [search,searchFilter,orderDateFilter]);
+        fetchData(search);
+    }, [search]);
 
     const handleDownloadOnClick = async (report: Report, request: Request) => {
         try {
@@ -146,7 +203,6 @@ export default function DownloadTable() {
                 a.click();
                 a.remove();
                 URL.revokeObjectURL(url);
-                fetchData(updateSearch);
             } else {
                 showAlert("Download failed")
             }
@@ -170,7 +226,6 @@ export default function DownloadTable() {
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                fetchData(updateSearch);
             } else {
                 showAlert("Download failed")
             }
@@ -180,9 +235,19 @@ export default function DownloadTable() {
     }
 
     const handleReset = () => {
-        setSearchFilter(null);
-        setSelectedOption(selectBoxOptions[0]);
-        setOrderDateFilter(undefined);
+        setFromDate(null)
+        setToDate(null)
+        setSearch((prevSearch) => {
+            const updatedFilterGroups = (prevSearch.filter_groups || []).filter(group =>
+                !group.filters?.some(filter => filter.column === "create_at")
+            );
+
+            return {
+                ...prevSearch,
+                filter_groups: updatedFilterGroups,
+                page: 1
+            };
+        });
     };
 
     return (
@@ -194,30 +259,16 @@ export default function DownloadTable() {
                 <div>
                     <DatePickerRangeBox
                         label={"from-to"}
+                        fromDate={fromDate}
+                        toDate={toDate}
                         onChange={(from, to) => {
-                            setOrderDateFilter(
-                                from && to ? {
-                                    filters: [
-                                        {
-                                            table: "request",
-                                            column: "create_at",
-                                            value: formatDateLocal(from),
-                                            operator: ">="
-                                        },
-                                        {
-                                            table: "request",
-                                            column: "create_at",
-                                            value: formatDateLocal(to),
-                                            operator: "<="
-                                        }
-                                    ]
-                                } as FilterGroup : undefined
-                            )
+                            addDateFilter(from, to);
                         }}
                     />
                     <GrPowerReset
                         className={style.resetButton}
-                        onClick={handleReset}/>
+                        onClick={handleReset}
+                    />
                 </div>
                 <div className={downloadStyle.filterContainerLeft}>
                     <SelectBox
@@ -230,16 +281,7 @@ export default function DownloadTable() {
                         }}
                     />
                     <InputBox label={"search"} onChange={(value) => {
-                        setSearchFilter(
-                            value && value.trim() !== ""
-                                ? {
-                                    table: selectedOption.table,
-                                    column: selectedOption.column,
-                                    operator: "LIKE",
-                                    value: value
-                                } as Filter
-                                : null
-                        );
+                        handleSearchChange(selectedOption, value)
                     }}></InputBox>
                 </div>
             </div>
@@ -247,7 +289,7 @@ export default function DownloadTable() {
                 <table className={globalTableStyle.table}>
                     <thead>
                     <tr>
-                        <th>
+                        <th className={globalTableStyle.stickyColumnHeaderCheckBox}>
                             <label form="agree" className={globalTableStyle.checkbox}>
                                 <input
                                     type="checkbox"
@@ -274,7 +316,7 @@ export default function DownloadTable() {
                     <tbody>
                     {requestData && requestData.length > 0 ? ( requestData.map((request, rowIndex) => (
                             <tr key={`${request.service!.id}${request.sample!.id}`}>
-                                <td>
+                                <td className={globalTableStyle.stickyColumnCheckBox}>
                                     <label form="agree" className={globalTableStyle.checkbox}>
                                         <input
                                             type="checkbox"
@@ -309,7 +351,7 @@ export default function DownloadTable() {
                         ))
                     ) : (
                         <tr>
-                        <td colSpan={11} className={globalTableStyle.noData}>
+                            <td colSpan={11} className={globalTableStyle.noData}>
                                 The searched data does not exist
                             </td>
                         </tr>

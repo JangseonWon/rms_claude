@@ -8,7 +8,7 @@ import React, {useEffect, useState} from "react";
 import type {Request} from "@/model/Request";
 import {faFileLines} from "@fortawesome/free-regular-svg-icons/faFileLines";
 import {postRequests} from "@/app/(afterLogin)/request/order/_api/postRequests";
-import {FilterGroup, Query} from "@/model/Query";
+import {Query} from "@/model/Query";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import SelectBox from "@/app/_component/SelectBox";
 import InputBox from "@/app/_component/InputBox";
@@ -20,33 +20,49 @@ import style from "@/css/qna/qnaTable.module.css";
 import {GrPowerReset} from "react-icons/gr";
 import {formatDateLocal, getStringDateFromComponents} from "@/app/_component/DateUtil";
 import RequestDetailInfo from "@/app/_component/RequestDetailInfo";
-
-export interface RequestWithSelected extends Request {
-    isSelected?: boolean;
-}
+import {format} from "date-fns";
 
 const selectBoxOptions: SelectBoxOption[] = [
+    { table: "request", column: "courier_company", name: "Global courier" },
+    { table: "request", column: "awb_number", name: "AirWaybill no" },
     { table: "organization", column: "name", name: "Institution" },
-    { table: "patient", column: "name", name: "Patient(s) Name" },
+    { table: "sample", column: "barcode", name: "RegistrationID" },
     { table: "service", column: "name", name: "Service" },
-    { table: "patient", column: "sex", name: "Gender" },
-    { table: "patient", column: "serial", name: "MRN" },
+    { table: "patient", column: "name", name: "Patient(s) Name" },
+    { table: "patient", column: "serial", name: "MRN" }
 ];
-const defaultSearch: Query = {size:10, page:1}
 const defaultFilter: Filter = {
     table: "request",
     column: "status",
     operator: "=",
     value: Status.COMPLETED_ORDER.valueOf()
 }
+const defaultSearch: Query = {
+    sorts: [
+        {
+            table: "sample",
+            column: "barcode",
+            asc: false
+        }
+    ],
+    filter_groups: [
+        {
+            filters: [
+                defaultFilter
+            ]
+        }
+    ],
+    size:10,
+    page:1
+}
 
 export default function RequestTable() {
-    const [requestData, setRequestData] = useState<RequestWithSelected[]>([]);
+    const [requestData, setRequestData] = useState<Request[]>([]);
     const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
     const [totalPage, setTotalPage] = useState<number>(0);
     const [search, setSearch] = useState<Query>(defaultSearch);
-    const [searchFilter, setSearchFilter] = useState<Filter | null>(null);
-    const [orderDateFilter, setOrderDateFilter] = useState<FilterGroup>()
+    const [fromDate, setFromDate] = useState<Date | null>(null);
+    const [toDate, setToDate] = useState<Date | null>(null);
     const [infoModalOpen, setInfoModalOpen] = useState<boolean>(false);
     const [infoRequest, setInfoRequest] = useState<Request>();
 
@@ -78,7 +94,7 @@ export default function RequestTable() {
         }
     };
 
-    const handleInfoClick = (request: RequestWithSelected) => {
+    const handleInfoClick = (request: Request) => {
         setInfoRequest(request);
         setInfoModalOpen(true);
     };
@@ -86,28 +102,88 @@ export default function RequestTable() {
     const closeModal = () => {
         setInfoModalOpen(false);
     }
+    const addDateFilter = (from: Date | null, to: Date | null) => {
+        if (!from || !to) return;
+        setFromDate(from);
+        setToDate(to);
+
+        setSearch((prevSearch) => {
+            const updatedFilters = (prevSearch.filter_groups || []).filter(group =>
+                !group.filters?.some(filter => filter.column === "create_at")
+            ) || [];
+
+            return {
+                ...prevSearch,
+                filter_groups: [
+                    ...updatedFilters,
+                    {
+                        condition_type: "AND",
+                        filters: [
+                            {
+                                table: "request",
+                                column: "create_at",
+                                value: format(from, "yyyy-MM-dd"),
+                                operator: ">="
+                            },
+                            {
+                                table: "request",
+                                column: "create_at",
+                                value: format(to, "yyyy-MM-dd"),
+                                operator: "<="
+                            }
+                        ]
+                    }
+                ],
+                page: 1
+            };
+        });
+    };
+
+    const handleSearchChange = (option: SelectBoxOption, value: string) => {
+        setSearch((prevSearch) => {
+            const newFilter = {
+                table: option.table!,
+                column: option.column!,
+                value: value,
+                operator: "LIKE"
+            };
+
+            return {
+                ...prevSearch,
+                filter_groups: [
+                    {
+                        condition_type: "AND",
+                        filters: [
+                            newFilter,
+                            defaultFilter
+                        ]
+                    },
+                    ...(prevSearch.filter_groups || []).filter(group => group.filters?.some(filter => filter.column === "create_at"))
+                ],
+                page: 1
+            };
+        });
+    };
 
     const handleReset = () => {
-        setSearchFilter(null);
-        setSelectedOption(selectBoxOptions[0]);
-        setOrderDateFilter(undefined);
+        setFromDate(null);
+        setToDate(null);
+        setSearch((prevSearch) => {
+            const updatedFilterGroups = (prevSearch.filter_groups || []).filter(group =>
+                !group.filters?.some(filter => filter.column === "create_at")
+            );
+
+            return {
+                ...prevSearch,
+                filter_groups: updatedFilterGroups,
+                page: 1
+            };
+        });
     };
 
     useEffect(() => {
-        const updatedSearch = {
-            ...search,
-            filter_groups: [
-                ...(orderDateFilter ? [orderDateFilter] : []),
-                {
-                    filters: [
-                        defaultFilter,
-                        ...(searchFilter ? [searchFilter] : []),
-                    ],
-                },
-            ],
-        };
-        fetchData(updatedSearch);
-    }, [search,searchFilter,orderDateFilter]);
+        fetchData(search)
+    }, [search]);
 
     return (
         <div className={globalTableStyle.container}>
@@ -115,25 +191,10 @@ export default function RequestTable() {
                 <div>
                     <DatePickerRangeBox
                         label={"from-to"}
+                        fromDate={fromDate}
+                        toDate={toDate}
                         onChange={(from, to) => {
-                            setOrderDateFilter(
-                                from && to ? {
-                                    filters: [
-                                        {
-                                            table: "request",
-                                            column: "create_at",
-                                            value: formatDateLocal(from),
-                                            operator: ">="
-                                        },
-                                        {
-                                            table: "request",
-                                            column: "create_at",
-                                            value: formatDateLocal(to),
-                                            operator: "<="
-                                        }
-                                    ]
-                                } as FilterGroup : undefined
-                            )
+                            addDateFilter(from, to);
                         }}
                     />
                     <GrPowerReset
@@ -151,16 +212,7 @@ export default function RequestTable() {
                         }}
                     />
                     <InputBox label={"search"} onChange={(value) => {
-                        setSearchFilter(
-                            value && value.trim() !== ""
-                                ? {
-                                    table: selectedOption.table,
-                                    column: selectedOption.column,
-                                    operator: "LIKE",
-                                    value: value
-                                } as Filter
-                                : null
-                        );
+                        handleSearchChange(selectedOption, value)
                     }}></InputBox>
                 </div>
             </div>

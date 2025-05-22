@@ -1,8 +1,6 @@
 'use client';
 
-import style from '@/app/(afterLogin)/request/dashboard/_component/downloadExcelButton.module.css';
 import {faDownload} from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React from "react";
 import * as XLSX from 'xlsx';
 import {format} from "date-fns";
@@ -10,13 +8,13 @@ import {Query} from "@/model/Query";
 import {postRequests} from "@/app/(afterLogin)/request/dashboard/_api/postRequests";
 import type {Request} from "@/model/Request";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
+import BlueButton from "@/app/_component/BlueButton";
 
 interface DownloadExcelButtonProps {
     search: Query;
-    status: string;
 }
 
-export default function DownloadExcelButton({ search, status }: DownloadExcelButtonProps) {
+export default function DownloadExcelButton({ search }: DownloadExcelButtonProps) {
     const showAlert = CallAlertDialog();
 
     const fetchData = async (search: Query) => {
@@ -67,7 +65,7 @@ export default function DownloadExcelButton({ search, status }: DownloadExcelBut
             "MRN": row.sample!.patient!.serial,
             "Patient BOD": row.sample?.patient ?
                 `${row.sample.patient.birth_year}-${row.sample.patient.birth_month}-${row.sample.patient.birth_day}` : '-',
-            "Current Status": formatStatus(row.status!)
+            "Current Status": row.status === 'UNCONFIRMED_ORDER' ? 'PENDING_APPROVAL' : row.status === 'COMPLETED_ORDER' ? 'APPROVAL' : row.status
         }));
 
         const worksheet = XLSX.utils.json_to_sheet(data, { header: headers });
@@ -101,12 +99,10 @@ export default function DownloadExcelButton({ search, status }: DownloadExcelBut
     }
 
     return (
-        <button
-            className={style.download}
+        <BlueButton
+            name={'Download Excel'}
             onClick={downloadExcel}
-        >
-            Download Excel&nbsp;
-            <FontAwesomeIcon className={style.downloadIcon} icon={faDownload} />
-        </button>
+            icon={faDownload}
+        />
     );
 }

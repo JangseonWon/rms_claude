@@ -36,7 +36,7 @@ const selectBoxOptions: SelectBoxOption[] = [
     { table: "patient", column: "serial", name: "MRN" },
     { table: "service", column: "id", name: "의뢰코드" },
     { table: "request", column: "courier_company", name: "배송업체" },
-    { table: "request", column: "awb_number", name: "운송번호" },
+    { table: "request", column: "awb_number", name: "운송번호" }
 ];
 
 const defaultFilter: Filter = {
@@ -116,10 +116,19 @@ export default function RequestManageTable() {
     };
 
     const handleReset = () => {
-        setSearch(defaultSearch);
-        addDateFilter(null , null);
         setFromDate(null);
         setToDate(null);
+        setSearch((prevSearch) => {
+            const updatedFilterGroups = (prevSearch.filter_groups || []).filter(group =>
+                !group.filters?.some(filter => filter.column === "create_at")
+            );
+
+            return {
+                ...prevSearch,
+                filter_groups: updatedFilterGroups,
+                page: 1
+            };
+        });
     };
 
     const handleInfoClick = (row: RequestWithSelected) => {
@@ -189,15 +198,20 @@ export default function RequestManageTable() {
     return (
         <div>
             <div className={globalTableStyle.container}>
+                <div className={globalTableStyle.formGroupRight}>
+                    <DownloadRequestExcelButton
+                        search={(() => {
+                            const { page, size, ...rest } = search;
+                            return rest;
+                        })()}
+                    />
+                </div>
                 <div className={globalTableStyle.formGroupBetween}>
                     <div>
-                        <DownloadRequestExcelButton
-                            from={fromDate}
-                            to={toDate}
-                            search={Object.fromEntries(Object.entries(search).filter(([key]) => !['page', 'size'].includes(key)))}
-                        />
                         <DatePickerRangeBox
                             label={"from-to"}
+                            fromDate={fromDate}
+                            toDate={toDate}
                             onChange={(from, to) => {
                                 addDateFilter(from, to);
                             }}
@@ -241,6 +255,7 @@ export default function RequestManageTable() {
                         <th>의뢰코드</th>
                         <th>배송업체</th>
                         <th>운송번호</th>
+                        <th>상태</th>
                         <th>상세정보</th>
                     </tr>
                     </thead>
@@ -266,6 +281,11 @@ export default function RequestManageTable() {
                             <td className={globalTableStyle.shortColumn}><CellTooltip text={request.courier_company}/>
                             </td>
                             <td className={globalTableStyle.middleColumn}><CellTooltip text={request.awb_number}/></td>
+                            <td className={globalTableStyle.longColumn}><CellTooltip text={
+                                request.status === 'UNCONFIRMED_ORDER' ? 'PENDING_APPROVAL' :
+                                    request.status === 'COMPLETED_ORDER' ? 'APPROVAL' :
+                                        request.status
+                            }/></td>
                             <td className={globalTableStyle.shortColumn}>
                                 <FontAwesomeIcon
                                     icon={faFileLines}

@@ -25,6 +25,7 @@ import {formatDateLocal, getStringDateFromComponents} from "@/app/_component/Dat
 import RequestDetailInfo from "@/app/_component/RequestDetailInfo";
 import {deleteRequests} from "@/app/(afterLogin)/request/order/_api/deleteRequests";
 import {useConfirmDialog} from "@/app/_component/dialog/useConfirmDialog";
+import {format} from "date-fns";
 
 
 export interface RequestWithSelected extends Request {
@@ -48,16 +49,34 @@ const defaultFilter: Filter = {
     value: Status.UNCONFIRMED_ORDER.valueOf()
 }
 
+const defaultSearch: Query = {
+    sorts: [
+        {
+            table: "sample",
+            column: "barcode",
+            asc: false
+        }
+    ],
+    filter_groups: [
+        {
+            filters: [
+                defaultFilter
+            ]
+        }
+    ]
+}
+
 export default function RequestTable() {
     const [requestData, setRequestData] = useState<RequestWithSelected[]>([]);
     const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
     const [airWaybillModal, setAirWaybillModal] = useState<boolean>(false);
     const [selectedRequests, setSelectedRequests] = useState<RequestWithSelected[]>([]);
     const isSelectedAll = requestData.every((row) => row.isSelected);
-    const [searchFilter, setSearchFilter] = useState<Filter | null>(null);
-    const [orderDateFilter, setOrderDateFilter] = useState<FilterGroup>();
     const [infoModalOpen, setInfoModalOpen] = useState<boolean>(false);
     const [infoRequest, setInfoRequest] = useState<Request>();
+    const [search, setSearch] = useState<Query>(defaultSearch);
+    const [fromDate, setFromDate] = useState<Date | null>(null);
+    const [toDate, setToDate] = useState<Date | null>(null);
     const showAlert = CallAlertDialog();
     const {confirm, dialogComponent } = useConfirmDialog()
 
@@ -68,16 +87,6 @@ export default function RequestTable() {
             return updatedData;
         });
     };
-    const fetchData = async (search: Query) => {
-        try {
-            const response = await postRequests(search);
-            const data = await response.json();
-            setRequestData(data as Request[]);
-        }
-        catch {
-            setRequestData([]);
-        }
-    };
     const handleDeleteClick = async() => {
         const selectedRequests = requestData.filter(request => request.isSelected);
         if( selectedRequests.length === 0) {
@@ -87,7 +96,7 @@ export default function RequestTable() {
         const ok = await confirm("Confirmation","Are you sure you want to delete this request? \n This action cannot be undone.")
         if (ok) {
             const response = await deleteRequests(selectedRequests)
-            await fetchData(updatedSearch())
+            await fetchData(search)
             if (response) showAlert("Success")
         }
     }
@@ -125,7 +134,7 @@ export default function RequestTable() {
             const response = await patchRequests(updatedRequests);
             if(response.ok) {
                 showAlert("Success")
-                await fetchData(updatedSearch());
+                await fetchData(search);
             } else {
                 console.error("Failed to confirm requests:", response.statusText);
             }
@@ -141,32 +150,100 @@ export default function RequestTable() {
         setRequestData((prevData) => prevData.map((row) => ({ ...row, isSelected })));
     };
 
-    const updatedSearch = (): Query => ({
-        filter_groups: [
-            ...(orderDateFilter ? [orderDateFilter] : []),
-            {
-                filters: [
-                    defaultFilter,
-                    ...(searchFilter ? [searchFilter] : []),
-                ],
-            },
-        ],
-    });
-
     const handleInfoClick = (request: RequestWithSelected) => {
         setInfoRequest(request);
         setInfoModalOpen(true);
     };
+    const handleSearchChange = (option: SelectBoxOption, value: string) => {
+        setSearch((prevSearch) => {
+            const newFilter = {
+                table: option.table!,
+                column: option.column!,
+                value: value,
+                operator: "LIKE"
+            };
+
+            return {
+                ...prevSearch,
+                filter_groups: [
+                    {
+                        condition_type: "AND",
+                        filters: [
+                            newFilter,
+                            defaultFilter
+                        ]
+                    },
+                    ...(prevSearch.filter_groups || []).filter(group => group.filters?.some(filter => filter.column === "create_at"))
+                ]
+            };
+        });
+    };
+
+    const addDateFilter = (from: Date | null, to: Date | null) => {
+        if (!from || !to) return;
+        setFromDate(from);
+        setToDate(to);
+
+        setSearch((prevSearch) => {
+            const updatedFilters = (prevSearch.filter_groups || []).filter(group =>
+                !group.filters?.some(filter => filter.column === "create_at")
+            ) || [];
+
+            return {
+                ...prevSearch,
+                filter_groups: [
+                    ...updatedFilters,
+                    {
+                        condition_type: "AND",
+                        filters: [
+                            {
+                                table: "request",
+                                column: "create_at",
+                                value: format(from, "yyyy-MM-dd"),
+                                operator: ">="
+                            },
+                            {
+                                table: "request",
+                                column: "create_at",
+                                value: format(to, "yyyy-MM-dd"),
+                                operator: "<="
+                            }
+                        ]
+                    }
+                ]
+            };
+        });
+    };
 
     const handleReset = () => {
-        setSearchFilter(null);
-        setSelectedOption(selectBoxOptions[0]);
-        setOrderDateFilter(undefined);
+        setFromDate(null);
+        setToDate(null);
+        setSearch((prevSearch) => {
+            const updatedFilterGroups = (prevSearch.filter_groups || []).filter(group =>
+                !group.filters?.some(filter => filter.column === "create_at")
+            );
+
+            return {
+                ...prevSearch,
+                filter_groups: updatedFilterGroups,
+            };
+        });
+    };
+
+    const fetchData = async (search: Query) => {
+        try {
+            const response = await postRequests(search);
+            const data = await response.json();
+            setRequestData(data as Request[]);
+        }
+        catch {
+            setRequestData([]);
+        }
     };
 
     useEffect(() => {
-        fetchData(updatedSearch());
-    }, [searchFilter,orderDateFilter]);
+        fetchData(search);
+    }, [search]);
 
     return (
         <>
@@ -180,26 +257,12 @@ export default function RequestTable() {
                 <div style={{ position: "relative", zIndex: 3 }}>
                     <DatePickerRangeBox
                         label={"from-to"}
+                        fromDate={fromDate}
+                        toDate={toDate}
                         onChange={(from, to) => {
-                            setOrderDateFilter(
-                                from && to ? {
-                                    filters: [
-                                        {
-                                            table: "request",
-                                            column: "create_at",
-                                            value: formatDateLocal(from) ,
-                                            operator: ">="
-                                        },
-                                        {
-                                            table: "request",
-                                            column: "create_at",
-                                            value: formatDateLocal(to),
-                                            operator: "<="
-                                        }
-                                    ]
-                                } as FilterGroup : undefined
-                            )
-                        }}/>
+                            addDateFilter(from, to);
+                        }}
+                    />
                     <GrPowerReset
                         className={style.resetButton}
                         onClick={handleReset}/>
@@ -217,16 +280,7 @@ export default function RequestTable() {
                     <InputBox
                         label={"search"}
                         onChange={(value) => {
-                            setSearchFilter(
-                                value && value.trim() !== ""
-                                    ? {
-                                        table: selectedOption.table,
-                                        column: selectedOption.column,
-                                        operator: "LIKE",
-                                        value: value
-                                    } as Filter
-                                    : null
-                            );
+                            handleSearchChange(selectedOption, value)
                     }}></InputBox>
                 </div>
             </div>
@@ -246,7 +300,7 @@ export default function RequestTable() {
                             </label>
                         </th>
                         <th className={`${globalTableStyle.longColumn} ${globalTableStyle.stickyColumnHeader}`}>Global courier</th>
-                        <th className={`${globalTableStyle.longColumn} ${globalTableStyle.stickyColumnHeaderSecond}`}>AirWaybill no.</th>
+                        <th className={`${globalTableStyle.longColumn} ${globalTableStyle.stickyColumnHeaderSecond} ${globalTableStyle.stickyColumnLast}`}>AirWaybill no.</th>
                         <th className={globalTableStyle.middleColumn}>Order Date<br/>(YYYY-MM-DD)</th>
                         <th className={globalTableStyle.middleColumn}>Resample</th>
                         <th className={globalTableStyle.longColumn}>User Name</th>
@@ -274,7 +328,7 @@ export default function RequestTable() {
                                     </label>
                                 </td>
                                 <td className={`${globalTableStyle.longColumn} ${globalTableStyle.stickyColumnFirstColumn}`}>{request.courier_company}</td>
-                                <td className={`${globalTableStyle.longColumn} ${globalTableStyle.stickyColumnSecondColumn}`}>{request.awb_number}</td>
+                                <td className={`${globalTableStyle.longColumn} ${globalTableStyle.stickyColumnSecondColumn} ${globalTableStyle.stickyColumnLast}`}>{request.awb_number}</td>
                                 <td className={globalTableStyle.middleColumn}>{request.create_at ? formatDateLocal(new Date(request.create_at)) : ''}</td>
                                 <td className={globalTableStyle.middleColumn}>{request.request_relation?.id == 2 && request.request_relation.name}</td>
                                 <td className={globalTableStyle.longColumn}><CellTooltip text={request.user?.name}/></td>
@@ -332,7 +386,7 @@ export default function RequestTable() {
                         if (response.ok) {
                             showAlert("Success");
                             closeModal();
-                            await fetchData(updatedSearch());
+                            await fetchData(search);
                         } else {
                             showAlert("Fail");
                         }

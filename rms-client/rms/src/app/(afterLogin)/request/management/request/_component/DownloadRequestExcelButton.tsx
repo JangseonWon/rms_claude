@@ -1,8 +1,6 @@
 'use client';
 
-import style from './downloadRequestExcelButton.module.css';
 import {faDownload} from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React from "react";
 import * as XLSX from 'xlsx';
 import {format} from "date-fns";
@@ -11,14 +9,13 @@ import type {Request} from "@/model/Request";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 import {postRequests} from "@/app/(afterLogin)/request/management/request/_api/postRequests";
 import {formatDateLocal, getStringDateFromComponents} from "@/app/_component/DateUtil";
+import BlueButton from "@/app/_component/BlueButton";
 
 interface DownloadExcelButtonProps {
-    from: Date | null,
-    to: Date | null,
     search: Query;
 }
 
-export default function DownloadRequestExcelButton({ search, from, to }: DownloadExcelButtonProps) {
+export default function DownloadRequestExcelButton({search}: DownloadExcelButtonProps) {
     const showAlert = CallAlertDialog();
 
     const fetchData = async (search: Query) => {
@@ -32,7 +29,7 @@ export default function DownloadRequestExcelButton({ search, from, to }: Downloa
     };
 
     const downloadExcel = async () => {
-        const requestData = await fetchData(search);
+        const requestData: Request[] = await fetchData(search);
 
         if (requestData.length === 0) {
             showAlert("No data available for download");
@@ -53,7 +50,8 @@ export default function DownloadRequestExcelButton({ search, from, to }: Downloa
             "MRN",
             "의뢰코드",
             "배송업체",
-            "운송번호"
+            "운송번호",
+            "상태"
         ];
 
         const data = requestData.map(row => ({
@@ -70,7 +68,8 @@ export default function DownloadRequestExcelButton({ search, from, to }: Downloa
             "MRN": row.sample?.patient?.serial,
             "의뢰코드": row.service?.id,
             "배송업체": row.courier_company,
-            "운송번호": row.awb_number
+            "운송번호": row.awb_number,
+            "상태": row.status === 'UNCONFIRMED_ORDER' ? 'PENDING_APPROVAL' : row.status === 'COMPLETED_ORDER' ? 'APPROVAL' : row.status
         }));
 
         const worksheet = XLSX.utils.json_to_sheet(data, { header: headers });
@@ -105,12 +104,10 @@ export default function DownloadRequestExcelButton({ search, from, to }: Downloa
     }
 
     return (
-        <button
-            className={style.download}
+        <BlueButton
+            name={'Download Excel'}
             onClick={downloadExcel}
-        >
-            Download Excel&nbsp;
-            <FontAwesomeIcon className={style.downloadIcon} icon={faDownload} />
-        </button>
+            icon={faDownload}
+        />
     );
 }

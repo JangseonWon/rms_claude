@@ -17,7 +17,6 @@ export default async function Page() {
                 </div>
                 <div className={style.rightSection}>
                     <Statistics/>
-                    {/*<OrderBoard/>*/}
                     <TestOption/>
                     {(session?.user.role === "ADMIN" || session?.user.role === "MANAGER") && (
                         <NonArrivedTable/>

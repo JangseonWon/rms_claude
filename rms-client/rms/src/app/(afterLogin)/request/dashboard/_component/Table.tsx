@@ -53,8 +53,9 @@ export default function Table() {
     const [selectOption, setSelectOption] = useState<SelectBoxOption>({ table: "sample", column: "barcode", name: "Registration ID" });
     const [infoRequest, setInfoRequest] = useState<Request>();
     const [modalOpen, setModalOpen] = useState<boolean>(false);
+    const [fromDate, setFromDate] = useState<Date | null>(null);
+    const [toDate, setToDate] = useState<Date | null>(null);
     const status = useStatus();
-    const setStatus = useSetStatus();
     const selectBoxOptions: SelectBoxOption[] = [
         { table: "sample", column: "barcode", name: "Registration ID" },
         { table: "organization", column: "id", name: "Institution" },
@@ -146,6 +147,8 @@ export default function Table() {
 
     const addDateFilter = (from: Date | null, to: Date | null) => {
         if (!from || !to) return;
+        setFromDate(from);
+        setToDate(to);
 
         setSearch((prevSearch) => {
             const updatedFilters = (prevSearch.filter_groups || []).filter(group =>
@@ -190,25 +193,37 @@ export default function Table() {
     }
 
     const handleReset = () => {
-        setSearch({ sort_by: "create_at", asc: false, size: 5, page: 1 });
-        setSearchValue('');
-        setStatus(Status.TOTAL);
-        setSelectOption({ table: "sample", column: "id", name: "Registration ID" });
-        addDateFilter(null , null);
+        setFromDate(null);
+        setToDate(null);
+        setSearch((prevSearch) => {
+            const updatedFilterGroups = (prevSearch.filter_groups || []).filter(group =>
+                !group.filters?.some(filter => filter.column === "create_at")
+            );
+
+            return {
+                ...prevSearch,
+                filter_groups: updatedFilterGroups,
+                page: 1
+            };
+        });
     };
 
     return (
         <div className={style.container}>
-            <div style={{float: "right"}}>
+            <div className={globalTableStyle.formGroupRight}>
                 <DownloadExcelButton
-                    search={Object.fromEntries(Object.entries(search).filter(([key]) => !['page', 'size'].includes(key)))}
-                    status={status}
+                    search={(() => {
+                        const {page, size, ...rest} = search;
+                        return rest;
+                    })()}
                 />
             </div>
             <div className={style.filterContainer}>
                 <div className={style.filterContainerLeft}>
                     <DatePickerRangeBox
                         label={"from-to"}
+                        fromDate={fromDate}
+                        toDate={toDate}
                         onChange={(from, to) =>{
                             addDateFilter(from, to);
                         }}/>
@@ -251,7 +266,7 @@ export default function Table() {
                 <tbody>
                 {requestData && requestData.length > 0 ? ( requestData.map((request) => (
                         <tr key={`${request.service!.id}${request.sample!.id}`}>
-                            <td className={globalTableStyle.shortColumn}><CellTooltip
+                            <td className={globalTableStyle.middleColumn}><CellTooltip
                                 text={request.create_at ? formatDateLocal(new Date(request.create_at)) : '-'}/></td>
                             <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample!.barcode}/>
                             </td>
@@ -270,8 +285,8 @@ export default function Table() {
                             </td>
                             <td className={globalTableStyle.shortColumn}>
                                 <CellTooltip text={
-                                    request.status === 'UNCONFIRMED_ORDER' ? 'Pending Approval' :
-                                        request.status === 'COMPLETED_ORDER' ? 'Approval' :
+                                    request.status === 'UNCONFIRMED_ORDER' ? 'PENDING_APPROVAL' :
+                                        request.status === 'COMPLETED_ORDER' ? 'APPROVAL' :
                                             request.status
                                 }/>
                             </td>

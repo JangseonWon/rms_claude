@@ -115,12 +115,6 @@ export default function RequestTable() {
 
     const selectedRequest = requestData.filter((row) => row.isSelected);
 
-    const handleReset = () => {
-        setSearchFilter(null);
-        setSelectedOption(selectBoxOptions[0]);
-        setOrderDateFilter(defaultOrderDateFilter);
-    };
-
     useEffect(() => {
         const updatedSearch: Query = {
             filter_groups: [
@@ -170,9 +164,6 @@ export default function RequestTable() {
                                 } as FilterGroup : defaultOrderDateFilter
                             )
                         }}/>
-                    <GrPowerReset
-                        className={style.resetButton}
-                        onClick={handleReset}/>
                 </div>
                 <div>
                     <SelectBox
@@ -202,7 +193,7 @@ export default function RequestTable() {
                 <table className={globalTableStyle.table}>
                     <thead>
                     <tr>
-                        <th>
+                        <th className={globalTableStyle.stickyColumnHeaderCheckBox}>
                             <label form="agree" className={globalTableStyle.checkbox}>
                                 <input
                                     type="checkbox"
@@ -228,7 +219,7 @@ export default function RequestTable() {
                     <tbody>
                     {requestData && requestData.length > 0 ? ( requestData.map((request, rowIndex) => (
                             <tr key={`${request.service!.id}${request.sample!.id}`}>
-                                <td onClick={(e) => e.stopPropagation()}>
+                                <td className={globalTableStyle.stickyColumnCheckBox} onClick={(e) => e.stopPropagation()}>
                                     <label form="agree" className={globalTableStyle.checkbox}>
                                         <input
                                             type="checkbox"
