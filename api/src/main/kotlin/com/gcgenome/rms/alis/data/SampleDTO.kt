@@ -12,6 +12,7 @@ import java.time.LocalDate
 
 data class SampleDTO(
     var sampleId: String? = null,
+    var rootSampleId: String? = null,
     var sampleTypeId: String? = null,
     @JsonDeserialize(using = LocalDateDeserializer::class)
     @JsonSerialize(using = LocalDateSerializer::class)

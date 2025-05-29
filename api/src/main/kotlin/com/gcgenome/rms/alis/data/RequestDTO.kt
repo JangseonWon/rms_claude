@@ -21,6 +21,8 @@ data class RequestDTO(
     var ward: String? = null,
     @JacksonXmlCData
     var physician: String? = null,
+    @JacksonXmlCData
+    var memo: String? = null,
     var user: UserDTO? = null,
     var sample: SampleDTO? = null,
 )
