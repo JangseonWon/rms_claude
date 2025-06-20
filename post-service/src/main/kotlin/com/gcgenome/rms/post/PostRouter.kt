@@ -78,7 +78,7 @@ class PostRouter (
                 postDTO.user = UserDTO(id = auth.user.id)
                 serviceHandler.insertPost(postDTO, fileParts)
             }
-            .flatMap { ServerResponse.ok().build() }
+            .then(ServerResponse.ok().build())
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(IllegalArgumentException::class.java) { e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue("${e.message}") }
             .onErrorResume { ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("error: ${it.cause}") }

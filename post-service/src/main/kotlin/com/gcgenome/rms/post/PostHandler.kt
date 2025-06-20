@@ -1,10 +1,13 @@
 package com.gcgenome.rms.post
 
+import com.gcgenome.rms.alarm.AlarmNotifier
 import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.dao.*
 import com.gcgenome.rms.data.*
 import com.gcgenome.rms.tables.pojos.Post
 import com.gcgenome.rms.tables.pojos.PostRead
+import kotlinx.coroutines.reactive.collect
+import org.jooq.Configuration
 import org.jooq.DSLContext
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.toMono
 import software.amazon.awssdk.core.async.AsyncRequestBody
 import software.amazon.awssdk.services.s3.S3AsyncClient
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
@@ -25,7 +29,8 @@ import java.time.format.DateTimeFormatter
 class PostHandler(
     val dslContext: DSLContext,
     val s3Client: S3AsyncClient,
-    @Value("\${aws.s3.bucket}") private val bucketName: String
+    @Value("\${aws.s3.bucket}") private val bucketName: String,
+    val alarmNotifier: AlarmNotifier
 ): PostDao, PostFileDao, CommentDao, UserDao, PostReadDao, PostCategoryDao {
     private val webClient: WebClient = WebClient.builder()
         .baseUrl("https://wh.jandi.com/connect-api/webhook")
@@ -65,46 +70,72 @@ class PostHandler(
     fun getAlarmCountByUserId(user: UserAuthentication): Mono<Int> {
         return Mono.from(dslContext.getAlarmCountByUserId(user.user.id!!))
     }
-
     fun insertPost(post: PostDTO, fileParts: List<FilePart>?): Mono<PostDTO> {
-        return dslContext.insertPost(post)
-            .flatMap { savedPost ->
-                val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd")
-                val formattedDate = savedPost.createAt!!.format(formatter)
-                val filePath = "post/${post.user!!.id}/${formattedDate}/${savedPost.id}"
+        val txMono: Mono<Pair<PostDTO, List<String>>> =
+            Mono.from(dslContext.transactionPublisher { cfg ->
+                val txDsl = cfg.dsl()
 
-                insertPostRead(post.user?.id!!, savedPost).then(
-                    fileParts?.let {
-                        uploadFilesToS3(savedPost.id!!, it, filePath)
-                    } ?: Mono.empty()
-                ).thenReturn(savedPost)
-            }
+                txDsl.insertPost(post)
+                    .flatMap { saved ->
+                        insertPostRead(txDsl, post.user!!.id!!, saved)
+                            .then(determineRecipients(txDsl, saved).collectList())
+                            .map { recipients -> saved to recipients }
+                    }
+            })
+
+        return txMono.flatMap { (savedPost, recipients) ->
+            val uploadMono: Mono<Void> =
+                fileParts?.let {
+                    val datePath = savedPost.createAt!!
+                        .format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
+                    val s3Prefix = "post/${post.user!!.id}/$datePath/${savedPost.id}"
+                    uploadFilesToS3(savedPost.id!!, it, s3Prefix)
+                } ?: Mono.empty()
+
+            val notifyMono: Mono<Void> = uploadMono.then(
+                Flux.fromIterable(recipients)
+                    .concatMap { uid ->
+                        dslContext.getAlarmCountByUserId(uid)
+                            .map { count -> uid to count }
+                    }
+                    .doOnNext { (uid, count) ->
+                        alarmNotifier.publish(
+                            AlarmMessage(
+                                userId     = uid,
+                                alarmCount = count,
+                                post       = savedPost
+                            )
+                        )
+                    }.then()
+            )
+            notifyMono.thenReturn(savedPost)
+        }
     }
 
-    fun insertPostRead(userId: String, post: PostDTO): Flux<PostRead> {
-        return Flux.from(dslContext.transactionPublisher { trx ->
-            trx.dsl().run {
-                dslContext.getCategoryById(post.postCategoryId!!)
-                    .flatMapMany { category ->
-                        when (category.name) {
-                            "notice" -> {
-                                dslContext.userPermissionSelectAllUser(userId)
-                                    .flatMap({ user -> insertPostRead(post.id!!, user.id!!) }, 10)
-                            }
-                            "qna" -> {
-                                dslContext.selectManagerAndUser(userId)
-                                    .flatMap({ user -> insertPostRead(post.id!!, user.id!!) }, 10)
-                            }
-                            "faq" -> {
-                                Flux.empty()
-                            }
-                            else -> {
-                                Flux.error(IllegalArgumentException("Unsupported category: ${category.name}"))
-                            }
-                        }
-                    }
+    private fun determineRecipients(txDsl: DSLContext, post: PostDTO): Flux<String> {
+        return txDsl.getCategoryById(post.postCategoryId!!)
+            .flatMapMany { cat ->
+                when (cat.name) {
+                    "notice" -> txDsl.userPermissionSelectAllUser()
+                    "qna"    -> txDsl.selectManagerAndUser()
+                    else     -> Flux.empty()
+                }
+            }.map { it.id!! }
+    }
+
+
+    fun insertPostRead(txDsl: DSLContext, userId: String, post: PostDTO): Mono<Void> {
+        return txDsl.getCategoryById(post.postCategoryId!!)
+            .flatMap{ cat ->
+                when (cat.name) {
+                    "notice" -> txDsl.userPermissionSelectAllUser()
+                    "qna"    -> txDsl.selectManagerAndUser()
+                    else     -> Flux.empty()
+                }.collectList()
             }
-        })
+            .flatMapMany { users -> Flux.fromIterable(users) }
+            .concatMap{ u -> txDsl.insertPostRead(post.id!!, u.id!!) }
+            .then()
     }
 
     fun updatePost(post: PostDTO, fileParts: List<FilePart>?): Mono<PostDTO> {
@@ -164,8 +195,13 @@ class PostHandler(
         })
     }
 
-    fun postReadByUser(postId: Long, userId: String): Mono<PostRead> {
-        return Mono.from(dslContext.updatePostRead(postId, userId))
+    fun postReadByUser(postId: Long, userId: String): Mono<Int> {
+        return Mono.from(dslContext.transactionPublisher { trx ->
+            trx.dsl().run {
+                updatePostRead(postId, userId)
+                    .flatMap { getAlarmCountByUserId(userId) }
+            }
+        })
     }
 
     fun postReadStatusChangeNull(postId: Long): Mono<PostRead> {
