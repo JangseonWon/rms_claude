@@ -14,6 +14,7 @@ jobs:
       REGISTRY_USERNAME_TEST: ${{ secrets.REGISTRY_USERNAME_TEST }}
       REGISTRY_PASSWORD_TEST: ${{ secrets.REGISTRY_PASSWORD_TEST }}
       BASE_URL_TEST: ${{ secrets.BASE_URL_TEST }}
+      WS_BASE_URL: ${{ secrets.NEXT_PUBLIC_WS_BASE_URL_TEST}}
       AUTH_SECRET_TEST: ${{ secrets.AUTH_SECRET_TEST }}
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
@@ -26,6 +27,7 @@ jobs:
           export REGISTRY_USERNAME=$REGISTRY_USERNAME_TEST
           export REGISTRY_PASSWORD=$REGISTRY_PASSWORD_TEST
           export BASE_URL=$BASE_URL_TEST
+          export NEXT_PUBLIC_WS_BASE_URL=$NEXT_PUBLIC_WS_BASE_URL_TEST
           export AUTH_SECRET=$AUTH_SECRET_TEST
         
           
@@ -37,4 +39,5 @@ jobs:
           -u $REGISTRY_USERNAME \
           -p $REGISTRY_PASSWORD \
           --auth-secret "$AUTH_SECRET" \
-          --base-url "$BASE_URL"
+          --base-url "$BASE_URL" \
+          --next-public-ws-base-url "$NEXT_PUBLIC_WS_BASE_URL"

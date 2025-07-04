@@ -13,15 +13,15 @@ import managementStyle from "@/css/managementTable.module.css";
 import SelectBox from "@/app/_component/SelectBox";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import {Query} from "@/model/Query";
-import {useSetProbandRequest} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 import {postRequests} from "@/app/(afterLogin)/request/services/[service]/single/_api/postRequests";
 import {Filter} from "@/model/Filter";
 import {getStringDateFromComponents} from "@/app/_component/DateUtil";
-import {useRequestStore} from "@/store/useRequestStore";
 
 type Props = {
+    request: Request
     closeModal: () => void;
+    onConfirm: (proband: Request) => void
 }
 
 const selectBoxOptions: SelectBoxOption[] = [
@@ -30,8 +30,7 @@ const selectBoxOptions: SelectBoxOption[] = [
     { table: "patient", column: "name", name: "Patient(s) Name" },
     { table: "patient", column: "serial", name: "MRN" }
 ];
-export default function SearchProbandModal({ closeModal }: Props) {
-    const {request} = useRequestStore()
+export default function SearchProbandModal({ request, closeModal, onConfirm }: Props) {
     const defaultFilters: Filter[] = [
         {
             table: "organization",
@@ -53,13 +52,12 @@ export default function SearchProbandModal({ closeModal }: Props) {
         }
     ]
 
-    const [requests, setRequests] = useState<Request[]>([]);
+    const [candidates, setCandidates] = useState<Request[]>([]);
+    const [selected, setSelected] = useState<Request>({});
     const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
     const [search, setSearch] = useState<Query>({size:5, page:1});
     const [searchFilter, setSearchFilter] = useState<Filter | undefined>(undefined);
     const [totalPage, setTotalPage] = useState<number>(0);
-    const [selectedRequest, setSelectedRequest] = useState<Request>({});
-    const setProbandRequest = useSetProbandRequest();
     const showAlert = CallAlertDialog();
 
     const fetchRequests = async (search: Query) => {
@@ -67,7 +65,7 @@ export default function SearchProbandModal({ closeModal }: Props) {
         if (response.ok) {
             const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
             const data: Request[] = await response.json();
-            setRequests(data);
+            setCandidates(data);
             setTotalPage(totalPage);
         }
     }
@@ -80,16 +78,15 @@ export default function SearchProbandModal({ closeModal }: Props) {
     };
 
     const handleRowClick = (request: Request) => {
-        setSelectedRequest(request);
+        setSelected(request);
     };
 
-    const handleConfirmClick = () => {
-        if (selectedRequest) {
-            setProbandRequest(selectedRequest);
-            closeModal();
-        } else {
+    const handleConfirm = () => {
+        if (!selected) {
             showAlert("Please select a row before confirming.");
+            return
         }
+        onConfirm(selected)
     };
 
     useEffect(() => {
@@ -175,17 +172,17 @@ export default function SearchProbandModal({ closeModal }: Props) {
                             </tr>
                             </thead>
                             <tbody>
-                            {requests && requests.length > 0 ? ( requests?.map((request, index) => (
+                            {candidates && candidates.length > 0 ? ( candidates?.map((candidate, index) => (
                                 <tr key={index}
-                                    onClick={() => handleRowClick(request)}
-                                    className={`${tableStyle.selectRow} ${selectedRequest.sample?.barcode === request.sample?.barcode ? tableStyle.selected : ''}`}
+                                    onClick={() => handleRowClick(candidate)}
+                                    className={`${tableStyle.selectRow} ${selected.sample?.barcode === candidate.sample?.barcode ? tableStyle.selected : ''}`}
                                 >
-                                    <td>{request.sample?.patient?.organization?.name}</td>
-                                    <td>{request.service?.name}</td>
-                                    <td>{request.sample?.barcode}</td>
-                                    <td>{request.sample?.patient?.name}</td>
-                                    <td>{request.sample?.patient?.serial}</td>
-                                    <td>{getStringDateFromComponents(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}</td>
+                                    <td>{candidate.sample?.patient?.organization?.name}</td>
+                                    <td>{candidate.service?.name}</td>
+                                    <td>{candidate.sample?.barcode}</td>
+                                    <td>{candidate.sample?.patient?.name}</td>
+                                    <td>{candidate.sample?.patient?.serial}</td>
+                                    <td>{getStringDateFromComponents(candidate.sample?.patient?.birth_year, candidate.sample?.patient?.birth_month, candidate.sample?.patient?.birth_day)}</td>
                                 </tr>
                             ))
                             ) : (
@@ -200,7 +197,7 @@ export default function SearchProbandModal({ closeModal }: Props) {
                     </div>
                 </div>
                 <div className={style.buttonGroup}>
-                    <BlueButton name={'Confirm'} onClick={handleConfirmClick}/>
+                    <BlueButton name={'Confirm'} onClick={handleConfirm}/>
                 </div>
             </div>
         </div>

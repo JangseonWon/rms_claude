@@ -5,7 +5,14 @@ import style from "@/app/(afterLogin)/home/_component/MainImage.module.css";
 export default function MainImage() {
     return (
         <div className={style.imageContainer}>
-            <Image src={homeMainImg} alt={"genome"}/>
+            <Image
+                src={homeMainImg}
+                alt={"genome"}
+                priority
+                placeholder={'blur'}
+                sizes={"100vw"}
+
+            />
             <div className={style.text}>
                 <p className={style.mainText}>Care to Cure,</p>
                 <p className={style.mainText}>We make it happen</p>

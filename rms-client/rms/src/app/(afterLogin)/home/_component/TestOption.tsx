@@ -53,6 +53,7 @@ export default function TestOption() {
                             <Image src={'/category/' + category.name + '.jpg'}
                                    alt={`${category.name}`}
                                    fill
+                                   sizes={"25vw"}
                             />
                         </div>
                         <div className={style.cardLabel}>{category.name}</div>

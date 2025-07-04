@@ -64,6 +64,8 @@ interface RequestDao: QueryDao {
             REQUEST.STATUS.`as`("status"),
             REQUEST.PHYSICIAN.`as`("physician"),
             REQUEST.CREATE_AT.`as`("create_at"),
+            REQUEST.DEPARTMENT.`as`("department"),
+            REQUEST.MEMO.`as`("memo"),
             jsonObject(
                 key("id").value(REQUEST_RELATION.ID),
                 key("name").value(REQUEST_RELATION.NAME)
@@ -82,6 +84,9 @@ interface RequestDao: QueryDao {
             jsonObject(
                 key("id").value(SAMPLE.ID),
                 key("barcode").value(SAMPLE.BARCODE),
+                key("age").value(SAMPLE.AGE),
+                key("sampling_on").value(SAMPLE.SAMPLING_ON),
+                key("quantity").value(SAMPLE.QUANTITY),
                 key("sample_type").value(
                     jsonObject(
                         key("id").value(SAMPLE_TYPE.ID),
@@ -108,6 +113,24 @@ interface RequestDao: QueryDao {
                             )
                         )
                     )
+                ),
+                key("extensions").value(
+                    select(
+                        jsonArrayAgg(jsonObject(
+                            key("id").value(EXTENSION.ID),
+                            key("name").value(EXTENSION.NAME),
+                            key("value").value(SAMPLE_EXTENSION.VALUE),
+                            key("regex").value(EXTENSION.REGEX),
+                            key("type").value(EXTENSION.TYPE),
+                            key("required").value(SERVICE_EXTENSION.REQUIRED),
+                            key("sort_extension").value(SERVICE_EXTENSION.SORT_EXTENSION)
+                        ))
+                    ).from(EXTENSION)
+                        .join(SERVICE_EXTENSION).on(SERVICE_EXTENSION.EXTENSION_ID.eq(EXTENSION.ID))
+                        .leftJoin(SAMPLE_EXTENSION)
+                        .on(SAMPLE_EXTENSION.EXTENSION_ID.eq(EXTENSION.ID))
+                        .and(SAMPLE_EXTENSION.SAMPLE_ID.eq(SAMPLE.ID))
+                        .where(SERVICE_EXTENSION.SERVICE_ID.eq(SERVICE.ID))
                 )
             ).`as`("sample")
         )
@@ -118,7 +141,7 @@ interface RequestDao: QueryDao {
         val groupByFields = listOf(
             REQUEST.USER_SERVICE_ID, REQUEST.STATUS, REQUEST.PHYSICIAN, REQUEST.CREATE_AT,
             REQUEST.AWB_NUMBER, REQUEST.COURIER_COMPANY,
-            REQUEST_GROUP.ID,
+            REQUEST_GROUP.ID, REQUEST.DEPARTMENT, REQUEST.MEMO,
             REQUEST_RELATION.ID,
             SERVICE.ID,
             USER.ID,

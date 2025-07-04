@@ -9,17 +9,49 @@ import {useRouter} from "next/navigation";
 import {signOut, useSession} from "next-auth/react";
 import ProfileAlarm from "@/app/(afterLogin)/_component/alarm/ProfileAlarm";
 import {getAlarmCountByUser} from "@/app/(afterLogin)/_api/getAlarmCountByUser";
-import {useAlarmCount, useSetAlarmCount} from "@/app/(afterLogin)/_component/alarm/store/useAlarmCountStore";
 import {Role} from "@/model/Role";
+import {AlarmMessage} from "@/model/AlarmMessage";
 
 export default function ProfileButton() {
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
     const [profileOpen, setProfileOpen] = useState(false);
     const [alarmOpen, setAlarmOpen] = useState(false);
-    const alarmCount = useAlarmCount();
-    const setAlarmCount = useSetAlarmCount();
+    const [alarmCount, setAlarmCount] = useState<number>(0)
     const router = useRouter()
     const alarmRef = useRef<HTMLDivElement>(null);
+
+    const wsRef = useRef<WebSocket | null>(null);
+
+    useEffect(() => {
+        fetchAlarmCount();
+        if (status !== "authenticated" || !session) return;
+        const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WS_BASE_URL}/w-api/post-service/ws/alarm?uid=${session?.user.id}`);
+
+        ws.onopen = () => {};
+
+        ws.onmessage = (ev) => {
+            try {
+                const msg: AlarmMessage = JSON.parse(ev.data)
+                if(msg.alarm_count !== undefined) {
+                    setAlarmCount(msg.alarm_count)
+                }
+            } catch (err) {
+                console.error("[WS] bad message", err, ev.data)
+            }
+        };
+
+        ws.onerror = (err) => {
+            console.error("[WS] error", err);
+        };
+
+        wsRef.current = ws;
+
+        return () => {
+            ws.close();
+            wsRef.current = null;
+        };
+    }, [status, session]);
+
 
     const onLogout = () =>{
         signOut({redirect: false})
@@ -71,16 +103,6 @@ export default function ProfileButton() {
             setAlarmCount(data as number);
         }
     };
-
-    useEffect(() => {
-        fetchAlarmCount();
-
-        const interval = setInterval(() => {
-            fetchAlarmCount();
-        }, 60000);
-
-        return () => clearInterval(interval);
-    }, []);
 
     return(
         <div className={style.container}>

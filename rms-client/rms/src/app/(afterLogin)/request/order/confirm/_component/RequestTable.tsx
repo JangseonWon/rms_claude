@@ -6,7 +6,7 @@ import React, {useEffect, useState} from "react";
 import type {Request} from "@/model/Request";
 import {faFileLines} from "@fortawesome/free-regular-svg-icons/faFileLines";
 import {postRequests} from "@/app/(afterLogin)/request/order/_api/postRequests";
-import {FilterGroup, Query} from "@/model/Query";
+import {Query} from "@/model/Query";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import SelectBox from "@/app/_component/SelectBox";
 import InputBox from "@/app/_component/InputBox";
@@ -359,13 +359,10 @@ export default function RequestTable() {
                     </tbody>
                 </table>
             </div>
-            {infoModalOpen && (
+            {infoModalOpen && infoRequest && (
                 <RequestDetailInfo
-                    disabled={true}
-                    serviceId={infoRequest?.service!.id!}
-                    sampleId={infoRequest?.sample!.id!}
-                    requestGroupId = {infoRequest?.request_group!.id!}
-                    userId={infoRequest?.user!.id!}
+                    editable={true}
+                    selectedRequest={infoRequest}
                     closeModal={closeModal}
                 />
             )}

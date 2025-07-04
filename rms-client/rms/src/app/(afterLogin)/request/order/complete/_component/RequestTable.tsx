@@ -269,13 +269,10 @@ export default function RequestTable() {
                         </tr>
                     )}
                     </tbody>
-                    {infoModalOpen && (
+                    {infoModalOpen && infoRequest &&(
                         <RequestDetailInfo
-                            disabled={true}
-                            serviceId={infoRequest?.service!.id!}
-                            sampleId={infoRequest?.sample!.id!}
-                            requestGroupId = {infoRequest?.request_group!.id!}
-                            userId={infoRequest?.user!.id!}
+                            editable={true}
+                            selectedRequest={infoRequest}
                             closeModal={closeModal}
                         />
                     )}

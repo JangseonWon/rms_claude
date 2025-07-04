@@ -1,232 +1,207 @@
 'use client';
 
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import style from './requestDetailInfoExtension.module.css';
 import {Extension, ExtensionType} from "@/model/Extension";
+import {Request} from "@/model/Request"
 import InputBox from "@/app/_component/InputBox";
 import SelectBox from "@/app/_component/SelectBox";
 import TextBox from "@/app/_component/TextBox";
 import SearchProbandModal
     from "@/app/(afterLogin)/request/services/[service]/single/_component/extension/SearchProbandModal";
-import {
-    useProbandModalOpen,
-    useProbandRequest,
-    useSetProbandModalOpen
-} from "@/app/(afterLogin)/request/services/[service]/single/store/useProbandStore";
-import {useRequestStore} from "@/store/useRequestStore";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 
 type Props = {
-    disabled?: boolean;
+    disabled?: boolean
+    request: Request
+    rootRequest: Request | undefined
+    schema: Extension[]
+    extensions: Extension[]
+    onChange: (id: string, value: string) => void
+    onProbandSelected: (proband: Request) => void
 }
 
 
-export default function RequestDetailInfoExtension({disabled=false}: Props) {
-    const { request, setRequest } = useRequestStore();
-    const probandRequest = useProbandRequest()
-    const probandModal = useProbandModalOpen();
-    const setProbandModal = useSetProbandModalOpen();
+export default function RequestDetailInfoExtension({disabled=false, request, rootRequest, schema, extensions, onChange, onProbandSelected}: Props) {
+    const showAlert = CallAlertDialog();
+    const [isProbandOpen, setProbandOpen] = useState(false)
+    const [proband, setProband] = useState<Request | undefined>(rootRequest)
 
-    const Close = () => {setProbandModal(false);}
-    const handleRequestChange = (path: string, value: any) => {
-        setRequest((prevState) => ({
-            ...prevState,
-            ...setNestedValue({...prevState}, path, value)
-        }));
+    const handleFindProband = () => {
+        if (!request.sample?.patient?.organization) {
+            showAlert('Please choose the institution');
+            return;
+        }
+        setProbandOpen(true);
     };
 
-    const setNestedValue = (object: any, nestedPath: string, newValue: any): any => {
-        const [firstKey, ...remainingPathSegments] = nestedPath.split('.');
-        if (remainingPathSegments.length === 0) {
-            if (Array.isArray(object[firstKey])) {
-                const updatedArray = object[firstKey].some((item: any) => item.id === newValue.id)
-                    ? object[firstKey].map((item: any) =>
-                        item.id === newValue.id ? { ...item, ...newValue } : item
-                    )
-                    : [...object[firstKey], newValue];
-                return { ...object, [firstKey]: updatedArray };
-            }
-            return { ...object, [firstKey]: newValue };
-        }
-        return {
-            ...object,
-            [firstKey]: setNestedValue(object[firstKey] || {}, remainingPathSegments.join('.'), newValue),
-        };
+    const handleConfirmProband = (proband: Request) => {
+        setProband(proband)
+        setProbandOpen(false);
+        onProbandSelected(proband)
     };
-    const generateSelectList = (regex: string): { name: string, value: string }[] => {
-        if (regex.includes("|")) {
-            return regex
-                .replace(/\\b|\b/g, '')
-                .replace(/\\|\(|\)|\?:/g, '')
-                .split('|')
-                .filter(value => value.trim() !== '')
-                .map(value => ({
-                    name: value,
-                    value: value
-                }));
-        }
-        return [];
-    };
-    const probandModalOpen = () => {
-        setProbandModal(true);
-    }
     useEffect(() => {
-        setRequest((prevState) => ({
-            ...prevState,
-            request_group: {
-                id: probandRequest?.request_group?.id
-            }
-        }));
-    }, [probandRequest]);
-
-
-    const renderExtensionComponent = (extension: Extension) => {
-        const selectList = generateSelectList(extension.regex || '');
-        switch (extension.type) {
-            case ExtensionType.LIST:
-                return <SelectBox
-                    disabled={disabled}
-                    key={extension.id}
-                    label={`${extension.name}${extension.required ? ' *' : ''}`}
-                    value={extension.value}
-                    options={selectList}
-                    required={extension.required}
-                    onChange={(selectedOption) => handleRequestChange("sample.extensions", { id: extension.id, value: selectedOption.value })}
-                    width="200px"
-                />;
-            case ExtensionType.BOOLEAN:
-                const booleanList = [
-                    {name: "TRUE", value: true},
-                    {name: "FALSE", value: false}
-                ];
-                return <SelectBox
-                    disabled={disabled}
-                    key={extension.id}
-                    label={`${extension.name}${extension.required ? ' *' : ''}`}
-                    value={extension.value}
-                    options={booleanList}
-                    required={extension.required}
-                    onChange={(selectedOption) => handleRequestChange("sample.extensions", { id: extension.id, value: selectedOption.value })}
-                    width="200px"
-                />;
-            case ExtensionType.INTEGER:
-            case ExtensionType.STRING:
-                return <InputBox
-                    disabled={disabled}
-                    label={`${extension.name}${extension.required ? ' *' : ''}`}
-                    value={extension.value}
-                    required={extension.required}
-                    onChange={(value) => handleRequestChange("sample.extensions", { id: extension.id, value: value })}
-                />;
-            case ExtensionType.FLOAT:
-                return <InputBox
-                    disabled={disabled}
-                    label={`${extension.name}${extension.required ? ' *' : ''}`}
-                    value={extension.value}
-                    required={extension.required}
-                    regex={"float"}
-                    onChange={(value) => handleRequestChange("sample.extensions", { id: extension.id, value: value })}
-                />;
-            case ExtensionType.TEXT:
-                return <TextBox
-                    disabled={disabled}
-                    label={`${extension.name}${extension.required ? ' *' : ''}`}
-                    value={extension.value}
-                    required={extension.required}
-                    onChange={(value) => handleRequestChange("sample.extensions", { id: extension.id, value: value })}
-                />;
-            case ExtensionType.PROBAND_LIST:
-                return <SelectBox
-                    disabled={disabled}
-                    label={extension.name!}
-                    value={extension.value}
-                    options={selectList}
-                    required={true}
-                    width="200px"
-                    onChange={(selectedOption) => {
-                        setRequest((prevState) => ({
-                            ...prevState,
-                            request_relation: {
-                                id: 3
-                            }
-                        }));
-                        handleRequestChange("sample.extensions", {
-                            id: extension.id,
-                            value: selectedOption.name
-                        })
-                    }}
-                />
-            case ExtensionType.PROBAND_SEARCH:
-                return <div className={style.probandInput}>
-                    <InputBox
-                        label={`Registration ID*`}
-                        required={true}
-                        disabled={true}
-                        value={probandRequest?.sample?.barcode}
-                    />
-                    <InputBox
-                        label={`${extension.name}*`}
-                        required={true}
-                        disabled={true}
-                        value={probandRequest?.sample?.patient?.serial}
-                        onChange={(value) => {
-                            setRequest((prevState) => ({
-                                ...prevState,
-                                request_relation: {
-                                    id: 3
-                                }
-                            }));
-                            handleRequestChange("sample.extensions", {
-                                id: extension.id,
-                                value: value
-                            })
-                        }}
-                    />
-                    { !disabled && (
-                        <button className={style.button} onClick={probandModalOpen}>
-                            Find Proband
-                        </button>
-                    )}
-                </div>
-            default:
-                return null;
-        }
-    };
-
+        if (!proband) return;
+        schema
+            .filter(ext => ext.type === ExtensionType.PROBAND_SEARCH)
+            .forEach(ext => {
+                onChange(ext.id!, proband.sample?.patient?.serial ?? "");
+            });
+    }, [proband]);
     return (
-        <div className={style.section}>
+        <div className={style.container}>
             <div className={style.gridContainer}>
-                {(request?.sample?.extensions ?? [])
+                {schema.filter(ext =>
+                        ext.type === ExtensionType.LIST ||
+                        ext.type === ExtensionType.STRING ||
+                        ext.type === ExtensionType.INTEGER ||
+                        ext.type === ExtensionType.FLOAT ||
+                        ext.type === ExtensionType.BOOLEAN)
                     .sort((a, b) => (a.sort_extension ?? 0) - (b.sort_extension ?? 0))
-                    .map((extension) =>
-                        extension.type === ExtensionType.TEXT ? (
-                            <div key={extension.id}>
-                                {renderExtensionComponent(extension)}
-                            </div>
-                        ) : (extension.type === ExtensionType.PROBAND_SEARCH || extension.type === ExtensionType.PROBAND_LIST) ? null : (
-                            <div key={extension.id} className={style.gridItem}>
-                                {renderExtensionComponent(extension)}
-                            </div>
-                        )
-                    )}
+                    .map(ext => {
+                        const current = extensions.find(e => e.id === ext.id)?.value ?? ""
+                        switch (ext.type) {
+                            case ExtensionType.LIST:
+                                const opts = ext.regex!
+                                    .replace(/\\b|\b/g, "")
+                                    .replace(/\\|\(|\)|\?:/g, "")
+                                    .split("|")
+                                    .map(v => ({name: v, value: v}))
+                                return (
+                                    <SelectBox
+                                        key={ext.id}
+                                        disabled={disabled}
+                                        label={`${ext.name}${ext.required ? ' *' : ''}`}
+                                        options={opts}
+                                        value={current}
+                                        required={ext.required}
+                                        onChange={opt => onChange(ext.id!, opt.value)}
+                                    />
+                                )
+                            case ExtensionType.BOOLEAN:
+                                const booleanList = [
+                                    {name: "true", value: true},
+                                    {name: "false", value: false}
+                                ];
+                                return <SelectBox
+                                    key={ext.id}
+                                    disabled={disabled}
+                                    label={`${ext.name}${ext.required ? ' *' : ''}`}
+                                    options={booleanList}
+                                    required={ext.required}
+                                    onChange={opt => onChange(ext.id!, opt.value)}
+                                    width="200px"
+                                />;
+                            case ExtensionType.STRING:
+                            case ExtensionType.INTEGER:
+                            case ExtensionType.FLOAT:
+                                return (
+                                    <InputBox
+                                        key={ext.id}
+                                        disabled={disabled}
+                                        label={`${ext.name}${ext.required ? ' *' : ''}`}
+                                        value={current}
+                                        required={ext.required}
+                                        regex={ext.regex}
+                                        onChange={v => onChange(ext.id!, v)}
+                                    />
+                                )
+                            default:
+                                return null
+                        }
+                })}
             </div>
-            {request?.sample?.extensions?.some((ext) => (ext.type === ExtensionType.PROBAND_SEARCH || ext.type === ExtensionType.PROBAND_LIST)) && (
-                <div>
+            {schema.some(ext => ext.type === ExtensionType.PROBAND_SEARCH || ext.type === ExtensionType.PROBAND_LIST)
+                && (
+                <>
                     <p className={style.title}>Proband Info.</p>
-                    <div className={style.proband}>
-                        {(request?.sample?.extensions?? [])
-                            .filter((ext) => (ext.type === ExtensionType.PROBAND_SEARCH || ext.type === ExtensionType.PROBAND_LIST))
+                    <div className={style.gridContainer}>
+                        {schema.filter(ext => ext.type === ExtensionType.PROBAND_LIST || ext.type === ExtensionType.PROBAND_SEARCH)
                             .sort((a, b) => (a.sort_extension ?? 0) - (b.sort_extension ?? 0))
-                            .map((extension) => (
-                                <div key={extension.id}>
-                                    {renderExtensionComponent(extension)}
-                                </div>
-                            ))}
+                            .map(ext => {
+                            const current = extensions.find(e => e.id === ext.id)?.value ?? ""
+                            switch (ext.type) {
+                                case ExtensionType.PROBAND_LIST:
+                                    const opts = ext.regex!
+                                        .replace(/\\b|\b/g, "")
+                                        .replace(/\\|\(|\)|\?:/g, "")
+                                        .split("|")
+                                        .map(v => ({name: v, value: v}));
+                                    return (
+                                        <SelectBox
+                                            key={ext.id}
+                                            disabled={disabled}
+                                            label={ext.name!}
+                                            value={current}
+                                            options={opts}
+                                            required={ext.required}
+                                            onChange={opt => onChange(ext.id!, opt.value)}
+                                        />
+                                    )
+                                case ExtensionType.PROBAND_SEARCH:
+                                    return (
+                                        <div key={ext.id}>
+                                            <InputBox
+                                                label={`Registration ID${ext.required ? " *" : ""}`}
+                                                required={ext.required}
+                                                disabled={true}
+                                                value={proband?.sample?.barcode}
+                                            />
+                                            <InputBox
+                                                label={`${ext.name}${ext.required ? " *" : ""}`}
+                                                required={ext.required}
+                                                disabled={true}
+                                                value={proband?.sample?.patient?.serial}
+                                                onChange={v => onChange(ext.id!, v)}
+                                            />
+                                            {!disabled && (
+                                                <button className={style.button} onClick={handleFindProband}>
+                                                    Find Proband
+                                                </button>
+                                            )}
+                                            {isProbandOpen && (
+                                                <SearchProbandModal
+                                                    request={request}
+                                                    closeModal={() => setProbandOpen(false)}
+                                                    onConfirm={handleConfirmProband}
+                                                />
+                                            )}
+                                        </div>
+                                    )
+                                default:
+                                    return null
+                            }
+
+                        })}
                     </div>
-                </div>
+                </>
             )}
-            {probandModal && (
-                <SearchProbandModal closeModal={Close}/>
-            )}
+            <div>
+                {schema
+                    .filter(ext => ext.type === ExtensionType.TEXT)
+                    .sort((a, b) => (a.sort_extension ?? 0) - (b.sort_extension ?? 0))
+                    .map(ext => {
+                    const current = extensions.find(e => e.id === ext.id)?.value ?? ""
+                    switch (ext.type) {
+                        case  ExtensionType.TEXT:
+                            return (
+                                <div key={ext.id}>
+                                    <TextBox
+                                        key={ext.id}
+                                        disabled={disabled}
+                                        label={`${ext.name}${ext.required ? " *" : ""}`}
+                                        value={current}
+                                        required={ext.required}
+                                        onChange={v => onChange(ext.id!, v)}
+                                    />
+                                </div>
+                            )
+                        default:
+                            return null
+                    }
+
+                })}
+            </div>
         </div>
     );
 }

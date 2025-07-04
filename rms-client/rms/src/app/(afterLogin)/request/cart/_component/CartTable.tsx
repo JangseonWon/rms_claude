@@ -135,7 +135,6 @@ export default function CartTable() {
     };
 
     const closeModal = () => {
-        setInfoRequest(undefined);
         setModalOpen(false);
         fetchData(updateSearch);
     }
@@ -265,7 +264,7 @@ export default function CartTable() {
                                 </td>
                                 <td className={globalTableStyle.shortColumn}>{request.sample!.patient!.sex}</td>
                                 <td className={globalTableStyle.longColumn}>{request.sample!.patient!.serial}</td>
-                                <td className={globalTableStyle.middleColumn}>{request.sample?.sampling_on! ? formatDateLocal(new Date(request.sample?.sampling_on)) : '-'}</td>
+                                <td className={globalTableStyle.middleColumn}>{request.sample?.sampling_on! ? formatDateLocal(new Date(request.sample!.sampling_on!)) : '-'}</td>
                                 <td className={globalTableStyle.shortColumn}>
                                     <FontAwesomeIcon
                                         icon={faFileLines}
@@ -310,13 +309,10 @@ export default function CartTable() {
                 ><FontAwesomeIcon icon={faAngleRight}/>
                 </button>
             </div>
-            {modalOpen && (
+            {modalOpen && infoRequest && (
                 <RequestDetailInfo
-                    disabled={false}
-                    serviceId={infoRequest?.service!.id!}
-                    sampleId={infoRequest?.sample!.id!}
-                    requestGroupId = {infoRequest?.request_group!.id!}
-                    userId={infoRequest?.user!.id!}
+                    editable={false}
+                    selectedRequest={infoRequest}
                     closeModal={closeModal}
                 />
             )}

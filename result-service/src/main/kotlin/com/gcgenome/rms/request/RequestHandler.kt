@@ -18,18 +18,17 @@ class RequestHandler(
     fun getRequestById(sampleId: UUID, serviceId: String): Mono<RequestDTO> {
         return dslContext.selectRequestById(sampleId, serviceId)
     }
-    fun saveResampleRequest(request: RequestDTO): Mono<Void> {
+     fun saveResampleRequest(request: RequestDTO, rootServiceId: String, rootSampleId: UUID): Mono<Void> {
         return Mono.from(
             dslContext.transactionPublisher { transaction ->
                 val dsl = transaction.dsl()
-                val newRequest = request.copy(
-                    sample = request.sample?.copy(id = null),
-                )
-                dsl.insertSample(newRequest.user!!, newRequest.sample!!, newRequest.status!!)
-                    .flatMap { dsl.insertResampleRequest(newRequest.apply { sample?.id = it.id}) }
-                    .flatMapMany { saveSampleExtensions(dsl, newRequest.sample!!.id!!,newRequest.sample!!.extensions!!) }
-                    .then(dsl.updateRequestStatusToComplete(request))
-                    .then()
+                dsl.insertSample(request.user!!, request.sample!!, request.status!!)
+                    .flatMap { sampleDto ->
+                        request.sample!!.id = sampleDto.id
+                        dsl.insertResampleRequest(request)
+                            .thenMany(saveSampleExtensions(dsl, sampleDto.id!!, request.sample!!.extensions ?: emptyList()))
+                            .then(dsl.updateRequestStatusToComplete(RequestDTO(service = ServiceDTO(id = rootServiceId), sample = SampleDTO(id=rootSampleId))))
+                    }.then()
         })
     }
     fun selectRequests(authentication: UserAuthentication, query: Query):  Mono<Page<RequestDTO>> {

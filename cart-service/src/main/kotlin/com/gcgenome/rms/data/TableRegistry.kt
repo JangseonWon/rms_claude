@@ -41,6 +41,7 @@ object TableRegistry {
             Long::class.java -> value.toLongOrNull() ?: value
             Double::class.java -> value.toDoubleOrNull() ?: value
             Boolean::class.java -> value.toBooleanStrictOrNull() ?: value
+            Integer::class.java -> value.toIntOrNull() ?: value
             else -> value
         }
         return conValue

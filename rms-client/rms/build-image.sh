@@ -44,8 +44,12 @@ while [ "$#" -gt 0 ]; do
             AUTH_SECRET="$2"
             shift 2
             ;;
-          --base-url)
+        --base-url)
             BASE_URL="$2"
+            shift 2
+            ;;
+        --next-public-ws-base-url)
+            NEXT_PUBLIC_WS_BASE_URL="$2"
             shift 2
             ;;
         *)
@@ -76,6 +80,7 @@ fi
 $RUNTIME build \
 --build-arg AUTH_SECRET=$AUTH_SECRET \
 --build-arg BASE_URL=$BASE_URL \
+--build-arg NEXT_PUBLIC_WS_BASE_URL=$NEXT_PUBLIC_WS_BASE_URL \
 -t "$REGISTRY/$IMAGE_NAME" . || { echo "Build failed"; exit 1; }
 
 # Push the image to the registry

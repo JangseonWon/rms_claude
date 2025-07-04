@@ -1,3 +1,8 @@
+.container {
+    display: flex;
+    flex-direction: column;
+}
+
 .section {
     display: grid;
 }
@@ -5,14 +10,9 @@
     padding-top: 10px;
 }
 .gridContainer {
-    width: 1000px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2%;
-}
-.gridItem {
-    margin: 10px 0;
-    width: 200px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0 20px;
 }
 .title {
     flex-basis: 100%;
@@ -26,13 +26,13 @@
     gap: 30px;
 }
 .button {
-    margin-top: 25px;
+    margin-top: 20px;
     position: relative;
     z-index: 1;
     font-size: 13px;
     padding: 6px 20px;
     min-width: 120px;
-    height: 30px;
+    height: 35px;
     border-radius: 15px;
     border: 1px solid #182847;
     transition: all 150ms ease;

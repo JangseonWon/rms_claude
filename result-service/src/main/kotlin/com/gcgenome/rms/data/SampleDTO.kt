@@ -35,7 +35,7 @@ data class SampleDTO(
     @JsonProperty("patient")
     var patient: PatientDTO? = null,
     @JsonProperty("sample_type")
-    var sampleType: SampleTypeDTO?,
+    var sampleType: SampleTypeDTO? = null,
     @JsonProperty("extensions")
-    var extensions: List<ExtensionDTO>?
+    var extensions: List<ExtensionDTO>? = null
 )

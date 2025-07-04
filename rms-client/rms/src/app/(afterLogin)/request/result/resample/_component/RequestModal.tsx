@@ -4,11 +4,9 @@ import style from "@/app/(afterLogin)/request/result/resample/_component/request
 import globalModalStyle from '@/css/modal.module.css';
 import {faXmark} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import React, {useEffect} from "react";
+import React, {useCallback, useEffect, useMemo, useState} from "react";
 import {Request} from "@/model/Request"
 import InputBox from "@/app/_component/InputBox";
-import Loading from "@/app/(afterLogin)/_component/Loading";
-import {useRequestStore} from '@/store/useRequestStore';
 import {format} from "date-fns";
 import DatePickerBox from "@/app/_component/DatePickerBox";
 import TextBox from "@/app/_component/TextBox";
@@ -17,44 +15,125 @@ import ExtensionInputComponent from "@/app/(afterLogin)/request/result/resample/
 import {putRequest} from "@/app/(afterLogin)/request/result/resample/_api/putRequest";
 import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
 import {Status} from "@/model/Status";
-import {getRequest} from "@/app/(afterLogin)/request/result/resample/_api/getRequest";
 import classNames from "classnames";
 import scroll from "@/css/scrollBar.module.css";
 import {getStringDateFromComponents} from "@/app/_component/DateUtil";
+import {Extension} from "@/model/Extension";
+import {fetchServiceExtensions} from "@/app/(afterLogin)/request/services/_api/fetchServiceExtensions";
 
 type Props = {
-    propRequest: Request | undefined
+    selectedRequest: Request
     closeModal: () => void;
     refreshData: () => void;
 }
 
-export default function RequestModal({propRequest, closeModal,refreshData}: Props) {
-    const { request, setRequest } = useRequestStore();
+export default function RequestModal({selectedRequest, closeModal,refreshData}: Props) {
     const showAlert = CallAlertDialog();
+    const initialRequest = useMemo<Request>(() => ({
+        user: { ...selectedRequest.user!},
+        service: { ...selectedRequest.service },
+        request_group: { ...selectedRequest.request_group },
+        sample: {
+            patient: { ...selectedRequest.sample!.patient! },
+            sample_type: { ...selectedRequest.sample!.sample_type },
+            extensions: []
+        },
+    }), [selectedRequest]);
+    const [request, setRequest] = useState<Request>(initialRequest);
+    const [schema, setSchema] = useState<Extension[]>([])
 
-    const handleRequestChange = (path: string, value: any) => {
-        setRequest(prevState => ({
-            ...prevState,
-            ...setNestedValue({ ...prevState }, path, value)
-        }));
-    };
-    const handleOrderNow = async() =>{
-        const updatedRequest: Request = {
+    useEffect(() => {
+        fetchServiceExtensions(request.service!.id!)
+            .then(res => res.json())
+            .then((data: Extension[]) => {
+                setSchema(data)
+                // extensions 초기화
+                setRequest(r => ({
+                    ...r,
+                    sample: {
+                        ...r.sample!,
+                        extensions: data.map(e => ({ id: e.id, value: undefined }))
+                    }
+                }))
+            })
+            .catch(err => {
+                showAlert('Failed to load extensions')
+            })
+    }, [request.service])
+
+    useEffect(() => {
+        const sample = request.sample;
+        const hasFullBirth = !!(sample?.patient?.birth_year && sample.patient.birth_month && sample.patient.birth_day);
+        const hasSamplingOn = sample?.sampling_on != null;
+
+        if (hasFullBirth && hasSamplingOn) {
+            const birthDate = new Date(
+                sample!.patient!.birth_year!,
+                sample!.patient!.birth_month! - 1,
+                sample!.patient!.birth_day!
+            );
+            const samplingDate = new Date(sample!.sampling_on!);
+            const computed = setAge(birthDate, samplingDate);
+            if (computed !== sample!.age) {
+                setRequest(prev => ({
+                    ...prev,
+                    sample: { ...prev.sample!, age: computed }
+                }));
+            }
+        } else {
+            setRequest(prev => ({
+                ...prev,
+                sample: { ...prev.sample!, age: undefined }
+            }));
+        }
+    }, [
+        request.sample?.patient?.birth_year,
+        request.sample?.patient?.birth_month,
+        request.sample?.patient?.birth_day,
+        request.sample?.sampling_on
+    ]);
+
+
+    const handleExtensionChange = useCallback((extId: string, value: any) => {
+        setRequest(r => ({
+            ...r,
+            sample: {
+                ...r.sample!,
+                extensions: r.sample!.extensions!.map(e =>
+                    e.id === extId ? { ...e, value } : e
+                )
+            }
+        }))
+    }, [])
+    const handleProbandSelected = (proband: Request) => {
+        setRequest(prev => ({
+            ...prev,
+            request_group: {id: proband.request_group?.id}
+        }))
+    }
+
+    const handleRequestChange = useCallback(
+        (path: string, value: unknown) => {
+            setRequest(prev => setNestedValue(prev, path, value));
+        },
+        []
+    );
+    const handleOrderNow = useCallback(async () => {
+        const updated: Request = {
             ...request,
             status: Status.UNCONFIRMED_ORDER,
-            request_relation: {
-                id:2
-            }
-        };
-        const response = await putRequest(updatedRequest!)
-        if(response.ok){
-            closeModal();
-            refreshData();
+            request_relation: { id: 2 },
+        }
+        try {
+            const res = await putRequest(updated, selectedRequest.service!!.id!!, selectedRequest.sample!!.id!! )
+            if (!res.ok) throw new Error()
             showAlert("success!")
-        }else{
+            closeModal()
+            refreshData()
+        } catch {
             showAlert("fail!")
         }
-    }
+    }, [request, closeModal, refreshData, showAlert]);
 
     const setNestedValue = (object: any, nestedPath: string, newValue: any): any => {
         const [firstKey, ...remainingPathSegments] = nestedPath.split('.');
@@ -74,34 +153,38 @@ export default function RequestModal({propRequest, closeModal,refreshData}: Prop
         }
         return age;
     };
-    const fetchRequest = async () => {
-        const response = await getRequest(propRequest!.sample!.id!, propRequest!.service!.id!)
-        const json = await response.json()
-        setRequest(json as Request)
-    };
 
-    useEffect(() => {
-        fetchRequest()
-    }, []);
-
-    const isAllRequiredFilled = () => {
-        const sample = request?.sample;
-        if (!sample) return false;
-        const requiredFields = [
-            sample?.patient?.organization?.id,
-            sample?.patient?.name,
-            sample?.patient?.serial,
-            sample?.patient?.sex,
-            sample?.sample_type?.id,
-            sample?.sampling_on,
-            sample?.quantity,
-        ];
-        if (requiredFields.some(field => typeof field !== 'string' || field.trim() === '')) return false;
-        return (sample.extensions || []).every(
-            extension =>
-                !extension.required || (extension.value != null && extension.value !== '')
-        );
-    };
+    const isAllRequiredFilled = useMemo(() => {
+        const sample = request.sample
+        if (!sample) return false
+        const baseOK = Boolean(
+            sample?.patient?.birth_year &&
+            sample?.patient?.birth_month &&
+            sample?.patient?.birth_day &&
+            sample?.patient?.organization?.id &&
+            sample?.patient?.name &&
+            sample?.patient?.serial &&
+            sample?.patient?.sex &&
+            sample?.sample_type?.id &&
+            sample?.sampling_on &&
+            sample?.quantity &&
+            new RegExp(`^\\d+$`).test(String(sample.quantity))
+        )
+        const exts = sample.extensions ?? []
+        const extOK = schema
+            .filter(e => e.required)
+            .every(e => {
+                const found = exts.find(x => x.id === e.id)
+                return Boolean(found && found.value && found.value !== '')
+            })
+        const regexOK = exts.every(e => {
+            const def = schema.find(s => s.id === e.id);
+            if (!def || !e.value) return true;
+            const pattern = new RegExp(`^${def.regex}$`);
+            return pattern.test(String(e.value));
+        });
+        return baseOK && extOK && regexOK
+    }, [request, schema])
 
     return (
         <div className={globalModalStyle.modalBackground}>
@@ -112,109 +195,103 @@ export default function RequestModal({propRequest, closeModal,refreshData}: Prop
                         <FontAwesomeIcon icon={faXmark}/>
                     </button>
                 </div>
-                {request ? (
-                    <div className={classNames(style.wrapper, scroll.default)}>
-                        <p className={style.contentTitle}>Institution name</p>
-                        <div className={style.flexStartContainer}>
-                            <InputBox
-                                label={"Institution"}
-                                value={request.sample?.patient?.organization?.name}
-                                disabled={true}
-                            />
-
-                        </div>
-                        <p className={style.contentTitle}>Service Info.</p>
-                        <div className={style.flexStartContainer}>
-                            <InputBox
-                                label={"Service"}
-                                value={request.service?.name}
-                                disabled={true}
-                            />
-                        </div>
-                        <p className={style.contentTitle}>Patient Info.</p>
-                        <div className={style.flexStartContainer}>
-                            <InputBox
-                                label={"Name*"}
-                                value={request.sample?.patient?.name}
-                                onChange={(value) => handleRequestChange('sample.patient.name', value)}
-                                disabled={true}
-                            />
-                            <InputBox
-                                label={"MRN*"}
-                                value={request.sample?.patient?.serial}
-                                onChange={(value) => handleRequestChange('sample.patient.serial', value)}
-                                disabled={true}
-                            />
-                            <InputBox
-                                label={"Date of Birth"}
-                                value={getStringDateFromComponents(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}
-                                disabled={true}
-                            />
-                            <InputBox
-                                label={"Age"}
-                                value={request.sample?.age}
-                                disabled={true}
-                            />
-                        </div>
-                        <p className={style.contentTitle}>Specimen/.Sample Info.</p>
-                        <div className={style.flexStartContainer}>
-                            <InputBox
-                                label={"Type*"}
-                                value={request.sample?.sample_type?.name}
-                                disabled={true}
-                            />
-                            <DatePickerBox
-                                label={"Collection Date*"}
-                                required={true}
-                                onChange={(date) => {
-                                    if (date) {
-                                        handleRequestChange('sample.sampling_on', format(date, "yyyy-MM-dd"))
-                                        if (request?.sample?.patient?.birth_year
-                                            && request?.sample?.patient?.birth_month
-                                            && request?.sample?.patient?.birth_day) {
-                                            handleRequestChange('sample.age', setAge(new Date(`${request?.sample.patient.birth_year}-${request?.sample.patient.birth_month}-${request?.sample.patient.birth_day}`), date));
-                                        }
-                                    } else {
-                                        handleRequestChange('sample.sampling_on', null)
-                                        handleRequestChange('sample.age', null);
-                                    }
-                                }}
-                            />
-                            <InputBox
-                                label={"Number of Specimens*"}
-                                regex={"-?\\d+"}
-                                required={true}
-                                onChange={(value) => handleRequestChange('sample.quantity', value)}
-                            />
-                        </div>
-                        <p className={style.contentTitle}>Additional Info.</p>
-                        <div className={style.flexStartContainer}>
-                            <InputBox
-                                label={"Medical Department"}
-                                onChange={(value) => handleRequestChange('department', value)}
-                            />
-                            <InputBox
-                                label={"Physician Name"}
-                                onChange={(value) => handleRequestChange('physician', value)}
-                            />
-                        </div>
-                        <div className={style.flexStartContainer}>
-                            <ExtensionInputComponent serviceId={request.service?.id!}/>
-                        </div>
-                        <TextBox
-                            label={'Memo'}
-                            value={request.memo}
-                            onChange={(value) => handleRequestChange('memo', value)}
+                <div className={classNames(style.wrapper, scroll.default)}>
+                    <p className={style.contentTitle}>Institution name</p>
+                    <div className={style.flexStartContainer}>
+                        <InputBox
+                            label={"Institution"}
+                            value={request.sample?.patient?.organization?.name}
+                            disabled={true}
                         />
-                        <div className={style.flexEndContainer}>
-                            <BlueButton
-                                name={"Order now"}
-                                disabled={!isAllRequiredFilled()}
-                                onClick={() => handleOrderNow()}
-                            />
-                        </div>
+
                     </div>
-                ) : <Loading/>}
+                    <p className={style.contentTitle}>Service Info.</p>
+                    <div className={style.flexStartContainer}>
+                        <InputBox
+                            label={"Service"}
+                            value={request.service?.name}
+                            disabled={true}
+                        />
+                    </div>
+                    <p className={style.contentTitle}>Patient Info.</p>
+                    <div className={style.flexStartContainer}>
+                        <InputBox
+                            label={"Name *"}
+                            value={request.sample?.patient?.name}
+                            onChange={(value) => handleRequestChange('sample.patient.name', value)}
+                            disabled={true}
+                        />
+                        <InputBox
+                            label={"MRN *"}
+                            value={request.sample?.patient?.serial}
+                            onChange={(value) => handleRequestChange('sample.patient.serial', value)}
+                            disabled={true}
+                        />
+                        <InputBox
+                            label={"Date of Birth"}
+                            value={getStringDateFromComponents(request.sample?.patient?.birth_year, request.sample?.patient?.birth_month, request.sample?.patient?.birth_day)}
+                            disabled={true}
+                        />
+                        <InputBox
+                            label={"Age"}
+                            value={request.sample?.age}
+                            disabled={true}
+                        />
+                    </div>
+                    <p className={style.contentTitle}>Specimen/.Sample Info.</p>
+                    <div className={style.flexStartContainer}>
+                        <InputBox
+                            label={"Type *"}
+                            value={request.sample?.sample_type?.name}
+                            disabled={true}
+                        />
+                        <DatePickerBox
+                            label={"Collection Date *"}
+                            required={true}
+                            onChange={(date) => {
+                                handleRequestChange('sample.sampling_on', format(date, "yyyy-MM-dd"))
+                            }}
+                        />
+                        <InputBox
+                            label={"Number of Specimens *"}
+                            regex={"-?\\d+"}
+                            required={true}
+                            onChange={(value) => handleRequestChange('sample.quantity', value)}
+                        />
+                    </div>
+                    <p className={style.contentTitle}>Additional Info.</p>
+                    <div className={style.flexStartContainer}>
+                        <InputBox
+                            label={"Medical Department"}
+                            onChange={(value) => handleRequestChange('department', value)}
+                        />
+                        <InputBox
+                            label={"Physician Name"}
+                            onChange={(value) => handleRequestChange('physician', value)}
+                        />
+                    </div>
+                    <div className={style.flexStartContainer}>
+                        <ExtensionInputComponent
+                            request={request}
+                            schema={schema}
+                            extensions={request.sample!.extensions!}
+                            onChange={handleExtensionChange}
+                            onProbandSelected={handleProbandSelected}
+                        />
+                    </div>
+                    <TextBox
+                        label={'Memo'}
+                        value={request.memo}
+                        onChange={(value) => handleRequestChange('memo', value)}
+                    />
+                    <div className={style.flexEndContainer}>
+                        <BlueButton
+                            name={"Order now"}
+                            disabled={!isAllRequiredFilled}
+                            onClick={handleOrderNow}
+                        />
+                    </div>
+                </div>
             </div>
         </div>
     )

@@ -22,7 +22,7 @@ class RequestRouter (
     @Bean("RequestRouter")
     fun route() = router {
         GET("/w-api/result-service/requests", :: getRequestById)
-        PUT("/w-api/result-service/requests", ::saveResampleRequest)
+        PUT("/w-api/result-service/requests/resample", ::saveResampleRequest)
         POST("/w-api/result-service/requests/search", ::searchRequests)
         PATCH("/w-api/result-service/requests", :: updateRequests)
     }
@@ -38,9 +38,11 @@ class RequestRouter (
 
 
     private fun saveResampleRequest(request: ServerRequest): Mono<ServerResponse> {
+        val serviceId = request.queryParam("service_id").get()
+        val sampleId = UUID.fromString(request.queryParam("sample_id").get())
         return authenticationHandler.principal(request)
             .then(request.bodyToMono(RequestDTO::class.java))
-            .flatMap { requestHandler.saveResampleRequest(it) }
+            .flatMap { requestHandler.saveResampleRequest(it, serviceId, sampleId) }
             .then(ServerResponse.ok().build())
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}") }
             .onErrorResume { e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Error: ${e.stackTraceToString()}") }

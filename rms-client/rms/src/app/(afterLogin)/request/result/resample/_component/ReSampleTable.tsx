@@ -331,9 +331,9 @@ export default function ReSampleTable() {
                     </button>
                 </div>
             </div>
-            {requestModalOpen && (
+            {requestModalOpen && selectedRequest && (
                 <RequestModal
-                    propRequest={selectedRequest}
+                    selectedRequest={selectedRequest}
                     closeModal={closeModal}
                     refreshData={refreshData}
                 />

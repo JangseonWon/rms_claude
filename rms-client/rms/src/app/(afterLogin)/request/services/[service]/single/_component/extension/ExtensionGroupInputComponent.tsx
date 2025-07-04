@@ -84,8 +84,8 @@ export default function ExtensionGroupInputComponent({ serviceId, onChange, onVa
                 .split('|')
                 .filter(value => value.trim() !== '')
                 .map(value => ({
-                    name: value.toUpperCase(),
-                    value: value.toLowerCase()
+                    name: value,
+                    value: value
                 }));
         }
         return [];

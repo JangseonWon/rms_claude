@@ -24,13 +24,13 @@ export default function Layout({ children }: Props) {
         <div className={style.layout}>
             {showAlertDialog && (<AlertDialog message={message}/>)}
             {showNoticeDialog && (<NoticeDialog message={noticeMessage}/>)}
-                <div className={style.header}>
+                <div>
                     <Header/>
                 </div>
                 <div className={style.content}>
                     {children}
                 </div>
-                <div className={style.footer}>
+                <div>
                     <Footer/>
                 </div>
         </div>

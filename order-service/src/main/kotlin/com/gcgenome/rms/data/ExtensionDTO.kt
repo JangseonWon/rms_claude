@@ -2,14 +2,22 @@ package com.gcgenome.rms.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-
 data class ExtensionDTO(
-    var id: String? = null,
-    var name: String? = null,
+    @JsonProperty("id")
+    var id: String?,
+    @JsonProperty("name")
+    var name: String?,
     @JsonProperty("name_kr")
-    var nameKr: String? = null,
-    var required: Boolean? = null,
-    var regex: String? = null,
-    var type: String? = null,
-    var value: String? = null
+    var nameKr: String?,
+    @JsonProperty("regex")
+    var regex: String?,
+    @JsonProperty("type")
+    var type: String?,
+    @JsonProperty("value")
+    var value: String?,
+    @JsonProperty("required")
+    var required: Boolean?,
+    @JsonProperty("sort_extension")
+    var sortExtension: Int?
+
 )

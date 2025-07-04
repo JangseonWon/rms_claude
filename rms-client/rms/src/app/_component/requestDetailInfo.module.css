@@ -43,32 +43,28 @@
 }
 .modalContent {
     padding: 5px;
-    height: 600px;
+    height: 800px;
     overflow-y: scroll;
 }
-.content {
+.container {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 20px;
 }
-.modalContent .content .title {
+.gridContainer {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0 20px;
+}
+.modalContent .title {
     flex-basis: 100%;
     margin: 20px 0 5px 0;
     color: #002b49;
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 700;
 }
-.modalContent .content > * {
-    padding-right: 20px;
-}
 .section {
-    padding-top: 10px;
     display: flex;
-}
-.section > * {
-    padding-right: 20px;
-}
-.memoSection {
-    width: 98.5%;
 }
 .modalBottom {
     margin-top: 5px;
