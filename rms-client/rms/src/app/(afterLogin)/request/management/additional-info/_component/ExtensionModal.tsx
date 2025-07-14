@@ -22,13 +22,15 @@ type Props = {
     closeModal: () => void;
     refreshTable: () => void;
 }
-
+const escapeForRegex = (str: string): string => {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+};
 const extensionOptions: SelectBoxOption[] = [
-    {value: '\\b(?:true|false)\\b', name: ExtensionType.BOOLEAN},
+    {value: '^(?:true|false)$', name: ExtensionType.BOOLEAN},
     {value: '.*', name: ExtensionType.STRING},
     {value: '.*', name: ExtensionType.TEXT},
-    {value: '-?\\d+', name: ExtensionType.INTEGER},
-    {value: '-?\\d+(\\.\\d+)?', name: ExtensionType.FLOAT},
+    {value: '^-?\\d+$', name: ExtensionType.INTEGER},
+    {value: '^-?\\d+(\\.\\d+)?$', name: ExtensionType.FLOAT},
     {name: ExtensionType.LIST},
     {name: ExtensionType.PROBAND_SEARCH},
     {name: ExtensionType.PROBAND_LIST},
@@ -41,59 +43,57 @@ export default function ExtensionModal({extensionId, closeModal, refreshTable}: 
     const fetchExtension = async (extensionId: string)=>{
         const response = await getExtension(extensionId)
         const data = await response.json()
-        const extension = data as Extension
-        setExtension(extension)
-        return extension
+        const ext = data as Extension
+        setExtension(ext)
+        if ((ext.type === ExtensionType.LIST || ext.type === ExtensionType.PROBAND_LIST) && ext.regex) {
+            const inner = ext.regex.replace(/^\^\(\?:|\)\$$/g, '');
+            const values = inner.split('|').map(item => item.replace(/\\(.)/g, '$1'));
+            setListInputs(values);
+        }
+        return ext
     }
 
 
     useEffect(() => {
-        fetchExtension(extensionId).then( (extension) => {
-            if ((extension?.type === ExtensionType.LIST || extension?.type === ExtensionType.PROBAND_LIST) && extension.regex) {
-                const splitRegex = extension.regex.replace(/\\b\(\?:|\)\\b/g, '').split('|');
-                setListInputs(splitRegex);
-            }
-        })
+        fetchExtension(extensionId)
     }, []);
 
 
     const handleAddInput = () => {
         setListInputs([...listInputs, '']);
     };
+    const updateRegex = (inputs: string[]) => {
+        const escaped = inputs.filter(v => v).map(escapeForRegex).join('|');
+        setExtension(prev => prev && ({
+            ...prev,
+            regex: `^(?:${escaped})$`,
+        }));
+    };
 
     const handleRemoveInput = (index: number) => {
-        setListInputs((prevListInputs) => {
-            const newListInputs = prevListInputs.filter((_, i) => i !== index);
-            setExtension((prevExtension) => ({
-                ...prevExtension,
-                regex: `\\b(?:${newListInputs.filter(input => input).join('|')})\\b`,
-            }));
-            return newListInputs;
-        });
+        const newList = listInputs.filter((_, i) => i !== index);
+        setListInputs(newList);
+        updateRegex(newList);
     };
 
     const handleListInputChange = (index: number, value: string) => {
-        setListInputs((prevListInputs) => {
-            const newListInputs = [...prevListInputs];
-            newListInputs[index] = value;
-            setExtension((prevExtension) => ({
-                ...prevExtension,
-                regex: `\\b(?:${newListInputs.filter(input => input).join('|')})\\b`,
-            }));
-            return newListInputs;
-        });
+        const newList = [...listInputs];
+        newList[index] = value;
+        setListInputs(newList);
+        updateRegex(newList);
     };
 
-    const handleUpdateButtonClick = async () => {
-        const response = await patchExtension(extension!)
-        if(response.ok){
-            showAlert("Update successful")
-            closeModal()
-            refreshTable()
-        } else {
-            showAlert("Fail update")
-        }
 
+    const handleUpdateButtonClick = async () => {
+        if (!extension) return;
+        const response = await patchExtension(extension);
+        if (response.ok) {
+            showAlert("Update successful");
+            closeModal();
+            refreshTable();
+        } else {
+            showAlert("Fail update");
+        }
     };
 
     return (

@@ -167,7 +167,7 @@ export default function RequestDetailInfo({editable, selectedRequest, closeModal
         const regexOK = exts.every(e => {
             const def = schema.find(s => s.id === e.id);
             if (!def || !e.value) return true;
-            const pattern = new RegExp(`^${def.regex}$`);
+            const pattern = new RegExp(`${def.regex}`)
             return pattern.test(String(e.value));
         });
         return baseOK && extOK && regexOK
@@ -347,7 +347,7 @@ export default function RequestDetailInfo({editable, selectedRequest, closeModal
                             <InputBox
                                 disabled={editable}
                                 label={"Number of Specimens*"}
-                                regex={"-?\\d+"}
+                                regex={"^\\d+$"}
                                 value={request.sample?.quantity?.toString()}
                                 required={true}
                                 onChange={(value) => handleRequestChange('sample.quantity', value)}

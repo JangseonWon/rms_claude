@@ -25,22 +25,12 @@ export default function ExtensionInputComponent({request, schema, onChange, onPr
 
 
     const generateSelectList = (regex: string): { name: string, value: string }[] => {
-        if (regex.includes("|")) {
-            return regex
-                .replace(/^\\b|\b$/g, '')
-                .replace(/^\\b|\b$/g, '')
-                .replace(/^\(\?:/, '')
-                .replace(/\)\\b$/, '')
-                .replace(/\\b/g, '')
-                .split('|')
-                .map(value => value.trim())
-                .filter(value => value !== '')
-                .map(value => ({
-                    name: value,
-                    value: value
-                }));
-        }
-        return [];
+        const inner = regex.replace(/^\^\(\?:|\)\$$/g, '');
+        return inner
+            .split('|')
+            .map(v=> v.trim().replace(/\\([.*+?^${}()|\[\]\\])/g, '$1'))
+            .filter(item => item !== '')
+            .map(item => ({ name: item, value: item }));
     };
 
     const handleFindProband = () => {

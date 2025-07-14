@@ -326,7 +326,7 @@ export default function GroupOrder() {
                     </div>
                     <InputBox
                         label={"Number of Specimens*"}
-                        regex={"-?\\d+"}
+                        regex={"^\\d+$"}
                         required={true}
                         onChange={(value) => handleRequestChange(index,`sample.quantity`, value)}
                     />
