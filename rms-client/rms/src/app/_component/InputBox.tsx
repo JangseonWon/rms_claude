@@ -22,7 +22,7 @@ export default function InputBox({label, value, regex, disabled=false, onChange,
     const userRegex = (() => {
         if (!regex) return null
         try {
-            return new RegExp(`^${regex}$`)
+            return new RegExp(`${regex}`)
         } catch {
             return null
         }

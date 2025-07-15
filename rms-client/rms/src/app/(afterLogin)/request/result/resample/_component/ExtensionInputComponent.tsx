@@ -61,9 +61,9 @@ export default function ExtensionInputComponent({request, schema, extensions, on
                         switch (ext.type) {
                             case ExtensionType.LIST:
                                 const opts = ext.regex!
-                                    .replace(/\\b|\b/g, "")
-                                    .replace(/\\|\(|\)|\?:/g, "")
+                                    .replace(/^\^\(\?:|\)\$$/g, '')
                                     .split("|")
+                                    .map(v=> v.trim().replace(/\\([.*+?^${}()|\[\]\\])/g, '$1'))
                                     .map(v => ({name: v, value: v}))
                                 return (
                                     <SelectBox
@@ -117,10 +117,10 @@ export default function ExtensionInputComponent({request, schema, extensions, on
                                     switch (ext.type) {
                                         case ExtensionType.PROBAND_LIST:
                                             const opts = ext.regex!
-                                                .replace(/\\b|\b/g, "")
-                                                .replace(/\\|\(|\)|\?:/g, "")
+                                                .replace(/^\^\(\?:|\)\$$/g, '')
                                                 .split("|")
-                                                .map(v => ({name: v, value: v}));
+                                                .map(v=> v.trim().replace(/\\([.*+?^${}()|\[\]\\])/g, '$1'))
+                                                .map(v => ({name: v, value: v}))
                                             return (
                                                 <SelectBox
                                                     label={ext.name!}

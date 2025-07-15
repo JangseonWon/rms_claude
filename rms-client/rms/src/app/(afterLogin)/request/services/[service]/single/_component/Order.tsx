@@ -223,7 +223,7 @@ export default function Order() {
         const regexOK = exts.every(e => {
             const def = schema.find(s => s.id === e.id);
             if (!def || !e.value) return true;
-            const pattern = new RegExp(`^${def.regex}$`);
+            const pattern = new RegExp(`${def.regex}`);
             return pattern.test(String(e.value));
         });
         return baseOK && extOK && regexOK
@@ -336,7 +336,7 @@ export default function Order() {
                 <InputBox
                     label={"Number of Specimens *"}
                     required={true}
-                    regex={"\\d+"}
+                    regex={"^\\d+$"}
                     onChange={(value) => handleRequestChange('sample.quantity', value)}
                 />
             </div>

@@ -79,14 +79,10 @@ export default function ExtensionGroupInputComponent({ serviceId, onChange, onVa
     const generateSelectList = (regex: string): { name: string, value: string }[] => {
         if (regex.includes("|")) {
             return regex
-                .replace(/\\b|\b/g, '')
-                .replace(/\\|\(|\)|\?:/g, '')
-                .split('|')
-                .filter(value => value.trim() !== '')
-                .map(value => ({
-                    name: value,
-                    value: value
-                }));
+                .replace(/^\^\(\?:|\)\$$/g, '')
+                .split("|")
+                .map(v=> v.trim().replace(/\\([.*+?^${}()|\[\]\\])/g, '$1'))
+                .map(v => ({name: v, value: v}))
         }
         return [];
     };
