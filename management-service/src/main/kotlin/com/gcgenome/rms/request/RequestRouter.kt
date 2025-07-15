@@ -4,7 +4,6 @@ import com.gcgenome.rms.auth.AuthenticationHandler
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.RequestDTO
 import com.gcgenome.rms.exception.*
-import com.gcgenome.rms.extension.ExtensionRouter
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
@@ -25,6 +24,7 @@ class RequestRouter(
     fun route() = router {
         POST("/w-api/management-service/requests/search", :: searchRequests)
         DELETE("/w-api/management-service/requests", :: deleteRequests)
+        PATCH("/w-api/management-service/requests", :: cancelRequests)
     }
     private val logger: Logger = LoggerFactory.getLogger(RequestRouter::class.java)
 
@@ -52,6 +52,19 @@ class RequestRouter(
             .flatMap { request.bodyToMono(Array<RequestDTO>::class.java) }
             .flatMap { requestHandler.deleteRequests(it).collectList() }
             .then(ServerResponse.ok().build())
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
+            .onErrorResume(OrderNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
+            .onErrorResume { e ->
+                logger.error(e.stackTraceToString())
+                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome")
+            }
+    }
+
+    private fun cancelRequests(request: ServerRequest): Mono<ServerResponse> {
+        return authenticationHandler.chkManager(request)
+            .flatMap { request.bodyToMono(Array<RequestDTO>::class.java) }
+            .flatMap { requestHandler.cancelRequests(it).collectList() }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), RequestDTO::class.java) }
             .onErrorResume(AuthenticationNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")}
             .onErrorResume(OrderNotFoundException::class.java) { e -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue("${e.message}") }
             .onErrorResume { e ->

@@ -21,6 +21,10 @@ import DownloadRequestExcelButton
     from "@/app/(afterLogin)/request/management/request/_component/DownloadRequestExcelButton";
 import RequestDetailInfo from "@/app/_component/RequestDetailInfo";
 import {faFileLines} from "@fortawesome/free-regular-svg-icons/faFileLines";
+import {CallAlertDialog} from "@/app/_component/dialog/CallAlertDialog";
+import {useConfirmDialog} from "@/app/_component/dialog/useConfirmDialog";
+import GreenButton from "@/app/_component/GreenButton";
+import {cancelRequests} from "@/app/(afterLogin)/request/management/request/_api/cancelRequests";
 
 interface RequestWithSelected extends Request {
     isSelected?: boolean;
@@ -39,11 +43,18 @@ const selectBoxOptions: SelectBoxOption[] = [
     { table: "request", column: "awb_number", name: "운송번호" }
 ];
 
-const defaultFilter: Filter = {
+const notCartFilter: Filter = {
     table: "request",
     column: "status",
     value: Status.CART.valueOf(),
     operator: "!="
+}
+
+const notCancelFilter: Filter = {
+    table: "request",
+    column: "is_cancel",
+    value: "false",
+    operator: "="
 }
 
 const defaultSearch: Query = {
@@ -57,7 +68,8 @@ const defaultSearch: Query = {
     filter_groups: [
         {
             filters: [
-                defaultFilter
+                notCartFilter,
+                notCancelFilter
             ]
         }
     ],
@@ -68,12 +80,16 @@ const defaultSearch: Query = {
 export default function RequestManageTable() {
     const [selectedOption, setSelectedOption] = useState<SelectBoxOption>(selectBoxOptions[0]);
     const [requests, setRequests] = useState<RequestWithSelected[]>([]);
+    const isSelectedAll = requests && requests.length > 0 ? requests.every((row) => row.isSelected) : false;
+    const [isCancelledChecked, setIsCancelledChecked] = useState(false);
     const [infoRequest, setInfoRequest] = useState<Request>();
     const [totalPage, setTotalPage] = useState<number>(0);
     const [search, setSearch] = useState<Query>(defaultSearch);
     const [fromDate, setFromDate] = useState<Date | null>(null);
     const [toDate, setToDate] = useState<Date | null>(null);
     const [modalOpen, setModalOpen] = useState<boolean>(false);
+    const showAlert = CallAlertDialog();
+    const {confirm, dialogComponent } = useConfirmDialog();
 
     const handlePageChange = (newPageNumber: number) => {
         setSearch(prevPage =>({
@@ -105,7 +121,7 @@ export default function RequestManageTable() {
                         condition_type: "AND",
                         filters: [
                             newFilter,
-                            defaultFilter
+                            notCartFilter
                         ]
                     },
                     ...(prevSearch.filter_groups || []).filter(group => group.filters?.some(filter => filter.column === "create_at"))
@@ -113,6 +129,15 @@ export default function RequestManageTable() {
                 page: 1
             };
         });
+    };
+
+    const handleCancelCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const checked = e.target.checked;
+        setIsCancelledChecked(checked);
+        handleSearchChange(
+            { table: "request", column: "is_cancel" },
+            checked.toString()
+        );
     };
 
     const handleReset = () => {
@@ -134,6 +159,20 @@ export default function RequestManageTable() {
     const handleInfoClick = (row: RequestWithSelected) => {
         setInfoRequest(row);
         setModalOpen(true);
+    };
+
+    const handleSelectAll = (isSelected: boolean) => {
+        setRequests((prevData) =>
+            prevData.map((row) => ({ ...row, isSelected }))
+        );
+    };
+
+    const handleSelectChange = (rowIndex: number, isSelected: boolean) => {
+        setRequests((prevData) => {
+            const updatedData = [...prevData];
+            updatedData[rowIndex].isSelected = isSelected;
+            return updatedData;
+        });
     };
 
     const closeModal = () => {
@@ -191,20 +230,49 @@ export default function RequestManageTable() {
         }
     };
 
+    const handleCancelClick = async() => {
+        const selectedRequests = requests.filter(request => request.isSelected);
+        if( selectedRequests.length === 0) {
+            showAlert("No selected.");
+            return;
+        }
+        const ok = await confirm("Confirmation","Are you sure you want to cancel this request? \n This action cannot be undone.")
+        if (ok) {
+            const response = await cancelRequests(selectedRequests)
+            await fetchData(search)
+            if (response) showAlert("Success");
+            else showAlert("Fail");
+        }
+    }
+
     useEffect(() => {
         fetchData(search)
     }, [search]);
 
     return (
         <div>
+            {dialogComponent}
             <div className={globalTableStyle.container}>
                 <div className={globalTableStyle.formGroupRight}>
+                    <GreenButton name={'Cancel'} onClick={handleCancelClick}/>
                     <DownloadRequestExcelButton
                         search={(() => {
-                            const { page, size, ...rest } = search;
+                            const {page, size, ...rest} = search;
                             return rest;
                         })()}
                     />
+                </div>
+                <div className={globalTableStyle.formGroupRight}>
+                    <label>Show Canceled</label>
+                    <label form="agree" className={globalTableStyle.checkbox}>
+                        <input
+                            type="checkbox"
+                            checked={isCancelledChecked}
+                            onChange={handleCancelCheckboxChange}
+                            className={globalTableStyle.checkbox}
+                        />
+                        <span className={globalTableStyle.checkmark}></span>
+                    </label>
                 </div>
                 <div className={globalTableStyle.formGroupBetween}>
                     <div>
@@ -219,7 +287,8 @@ export default function RequestManageTable() {
                         />
                         <GrPowerReset
                             className={globalTableStyle.resetButton}
-                            onClick={handleReset}/>
+                            onClick={handleReset}
+                        />
                     </div>
                     <div>
                         <SelectBox
@@ -241,6 +310,17 @@ export default function RequestManageTable() {
                 <table className={globalTableStyle.table}>
                     <thead>
                     <tr>
+                        <th className={globalTableStyle.stickyColumnHeaderCheckBox}>
+                            <label form="agree" className={globalTableStyle.checkbox}>
+                                <input
+                                    type="checkbox"
+                                    checked={isSelectedAll}
+                                    onChange={() => handleSelectAll(!isSelectedAll)}
+                                    className={globalTableStyle.checkbox}
+                                />
+                                <span className={globalTableStyle.checkmark}></span>
+                            </label>
+                        </th>
                         <th>의뢰날짜<br/>(YYYY-MM-DD)</th>
                         <th>거래처명</th>
                         <th>의뢰기관</th>
@@ -256,12 +336,27 @@ export default function RequestManageTable() {
                         <th>배송업체</th>
                         <th>운송번호</th>
                         <th>상태</th>
+                        <th>취소된의뢰</th>
+                        <th>취소시간</th>
+                        <th>림스재검사유</th>
+                        <th>림스재검요청시간</th>
                         <th>상세정보</th>
                     </tr>
                     </thead>
                     <tbody>
                     {requests && requests.length > 0 && requests.map((request, rowIndex) => (
-                        <tr key={rowIndex}>
+                        <tr key={`${request.service!.id}${request.sample!.id}`}>
+                            <td className={globalTableStyle.stickyColumnCheckBox}>
+                                <label form="agree" className={globalTableStyle.checkbox}>
+                                    <input
+                                        type="checkbox"
+                                        checked={request.isSelected || false}
+                                        onChange={() => handleSelectChange(rowIndex, !request.isSelected)}
+                                        className={globalTableStyle.checkbox}
+                                    />
+                                    <span className={globalTableStyle.checkmark}></span>
+                                </label>
+                            </td>
                             <td className={globalTableStyle.middleColumn}>{request.create_at ? formatDateLocal(new Date(request.create_at)) : ''}</td>
                             <td className={globalTableStyle.longColumn}><CellTooltip text={request.user?.name}/></td>
                             <td className={globalTableStyle.middleColumn}><CellTooltip
@@ -282,10 +377,19 @@ export default function RequestManageTable() {
                             </td>
                             <td className={globalTableStyle.middleColumn}><CellTooltip text={request.awb_number}/></td>
                             <td className={globalTableStyle.longColumn}><CellTooltip text={
-                                request.status === 'UNCONFIRMED_ORDER' ? 'PENDING_APPROVAL' :
-                                    request.status === 'COMPLETED_ORDER' ? 'APPROVAL' :
+                                request.status === Status.UNCONFIRMED_ORDER ? 'PENDING_APPROVAL' :
+                                    request.status === Status.COMPLETED_ORDER ? 'APPROVAL' :
                                         request.status
                             }/></td>
+                            <td className={globalTableStyle.middleColumn}><CellTooltip
+                                text={request.is_cancel ? "취소된의뢰" : ""}/></td>
+                            <td className={globalTableStyle.longColumn}>
+                                {request.is_cancel_at ? format(new Date(request.is_cancel_at), 'yyyy-MM-dd HH:mm:ss') : ''}
+                            </td>
+                            <td className={globalTableStyle.textColumn}>{request.lims_resample_reason}</td>
+                            <td className={globalTableStyle.longColumn}>
+                                {request.lims_resample_at ? format(new Date(request.lims_resample_at), 'yyyy-MM-dd HH:mm:ss') : ''}
+                            </td>
                             <td className={globalTableStyle.shortColumn}>
                                 <FontAwesomeIcon
                                     icon={faFileLines}

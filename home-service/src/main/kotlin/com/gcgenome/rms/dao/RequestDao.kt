@@ -12,13 +12,13 @@ interface RequestDao: QueryDao {
     fun DSLContext.selectStatusCount(user: User): Mono<StatusCount> {
         return Mono.from(
             select(
-                DSL.count().filterWhere(REQUEST.STATUS.ne(Status.CART.name)),
-                DSL.count().filterWhere(REQUEST.STATUS.eq(Status.UNCONFIRMED_ORDER.name)),
-                DSL.count().filterWhere(REQUEST.STATUS.eq(Status.COMPLETED_ORDER.name)),
-                DSL.count().filterWhere(REQUEST.STATUS.eq(Status.IN_PROGRESS.name)),
-                DSL.count().filterWhere(REQUEST.STATUS.eq(Status.TEST_FAILED.name)),
-                DSL.count().filterWhere(REQUEST.STATUS.eq(Status.DELIVERED.name)),
-                DSL.count().filterWhere(REQUEST.STATUS.eq(Status.COMPLETED.name))
+                DSL.count().filterWhere(REQUEST.STATUS.ne(Status.CART.name).and(REQUEST.IS_CANCEL.eq(false))),
+                DSL.count().filterWhere(REQUEST.STATUS.eq(Status.UNCONFIRMED_ORDER.name).and(REQUEST.IS_CANCEL.eq(false))),
+                DSL.count().filterWhere(REQUEST.STATUS.eq(Status.COMPLETED_ORDER.name).and(REQUEST.IS_CANCEL.eq(false))),
+                DSL.count().filterWhere(REQUEST.STATUS.eq(Status.IN_PROGRESS.name).and(REQUEST.IS_CANCEL.eq(false))),
+                DSL.count().filterWhere(REQUEST.STATUS.eq(Status.TEST_FAILED.name).and(REQUEST.IS_CANCEL.eq(false))),
+                DSL.count().filterWhere(REQUEST.STATUS.eq(Status.DELIVERED.name).and(REQUEST.IS_CANCEL.eq(false))),
+                DSL.count().filterWhere(REQUEST.STATUS.eq(Status.COMPLETED.name).and(REQUEST.IS_CANCEL.eq(false)))
             )
                 .from(REQUEST)
                 .where().apply {

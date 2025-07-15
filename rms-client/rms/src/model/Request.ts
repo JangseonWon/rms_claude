@@ -9,6 +9,8 @@ export interface Request {
     service?: Service
     user_service_id?: string
     status?: string
+    is_cancel?: boolean
+    is_cancel_at?: Date
     memo?: string
     department?: string
     ward?: string

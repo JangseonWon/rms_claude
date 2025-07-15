@@ -1,11 +1,9 @@
 package com.gcgenome.rms.user
 
-import com.gcgenome.rms.authentication.UserAuthentication
 import com.gcgenome.rms.dao.*
 import com.gcgenome.rms.data.Page
 import com.gcgenome.rms.data.Query
 import com.gcgenome.rms.data.RequestDTO
-import com.gcgenome.rms.data.Role
 import org.jooq.DSLContext
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
@@ -30,6 +28,16 @@ class RequestHandler(
                         .then(deleteSampleById(request.sample!!.id!!))
                         .then(deletePatientById(request.sample!!.patient!!, request.user!!.id))
                         .then()
+                }
+            }
+        })
+    }
+
+    fun cancelRequests(requests: Array<RequestDTO>): Flux<RequestDTO> {
+        return Flux.from(dslContext.transactionPublisher { trx ->
+            trx.dsl().run {
+                Flux.fromArray(requests).flatMap { request ->
+                    cancelRequestById(request)
                 }
             }
         })

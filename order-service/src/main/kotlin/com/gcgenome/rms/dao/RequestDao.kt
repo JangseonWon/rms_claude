@@ -66,6 +66,7 @@ interface RequestDao: QueryDao {
             REQUEST.CREATE_AT.`as`("create_at"),
             REQUEST.DEPARTMENT.`as`("department"),
             REQUEST.MEMO.`as`("memo"),
+            REQUEST.IS_CANCEL.`as`("is_cancel"),
             jsonObject(
                 key("id").value(REQUEST_RELATION.ID),
                 key("name").value(REQUEST_RELATION.NAME)
@@ -134,15 +135,18 @@ interface RequestDao: QueryDao {
                 )
             ).`as`("sample")
         )
+        val baseCondition = REQUEST.SAMPLE_ID.eq(SAMPLE.ID)
+            .and(REQUEST.SERVICE_ID.eq(SERVICE.ID))
+
         val condition = if (user.role == "USER") {
-            REQUEST.USER_ID.eq(user.id)
-        } else noCondition()
+            baseCondition.and(REQUEST.USER_ID.eq(user.id))
+        } else { baseCondition }
 
         val groupByFields = listOf(
             REQUEST.USER_SERVICE_ID, REQUEST.STATUS, REQUEST.PHYSICIAN, REQUEST.CREATE_AT,
             REQUEST.AWB_NUMBER, REQUEST.COURIER_COMPANY,
             REQUEST_GROUP.ID, REQUEST.DEPARTMENT, REQUEST.MEMO,
-            REQUEST_RELATION.ID,
+            REQUEST_RELATION.ID, REQUEST.IS_CANCEL,
             SERVICE.ID,
             USER.ID,
             SAMPLE.ID, SAMPLE_TYPE.ID,

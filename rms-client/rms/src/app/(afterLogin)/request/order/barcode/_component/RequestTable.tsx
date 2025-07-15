@@ -16,8 +16,6 @@ import BlueButton from "@/app/_component/BlueButton";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
 import BarcodeModal from "@/app/(afterLogin)/request/order/barcode/_component/BarcodeModal";
 import CellTooltip from "@/app/_component/CellToolTip";
-import style from "@/css/qna/qnaTable.module.css";
-import {GrPowerReset} from "react-icons/gr";
 import {formatDateLocal, getStringDateFromComponents} from "@/app/_component/DateUtil";
 import RequestDetailInfo from "@/app/_component/RequestDetailInfo";
 
@@ -32,11 +30,17 @@ const selectBoxOptions: SelectBoxOption[] = [
     { table: "patient", column: "sex", name: "Gender" },
     { table: "patient", column: "serial", name: "MRN" },
 ];
-const defaultFilter: Filter = {
+const notCartFilter: Filter = {
     table: "request",
     column: "status",
-    operator: "!=",
-    value: Status.CART.valueOf()
+    value: Status.CART.valueOf(),
+    operator: "!="
+}
+const notCancelFilter: Filter = {
+    table: "request",
+    column: "is_cancel",
+    value: "false",
+    operator: "="
 }
 const today = new Date();
 const sevenDaysAgo = new Date();
@@ -121,7 +125,8 @@ export default function RequestTable() {
                 ...(orderDateFilter ? [orderDateFilter] : []),
                 {
                     filters: [
-                        defaultFilter,
+                        notCartFilter,
+                        notCancelFilter,
                         ...(searchFilter ? [searchFilter] : []),
                     ],
                 },

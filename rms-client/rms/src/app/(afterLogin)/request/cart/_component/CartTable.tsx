@@ -43,10 +43,17 @@ const selectBoxOptions: SelectBoxOption[] = [
 ];
 
 const defaultSearch: Query = {size:10, page:1}
-const defaultFilter: Filter = {
+const cartFilter: Filter = {
     table: "request",
     column: "status",
     value: "CART",
+    operator: "="
+}
+
+const notCancelFilter: Filter = {
+    table: "request",
+    column: "is_cancel",
+    value: "false",
     operator: "="
 }
 
@@ -74,7 +81,8 @@ export default function CartTable() {
                 {
                     filters: [
                         ...(searchFilter ? [searchFilter] : []),
-                        defaultFilter
+                        cartFilter,
+                        notCancelFilter
                     ]
                 }
             ],

@@ -39,8 +39,8 @@ object TableRegistry {
         val conValue = when {
             UUID::class.java.isAssignableFrom(type) -> UUID.fromString(value) ?: value
             Int::class.java.isAssignableFrom(type) || Integer::class.java.isAssignableFrom(type) -> value.toIntOrNull() ?: value
-            Long::class.java.isAssignableFrom(type) -> value.toLongOrNull() ?: value
-            Double::class.java.isAssignableFrom(type) -> value.toDoubleOrNull() ?: value
+            Long::class.java.isAssignableFrom(type) || Long::class.java.isAssignableFrom(type) -> value.toLongOrNull() ?: value
+            Double::class.java.isAssignableFrom(type) || Double::class.java.isAssignableFrom(type) -> value.toDoubleOrNull() ?: value
             Boolean::class.java.isAssignableFrom(type) || java.lang.Boolean::class.java.isAssignableFrom(type) -> value.toBooleanStrictOrNull() ?: value
             else -> value
         }

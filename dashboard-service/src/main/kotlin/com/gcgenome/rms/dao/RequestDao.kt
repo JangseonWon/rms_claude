@@ -112,7 +112,7 @@ interface RequestDao: QueryDao {
             baseCondition.and(REQUEST.USER_ID.eq(userDto.id))
         } else {
             baseCondition
-        }.and(REQUEST.STATUS.ne("CART"))
+        }
 
         return selectPage(mainTable = REQUEST, query = query,
             joinTables = joins, selectFields = fields, where = finalCondition) { record ->
@@ -124,13 +124,13 @@ interface RequestDao: QueryDao {
     fun DSLContext.selectStatusCount(user: User): Mono<StatusCount> {
         return Mono.from(
             select(
-                count().filterWhere(REQUEST.STATUS.ne(Status.CART.name)),
-                count().filterWhere(REQUEST.STATUS.eq(Status.UNCONFIRMED_ORDER.name)),
-                count().filterWhere(REQUEST.STATUS.eq(Status.COMPLETED_ORDER.name)),
-                count().filterWhere(REQUEST.STATUS.eq(Status.IN_PROGRESS.name)),
-                count().filterWhere(REQUEST.STATUS.eq(Status.TEST_FAILED.name)),
-                count().filterWhere(REQUEST.STATUS.eq(Status.DELIVERED.name)),
-                count().filterWhere(REQUEST.STATUS.eq(Status.COMPLETED.name))
+                count().filterWhere(REQUEST.STATUS.ne(Status.CART.name).and(REQUEST.IS_CANCEL.eq(false))),
+                count().filterWhere(REQUEST.STATUS.eq(Status.UNCONFIRMED_ORDER.name).and(REQUEST.IS_CANCEL.eq(false))),
+                count().filterWhere(REQUEST.STATUS.eq(Status.COMPLETED_ORDER.name).and(REQUEST.IS_CANCEL.eq(false))),
+                count().filterWhere(REQUEST.STATUS.eq(Status.IN_PROGRESS.name).and(REQUEST.IS_CANCEL.eq(false))),
+                count().filterWhere(REQUEST.STATUS.eq(Status.TEST_FAILED.name).and(REQUEST.IS_CANCEL.eq(false))),
+                count().filterWhere(REQUEST.STATUS.eq(Status.DELIVERED.name).and(REQUEST.IS_CANCEL.eq(false))),
+                count().filterWhere(REQUEST.STATUS.eq(Status.COMPLETED.name).and(REQUEST.IS_CANCEL.eq(false)))
             )
                 .from(REQUEST)
                 .where().apply {

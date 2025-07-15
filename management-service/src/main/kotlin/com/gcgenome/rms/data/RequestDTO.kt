@@ -32,5 +32,16 @@ data class RequestDTO(
     @JsonProperty("request_group")
     var requestGroup: RequestGroupDTO? = null,
     @JsonProperty("user")
-    var user: UserDTO? = null
+    var user: UserDTO? = null,
+    var isCancel: Boolean? = null,
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonProperty("is_cancel_at")
+    var isCancelAt: LocalDateTime? = null,
+    @JsonProperty("lims_resample_reason")
+    var limsResampleReason: String? = null,
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
+    @JsonSerialize(using = LocalDateTimeSerializer::class)
+    @JsonProperty("lims_resample_at")
+    var limsResampleAt: LocalDateTime? = null,
 )

@@ -26,4 +26,4 @@ aws:
     endpoint: ${S3_ENDPOINT}
     bucket: ${S3_BUCKET_NAME}
 server:
-  port: 1234
+  port: 6666

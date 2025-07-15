@@ -7,6 +7,7 @@ import com.gcgenome.rms.tables.references.*
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.*
 import reactor.core.publisher.Mono
+import java.time.LocalDateTime
 
 interface RequestDao: QueryDao {
     fun DSLContext.deleteRequestById(request: RequestDTO): Mono<RequestDTO> {
@@ -17,6 +18,16 @@ interface RequestDao: QueryDao {
             ).returning()
         ).map { it.into(RequestDTO::class.java) }
     }
+
+    fun DSLContext.cancelRequestById(request: RequestDTO): Mono<RequestDTO> {
+        return Mono.from(
+            update(REQUEST)
+                .set(REQUEST.IS_CANCEL, true)
+                .set(REQUEST.IS_CANCEL_AT, LocalDateTime.now())
+                .where(REQUEST.SAMPLE_ID.eq(request.sample?.id)).returning()
+        ).map { it.into(RequestDTO::class.java) }
+    }
+
     fun DSLContext.selectRequestsWithPage(query: Query): Mono<Page<RequestDTO>> {
         val mainTable = REQUEST
         val joins = listOf(
@@ -54,6 +65,10 @@ interface RequestDao: QueryDao {
             REQUEST.COURIER_COMPANY.`as`("courier_company"),
             REQUEST.AWB_NUMBER.`as`("awb_number"),
             REQUEST.CREATE_AT.`as`("create_at"),
+            REQUEST.IS_CANCEL.`as`("is_cancel"),
+            REQUEST.IS_CANCEL_AT.`as`("is_cancel_at"),
+            REQUEST.LIMS_RESAMPLE_AT.`as`("lims_resample_at"),
+            REQUEST.LIMS_RESAMPLE_REASON.`as`("lims_resample_reason"),
             jsonObject(
                 key("id").value(REQUEST_GROUP.ID)
             ).`as`("request_group"),
@@ -119,7 +134,7 @@ interface RequestDao: QueryDao {
         )
         val groupByFields = listOf(
             REQUEST.USER_SERVICE_ID, REQUEST.STATUS, REQUEST.PHYSICIAN, REQUEST.CREATE_AT, REQUEST.COURIER_COMPANY, REQUEST.AWB_NUMBER,
-            REQUEST_GROUP.ID, REQUEST_RELATION.ID,
+            REQUEST_GROUP.ID, REQUEST_RELATION.ID, REQUEST.IS_CANCEL, REQUEST.IS_CANCEL_AT, REQUEST.LIMS_RESAMPLE_AT, REQUEST.LIMS_RESAMPLE_REASON,
             SERVICE.ID,
             USER.ID,
             SAMPLE.ID,

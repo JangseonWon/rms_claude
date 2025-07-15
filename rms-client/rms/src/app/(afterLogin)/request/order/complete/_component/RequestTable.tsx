@@ -37,6 +37,12 @@ const defaultFilter: Filter = {
     operator: "=",
     value: Status.COMPLETED_ORDER.valueOf()
 }
+const notCancelFilter: Filter = {
+    table: "request",
+    column: "is_cancel",
+    value: "false",
+    operator: "="
+}
 const defaultSearch: Query = {
     sorts: [
         {
@@ -48,7 +54,8 @@ const defaultSearch: Query = {
     filter_groups: [
         {
             filters: [
-                defaultFilter
+                defaultFilter,
+                notCancelFilter
             ]
         }
     ],
@@ -155,7 +162,8 @@ export default function RequestTable() {
                         condition_type: "AND",
                         filters: [
                             newFilter,
-                            defaultFilter
+                            defaultFilter,
+                            notCancelFilter
                         ]
                     },
                     ...(prevSearch.filter_groups || []).filter(group => group.filters?.some(filter => filter.column === "create_at"))

@@ -32,5 +32,6 @@ data class RequestDTO(
     var requestRelation: RequestRelationDTO? = null,
     var service: ServiceDTO? = null,
     var sample: SampleDTO? = null,
-    var user: UserDTO? = null
+    var user: UserDTO? = null,
+    var isCancel: Boolean? = null
 )

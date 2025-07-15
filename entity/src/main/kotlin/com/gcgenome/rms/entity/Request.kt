@@ -41,6 +41,10 @@ data class Request(
     val limsCompletedAt: LocalDateTime,
     @Column(name = "lims_resample_reason", length = 128, nullable = true)
     val limsResampleReason: String,
+    @Column(name = "is_cancel", nullable = false)
+    val isCancel: Boolean,
+    @Column(name = "is_cancel_at", nullable = true)
+    val isCancelAt: LocalDateTime,
 
 
 

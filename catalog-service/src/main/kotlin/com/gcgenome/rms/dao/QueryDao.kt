@@ -2,11 +2,14 @@ package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.Page
 import com.gcgenome.rms.data.Query
+import com.gcgenome.rms.data.TableRegistry
 import org.jooq.*
-import org.jooq.impl.DSL
 import org.jooq.impl.DSL.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 
 interface QueryDao {
     enum class JoinType {
@@ -135,16 +138,22 @@ interface QueryDao {
             filterGroup.filters.forEach { filter ->
                 val table = filter.table
                 val column = filter.column
+                val value = filter.value
                 val field = field(name(table, column))
+                val convertTypeValue = TableRegistry.convertTypeValue(table, column, value)
 
                 val filterCondition = when (filter.operator) {
-                    "=" -> field.eq(filter.value)
-                    "!=" -> field.ne(filter.value)
-                    ">" -> field.gt(filter.value)
-                    "<" -> field.lt(filter.value)
-                    ">=" -> field.ge(filter.value)
-                    "<=" -> field.le(filter.value)
-                    "LIKE" -> field.likeIgnoreCase("%${filter.value}%")
+                    "=" -> field.eq(convertTypeValue)
+                    "!=" -> field.ne(convertTypeValue)
+                    ">" -> field.gt(convertTypeValue)
+                    "<" -> field.lt(convertTypeValue)
+                    ">=" -> if (isTimestampColumn(column)) {
+                        field.ge(parseTimestamp(filter.value))
+                    } else field.ge(filter.value)
+                    "<=" -> if (isTimestampColumn(column)) {
+                        field.le(parseEndOfDayTimestamp(filter.value))
+                    } else field.le(filter.value)
+                    "LIKE" -> field.likeIgnoreCase("%${convertTypeValue}%")
                     else -> null
                 }
                 filterCondition?.let {
@@ -159,6 +168,7 @@ interface QueryDao {
         }
         return finalCondition
     }
+
     private fun orderBy(query: Query): List<SortField<*>> {
         val sortFields = mutableListOf<SortField<*>>()
 
@@ -173,5 +183,15 @@ interface QueryDao {
         }
 
         return sortFields
+    }
+
+    private fun isTimestampColumn(column: String): Boolean {
+        return column.contains("_at", ignoreCase = true)
+    }
+    private fun parseTimestamp(value: String): LocalDateTime {
+        return LocalDate.parse(value).atStartOfDay()
+    }
+    private fun parseEndOfDayTimestamp(date: String): LocalDateTime {
+        return LocalDate.parse(date).atTime(LocalTime.MAX)
     }
 }

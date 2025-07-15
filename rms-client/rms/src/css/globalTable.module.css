@@ -40,8 +40,7 @@
 }
 .table {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0 1px;
+    border-collapse: collapse;
 }
 .table thead {
     background: linear-gradient(to right, #023a60, #5676a2);
@@ -99,7 +98,7 @@
 .stickyColumnCheckBox {
     position: sticky;
     left: 0.5px;
-    background-color: white;
+    background-color: inherit;
     z-index: 1;
 }
 .stickyColumnFirstColumn {
@@ -116,6 +115,12 @@
 }
 .stickyColumnLast {
     border-right: 3px double #838689;
+}
+.textColumn {
+    white-space: normal;
+    word-break: break-word;
+    min-width: 150px;
+    max-width: 150px;
 }
 .longColumn {
     min-width: 150px;

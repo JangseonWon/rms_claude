@@ -26,6 +26,7 @@ interface RequestDao : QueryDao{
                 .set(REQUEST.USER_ID, request.user!!.id)
                 .set(REQUEST.REQUEST_GROUP_ID, request.requestGroup!!.id)
                 .set(REQUEST.REQUEST_RELATION_ID, request.requestRelation!!.id)
+                .set(REQUEST.IS_CANCEL, false)
                 .returning()
         ).map { it.into(RequestDTO::class.java) }
     }

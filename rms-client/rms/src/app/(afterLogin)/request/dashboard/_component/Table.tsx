@@ -10,7 +10,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import InputBox from "@/app/_component/InputBox";
 import SelectBox from "@/app/_component/SelectBox";
 import DatePickerRangeBox from "@/app/_component/DatePickerRangeBox";
-import {useSetStatus, useStatus} from "@/app/(afterLogin)/request/dashboard/store/useStatusStore";
+import {useStatus} from "@/app/(afterLogin)/request/dashboard/store/useStatusStore";
 import {Query} from "@/model/Query";
 import DownloadExcelButton from "@/app/(afterLogin)/request/dashboard/_component/DownloadExcelButton";
 import {Status} from "@/model/Status";
@@ -37,12 +37,19 @@ export default function Table() {
             filter_groups: [
                     {
                         condition_type: "AND",
-                        filters: [{
-                                    table: 'request',
-                                    column: 'status',
-                                    value: globalStatus,
-                                    operator: "="
-                                }
+                        filters: [
+                            {
+                                table: 'request',
+                                column: 'status',
+                                value: globalStatus,
+                                operator: "="
+                            },
+                            {
+                                table: 'request',
+                                column: 'is_cancel',
+                                value: "false",
+                                operator: "LIKE"
+                            }
                         ]
                     }
                 ]
@@ -125,13 +132,28 @@ export default function Table() {
                                     column: 'status',
                                     value: status,
                                     operator: "="
-                                }]
-                                : [{
+                                },
+                                {
+                                    table: 'request',
+                                    column: 'is_cancel',
+                                    value: "false",
+                                    operator: "LIKE"
+                                }
+                                ]
+                                : [
+                                    {
                                     table: 'request',
                                     column: 'status',
                                     value: 'CART',
                                     operator: "!="
-                                }])
+                                    },
+                                    {
+                                        table: 'request',
+                                        column: 'is_cancel',
+                                        value: "false",
+                                        operator: "LIKE"
+                                    }
+                                    ])
                         ]
                     },
                     ...(prevSearch.filter_groups || []).filter(group => group.filters?.some(filter => filter.column === "create_at"))

@@ -46,6 +46,12 @@ const defaultFilter: Filter = {
     operator: "=",
     value: Status.TEST_FAILED.valueOf()
 }
+const notCancelFilter: Filter = {
+    table: "request",
+    column: "is_cancel",
+    value: "false",
+    operator: "="
+}
 
 
 export default function ReSampleTable() {
@@ -109,6 +115,7 @@ export default function ReSampleTable() {
                     {
                         filters: [
                             defaultFilter,
+                            notCancelFilter,
                             ...(searchFilter ? [searchFilter] : []),
                         ],
                     }
@@ -148,6 +155,7 @@ export default function ReSampleTable() {
                 {
                     filters: [
                         defaultFilter,
+                        notCancelFilter,
                         ...(searchFilter ? [searchFilter] : []),
                     ],
                 },
@@ -184,6 +192,7 @@ export default function ReSampleTable() {
                 {
                     filters: [
                         defaultFilter,
+                        notCancelFilter,
                         ...(searchFilter ? [searchFilter] : []),
                     ],
                 }

@@ -35,6 +35,7 @@ interface RequestDao: QueryDao {
             REQUEST.CART_AT,
             REQUEST.AWB_NUMBER,
             REQUEST.COURIER_COMPANY,
+            REQUEST.IS_CANCEL,
             jsonObject(
                 key("id").value(SERVICE.ID),
                 key("name").value(SERVICE.NAME)

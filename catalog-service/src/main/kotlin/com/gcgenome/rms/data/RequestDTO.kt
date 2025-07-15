@@ -41,6 +41,7 @@ data class RequestDTO(
     @JsonProperty("request_group")
     var requestGroup: RequestGroupDTO? = RequestGroupDTO(),
     @JsonProperty("request_relation")
-    var requestRelation: RequestRelationDTO? = RequestRelationDTO(id=1)
+    var requestRelation: RequestRelationDTO? = RequestRelationDTO(id=1),
+    var isCancel: Boolean? = null
 )
 

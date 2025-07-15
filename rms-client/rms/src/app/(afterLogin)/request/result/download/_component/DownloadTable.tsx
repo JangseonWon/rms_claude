@@ -13,7 +13,7 @@ import InputBox from "@/app/_component/InputBox";
 import BlueButton from "@/app/_component/BlueButton";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import {Filter} from "@/model/Filter";
-import {FilterGroup, Query} from "@/model/Query";
+import {Query} from "@/model/Query";
 import {Report} from "@/model/Report";
 import {getReportFiles} from "@/app/(afterLogin)/request/result/download/_api/getReportFiles";
 import {Status} from "@/model/Status";
@@ -49,6 +49,12 @@ const completedFilter: Filter = {
     operator: "=",
     value: Status.COMPLETED.valueOf()
 }
+const notCancelFilter: Filter = {
+    table: "request",
+    column: "is_cancel",
+    value: "false",
+    operator: "="
+}
 const defaultSearch: Query = {
     sorts: [
         {
@@ -62,7 +68,8 @@ const defaultSearch: Query = {
             condition_type: "OR",
             filters: [
                 deliveredFilter,
-                completedFilter
+                completedFilter,
+                notCancelFilter
             ]
         }
     ],
@@ -128,7 +135,8 @@ export default function DownloadTable() {
                     },
                     {
                         filters: [
-                            newFilter
+                            newFilter,
+                            notCancelFilter
                         ]
                     },
                     ...(prevSearch.filter_groups || []).filter(group => group.filters?.some(filter => filter.column === "create_at"))
