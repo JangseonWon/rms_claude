@@ -68,7 +68,12 @@ const defaultSearch: Query = {
             condition_type: "OR",
             filters: [
                 deliveredFilter,
-                completedFilter,
+                completedFilter
+            ]
+        },
+        {
+            condition_type: "OR",
+            filters: [
                 notCancelFilter
             ]
         }
