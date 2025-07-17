@@ -397,7 +397,7 @@ export default function RequestManageTable() {
                             <td className={globalTableStyle.middleColumn}><CellTooltip
                                 text={request.is_cancel ? "취소된의뢰" : ""}/></td>
                             <td className={globalTableStyle.longColumn}>
-                                {request.is_cancel_at ? format(new Date(request.is_cancel_at), 'yyyy-MM-dd HH:mm:ss') : ''}
+                                {request.cancel_at ? format(new Date(request.cancel_at), 'yyyy-MM-dd HH:mm:ss') : ''}
                             </td>
                             <td className={globalTableStyle.textColumn}>{request.lims_resample_reason}</td>
                             <td className={globalTableStyle.longColumn}>

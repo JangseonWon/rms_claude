@@ -10,7 +10,7 @@ export interface Request {
     user_service_id?: string
     status?: string
     is_cancel?: boolean
-    is_cancel_at?: Date
+    cancel_at?: Date
     memo?: string
     department?: string
     ward?: string

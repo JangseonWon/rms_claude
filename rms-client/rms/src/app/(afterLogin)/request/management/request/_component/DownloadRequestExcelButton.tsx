@@ -75,7 +75,7 @@ export default function DownloadRequestExcelButton({search}: DownloadExcelButton
             "운송번호": row.awb_number,
             "상태": row.status === 'UNCONFIRMED_ORDER' ? 'PENDING_APPROVAL' : row.status === 'COMPLETED_ORDER' ? 'APPROVAL' : row.status,
             "취소된의뢰": row.is_cancel,
-            "취소시간": row.is_cancel_at,
+            "취소시간": row.cancel_at,
             "림스재검사유": row.lims_resample_reason,
             "림스재검요청시간": row.lims_resample_at
         }));

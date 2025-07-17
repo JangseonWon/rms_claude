@@ -36,8 +36,8 @@ data class RequestDTO(
     var isCancel: Boolean? = null,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     @JsonSerialize(using = LocalDateTimeSerializer::class)
-    @JsonProperty("is_cancel_at")
-    var isCancelAt: LocalDateTime? = null,
+    @JsonProperty("cancel_at")
+    var cancelAt: LocalDateTime? = null,
     @JsonProperty("lims_resample_reason")
     var limsResampleReason: String? = null,
     @JsonDeserialize(using = LocalDateTimeDeserializer::class)

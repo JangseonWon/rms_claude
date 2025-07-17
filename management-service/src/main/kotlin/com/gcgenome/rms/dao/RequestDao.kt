@@ -23,7 +23,7 @@ interface RequestDao: QueryDao {
         return Mono.from(
             update(REQUEST)
                 .set(REQUEST.IS_CANCEL, true)
-                .set(REQUEST.IS_CANCEL_AT, LocalDateTime.now())
+                .set(REQUEST.CANCEL_AT, LocalDateTime.now())
                 .where(REQUEST.SAMPLE_ID.eq(request.sample?.id)).returning()
         ).map { it.into(RequestDTO::class.java) }
     }
@@ -66,7 +66,7 @@ interface RequestDao: QueryDao {
             REQUEST.AWB_NUMBER.`as`("awb_number"),
             REQUEST.CREATE_AT.`as`("create_at"),
             REQUEST.IS_CANCEL.`as`("is_cancel"),
-            REQUEST.IS_CANCEL_AT.`as`("is_cancel_at"),
+            REQUEST.CANCEL_AT.`as`("cancel_at"),
             REQUEST.LIMS_RESAMPLE_AT.`as`("lims_resample_at"),
             REQUEST.LIMS_RESAMPLE_REASON.`as`("lims_resample_reason"),
             jsonObject(
@@ -134,7 +134,7 @@ interface RequestDao: QueryDao {
         )
         val groupByFields = listOf(
             REQUEST.USER_SERVICE_ID, REQUEST.STATUS, REQUEST.PHYSICIAN, REQUEST.CREATE_AT, REQUEST.COURIER_COMPANY, REQUEST.AWB_NUMBER,
-            REQUEST_GROUP.ID, REQUEST_RELATION.ID, REQUEST.IS_CANCEL, REQUEST.IS_CANCEL_AT, REQUEST.LIMS_RESAMPLE_AT, REQUEST.LIMS_RESAMPLE_REASON,
+            REQUEST_GROUP.ID, REQUEST_RELATION.ID, REQUEST.IS_CANCEL, REQUEST.CANCEL_AT, REQUEST.LIMS_RESAMPLE_AT, REQUEST.LIMS_RESAMPLE_REASON,
             SERVICE.ID,
             USER.ID,
             SAMPLE.ID,

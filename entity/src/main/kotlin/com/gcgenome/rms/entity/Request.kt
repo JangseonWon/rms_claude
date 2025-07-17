@@ -43,8 +43,8 @@ data class Request(
     val limsResampleReason: String,
     @Column(name = "is_cancel", nullable = false)
     val isCancel: Boolean,
-    @Column(name = "is_cancel_at", nullable = true)
-    val isCancelAt: LocalDateTime,
+    @Column(name = "cancel_at", nullable = true)
+    val cancelAt: LocalDateTime,
 
 
 
