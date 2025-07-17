@@ -404,6 +404,8 @@ export default function RequestDetailInfo({editable, selectedRequest, closeModal
                                 label={'Memo'}
                                 value={request.memo}
                                 onChange={(value) => handleRequestChange('memo', value)}
+                                placeholder={"Maximum 100 characters"}
+                                lengthLimit={100}
                             />
                         </div>
                         {rootRequest && (

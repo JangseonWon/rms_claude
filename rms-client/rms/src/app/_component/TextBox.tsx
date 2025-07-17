@@ -7,21 +7,29 @@ type Props = {
     disabled?: boolean
     onChange?: (value: string) => void
     required?: boolean;
+    placeholder?: string
+    lengthLimit?: number
 }
 
-export default function TextBox({ label, value, disabled = false, onChange, required=false }: Props) {
+export default function TextBox({label, value, disabled = false, onChange, required=false, lengthLimit, placeholder}: Props) {
     const [inputValue, setInputValue] = useState('');
     const [hasError, setHasError] = useState(false);
 
+    const allowedCharRegex = /[^a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ가-힣\s~`!@#$%^&*()\-_=\[\]{}\\|;:'",.<>/?]/g
+
     const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-        const newValue = event.target.value;
-        setInputValue(newValue);
-        if (onChange) {
-            onChange(newValue);
+        let newValue = event.target.value
+        newValue = newValue.replace(allowedCharRegex, "")
+
+        if (typeof lengthLimit === 'number' && lengthLimit > 0 && newValue.length > lengthLimit) {
+            newValue = newValue.slice(0, lengthLimit);
         }
 
-        setHasError(required && newValue.trim() === '');
-    };
+        setInputValue(newValue)
+        onChange?.(newValue)
+
+        setHasError(required && newValue.trim() === "")
+    }
 
     useEffect(() => {
         setInputValue(value || '');
@@ -32,6 +40,7 @@ export default function TextBox({ label, value, disabled = false, onChange, requ
         <div className={`${style.content} ${hasError ? style.error : ""}`}>
             <p>{label}</p>
             <textarea
+                placeholder={placeholder}
                 className={`${style.memo} ${disabled ? style.disable : ""}`}
                 rows={8}
                 value={inputValue}

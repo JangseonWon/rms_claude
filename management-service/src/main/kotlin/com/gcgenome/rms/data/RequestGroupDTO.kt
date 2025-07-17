@@ -5,5 +5,5 @@ import java.util.*
 
 data class RequestGroupDTO(
     @JsonProperty("id")
-    val id: UUID?,
+    var id: UUID?,
 )

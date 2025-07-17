@@ -13,6 +13,32 @@ import reactor.core.publisher.Mono
 class RequestHandler(
     val dslContext: DSLContext,
 ): RequestDao, RequestGroupDao, SampleExtensionDao, SampleDao, PatientDao, ReportDao{
+    fun saveRequest(requests: Array<RequestDTO>): Flux<RequestDTO> {
+        return Flux.from(dslContext.transactionPublisher { trx ->
+            trx.dsl().run {
+                Flux.fromArray(requests).flatMap { request ->
+                    insertPatient(request.user!!.id, request.sample!!.patient!!)
+                        .then(insertSample(request.user!!, request.sample!!, request.status!!))
+                        .flatMap { sampleRecord ->
+                            val extensions = request.sample!!.extensions ?: emptyList()
+                            Flux.fromIterable(extensions)
+                                .filter { it.value != null }
+                                .flatMap { extension -> insertSampleExtension(extension, sampleRecord.id!!) }
+                                .then(insertRequestGroup()
+                                    .flatMap { requestGroup ->
+                                        val updatedRequest = request.apply {
+                                            this.sample!!.id = sampleRecord.id
+                                            this.user!!.id = user!!.id
+                                            this.requestGroup = requestGroup
+                                        }
+                                        insertRequest(updatedRequest)
+                                    })
+                        }
+                }
+            }
+        })
+    }
+
     fun searchRequests(query: Query): Mono<Page<RequestDTO>> {
         return dslContext.selectRequestsWithPage(query)
     }

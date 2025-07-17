@@ -352,6 +352,8 @@ export default function GroupOrder() {
                         label={"Memo"}
                         value={requests[index]?.memo}
                         onChange={(value) => handleRequestChange(index,`memo`, value)}
+                        placeholder={"Maximum 100 characters"}
+                        lengthLimit={100}
                     />
                 </div>
             </div>

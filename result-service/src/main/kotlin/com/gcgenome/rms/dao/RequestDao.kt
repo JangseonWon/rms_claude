@@ -23,6 +23,7 @@ interface RequestDao: QueryDao{
                 .set(REQUEST.USER_ID, request.user!!.id)
                 .set(REQUEST.REQUEST_GROUP_ID, request.requestGroup!!.id)
                 .set(REQUEST.REQUEST_RELATION_ID, request.requestRelation!!.id)
+                .set(REQUEST.IS_CANCEL, false)
                 .set(REQUEST.CREATE_AT, request.status.takeIf { it == Status.UNCONFIRMED_ORDER }?.let { LocalDateTime.now() })
                 .set(REQUEST.CART_AT, request.status.takeIf { it == Status.CART }?.let { LocalDateTime.now() })
                 .returning()

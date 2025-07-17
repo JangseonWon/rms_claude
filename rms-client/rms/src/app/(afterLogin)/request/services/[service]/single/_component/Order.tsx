@@ -361,6 +361,8 @@ export default function Order() {
                 label={'Memo'}
                 value={request?.memo}
                 onChange={(value) => handleRequestChange('memo', value)}
+                placeholder={"Maximum 100 characters"}
+                lengthLimit={100}
             />
         </div>
     )

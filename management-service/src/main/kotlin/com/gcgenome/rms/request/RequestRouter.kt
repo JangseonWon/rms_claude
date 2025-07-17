@@ -22,11 +22,26 @@ class RequestRouter(
 ) {
     @Bean("OrderRouter")
     fun route() = router {
+        PUT("/w-api/management-service/requests", :: saveOldRequests)
         POST("/w-api/management-service/requests/search", :: searchRequests)
         DELETE("/w-api/management-service/requests", :: deleteRequests)
         PATCH("/w-api/management-service/requests", :: cancelRequests)
     }
     private val logger: Logger = LoggerFactory.getLogger(RequestRouter::class.java)
+
+    private fun saveOldRequests(request: ServerRequest): Mono<ServerResponse> {
+        return authenticationHandler.chkManager(request)
+            .then(request.bodyToMono(Array<RequestDTO>::class.java))
+            .flatMap { requestHandler.saveRequest(it).collectList() }
+            .flatMap { ServerResponse.ok().build() }
+            .onErrorResume(AuthenticationNotFoundException::class.java) { e ->
+                ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue("${e.message}")
+            }
+//            .onErrorResume { e ->
+//                logger.error(e.stackTraceToString())
+//                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome")
+//            }
+    }
 
     private fun searchRequests(request: ServerRequest): Mono<ServerResponse> {
         return authenticationHandler.chkManager(request)

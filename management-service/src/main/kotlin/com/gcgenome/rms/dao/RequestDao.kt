@@ -10,6 +10,26 @@ import reactor.core.publisher.Mono
 import java.time.LocalDateTime
 
 interface RequestDao: QueryDao {
+    fun DSLContext.insertRequest(request: RequestDTO): Mono<RequestDTO> {
+        return Mono.from(
+            insertInto(REQUEST)
+                .set(REQUEST.SERVICE_ID, request.service!!.id)
+                .set(REQUEST.SAMPLE_ID, request.sample!!.id)
+                .set(REQUEST.USER_SERVICE_ID, request.userServiceId ?: request.service!!.id)
+                .set(REQUEST.STATUS, request.status.toString())
+                .set(REQUEST.MEMO, request.memo)
+                .set(REQUEST.DEPARTMENT, request.department)
+                .set(REQUEST.WARD, request.ward)
+                .set(REQUEST.PHYSICIAN, request.physician)
+                .set(REQUEST.CREATE_AT, request.createAt)
+                .set(REQUEST.USER_ID, request.user!!.id)
+                .set(REQUEST.REQUEST_GROUP_ID, request.requestGroup!!.id)
+                .set(REQUEST.REQUEST_RELATION_ID, request.requestRelation!!.id)
+                .set(REQUEST.IS_CANCEL, false)
+                .returning()
+        ).map { it.into(RequestDTO::class.java) }
+    }
+
     fun DSLContext.deleteRequestById(request: RequestDTO): Mono<RequestDTO> {
         return Mono.from(
             deleteFrom(REQUEST).where(

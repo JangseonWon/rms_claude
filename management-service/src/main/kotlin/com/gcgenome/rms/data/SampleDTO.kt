@@ -16,6 +16,8 @@ data class SampleDTO(
     var barcode: String?,
     var quantity: Int?,
     var age: Int?,
+    @JsonProperty("user_sample_id")
+    val userSampleId: String?,
     @JsonDeserialize(using = LocalDateDeserializer::class)
     @JsonSerialize(using = LocalDateSerializer::class)
     @JsonProperty("sampling_on")

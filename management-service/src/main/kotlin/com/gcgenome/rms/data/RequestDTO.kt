@@ -44,4 +44,6 @@ data class RequestDTO(
     @JsonSerialize(using = LocalDateTimeSerializer::class)
     @JsonProperty("lims_resample_at")
     var limsResampleAt: LocalDateTime? = null,
+    @JsonProperty("request_relation")
+    var requestRelation: RequestRelationDTO? = RequestRelationDTO(id=1),
 )
