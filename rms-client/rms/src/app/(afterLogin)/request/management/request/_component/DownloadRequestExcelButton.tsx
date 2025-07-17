@@ -51,7 +51,11 @@ export default function DownloadRequestExcelButton({search}: DownloadExcelButton
             "의뢰코드",
             "배송업체",
             "운송번호",
-            "상태"
+            "상태",
+            "취소된의뢰",
+            "취소시간",
+            "림스재검사유",
+            "림스재검요청시간"
         ];
 
         const data = requestData.map(row => ({
@@ -69,7 +73,11 @@ export default function DownloadRequestExcelButton({search}: DownloadExcelButton
             "의뢰코드": row.service?.id,
             "배송업체": row.courier_company,
             "운송번호": row.awb_number,
-            "상태": row.status === 'UNCONFIRMED_ORDER' ? 'PENDING_APPROVAL' : row.status === 'COMPLETED_ORDER' ? 'APPROVAL' : row.status
+            "상태": row.status === 'UNCONFIRMED_ORDER' ? 'PENDING_APPROVAL' : row.status === 'COMPLETED_ORDER' ? 'APPROVAL' : row.status,
+            "취소된의뢰": row.is_cancel,
+            "취소시간": row.is_cancel_at,
+            "림스재검사유": row.lims_resample_reason,
+            "림스재검요청시간": row.lims_resample_at
         }));
 
         const worksheet = XLSX.utils.json_to_sheet(data, { header: headers });
