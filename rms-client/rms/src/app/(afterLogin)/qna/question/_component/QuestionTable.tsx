@@ -18,11 +18,24 @@ import globalTableStyle from "@/css/globalTable.module.css";
 import {GrPowerReset} from "react-icons/gr";
 import {formatDateLocal} from "@/app/_component/DateUtil";
 
+const defaultSearch: Query = {
+    sorts: [
+        {
+            table: "post",
+            column: "create_at",
+            asc: false
+        }
+    ],
+    size:8,
+    page:1
+}
+
+
 export default function QuestionTable() {
     const router = useRouter();
     const [postData, setPostData] = useState<Post[]>([]);
     const [totalPage, setTotalPage] = useState<number>(4);
-    const [search, setSearch] = useState<Query>({sort_by:"create_at", asc: false, size:8, page:1});
+    const [search, setSearch] = useState<Query>(defaultSearch);
     const [selectOption, setSelectOption] = useState<SelectBoxOption>({ table: "post", column: "title", name: "Title" });
     const [pageRange, setPageRange] = useState<{ start: number, end: number }>({ start: 1, end: 10 });
 
@@ -134,7 +147,7 @@ export default function QuestionTable() {
     }, []);
 
     const handleReset = () => {
-        setSearch({ sort_by:"create_at", asc: false, size:8, page:1 });
+        setSearch(defaultSearch);
         setSelectOption({ table: "post", column: "title", name: "Title" });
     };
 

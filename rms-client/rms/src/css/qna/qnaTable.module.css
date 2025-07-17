@@ -70,10 +70,6 @@
     padding: 6px 12px;
     text-align: center;
 }
-.title {
-    max-width: 650px;
-    text-align: left !important;
-}
 .titleTd {
     display: flex;
     width: 630px;

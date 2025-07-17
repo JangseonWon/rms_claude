@@ -20,11 +20,22 @@ import {GrPowerReset} from "react-icons/gr";
 import {Role} from "@/model/Role";
 import {formatDateLocal} from "@/app/_component/DateUtil";
 
+const defaultSearch: Query = {
+    sorts: [
+        {
+            table: "post",
+            column: "create_at",
+            asc: false
+        }
+    ],
+    size:8,
+    page:1
+}
 export default function FaqTable() {
     const router = useRouter();
     const [postData, setPostData] = useState<Post[]>([]);
     const [totalPage, setTotalPage] = useState<number>(4);
-    const [search, setSearch] = useState<Query>({sort_by:"create_at", asc: false, size:8, page:1});
+    const [search, setSearch] = useState<Query>(defaultSearch);
     const [selectOption, setSelectOption] = useState<SelectBoxOption>({ table: "post", column: "title", name: "Title" });
     const [pageRange, setPageRange] = useState<{ start: number, end: number }>({ start: 1, end: 10 });
     const { data: session } = useSession();
@@ -137,7 +148,7 @@ export default function FaqTable() {
     }, []);
 
     const handleReset = () => {
-        setSearch({ sort_by:"create_at", asc: false, size:8, page:1 });
+        setSearch(defaultSearch);
         setSelectOption({ table: "post", column: "title", name: "Title" });
     };
 
@@ -178,11 +189,11 @@ export default function FaqTable() {
                 <table className={style.table}>
                     <thead>
                     <tr>
-                        <th className={style.category}>No</th>
-                        <th className={style.title}>Title</th>
+                        <th>No</th>
+                        <th>Title</th>
                         <th/>
-                        <th className={style.user}>User Name</th>
-                        <th className={style.date}>Date</th>
+                        <th>User Name</th>
+                        <th>Date</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -201,7 +212,7 @@ export default function FaqTable() {
                                     {isNew && <span className={style.newBadge}>N</span>}
                                 </td>
                                 <td className={style.newAndComment}>
-                                    <FontAwesomeIcon className={style.commentIcon} icon={faComment}/>
+                                    <FontAwesomeIcon icon={faComment}/>
                                     {row.comment_count}
                                 </td>
                                 <td>{row.user?.name}</td>

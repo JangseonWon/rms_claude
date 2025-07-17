@@ -16,10 +16,22 @@ import {Query} from "@/model/Query";
 import {SelectBoxOption} from "@/model/SelectBoxOption";
 import SelectBox from "@/app/_component/SelectBox";
 
+const defaultSearch: Query = {
+    sorts: [
+        {
+            table: "organization",
+            column: "id",
+            asc: true
+        }
+    ],
+    size:10,
+    page:1
+}
+
 export default function InstitutionTable() {
     const [organizationData, setOrganizationData] = useState<Organization[]>([])
     const [totalPage, setTotalPage] = useState<number>(0);
-    const [search, setSearch] = useState<Query>({sort_by:"id", asc: false, size:10, page:1});
+    const [search, setSearch] = useState<Query>(defaultSearch);
     const [pageRange, setPageRange] = useState<{ start: number, end: number }>({ start: 1, end: 10 });
     const [selectOption, setSelectOption] = useState<SelectBoxOption>({ table: "organization", column: "id", name: "Id" });
     const [selectInstitution, setSelectInstitution] = useState<Organization>();

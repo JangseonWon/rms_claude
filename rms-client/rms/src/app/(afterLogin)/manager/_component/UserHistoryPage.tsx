@@ -26,14 +26,13 @@ const selectBoxOptions: SelectBoxOption[] = [
 const defaultSearch: Query = {
     sorts: [
         {
-            "table": "user_history",
-            "column": "id",
-            "asc": false
+            table: "user_history",
+            column: "changed_at",
+            asc: false
         }
     ],
     size:10,
-    page:1,
-    sort_by: "changed_at"
+    page:1
 }
 
 export default function UserHistoryPage() {

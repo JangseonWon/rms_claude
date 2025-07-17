@@ -30,8 +30,13 @@ export default function Table() {
     const globalStatus = useStatus();
     const [search, setSearch] = useState<Query>(
         {
-            sort_by:"create_at",
-            asc: false,
+            sorts:[
+                {
+                    table: "request",
+                    column: "create_at",
+                    asc: false
+                }
+            ],
             size:5,
             page:1,
             filter_groups: [
