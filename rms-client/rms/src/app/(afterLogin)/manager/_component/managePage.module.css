@@ -62,3 +62,15 @@
     width: 100%;
     overflow-x: scroll;
 }
+.textboxContainer {
+    display: flex;
+    gap: 8%;
+}
+.textbox {
+    width: 600px;
+}
+.textboxExample textarea{
+    width: 600px;
+    font-weight: bold;
+    color: #002b49;
+}

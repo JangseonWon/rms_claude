@@ -77,6 +77,13 @@ export default function CartTable() {
     useEffect(() => {
         const updatedSearch = {
             ...search,
+            sorts: [
+                {
+                    table: "request",
+                    column: "cart_at",
+                    asc: false
+                }
+            ],
             filter_groups: [
                 {
                     filters: [
@@ -240,6 +247,7 @@ export default function CartTable() {
                                 <span className={globalTableStyle.checkmark}></span>
                             </label>
                         </th>
+                        <th className={globalTableStyle.middleColumn}>Cart Date<br/>(YYYY-MM-DD)</th>
                         <th className={globalTableStyle.middleColumn}>Institution</th>
                         <th className={globalTableStyle.longColumn}>Patient(s) Name</th>
                         <th className={globalTableStyle.longColumn}>Service</th>
@@ -264,9 +272,13 @@ export default function CartTable() {
                                         <span className={globalTableStyle.checkmark}></span>
                                     </label>
                                 </td>
-                                <td className={globalTableStyle.middleColumn}><CellTooltip text={request.sample!.patient!.organization!.id}/></td>
-                                <td className={globalTableStyle.longColumn}><CellTooltip text={request.sample!.patient!.name}/></td>
-                                <td className={globalTableStyle.longColumn}><CellTooltip text={request.service!.name}/></td>
+                                <td className={globalTableStyle.middleColumn}>{request.cart_at ? formatDateLocal(new Date(request.cart_at)) : '-'}</td>
+                                <td className={globalTableStyle.middleColumn}><CellTooltip
+                                    text={request.sample!.patient!.organization!.id}/></td>
+                                <td className={globalTableStyle.longColumn}><CellTooltip
+                                    text={request.sample!.patient!.name}/></td>
+                                <td className={globalTableStyle.longColumn}><CellTooltip text={request.service!.name}/>
+                                </td>
                                 <td className={globalTableStyle.middleColumn}>{request.sample?.patient ?
                                     formatDate(request.sample.patient.birth_year, request.sample.patient.birth_month, request.sample.patient.birth_day) : '-'}
                                 </td>

@@ -134,10 +134,23 @@ export default function RequestManageTable() {
     const handleCancelCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const checked = e.target.checked;
         setIsCancelledChecked(checked);
-        handleSearchChange(
-            { table: "request", column: "is_cancel" },
-            checked.toString()
-        );
+        setSearch(prevSearch => {
+            const updatedFilterGroups = (prevSearch.filter_groups || []).map(group => {
+                const filters = group.filters?.filter(filter => filter.column !== "is_cancel") || [];
+                return {
+                    ...group,
+                    filters: checked
+                        ? [...filters]
+                        : [...filters, notCancelFilter]
+                };
+            });
+
+            return {
+                ...prevSearch,
+                filter_groups: updatedFilterGroups,
+                page: 1
+            };
+        });
     };
 
     const handleReset = () => {

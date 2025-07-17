@@ -39,7 +39,17 @@ const selectBoxOptions: SelectBoxOption[] = [
     { table: "patient", column: "serial", name: "MRN" }
 ];
 
-const defaultSearch: Query = {size:10, page:1}
+const defaultSearch: Query = {
+    sorts: [
+        {
+            table: "request",
+            column: "create_at",
+            asc: false
+        }
+    ],
+    size:10,
+    page:1
+}
 const defaultFilter: Filter = {
     table: "request",
     column: "status",
