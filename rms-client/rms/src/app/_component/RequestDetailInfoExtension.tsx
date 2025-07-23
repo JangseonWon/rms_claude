@@ -135,12 +135,13 @@ export default function RequestDetailInfoExtension({disabled=false, request, roo
                                             value={current}
                                             options={opts}
                                             required={ext.required}
+                                            width="200px"
                                             onChange={opt => onChange(ext.id!, opt.value)}
                                         />
                                     )
                                 case ExtensionType.PROBAND_SEARCH:
                                     return (
-                                        <div key={ext.id}>
+                                        <div key={ext.id} className={style.flexContainer}>
                                             <InputBox
                                                 label={`Registration ID${ext.required ? " *" : ""}`}
                                                 required={ext.required}

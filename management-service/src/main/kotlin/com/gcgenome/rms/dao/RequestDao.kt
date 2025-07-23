@@ -87,6 +87,7 @@ interface RequestDao: QueryDao {
             REQUEST.CREATE_AT.`as`("create_at"),
             REQUEST.IS_CANCEL.`as`("is_cancel"),
             REQUEST.CANCEL_AT.`as`("cancel_at"),
+            REQUEST.MEMO,
             REQUEST.LIMS_RESAMPLE_AT.`as`("lims_resample_at"),
             REQUEST.LIMS_RESAMPLE_REASON.`as`("lims_resample_reason"),
             jsonObject(
@@ -153,8 +154,9 @@ interface RequestDao: QueryDao {
             ).`as`("reports")
         )
         val groupByFields = listOf(
-            REQUEST.USER_SERVICE_ID, REQUEST.STATUS, REQUEST.PHYSICIAN, REQUEST.CREATE_AT, REQUEST.COURIER_COMPANY, REQUEST.AWB_NUMBER,
-            REQUEST_GROUP.ID, REQUEST_RELATION.ID, REQUEST.IS_CANCEL, REQUEST.CANCEL_AT, REQUEST.LIMS_RESAMPLE_AT, REQUEST.LIMS_RESAMPLE_REASON,
+            REQUEST.USER_SERVICE_ID, REQUEST.STATUS, REQUEST.PHYSICIAN, REQUEST.CREATE_AT,
+            REQUEST.COURIER_COMPANY, REQUEST.AWB_NUMBER, REQUEST_GROUP.ID, REQUEST_RELATION.ID, REQUEST.MEMO,
+            REQUEST.IS_CANCEL, REQUEST.CANCEL_AT, REQUEST.LIMS_RESAMPLE_AT, REQUEST.LIMS_RESAMPLE_REASON,
             SERVICE.ID,
             USER.ID,
             SAMPLE.ID,
