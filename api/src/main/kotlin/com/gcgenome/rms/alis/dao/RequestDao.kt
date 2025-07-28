@@ -7,6 +7,7 @@ import com.gcgenome.rms.alis.data.Status
 import com.gcgenome.rms.tables.references.*
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.*
+import org.jooq.impl.SQLDataType
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.time.LocalTime
@@ -23,6 +24,35 @@ interface RequestDao {
             baseCondition.and(ORGANIZATION.USER_ID.eq(alisQuery.search.userId))
         } else { baseCondition }
 
+        val ta0093Value = max(
+            `when`(
+                SAMPLE_EXTENSION.EXTENSION_ID.eq("TA0093"),
+                SAMPLE_EXTENSION.VALUE
+            ).otherwise(inline(null, SQLDataType.VARCHAR))
+        ).cast(SQLDataType.VARCHAR)
+
+        val ta0095Value = max(
+            `when`(
+                SAMPLE_EXTENSION.EXTENSION_ID.eq("TA0095"),
+                SAMPLE_EXTENSION.VALUE
+            ).otherwise(inline(null, SQLDataType.VARCHAR))
+        ).cast(SQLDataType.VARCHAR)
+
+        val extConcat = concat(
+            coalesce(ta0093Value, inline("")),
+            `when`(ta0093Value.isNotNull.and(ta0095Value.isNotNull), inline(", "))
+            .otherwise(inline("")), coalesce(ta0095Value, inline("")))
+
+        val memoField = `when`(
+            ta0093Value.isNotNull.or(ta0095Value.isNotNull),
+            concat(
+                extConcat,
+                inline(", "),
+                inline("(memo) "),
+                REQUEST.MEMO
+            )
+        ).otherwise(REQUEST.MEMO).`as`("memo")
+
         return Flux.from(
             select(
                 REQUEST.CREATE_AT.`as`("requestAt"),
@@ -31,7 +61,7 @@ interface RequestDao {
                 REQUEST.DEPARTMENT.`as`("department"),
                 REQUEST.WARD.`as`("ward"),
                 REQUEST.PHYSICIAN.`as`("physician"),
-                REQUEST.MEMO.`as`("memo"),
+                memoField, // LIMS 초기의뢰바코드 연동 개발 완료되면 REQEUST.MEMO만 전달 예정
                 jsonObject(
                     key("userId").value(ORGANIZATION.USER_ID),
                     key("organization").value(jsonObject(
