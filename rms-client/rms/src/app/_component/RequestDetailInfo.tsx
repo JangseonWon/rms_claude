@@ -207,9 +207,7 @@ export default function RequestDetailInfo({editable, selectedRequest, closeModal
             .then((data: Extension[]) => {
                 setSchema(data)
             })
-            .catch(err => {
-                showAlert('Failed to load extensions')
-            })
+            .catch(() => {showAlert('Failed to load extensions')})
     }, [fetchRequest, fetchOrganizations, fetchSampleType]);
 
     useEffect(() => {
@@ -404,7 +402,6 @@ export default function RequestDetailInfo({editable, selectedRequest, closeModal
                                 label={'Memo'}
                                 value={request.memo}
                                 onChange={(value) => handleRequestChange('memo', value)}
-                                placeholder={"Maximum 100 characters"}
                                 lengthLimit={100}
                             />
                         </div>

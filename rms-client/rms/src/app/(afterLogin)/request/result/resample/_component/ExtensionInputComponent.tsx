@@ -39,11 +39,13 @@ export default function ExtensionInputComponent({request, schema, extensions, on
     };
     useEffect(() => {
         if (!proband) return;
-        schema
-            .filter(ext => ext.type === ExtensionType.PROBAND_SEARCH)
-            .forEach(ext => {
+        schema.forEach(ext => {
+            if (ext.type === ExtensionType.PROBAND_SEARCH) {
                 onChange(ext.id!, proband.sample?.patient?.serial ?? "");
-            });
+            } else if (ext.type === ExtensionType.REGISTRATION_ID) {
+                onChange(ext.id!, proband.sample?.barcode ?? "");
+            }
+        });
     }, [proband]);
 
     return (
@@ -105,8 +107,9 @@ export default function ExtensionInputComponent({request, schema, extensions, on
                         }
                     })}
             </div>
-            {schema.some(ext => ext.type === ExtensionType.PROBAND_SEARCH || ext.type === ExtensionType.PROBAND_LIST)
-                && (
+            {schema.some(ext =>
+                    [ExtensionType.PROBAND_SEARCH, ExtensionType.PROBAND_LIST, ExtensionType.REGISTRATION_ID].includes(ext.type!)
+                ) && (
                     <>
                         <p className={style.title}>Proband Info.</p>
                         <div className={style.gridContainer}>
@@ -130,15 +133,18 @@ export default function ExtensionInputComponent({request, schema, extensions, on
                                                     onChange={opt => onChange(ext.id!, opt.value)}
                                                 />
                                             )
+                                        case ExtensionType.REGISTRATION_ID:
+                                            return (
+                                                <InputBox
+                                                    label={`Registration ID${ext.required ? " *" : ""}`}
+                                                    required={ext.required}
+                                                    disabled={true}
+                                                    value={proband?.sample?.barcode}
+                                                />
+                                            )
                                         case ExtensionType.PROBAND_SEARCH:
                                             return (
                                                 <>
-                                                    <InputBox
-                                                        label={`Registration ID${ext.required ? " *" : ""}`}
-                                                        required={ext.required}
-                                                        disabled={true}
-                                                        value={proband?.sample?.barcode}
-                                                    />
                                                     <InputBox
                                                         disabled={true}
                                                         label={`${ext.name}${ext.required ? " *" : ""}`}

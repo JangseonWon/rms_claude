@@ -49,11 +49,13 @@ export default function ExtensionInputComponent({request, schema, onChange, onPr
 
     useEffect(() => {
         if (!proband) return;
-        schema
-            .filter(ext => ext.type === ExtensionType.PROBAND_SEARCH)
-            .forEach(ext => {
+        schema.forEach(ext => {
+            if (ext.type === ExtensionType.PROBAND_SEARCH) {
                 onChange(ext.id!, proband.sample?.patient?.serial ?? "");
-            });
+            } else if (ext.type === ExtensionType.REGISTRATION_ID) {
+                onChange(ext.id!, proband.sample?.barcode ?? "");
+            }
+        });
     }, [proband]);
 
 
@@ -115,15 +117,18 @@ export default function ExtensionInputComponent({request, schema, onChange, onPr
                     width="200px"
                     onChange={opt => onChange(ext.id!, opt.value)}
                 />
-            case ExtensionType.PROBAND_SEARCH:
-                return <div className={style.probandInput}>
+            case ExtensionType.REGISTRATION_ID:
+                return (
                     <InputBox
-                        key={`registration${ext.id}`}
-                        label={`Registration ID${ext.required ? ' *' : ''}`}
+                        key={`${ext.name}${ext.id}`}
+                        label={`${ext.name}${ext.required ? ' *' : ''}`}
                         required={ext.required}
                         disabled={true}
                         value={proband?.sample?.barcode}
                     />
+                )
+            case ExtensionType.PROBAND_SEARCH:
+                return <div className={style.probandInput}>
                     <InputBox
                         key={`${ext.name}${ext.id}`}
                         label={`${ext.name}${ext.required ? ' *' : ''}`}
@@ -163,12 +168,12 @@ export default function ExtensionInputComponent({request, schema, onChange, onPr
                     )
                 }
             </div>
-            {schema.some((ext) => (ext.type === ExtensionType.PROBAND_SEARCH || ext.type === ExtensionType.PROBAND_LIST)) && (
+            {schema.some((ext) => [ExtensionType.PROBAND_SEARCH, ExtensionType.PROBAND_LIST, ExtensionType.REGISTRATION_ID].includes(ext.type!)) && (
                 <div>
                     <p className={style.title}>Proband Info.</p>
                     <div className={style.proband}>
                         {schema
-                            .filter((ext) => (ext.type === ExtensionType.PROBAND_SEARCH || ext.type === ExtensionType.PROBAND_LIST))
+                            .filter((ext) => [ExtensionType.PROBAND_SEARCH, ExtensionType.PROBAND_LIST, ExtensionType.REGISTRATION_ID].includes(ext.type!))
                             .sort((a, b) => (a.sort_extension ?? 0) - (b.sort_extension ?? 0))
                             .map((ext) => (
                                 <div key={ext.id}>

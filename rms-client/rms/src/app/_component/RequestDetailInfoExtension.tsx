@@ -42,11 +42,13 @@ export default function RequestDetailInfoExtension({disabled=false, request, roo
     };
     useEffect(() => {
         if (!proband) return;
-        schema
-            .filter(ext => ext.type === ExtensionType.PROBAND_SEARCH)
-            .forEach(ext => {
+        schema.forEach(ext => {
+            if (ext.type === ExtensionType.PROBAND_SEARCH) {
                 onChange(ext.id!, proband.sample?.patient?.serial ?? "");
-            });
+            } else if (ext.type === ExtensionType.REGISTRATION_ID) {
+                onChange(ext.id!, proband.sample?.barcode ?? "");
+            }
+        });
     }, [proband]);
     return (
         <div className={style.container}>
@@ -111,12 +113,11 @@ export default function RequestDetailInfoExtension({disabled=false, request, roo
                         }
                 })}
             </div>
-            {schema.some(ext => ext.type === ExtensionType.PROBAND_SEARCH || ext.type === ExtensionType.PROBAND_LIST)
-                && (
+            {schema.some((ext) => [ExtensionType.PROBAND_SEARCH, ExtensionType.PROBAND_LIST, ExtensionType.REGISTRATION_ID].includes(ext.type!)) && (
                 <>
                     <p className={style.title}>Proband Info.</p>
                     <div className={style.gridContainer}>
-                        {schema.filter(ext => ext.type === ExtensionType.PROBAND_LIST || ext.type === ExtensionType.PROBAND_SEARCH)
+                        {schema.filter((ext) => [ExtensionType.PROBAND_SEARCH, ExtensionType.PROBAND_LIST, ExtensionType.REGISTRATION_ID].includes(ext.type!))
                             .sort((a, b) => (a.sort_extension ?? 0) - (b.sort_extension ?? 0))
                             .map(ext => {
                             const current = extensions.find(e => e.id === ext.id)?.value ?? ""
@@ -139,15 +140,19 @@ export default function RequestDetailInfoExtension({disabled=false, request, roo
                                             onChange={opt => onChange(ext.id!, opt.value)}
                                         />
                                     )
+                                case ExtensionType.REGISTRATION_ID:
+                                    return (
+                                        <InputBox
+                                            label={`Registration ID${ext.required ? " *" : ""}`}
+                                            required={ext.required}
+                                            disabled={true}
+                                            value={proband?.sample?.barcode}
+                                            onChange={v => onChange(ext.id!, v)}
+                                        />
+                                    )
                                 case ExtensionType.PROBAND_SEARCH:
                                     return (
                                         <div key={ext.id} className={style.flexContainer}>
-                                            <InputBox
-                                                label={`Registration ID${ext.required ? " *" : ""}`}
-                                                required={ext.required}
-                                                disabled={true}
-                                                value={proband?.sample?.barcode}
-                                            />
                                             <InputBox
                                                 label={`${ext.name}${ext.required ? " *" : ""}`}
                                                 required={ext.required}
