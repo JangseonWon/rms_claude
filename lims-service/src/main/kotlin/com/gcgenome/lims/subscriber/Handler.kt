@@ -30,7 +30,6 @@ class Handler(
 
         return Mono.from(dslContext.run {
             selectSampleByBarcode(barcode)
-                .switchIfEmpty(Mono.error(NotFoundBarcodeException("not found barcode: $barcode")))
                 .flatMap { sample -> selectRequestBySampleIdAndServiceId(sample.id!!, serviceId) }
                 .flatMap { request ->
                     when{
@@ -40,7 +39,7 @@ class Handler(
                             updateRequestStatusById(request.serviceId!!, request.sampleId!!, message, Status.DELIVERED)
                         message.process == LimsStatus.RESAMPLED.name && message.type == LimsStatus.COMPLETE.name ->
                             updateRequestStatusById(request.serviceId!!, request.sampleId!!, message, Status.TEST_FAILED)
-                        else -> Mono.error(InvalidWorkflowException("Invalid workflow: barcode=$barcode, service=$serviceId, process=${message.process}, type=${message.type}"))
+                        else -> Mono.empty()
                     }
                 }
         })
@@ -53,7 +52,6 @@ class Handler(
 
         return Mono.from(dslContext.run {
             selectSampleByBarcode(barcode)
-                .switchIfEmpty(Mono.error(NotFoundBarcodeException("not found barcode: $barcode")))
                 .flatMap { sample -> selectRequestBySampleIdAndServiceId(sample.id!!, serviceId) }
                 .flatMap { request ->
                     val year = barcode.substring(0, 4)
