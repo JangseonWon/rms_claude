@@ -56,7 +56,7 @@ export default function RequestModal({selectedRequest, closeModal,refreshData}: 
                     }
                 }))
             })
-            .catch(err => {
+            .catch(() => {
                 showAlert('Failed to load extensions')
             })
     }, [request.service])
@@ -126,7 +126,7 @@ export default function RequestModal({selectedRequest, closeModal,refreshData}: 
         }
         try {
             const res = await putRequest(updated, selectedRequest.service!!.id!!, selectedRequest.sample!!.id!! )
-            if (!res.ok) throw new Error()
+            if (!res.ok) new Error()
             showAlert("success!")
             closeModal()
             refreshData()
@@ -188,7 +188,7 @@ export default function RequestModal({selectedRequest, closeModal,refreshData}: 
 
     return (
         <div className={globalModalStyle.modalBackground}>
-            <div className={globalModalStyle.modal}>
+            <div className={globalModalStyle.modal} style={{width:"950px"}}>
                 <div className={style.modalTitle}>
                     <h1>Re-sample Order</h1>
                     <button onClick={closeModal}>
