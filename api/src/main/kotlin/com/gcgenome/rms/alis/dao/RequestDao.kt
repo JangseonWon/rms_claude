@@ -47,8 +47,7 @@ interface RequestDao {
             ta0093Value.isNotNull.or(ta0095Value.isNotNull),
             concat(
                 extConcat,
-                inline(", "),
-                inline("(memo) "),
+                inline(" / (memo) "),
                 REQUEST.MEMO
             )
         ).otherwise(REQUEST.MEMO).`as`("memo")
