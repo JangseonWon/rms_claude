@@ -160,18 +160,6 @@ export default function RequestDetailInfoExtension({disabled=false, request, roo
                                                 value={proband?.sample?.patient?.serial}
                                                 onChange={v => onChange(ext.id!, v)}
                                             />
-                                            {!disabled && (
-                                                <button className={style.button} onClick={handleFindProband}>
-                                                    Find Proband
-                                                </button>
-                                            )}
-                                            {isProbandOpen && (
-                                                <SearchProbandModal
-                                                    request={request}
-                                                    closeModal={() => setProbandOpen(false)}
-                                                    onConfirm={handleConfirmProband}
-                                                />
-                                            )}
                                         </div>
                                     )
                                 default:
@@ -179,6 +167,18 @@ export default function RequestDetailInfoExtension({disabled=false, request, roo
                             }
 
                         })}
+                        {!disabled && (
+                            <button className={style.button} onClick={handleFindProband}>
+                                Find Proband
+                            </button>
+                        )}
+                        {isProbandOpen && (
+                            <SearchProbandModal
+                                request={request}
+                                closeModal={() => setProbandOpen(false)}
+                                onConfirm={handleConfirmProband}
+                            />
+                        )}
                     </div>
                 </>
             )}

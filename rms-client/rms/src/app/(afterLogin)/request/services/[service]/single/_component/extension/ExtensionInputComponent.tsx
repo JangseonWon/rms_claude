@@ -136,16 +136,6 @@ export default function ExtensionInputComponent({request, schema, onChange, onPr
                         disabled={true}
                         value={proband?.sample?.patient?.serial}
                     />
-                    <button className={style.button} onClick={handleFindProband}>
-                        Find Proband
-                    </button>
-                    {isProbandOpen && (
-                        <SearchProbandModal
-                            request={request}
-                            closeModal={() => setProbandOpen(false)}
-                            onConfirm={handleConfirmProband}
-                        />
-                    )}
                 </div>
             default:
                 return null;
@@ -172,14 +162,23 @@ export default function ExtensionInputComponent({request, schema, onChange, onPr
                 <div>
                     <p className={style.title}>Proband Info.</p>
                     <div className={style.proband}>
-                        {schema
-                            .filter((ext) => [ExtensionType.PROBAND_SEARCH, ExtensionType.PROBAND_LIST, ExtensionType.REGISTRATION_ID].includes(ext.type!))
+                        {schema.filter((ext) => [ExtensionType.PROBAND_SEARCH, ExtensionType.PROBAND_LIST, ExtensionType.REGISTRATION_ID].includes(ext.type!))
                             .sort((a, b) => (a.sort_extension ?? 0) - (b.sort_extension ?? 0))
                             .map((ext) => (
                                 <div key={ext.id}>
                                     {renderExtensionComponent(ext)}
                                 </div>
                             ))}
+                        <button className={style.button} onClick={handleFindProband}>
+                            Find Proband
+                        </button>
+                        {isProbandOpen && (
+                            <SearchProbandModal
+                                request={request}
+                                closeModal={() => setProbandOpen(false)}
+                                onConfirm={handleConfirmProband}
+                            />
+                        )}
                     </div>
                 </div>
             )}

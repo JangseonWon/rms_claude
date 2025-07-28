@@ -113,7 +113,7 @@ export default function ExtensionInputComponent({request, schema, extensions, on
                     <>
                         <p className={style.title}>Proband Info.</p>
                         <div className={style.gridContainer}>
-                            {schema.filter(ext => ext.type === ExtensionType.PROBAND_LIST || ext.type === ExtensionType.PROBAND_SEARCH)
+                            {schema.filter((ext) => [ExtensionType.PROBAND_SEARCH, ExtensionType.PROBAND_LIST, ExtensionType.REGISTRATION_ID].includes(ext.type!))
                                 .sort((a, b) => (a.sort_extension ?? 0) - (b.sort_extension ?? 0))
                                 .map(ext => {
                                     const current = extensions.find(e => e.id === ext.id)?.value ?? ""
@@ -152,16 +152,6 @@ export default function ExtensionInputComponent({request, schema, extensions, on
                                                         value={proband?.sample?.patient?.serial}
                                                         onChange={v => onChange(ext.id!, v)}
                                                     />
-                                                    <button className={style.button} onClick={handleFindProband}>
-                                                        Find Proband
-                                                    </button>
-                                                    {isProbandOpen && (
-                                                        <SearchProbandModal
-                                                            request={request}
-                                                            closeModal={() => setProbandOpen(false)}
-                                                            onConfirm={handleConfirmProband}
-                                                        />
-                                                    )}
                                                 </>
                                             )
                                         default:
@@ -169,6 +159,16 @@ export default function ExtensionInputComponent({request, schema, extensions, on
                                     }
 
                                 })}
+                            <button className={style.button} onClick={handleFindProband}>
+                                Find Proband
+                            </button>
+                            {isProbandOpen && (
+                                <SearchProbandModal
+                                    request={request}
+                                    closeModal={() => setProbandOpen(false)}
+                                    onConfirm={handleConfirmProband}
+                                />
+                            )}
                         </div>
                     </>
                 )}
