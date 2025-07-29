@@ -1,5 +1,6 @@
 .selectContainer {
     position: relative;
+    width: 200px;
 }
 .label{
     font-size: 11px;
