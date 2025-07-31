@@ -327,8 +327,12 @@ export default function DownloadTable() {
                     </tr>
                     </thead>
                     <tbody>
-                    {requestData && requestData.length > 0 ? ( requestData.map((request, rowIndex) => (
-                            <tr key={`${request.service!.id}${request.sample!.id}`}>
+                    {requestData && requestData.length > 0 ? ( requestData.map((request, rowIndex) => {
+                            const latestPdfReport = (request.reports as Report[])?.filter(
+                                (report) => report.type === 'PDF' && report.is_latest === true
+                            )[0];
+                            return (
+                                <tr key={`${request.service!.id}${request.sample!.id}`}>
                                 <td className={globalTableStyle.stickyColumnCheckBox}>
                                     <label form="agree" className={globalTableStyle.checkbox}>
                                         <input
@@ -348,20 +352,21 @@ export default function DownloadTable() {
                                 <td className={globalTableStyle.longColumn}><CellTooltip text={request.service?.name}/></td>
                                 <td className={globalTableStyle.longColumn}><CellTooltip text={request.sample?.patient?.name}/></td>
                                 <td className={globalTableStyle.longColumn}>{request.sample?.patient?.serial}</td>
-                                <td className={globalTableStyle.middleColumn}>{request.lims_completed_at ? formatDateLocal(new Date(request.lims_completed_at)) : ''}</td>
+                                <td className={globalTableStyle.middleColumn}>{latestPdfReport?.create_at ? formatDateLocal(new Date(latestPdfReport.create_at)) : ''}</td>
                                 <td className={globalTableStyle.middleColumn}>{request.status}</td>
                                 <td className={globalTableStyle.middleColumn}>
-                                    {(request.reports as Report[])
-                                        ?.filter((report: Report) => report.type === 'PDF' && report.is_latest === true).map((report) => (
-                                            <FontAwesomeIcon
-                                                key={report.id}
-                                                className={downloadStyle.downloadIcon}
-                                                icon={faFilePdf}
-                                                onClick={() => handleDownloadOnClick(report, request)}/>
-                                        ))}
+                                    {latestPdfReport ? (
+                                        <FontAwesomeIcon
+                                            key={latestPdfReport.id}
+                                            className={downloadStyle.downloadIcon}
+                                            icon={faFilePdf}
+                                            onClick={() => handleDownloadOnClick(latestPdfReport!, request)}
+                                        />
+                                    ) : null}
                                 </td>
                             </tr>
-                        ))
+                            )
+                    })
                     ) : (
                         <tr>
                             <td colSpan={11} className={globalTableStyle.noData}>
