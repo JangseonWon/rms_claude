@@ -34,6 +34,7 @@ const extensionOptions: SelectBoxOption[] = [
     {name: ExtensionType.LIST},
     {name: ExtensionType.PROBAND_SEARCH},
     {name: ExtensionType.PROBAND_LIST},
+    {name: ExtensionType.REGISTRATION_ID}
 ];
 export default function ExtensionModal({extensionId, closeModal, refreshTable}: Props) {
     const [extension, setExtension] = useState<Extension>()

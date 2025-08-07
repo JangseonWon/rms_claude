@@ -39,7 +39,7 @@ export default function AirWaybillModal({closeModal, onConfirm}: Props) {
                         onClick={closeModal}
                     />
                     <BlueButton
-                        name={"Confirm"}
+                        name={"OK"}
                         onClick={() => onConfirm(courierCompany, awbNumber)}
                     />
                 </div>

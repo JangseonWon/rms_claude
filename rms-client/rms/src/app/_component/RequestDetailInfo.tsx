@@ -251,6 +251,7 @@ export default function RequestDetailInfo({editable, selectedRequest, closeModal
                 </div>
                 {request && rootRequest !== undefined ? (
                     <div className={classNames(style.modalContent, scrollbar.default)}>
+                        <div className={scrollbar.wrapper}>
                         <p className={style.title}>Institution name*</p>
                         <div className={style.gridContainer}>
                             <SelectBox
@@ -433,6 +434,7 @@ export default function RequestDetailInfo({editable, selectedRequest, closeModal
                                 />
                             </div>
                         )}
+                    </div>
                     </div>
                 ) : <Loading/>}
             </div>
