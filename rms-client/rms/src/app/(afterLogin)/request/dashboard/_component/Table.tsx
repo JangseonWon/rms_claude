@@ -27,6 +27,7 @@ interface RequestWithSelected extends Request {
 
 export default function Table() {
     const [requestData, setRequestData] = useState<Request[]>([]);
+    const [tableKey, setTableKey] = useState(0);
     const globalStatus = useStatus();
     const [search, setSearch] = useState<Query>(
         {
@@ -84,6 +85,7 @@ export default function Table() {
             const totalPage = parseInt(response.headers.get("X-Total-Page") || '0');
             const responseData = await response.json();
             setRequestData(responseData as Request[]);
+            setTableKey(prev => prev + 1);
             setTotalPage(totalPage);
         }
     },[]);
@@ -275,7 +277,7 @@ export default function Table() {
                     </div>
                 </div>
             </div>
-            <table className={style.table}>
+            <table key={tableKey} className={style.table}>
                 <thead>
                 <tr>
                     <th>Order Date<br/>(YYYY-MM-DD)</th>

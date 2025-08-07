@@ -20,7 +20,7 @@ export default function ListServicePage() {
     const [categoryArray, setCategoryArray] = useState<Categories[]>();
     const [serviceOptions, setServiceOptions] = useState<Option[]>([])
     const [isLoading, setIsLoading] = useState(false);
-    const [serviceData, setServiceData] = useState<Service[]>();
+    const [serviceMap, setServiceMap] = useState<{ [categoryId: string]: Service[] }>({});
     const [selectedCard, setSelectedCard] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const selectCategory = useSelectCategory();
@@ -51,6 +51,10 @@ export default function ListServicePage() {
     const cardOnClick = (category: Categories) => {
         setSelectedCard(category.id!);
         setSelectCategory(category);
+
+        if (!serviceMap[category.id!]) {
+            fetchServiceData(category.id!);
+        }
     }
 
     const handleSelect = async (option: any) => {
@@ -95,9 +99,15 @@ export default function ListServicePage() {
         const response = await getServicesByCategoryId(categoryId);
         if (response.ok) {
             const data = await response.json();
-            setServiceData(data as Service[]);
+            setServiceMap(prev => ({
+                ...prev,
+                [categoryId]: data as Service[]
+            }));
         } else {
-            setServiceData([]);
+            setServiceMap(prev => ({
+                ...prev,
+                [categoryId]: []
+            }));
         }
     }
 
@@ -163,8 +173,7 @@ export default function ListServicePage() {
     }, [categoryArray]);
 
     useEffect(() => {
-        if (selectCategory) {
-            setServiceData([]);
+        if (selectCategory && !serviceMap[selectCategory.id!]) {
             fetchServiceData(selectCategory.id!);
         }
     }, [selectCategory]);
@@ -183,51 +192,54 @@ export default function ListServicePage() {
                     />
                 </div>
                 <section className={style.categorySection}>
-                    {categoryArray && categoryArray.length > 0 && categoryArray.map((category) => (
-                        <div key={category.id}
-                             id={category.id}
-                             className={`${style.categoryItem} ${selectedCard === category.id ? style.selectedCard : ''}`}
-                             onClick={() => cardOnClick(category)}
-                        >
-                            <div className={style.cardContainer}>
-                                <div className={style.cartTopSection}>
-                                    <div className={style.cardDescription}>
-                                        <span
-                                            className={`${style.categoryTitle} ${selectedCard === category.id ? style.selectedTitle : ''}`}>
-                                            {category.name}
-                                        </span>
-                                        <span
-                                            className={`${style.categoryDescription} ${selectedCard === category.id ? style.selectedDescriptionText : ''}`}
-                                            dangerouslySetInnerHTML={{__html: description(category.name)}}
-                                        />
+                    {categoryArray && categoryArray.length > 0 && categoryArray.map((category) => {
+                        const services = serviceMap[category.id!] || [];
+                        return (
+                            <div key={category.id}
+                                 id={category.id}
+                                 className={`${style.categoryItem} ${selectedCard === category.id ? style.selectedCard : ''}`}
+                                 onClick={() => cardOnClick(category)}
+                            >
+                                <div className={style.cardContainer}>
+                                    <div className={style.cartTopSection}>
+                                        <div className={style.cardDescription}>
+                                            <span
+                                                className={`${style.categoryTitle} ${selectedCard === category.id ? style.selectedTitle : ''}`}>
+                                                {category.name}
+                                            </span>
+                                            <span
+                                                className={`${style.categoryDescription} ${selectedCard === category.id ? style.selectedDescriptionText : ''}`}
+                                                dangerouslySetInnerHTML={{__html: description(category.name)}}
+                                            />
+                                        </div>
+                                        <div
+                                            className={`${style.cardPicture} ${selectedCard === category.id ? style.selectedCardPicture : ''}`}>
+                                            <Image src={'/category/' + category.name + '.jpg'}
+                                                   alt={category.name}
+                                                   fill
+                                            />
+                                        </div>
                                     </div>
-                                    <div
-                                        className={`${style.cardPicture} ${selectedCard === category.id ? style.selectedCardPicture : ''}`}>
-                                        <Image src={'/category/' + category.name + '.jpg'}
-                                               alt={category.name}
-                                               fill
-                                        />
-                                    </div>
-                                </div>
-                                <div className={`${style.cartBottomSection} ${selectedCard === category.id ? style.expanded : ''}`}>
-                                    <div className={style.cartBottomSectionScroll}>
-                                        {serviceData && serviceData.length > 0 ? (serviceData?.map((service) => (
-                                                <div key={service.id} className={style.serviceLink}
-                                                     onClick={() => serviceOnClick(service)}>
-                                                    <span className={style.serviceCode}>{service.id}</span>
-                                                    <span className={style.serviceName}>{service.name}</span>
+                                    <div className={`${style.cartBottomSection} ${selectedCard === category.id ? style.expanded : ''}`}>
+                                        <div className={style.cartBottomSectionScroll}>
+                                            {services.length > 0 ? (
+                                                services.map((service) => (
+                                                    <div key={service.id} className={style.serviceLink}
+                                                         onClick={() => serviceOnClick(service)}>
+                                                        <span className={style.serviceCode}>{service.id}</span>
+                                                        <span className={style.serviceName}>{service.name}</span>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div className={style.noServicesMessage}>
+                                                    The service does not exist.
                                                 </div>
-                                            ))
-                                        ) : (
-                                            <div className={style.noServicesMessage}>
-                                                The service does not exist.
-                                            </div>
-                                        )}
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        )})}
                 </section>
             </section>
         </div>

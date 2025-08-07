@@ -146,7 +146,7 @@ export default function RequestDetailInfoExtension({disabled=false, request, roo
                                             label={`Registration ID${ext.required ? " *" : ""}`}
                                             required={ext.required}
                                             disabled={true}
-                                            value={proband?.sample?.barcode}
+                                            value={current}
                                             onChange={v => onChange(ext.id!, v)}
                                         />
                                     )
@@ -157,7 +157,7 @@ export default function RequestDetailInfoExtension({disabled=false, request, roo
                                                 label={`${ext.name}${ext.required ? " *" : ""}`}
                                                 required={ext.required}
                                                 disabled={true}
-                                                value={proband?.sample?.patient?.serial}
+                                                value={current}
                                                 onChange={v => onChange(ext.id!, v)}
                                             />
                                         </div>
