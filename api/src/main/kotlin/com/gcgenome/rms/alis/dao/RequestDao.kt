@@ -71,15 +71,6 @@ interface RequestDao {
                     ))
                 ).`as`("user"),
                 jsonObject(
-                    key("rootSampleId").value(
-                        `when`(REQUEST.REQUEST_RELATION_ID.ne(1),
-                            select(field("root_sample.barcode"))
-                                .from(REQUEST.`as`("root_req"))
-                                .leftJoin(SAMPLE.`as`("root_sample")).on(field("root_req.sample_id").eq(field("root_sample.id")))
-                                .where(field("root_req.request_group_id").eq(REQUEST.REQUEST_GROUP_ID))
-                                .and(field("root_req.request_relation_id").eq(1))
-                        )
-                    ),
                     key("sampleId").value(SAMPLE.BARCODE),
                     key("sampleTypeId").value(SAMPLE.SAMPLE_TYPE_ID),
                     key("samplingOn").value(SAMPLE.SAMPLING_ON),
@@ -119,8 +110,6 @@ interface RequestDao {
                     REQUEST.WARD,
                     REQUEST.PHYSICIAN,
                     REQUEST.MEMO,
-                    REQUEST.REQUEST_RELATION_ID,
-                    REQUEST.REQUEST_GROUP_ID,
                     SAMPLE.CREATE_AT,
                     SAMPLE.BARCODE,
                     SAMPLE.SAMPLE_TYPE_ID,
