@@ -7,27 +7,22 @@ const nextConfig = {
             {
                 source: '/w-api/login-service/:path*',
                 destination: `${baseUrl}/w-api/login-service/:path*`,
-                // destination: `http://localhost:9395/w-api/login-service/:path*`,
             },
             {
                 source: '/w-api/management-service/:path*',
                 destination: `${baseUrl}/w-api/management-service/:path*`,
-                // destination: `http://localhost:9090/w-api/management-service/:path*`,
             },
             {
                 source: '/w-api/order-service/:path*',
                 destination: `${baseUrl}/w-api/order-service/:path*`,
-                // destination: `http://localhost:9887/w-api/order-service/:path*`,
             },
             {
                 source: '/w-api/dashboard-service/:path*',
                 destination: `${baseUrl}/w-api/dashboard-service/:path*`,
-                // destination: `http://localhost:4444/w-api/dashboard-service/:path*`,
             },
             {
                 source: '/w-api/cart-service/:path*',
                 destination: `${baseUrl}/w-api/cart-service/:path*`,
-                // destination: `http://localhost:9886/w-api/cart-service/:path*`,
             },
             {
                 source: '/w-api/post-service/:path*',
@@ -40,17 +35,14 @@ const nextConfig = {
             {
                 source: '/w-api/catalog-service/:path*',
                 destination: `${baseUrl}/w-api/catalog-service/:path*`,
-                // destination: `http://localhost:9098/w-api/catalog-service/:path*`,
             },
             {
                 source: '/w-api/result-service/:path*',
                 destination: `${baseUrl}/w-api/result-service/:path*`,
-                // destination: `http://localhost:6666/w-api/result-service/:path*`,
             },
             {
                 source: '/w-api/home-service/:path*',
                 destination: `${baseUrl}/w-api/home-service/:path*`,
-                // destination: `http://localhost:3333/w-api/home-service/:path*`,
             }
         ];
     },
