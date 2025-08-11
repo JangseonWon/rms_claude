@@ -31,20 +31,20 @@ interface RequestDao {
             ).otherwise(inline(null, SQLDataType.VARCHAR))
         ).cast(SQLDataType.VARCHAR)
 
-        val ta0095Value = max(
+        val ta0028Value = max(
             `when`(
-                SAMPLE_EXTENSION.EXTENSION_ID.eq("TA0095"),
+                SAMPLE_EXTENSION.EXTENSION_ID.eq("TA0028"),
                 SAMPLE_EXTENSION.VALUE
             ).otherwise(inline(null, SQLDataType.VARCHAR))
         ).cast(SQLDataType.VARCHAR)
 
         val extConcat = concat(
             coalesce(ta0093Value, inline("")),
-            `when`(ta0093Value.isNotNull.and(ta0095Value.isNotNull), inline(", "))
-            .otherwise(inline("")), coalesce(ta0095Value, inline("")))
+            `when`(ta0093Value.isNotNull.and(ta0028Value.isNotNull), inline(", "))
+            .otherwise(inline("")), coalesce(ta0028Value, inline("")))
 
         val memoField = `when`(
-            ta0093Value.isNotNull.or(ta0095Value.isNotNull),
+            ta0093Value.isNotNull.or(ta0028Value.isNotNull),
             concat(
                 extConcat,
                 inline(" / (memo) "),
