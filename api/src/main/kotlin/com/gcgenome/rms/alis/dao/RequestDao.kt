@@ -43,14 +43,17 @@ interface RequestDao {
             `when`(ta0093Value.isNotNull.and(ta0028Value.isNotNull), inline(", "))
             .otherwise(inline("")), coalesce(ta0028Value, inline("")))
 
-        val memoField = `when`(
-            ta0093Value.isNotNull.or(ta0028Value.isNotNull),
-            concat(
-                extConcat,
-                inline(" / (memo) "),
-                REQUEST.MEMO
-            )
-        ).otherwise(REQUEST.MEMO).`as`("memo")
+        val hasExt = ta0093Value.isNotNull.or(ta0028Value.isNotNull)
+
+        val memoField =
+            `when`(
+                hasExt,
+                `when`(
+                    REQUEST.MEMO.isNotNull,
+                    concat(extConcat, inline(" / (memo) "), REQUEST.MEMO)
+                ).otherwise(extConcat)
+            ).otherwise(REQUEST.MEMO)
+                .`as`("memo")
 
         return Flux.from(
             select(
