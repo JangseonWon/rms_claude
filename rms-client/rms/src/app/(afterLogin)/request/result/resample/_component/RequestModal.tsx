@@ -119,17 +119,19 @@ export default function RequestModal({selectedRequest, closeModal,refreshData}: 
         []
     );
     const handleOrderNow = useCallback(async () => {
+        const existingExtensions = request.sample?.extensions ?? [];
+        const hasTA0093 = existingExtensions.some(ext => ext.id === "TA0093");
+        const updatedExtensions = hasTA0093 ? existingExtensions
+            : [
+                ...existingExtensions,
+                { id: "TA0093", value: selectedRequest.sample?.barcode },
+            ];
+
         const updated: Request = {
             ...request,
             sample: {
                 ...request.sample,
-                extensions: [
-                    ...(request.sample?.extensions ?? []),
-                    {
-                        id: "TA0093",
-                        value: selectedRequest.sample?.barcode,
-                    },
-                ],
+                extensions: updatedExtensions,
             },
             status: Status.UNCONFIRMED_ORDER,
             request_relation: { id: 2 },
