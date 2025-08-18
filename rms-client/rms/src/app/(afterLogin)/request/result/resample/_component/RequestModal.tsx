@@ -40,13 +40,13 @@ export default function RequestModal({selectedRequest, closeModal,refreshData}: 
         },
     }), [selectedRequest]);
     const [request, setRequest] = useState<Request>(initialRequest);
-    const [schema, setSchema] = useState<Extension[]>([])
+    const [extension, setExtension] = useState<Extension[]>([])
 
     useEffect(() => {
         fetchServiceExtensions(request.service!.id!)
             .then(res => res.json())
             .then((data: Extension[]) => {
-                setSchema(data)
+                setExtension(data)
                 // extensions 초기화
                 setRequest(r => ({
                     ...r,
@@ -121,6 +121,16 @@ export default function RequestModal({selectedRequest, closeModal,refreshData}: 
     const handleOrderNow = useCallback(async () => {
         const updated: Request = {
             ...request,
+            sample: {
+                ...request.sample,
+                extensions: [
+                    ...(request.sample?.extensions ?? []),
+                    {
+                        id: "TA0093",
+                        value: selectedRequest.sample?.barcode,
+                    },
+                ],
+            },
             status: Status.UNCONFIRMED_ORDER,
             request_relation: { id: 2 },
         }
@@ -171,20 +181,20 @@ export default function RequestModal({selectedRequest, closeModal,refreshData}: 
             new RegExp(`^\\d+$`).test(String(sample.quantity))
         )
         const exts = sample.extensions ?? []
-        const extOK = schema
+        const extOK = extension
             .filter(e => e.required)
             .every(e => {
                 const found = exts.find(x => x.id === e.id)
                 return Boolean(found && found.value && found.value !== '')
             })
         const regexOK = exts.every(e => {
-            const def = schema.find(s => s.id === e.id);
+            const def = extension.find(s => s.id === e.id);
             if (!def || !e.value) return true;
             const pattern = new RegExp(`${def.regex}`);
             return pattern.test(String(e.value));
         });
         return baseOK && extOK && regexOK
-    }, [request, schema])
+    }, [request, extension])
 
     return (
         <div className={globalModalStyle.modalBackground}>
@@ -273,7 +283,7 @@ export default function RequestModal({selectedRequest, closeModal,refreshData}: 
                     <div className={style.flexStartContainer}>
                         <ExtensionInputComponent
                             request={request}
-                            schema={schema}
+                            schema={extension}
                             extensions={request.sample!.extensions!}
                             onChange={handleExtensionChange}
                             onProbandSelected={handleProbandSelected}
