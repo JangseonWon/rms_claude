@@ -7,9 +7,9 @@ data:
   database.yaml: |
     spring:
       r2dbc:
-        url: ${database.url}
-        username: ${database.username}
-        password: ${database.password}
+        url: ${labs-database.url}
+        username: ${labs-database.username}
+        password: ${labs-database.password}
         pool:
           initial-size: 2
           max-size: 50
