@@ -1,0 +1,17 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: labs-database
+  namespace: {{ .Release.Namespace }}
+data:
+  database.yaml: |
+    spring:
+      r2dbc:
+        url: ${database.url}
+        username: ${database.username}
+        password: ${database.password}
+        pool:
+          initial-size: 2
+          max-size: 50
+          max-idle-time: 30m
+          validation-query: SELECT 1
