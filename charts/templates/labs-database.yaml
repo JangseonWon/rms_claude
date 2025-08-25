@@ -4,7 +4,7 @@ metadata:
   name: labs-database
   namespace: {{ .Release.Namespace }}
 data:
-  database.yaml: |
+  labs-database.yaml: |
     spring:
       r2dbc:
         url: ${labs-database.url}
