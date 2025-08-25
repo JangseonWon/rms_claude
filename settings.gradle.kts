@@ -4,6 +4,8 @@ plugins {
 rootProject.name = "rms"
 
 include("entity")
+include("entity-labs")
+include("labs-api")
 include("management-service")
 include("alis-api")
 include("lims-service")
@@ -80,6 +82,7 @@ dependencyResolutionManagement {
             library("jooq", "org.jooq", "jooq").version{ require("3.19.0") }
             library("jooq-codegen", "org.jooq", "jooq-codegen").version{ require("3.19.0") }
             library("jooq-meta", "org.jooq", "jooq-meta").version{ require("3.19.0") }
+            library("jooq-r2dbc", "org.jooq", "jooq-r2dbc").version{ require("3.19.0") }
             bundle("jooq", listOf("jooq", "jooq-codegen", "jooq-meta"))
         }
     }
