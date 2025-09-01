@@ -15,11 +15,9 @@ data class SampleDTO(
     var serial: String? = null,
     @JsonProperty("count")
     var count: Int? = null,
-    @JsonProperty("age")
-    var age: Int? = null,
     @JsonProperty("sampling_on")
     var samplingOn: LocalDate? = null,
-    @JsonProperty("create_at")
+    @JsonIgnore
     var createAt: LocalDateTime? = null,
 
     @JsonIgnore

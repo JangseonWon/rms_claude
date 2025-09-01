@@ -1,4 +1,4 @@
-package com.gcgenome.rms.labs.organization
+package com.gcgenome.rms.organization
 
 import com.gcgenome.rms.config.CustomAuthenticationToken
 import com.gcgenome.rms.data.*

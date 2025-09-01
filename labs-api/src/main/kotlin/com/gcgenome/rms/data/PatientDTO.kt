@@ -3,7 +3,6 @@ package com.gcgenome.rms.data
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.*
 
 data class PatientDTO(
@@ -15,6 +14,8 @@ data class PatientDTO(
     var name: String? = null,
     @JsonProperty("sex")
     var sex: String? = null,
+    @JsonProperty("age")
+    var age: Int? = null,
     @JsonProperty("birth")
     var birth: LocalDate? = null
 )

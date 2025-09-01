@@ -2,7 +2,6 @@ package com.gcgenome.rms.data
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.gcgenome.rms.tables.RequestExtension
 import java.time.LocalDateTime
 import java.util.*
 

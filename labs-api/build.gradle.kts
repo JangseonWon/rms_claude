@@ -12,6 +12,7 @@ plugins {
 }
 dependencies {
     implementation(libs.spring.log4j2)
+    implementation(libs.spring.validation)
     implementation(libs.bundles.kotlin.webflux)
     implementation(libs.bundles.r2dbc.postgres)
     implementation(libs.bundles.jooq)

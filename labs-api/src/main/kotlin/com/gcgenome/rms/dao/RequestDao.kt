@@ -1,7 +1,8 @@
 package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.*
-import com.gcgenome.rms.data.patch.RequestPatchDTO
+import com.gcgenome.rms.entity.RequestEntity
+import com.gcgenome.rms.request.dto.request.RequestPatchDTO
 import com.gcgenome.rms.tables.references.*
 import org.jooq.Condition
 import org.jooq.DSLContext
@@ -38,6 +39,8 @@ interface RequestDao {
                 USER_SERVICE.SERIAL,
                 SAMPLE.asterisk(),
                 SAMPLE_TYPE.CODE,
+                SAMPLE_TYPE.NAME_KR,
+                SAMPLE_TYPE.NAME_EN,
                 USER_SAMPLE_TYPE.SERIAL,
                 extensionsField
             ).from(REQUEST)
@@ -61,7 +64,12 @@ interface RequestDao {
             val extension = rec.get(extensionsField)
 
             service.serial = rec.get(USER_SERVICE.SERIAL)
-            sample.type = SampleTypeDTO(code = rec.get(SAMPLE_TYPE.CODE), serial = rec.get(USER_SAMPLE_TYPE.SERIAL))
+            sample.type = SampleTypeDTO(
+                code = rec.get(SAMPLE_TYPE.CODE),
+                serial = rec.get(USER_SAMPLE_TYPE.SERIAL),
+                nameKr = rec.get(SAMPLE_TYPE.NAME_KR),
+                nameEn = rec.get(SAMPLE_TYPE.NAME_EN)
+            )
             request.patient = patient
             request.organization = organization
             request.service = service
@@ -85,6 +93,7 @@ interface RequestDao {
             ).convertFrom { r: org.jooq.Result<Record4<String?, String?, String?, String?>> ->
                 r.map { it.into(RequestExtensionDTO::class.java) }
             }
+
         return Mono.from(
             select(
                 REQUEST.asterisk(),
@@ -122,22 +131,22 @@ interface RequestDao {
             request
         }
     }
-    fun DSLContext.insertRequest(request: RequestDTO): Mono<RequestDTO> {
+    fun DSLContext.insertRequest(requestEntity: RequestEntity): Mono<RequestDTO> {
         return Mono.from(
             insertInto(REQUEST)
-                .set(REQUEST.ID, request.id)
-                .set(REQUEST.GENOME_PRICE, request.genomePrice)
-                .set(REQUEST.LABS_PRICE, request.labsPrice)
-                .set(REQUEST.DEPARTMENT, request.department)
-                .set(REQUEST.WARD, request.ward)
-                .set(REQUEST.PHYSICIAN, request.physician)
+                .set(REQUEST.ID, requestEntity.id)
+                .set(REQUEST.GENOME_PRICE, requestEntity.genomePrice)
+                .set(REQUEST.LABS_PRICE, requestEntity.labsPrice)
+                .set(REQUEST.DEPARTMENT, requestEntity.department)
+                .set(REQUEST.WARD, requestEntity.ward)
+                .set(REQUEST.PHYSICIAN, requestEntity.physician)
                 .set(REQUEST.CREATE_AT, LocalDateTime.now())
-                .set(REQUEST.SERVICE_ID, request.serviceId)
-                .set(REQUEST.SAMPLE_ID, request.sampleId)
-                .set(REQUEST.ORGANIZATION_ID, request.organizationId)
-                .set(REQUEST.PATIENT_ID, request.patientId)
-                .set(REQUEST.IS_EDITABLE, true)
-                .set(REQUEST.IS_DELETABLE, true)
+                .set(REQUEST.SERVICE_ID, requestEntity.serviceId)
+                .set(REQUEST.SAMPLE_ID, requestEntity.sampleId)
+                .set(REQUEST.ORGANIZATION_ID, requestEntity.organizationId)
+                .set(REQUEST.PATIENT_ID, requestEntity.patientId)
+                .set(REQUEST.IS_EDITABLE, requestEntity.isEditable)
+                .set(REQUEST.IS_DELETABLE, requestEntity.isDeletable)
                 .returning()
         ).map { it.into(RequestDTO::class.java) }
     }

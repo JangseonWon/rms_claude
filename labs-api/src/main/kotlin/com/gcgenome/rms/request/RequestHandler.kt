@@ -1,9 +1,16 @@
-package com.gcgenome.rms.labs.request
+package com.gcgenome.rms.request
 
 import com.gcgenome.rms.dao.*
 import com.gcgenome.rms.data.*
-import com.gcgenome.rms.data.patch.RequestPatchDTO
+import com.gcgenome.rms.entity.RequestExtensionEntity
+import com.gcgenome.rms.entity.SampleEntity
 import com.gcgenome.rms.exception.*
+import com.gcgenome.rms.request.dto.mapper.toPatientEntity
+import com.gcgenome.rms.request.dto.mapper.toRequestEntity
+import com.gcgenome.rms.request.dto.mapper.toSampleEntity
+import com.gcgenome.rms.request.dto.request.RequestExtensionRefDTO
+import com.gcgenome.rms.request.dto.request.RequestPatchDTO
+import com.gcgenome.rms.request.dto.request.RequestPutDTO
 import org.jooq.DSLContext
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
@@ -75,76 +82,70 @@ class RequestHandler(
         }).then()
     }
 
-    fun saveRequest(userId: UUID, requestDTO: RequestDTO, serviceSerial: String, sampleSerial: String): Mono<RequestDTO> {
+    fun saveRequest(userId: UUID, requestPutDTO: RequestPutDTO, serviceSerial: String, sampleSerial: String): Mono<RequestDTO> {
         return Mono.from(dsl.transactionPublisher { trx ->
             val trxDsl  = trx.dsl()
             Mono.zip(
-                trxDsl.selectOrganizationByUserIdAndSerial(userId, requestDTO.organization!!.serial!!).orUnprocessable(listOf(FieldError(field = "organization.serial", message = "not found"))),
+                trxDsl.selectOrganizationByUserIdAndSerial(userId, requestPutDTO.organization.serial).orUnprocessable(listOf(FieldError(field = "organization.serial", message = "not found"))),
                 trxDsl.selectUserServiceByUserIdAndSerial(userId, serviceSerial).orUnprocessable(listOf(FieldError(field = "service.serial", message = "not found"))),
-                trxDsl.selectUserSampleTypeByUserIdAndSerial(userId, requestDTO.sample!!.type!!.serial!!).orUnprocessable(listOf(FieldError(field = "sample.type.serial", message = "not found")))
+                trxDsl.selectUserSampleTypeByUserIdAndSerial(userId, requestPutDTO.sample.type.serial).orUnprocessable(listOf(FieldError(field = "sample.type.serial", message = "not found")))
             ).flatMap { tuple ->
                 val organization = tuple.t1
                 val userService = tuple.t2
                 val userSampleType = tuple.t3
 
-                val reqPatient = requestDTO.patient!!.apply { id = UUID.randomUUID() }
-                val reqSample = requestDTO.sample!!.apply {
-                    id = UUID.randomUUID()
-                    serial = sampleSerial
-                    sampleTypeId = userSampleType.sampleTypeId
-                }
-                validateExtensions(trxDsl, userService.serviceId!!, requestDTO.extensions)
-                    .then(trxDsl.insertPatient(reqPatient))
-                    .then(trxDsl.insertOrGetSample(userId, reqSample)
-                        .flatMap { ensuredSample ->
-                            val conflicts = diffSample(ensuredSample, reqSample)
-                            if (conflicts.isNotEmpty()) {
-                                Mono.error(ConflictException(fieldErrors = conflicts))
-                            } else {
-                                Mono.just(ensuredSample)
-                            }
-                        }
-                    )
+                val patientEntity = requestPutDTO.toPatientEntity()
+                val sampleEntity = requestPutDTO.toSampleEntity(sampleSerial, userSampleType.sampleTypeId!!, userId)
+
+                trxDsl.insertPatient(patientEntity)
+                    .then(trxDsl.selectSampleByUserIdAndSerial(userId, sampleSerial))
+                    .switchIfEmpty(trxDsl.insertSample(userId, sampleEntity))
                     .flatMap { ensuredSample ->
-                        val reqRequest = requestDTO.apply {
-                            id = UUID.randomUUID()
-                            serviceId = userService.serviceId
-                            sampleId = ensuredSample.id
-                            organizationId = organization.id
-                            patientId = reqPatient.id
-                        }
-                        trxDsl.insertRequest(reqRequest)
+                        val conflicts = diffSample(ensuredSample, sampleEntity)
+                        if (conflicts.isNotEmpty()) Mono.error(ConflictException(fieldErrors = conflicts))
+                        else Mono.just(ensuredSample)
+                    }
+                    .flatMap { ensuredSample ->
+                        val requestEntity = requestPutDTO.toRequestEntity(
+                            serviceId = userService.serviceId!!,
+                            sampleId = ensuredSample.id!!,
+                            organizationId = organization.id!!,
+                            patientId = patientEntity.id
+
+                        )
+                        trxDsl.insertRequest(requestEntity)
                             .mapUniqueViolation(
                                 constraint = "uk_request_sample_id_service_id",
                                 fieldErrors = listOf(
-                                    FieldError(field = "sample.serial", message = "already exists", rejectedValue = reqSample.serial),
+                                    FieldError(field = "sample.serial", message = "already exists", rejectedValue = ensuredSample.serial),
                                     FieldError(field = "serial", message = "already exists", rejectedValue = serviceSerial)
                                 ),
                                 code = ErrorCode.DUPLICATE_KEY
                             )
-                            .then(insertExtensions(trxDsl, reqRequest.id!!, reqRequest.extensions))
-                            .then(trxDsl.selectRequestById(reqRequest.id!!))
+                            .then(validateExtensions(trxDsl, userService.serviceId!!, requestPutDTO.extensions))
+                            .then(insertExtensions(trxDsl, requestEntity.id, requestPutDTO.extensions))
+                            .then(trxDsl.selectRequestById(requestEntity.id))
                     }
             }
         })
     }
 
-    fun insertExtensions(trxDsl: DSLContext, requestId: UUID, requestExtensions: List<RequestExtensionDTO>?): Mono<Void> {
+    fun insertExtensions(trxDsl: DSLContext, requestId: UUID, requestExtensions: List<RequestExtensionRefDTO>?): Mono<Void> {
         return Flux.fromIterable(requestExtensions ?: emptyList())
-            .flatMap { ext ->
-                trxDsl.selectExtensionBycode(ext.code!!).flatMap { extension ->
-                    val reqRequestExtension = RequestExtensionDTO(
+            .flatMap { extensionReq ->
+                trxDsl.selectExtensionByCode(extensionReq.code).flatMap { extensionRes ->
+                    val requestExtensionEntity = RequestExtensionEntity(
                         id = UUID.randomUUID(),
-                        value = ext.value,
+                        value = extensionReq.value,
                         requestId = requestId,
-                        extensionId = extension.id
+                        extensionId = extensionRes.id
                     )
-                    trxDsl.insertRequestExtension(reqRequestExtension)
+                    trxDsl.insertRequestExtension(requestExtensionEntity)
                 }
             }.then()
     }
 
-    fun validateExtensions(trxDsl: DSLContext, serviceId: UUID, requestExtensions: List<RequestExtensionDTO>?): Mono<Void> {
+    fun validateExtensions(trxDsl: DSLContext, serviceId: UUID, requestExtensions: List<RequestExtensionRefDTO>?): Mono<Void> {
         val requiredAndAllowedMono = trxDsl.selectServiceExtensionByServiceId(serviceId)
             .collectList()
             .map { rows ->
@@ -155,7 +156,7 @@ class RequestHandler(
 
                 required to allowed
             }
-        val providedMap = (requestExtensions ?: emptyList()).associate { it.code!! to (it.value ?: "") }
+        val providedMap = (requestExtensions ?: emptyList()).associate { it.code to (it.value ?: "") }
         val providedCodes = providedMap.keys
 
         return requiredAndAllowedMono.flatMap { (requiredCodes, allowedCodes) ->
@@ -173,14 +174,14 @@ class RequestHandler(
             }
         }
     }
-    private fun diffSample(existing: SampleDTO, incoming: SampleDTO): List<FieldError> {
+    private fun diffSample(existing: SampleDTO, incoming: SampleEntity): List<FieldError> {
         val errs = mutableListOf<FieldError>()
 
         if (existing.sampleTypeId != incoming.sampleTypeId) {
             errs += FieldError(
                 field = "sample.type.serial",
                 message = "conflicts with existing sample",
-                rejectedValue = incoming.type?.serial
+                //rejectedValue = incoming.type.serial
             )
         }
         if (existing.samplingOn != incoming.samplingOn) {
@@ -195,13 +196,6 @@ class RequestHandler(
                 field = "sample.count",
                 message = "conflicts with existing sample",
                 rejectedValue = incoming.count
-            )
-        }
-        if (existing.age != incoming.age) {
-            errs += FieldError(
-                field = "sample.age",
-                message = "conflicts with existing sample",
-                rejectedValue = incoming.age
             )
         }
         return errs
@@ -229,7 +223,7 @@ class RequestHandler(
                             if (patch.organization.isPresent && patch.organization.get().serial.isPresent) {
                                 val orgSerial = patch.organization.get().serial.orElse(null)
                                     ?: return@flatMap Mono.error(UnprocessableEntityException(listOf(
-                                        FieldError("organization.serial", "cannot be null")
+                                        FieldError("organization.serial", "must not be null")
                                     )))
                                 trxDsl.selectOrganizationByUserIdAndSerial(userId, orgSerial)
                                     .orUnprocessable(listOf(FieldError("organization.serial", "not found", orgSerial)))

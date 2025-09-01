@@ -14,13 +14,15 @@ data class Patient(
     @Id
     @Column(name = "id")
     val id: UUID,
-    @Column(name = "serial", length = 64, nullable = false)
+    @Column(name = "serial", length = 64, nullable = true)
     val serial: String,
     @Column(name = "name", length = 64, nullable = false)
     val name: String,
     @Column(name = "sex", length = 64, nullable = true)
     val sex: String,
-    @Column(name = "birth", nullable = false)
+    @Column(name = "age", nullable = true)
+    val age: Int,
+    @Column(name = "birth", nullable = true)
     val birth: LocalDate,
 
     @OneToOne(mappedBy = "patientId")

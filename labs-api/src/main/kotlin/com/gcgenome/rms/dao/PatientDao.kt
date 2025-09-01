@@ -1,8 +1,8 @@
 package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.PatientDTO
-import com.gcgenome.rms.data.RequestDTO
-import com.gcgenome.rms.data.patch.PatientPatchDTO
+import com.gcgenome.rms.entity.PatientEntity
+import com.gcgenome.rms.request.dto.request.PatientPatchDTO
 import com.gcgenome.rms.tables.references.PATIENT
 import org.jooq.DSLContext
 import org.jooq.Field
@@ -11,13 +11,14 @@ import java.time.LocalDate
 import java.util.*
 
 interface PatientDao {
-    fun DSLContext.insertPatient(patient: PatientDTO): Mono<PatientDTO> {
+    fun DSLContext.insertPatient(patient: PatientEntity): Mono<PatientDTO> {
         return Mono.from(
             insertInto(PATIENT)
                 .set(PATIENT.ID, patient.id)
                 .set(PATIENT.SERIAL, patient.serial)
                 .set(PATIENT.NAME, patient.name)
                 .set(PATIENT.SEX, patient.sex)
+                .set(PATIENT.AGE, patient.age)
                 .set(PATIENT.BIRTH, patient.birth)
                 .returning()
         ).map { it.into(PatientDTO::class.java) }
@@ -36,6 +37,7 @@ interface PatientDao {
         val updates = mutableMapOf<Field<*>, Any?>()
         if (patch.name.isPresent)  updates[PATIENT.NAME]  = patch.name.orElse(null)
         if (patch.sex.isPresent)   updates[PATIENT.SEX]   = patch.sex.orElse(null)
+        if (patch.age.isPresent)   updates[PATIENT.AGE]   = patch.age.orElse(null)
         if (patch.birth.isPresent) updates[PATIENT.BIRTH] = patch.birth.orElse(null)?.let(LocalDate::parse)
 
         if (updates.isEmpty()) return Mono.just(false)

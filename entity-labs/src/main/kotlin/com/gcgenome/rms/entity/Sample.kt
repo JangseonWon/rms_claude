@@ -20,12 +20,10 @@ data class Sample(
     val id: UUID,
     @Column(name = "barcode", length = 64, nullable = true)
     val barcode: String,
-    @Column(name = "serial", length = 64, nullable = true)
+    @Column(name = "serial", length = 64, nullable = false)
     val serial: String,
-    @Column(name = "count", nullable = true)
+    @Column(name = "count", nullable = false)
     val count: Int,
-    @Column(name = "age", nullable = true)
-    val age: Int,
     @Column(name = "sampling_on", nullable = false)
     val samplingOn: LocalDate,
     @Column(name = "create_at", nullable = false)

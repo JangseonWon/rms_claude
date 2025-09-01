@@ -1,4 +1,4 @@
-package com.gcgenome.rms.labs.organization
+package com.gcgenome.rms.organization
 
 import com.gcgenome.rms.dao.OrganizationDao
 import com.gcgenome.rms.data.OrganizationDTO

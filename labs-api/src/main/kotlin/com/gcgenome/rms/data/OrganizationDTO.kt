@@ -1,8 +1,6 @@
 package com.gcgenome.rms.data
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.gcgenome.rms.tables.pojos.User
 import java.time.LocalDateTime
 import java.util.UUID
 

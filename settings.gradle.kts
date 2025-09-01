@@ -29,6 +29,7 @@ dependencyResolutionManagement {
             bundle("kotlin", listOf("reflect"))
 
             library("spring-webflux", "org.springframework.boot", "spring-boot-starter-webflux").withoutVersion()
+            library("spring-validation", "org.springframework.boot", "spring-boot-starter-validation").withoutVersion()
             library("kotlin-reactor", "io.projectreactor.kotlin", "reactor-kotlin-extensions").withoutVersion()
             library("kotlin-coroutines-reactor", "org.jetbrains.kotlinx", "kotlinx-coroutines-reactor").withoutVersion()
             library("kotlin-jackson", "com.fasterxml.jackson.module", "jackson-module-kotlin").withoutVersion()
