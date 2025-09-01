@@ -15,7 +15,7 @@ export default function TextBox({label, value, disabled = false, onChange, requi
     const [inputValue, setInputValue] = useState('');
     const [hasError, setHasError] = useState(false);
 
-    const allowedCharRegex = /[^a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ가-힣\s~`!@#$%^&*()\-_=\[\]{}\\|;:'",.<>/?]/g
+    const allowedCharRegex = /[^a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ가-힣\s~`!@#$%^&*()\-_=|,.<>/?]/g
 
     const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
         let newValue = event.target.value
