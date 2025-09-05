@@ -14,9 +14,11 @@ data:
             reportSubscribe-in-0:
               destination: report
               group: rms-test-subscriber
+              consumer: 10
             workflowSubscribe-in-0:
               destination: workflow-event
               group: rms-test-subscriber
+              consumer: 10
           kafka:
             binder:
               brokers: ${kafka.test}

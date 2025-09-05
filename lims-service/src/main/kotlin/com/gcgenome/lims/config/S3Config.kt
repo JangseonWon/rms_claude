@@ -29,12 +29,13 @@ class S3Config(
             .credentialsProvider { AwsBasicCredentials.create(accessKey, secretKey) }
             .endpointOverride(URI.create(endpoint))
             .forcePathStyle(true)
-            .serviceConfiguration(s3Configuration()).build();
+            .serviceConfiguration(s3Configuration()).build()
     }
     private fun sdkAsyncHttpClient(): SdkAsyncHttpClient {
         return NettyNioAsyncHttpClient.builder()
             .writeTimeout(Duration.ZERO)
-            .maxConcurrency(64)
+            .maxConcurrency(256)
+            .connectionAcquisitionTimeout(Duration.ofSeconds(30))
             .build()
     }
     private fun s3Configuration(): S3Configuration {
