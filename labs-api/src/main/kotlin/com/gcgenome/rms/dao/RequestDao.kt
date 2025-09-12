@@ -3,6 +3,7 @@ package com.gcgenome.rms.dao
 import com.gcgenome.rms.data.*
 import com.gcgenome.rms.entity.RequestEntity
 import com.gcgenome.rms.request.dto.request.RequestPatchDTO
+import com.gcgenome.rms.request.dto.request.RequestPostDTO
 import com.gcgenome.rms.tables.references.*
 import org.jooq.Condition
 import org.jooq.DSLContext
@@ -162,7 +163,7 @@ interface RequestDao {
         userId: UUID,
         fromInclusive: LocalDateTime,
         toExclusive: LocalDateTime,
-        q: RequestSearchDTO
+        q: RequestPostDTO
     ): Flux<RequestDTO> {
 
         val usSerialField = USER_SERVICE.SERIAL

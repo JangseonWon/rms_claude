@@ -1,11 +1,14 @@
-package com.gcgenome.rms.request
+package com.gcgenome.rms.request.router
 
 import com.gcgenome.rms.config.CustomAuthenticationToken
 import com.gcgenome.rms.data.*
 import com.gcgenome.rms.exception.ErrorResponseMapper
 import com.gcgenome.rms.exception.UnprocessableEntityException
 import com.gcgenome.rms.request.dto.request.RequestPatchDTO
+import com.gcgenome.rms.request.dto.request.RequestPostDTO
 import com.gcgenome.rms.request.dto.request.RequestPutDTO
+import com.gcgenome.rms.request.handler.RequestHandler
+import jakarta.validation.Validator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.MediaType
@@ -18,7 +21,7 @@ import reactor.core.publisher.Mono
 class RequestRouter (
     private val requestHandler: RequestHandler,
     private val errorResponseMapper: ErrorResponseMapper,
-    private val validator: jakarta.validation.Validator
+    private val validator: Validator
 ){
     @Bean
     fun requestRoute() = router {
@@ -69,9 +72,11 @@ class RequestRouter (
 
     private fun searchRequests(request: ServerRequest): Mono<ServerResponse> {
         val principalMono = request.principal().cast(CustomAuthenticationToken::class.java)
-        val bodyMono = request.bodyToMono(RequestSearchDTO::class.java).defaultIfEmpty(RequestSearchDTO())
+        val requestBody = request.bodyToMono(RequestPostDTO::class.java)
+            .switchIfEmpty(Mono.error(UnprocessableEntityException(listOf(FieldError("_body", "must not be empty")))))
+            .doOnNext { validateOrThrow(validator, it) }
 
-        return Mono.zip(principalMono, bodyMono)
+        return Mono.zip(principalMono, requestBody)
             .flatMap { requestHandler.searchRequests(it.t1.user.id, it.t2).collectList() }
             .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), RequestDTO::class.java) }
             .onErrorResume { e -> errorResponseMapper.toResponse(e, request) }
@@ -92,7 +97,7 @@ class RequestRouter (
             .onErrorResume { e -> errorResponseMapper.toResponse(e, request) }
     }
 
-    private fun <T : Any> validateOrThrow(validator: jakarta.validation.Validator, target: T) {
+    private fun <T : Any> validateOrThrow(validator: Validator, target: T) {
         val v = validator.validate(target)
         if (v.isNotEmpty()) {
             val errors = v.map {

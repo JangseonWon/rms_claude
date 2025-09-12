@@ -1,4 +1,4 @@
-package com.gcgenome.rms.request
+package com.gcgenome.rms.request.handler
 
 import com.gcgenome.rms.dao.*
 import com.gcgenome.rms.data.*
@@ -10,6 +10,7 @@ import com.gcgenome.rms.request.dto.mapper.toRequestEntity
 import com.gcgenome.rms.request.dto.mapper.toSampleEntity
 import com.gcgenome.rms.request.dto.request.RequestExtensionRefDTO
 import com.gcgenome.rms.request.dto.request.RequestPatchDTO
+import com.gcgenome.rms.request.dto.request.RequestPostDTO
 import com.gcgenome.rms.request.dto.request.RequestPutDTO
 import org.jooq.DSLContext
 import org.springframework.stereotype.Service
@@ -23,23 +24,20 @@ class RequestHandler(
     private val dsl: DSLContext
 ): PatientDao, RequestDao, UserServiceDao, OrganizationDao, UserSampleTypeDao, SampleDao, ServiceExtensionDao, RequestExtensionDao, ExtensionDao  {
 
-    fun searchRequests(userId: UUID, q: RequestSearchDTO): Flux<RequestDTO> {
-        val from = q.requestDateFrom
-        val to   = q.requestDateTo
+    fun searchRequests(userId: UUID, requestPostDTO: RequestPostDTO): Flux<RequestDTO> {
+        val from = requestPostDTO.requestDateFrom
+        val to   = requestPostDTO.requestDateTo
         val errors = mutableListOf<FieldError>()
-        if (from == null) errors += FieldError("request_data_from", "required")
-        if (to == null)   errors += FieldError("request_data_to", "required")
-        if (from != null && to != null) {
-            if (from.isAfter(to)) errors += FieldError("request_data_from", "must be <= request_data_to", from)
-            val days = ChronoUnit.DAYS.between(from, to)
-            if (days > 31) errors += FieldError("request_data_to", "range must be <= 31 days", to)
-        }
+
+        if (from.isAfter(to)) errors += FieldError("request_data_from", "must be <= request_data_to", from)
+        val days = ChronoUnit.DAYS.between(from, to)
+        if (days > 31) errors += FieldError("request_data_to", "range must be <= 31 days", to)
         if (errors.isNotEmpty()) return Flux.error(UnprocessableEntityException(errors))
 
-        val startTs = from!!.atStartOfDay()
-        val endTsExclusive = to!!.plusDays(1).atStartOfDay()
+        val startTs = from.atStartOfDay()
+        val endTsExclusive = to.plusDays(1).atStartOfDay()
 
-        return dsl.searchRequests(userId, startTs, endTsExclusive, q)
+        return dsl.searchRequests(userId, startTs, endTsExclusive, requestPostDTO)
     }
 
     fun getRequestBySerial(userId: UUID, serviceSerial: String, sampleSerial: String): Mono<RequestDTO> {
@@ -90,7 +88,7 @@ class RequestHandler(
                 trxDsl.selectUserServiceByUserIdAndSerial(userId, serviceSerial).orUnprocessable(listOf(FieldError(field = "service.serial", message = "not found"))),
                 trxDsl.selectUserSampleTypeByUserIdAndSerial(userId, requestPutDTO.sample.type.serial).orUnprocessable(listOf(FieldError(field = "sample.type.serial", message = "not found")))
             ).flatMap { tuple ->
-                val organization = tuple.t1
+                val organizationRes = tuple.t1
                 val userService = tuple.t2
                 val userSampleType = tuple.t3
 
@@ -109,7 +107,7 @@ class RequestHandler(
                         val requestEntity = requestPutDTO.toRequestEntity(
                             serviceId = userService.serviceId!!,
                             sampleId = ensuredSample.id!!,
-                            organizationId = organization.id!!,
+                            organizationId = organizationRes.id,
                             patientId = patientEntity.id
 
                         )

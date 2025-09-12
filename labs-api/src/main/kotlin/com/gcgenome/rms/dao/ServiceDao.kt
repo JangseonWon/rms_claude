@@ -1,15 +1,15 @@
 package com.gcgenome.rms.dao
 
-import com.gcgenome.rms.data.ServiceDTO
+import com.gcgenome.rms.service.dto.request.ServicePostDTO
+import com.gcgenome.rms.service.dto.response.ServiceResponseDTO
 import com.gcgenome.rms.tables.references.*
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
-import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
 import java.util.UUID
 
 interface ServiceDao {
-    fun DSLContext.searchServices(userId: UUID, service: ServiceDTO): Flux<ServiceDTO> {
+    fun DSLContext.searchServices(userId: UUID, service: ServicePostDTO): Flux<ServiceResponseDTO> {
         return Flux.from(
             select(
                 SERVICE.CODE,
@@ -60,6 +60,6 @@ interface ServiceDao {
                     SERVICE.ID,
                     USER_SERVICE.SERIAL
                 )
-        ).map { it.into(ServiceDTO::class.java) }
+        ).map { it.into(ServiceResponseDTO::class.java) }
     }
 }

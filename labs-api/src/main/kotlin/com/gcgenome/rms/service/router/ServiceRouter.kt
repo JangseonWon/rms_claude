@@ -1,7 +1,9 @@
-package com.gcgenome.rms.service
+package com.gcgenome.rms.service.router
 
 import com.gcgenome.rms.config.CustomAuthenticationToken
 import com.gcgenome.rms.data.*
+import com.gcgenome.rms.service.dto.request.ServicePostDTO
+import com.gcgenome.rms.service.handler.ServiceHandler
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
@@ -30,7 +32,7 @@ class ServiceRouter (
 
     private fun searchServices(request: ServerRequest): Mono<ServerResponse> {
         val principalMono = request.principal().cast(CustomAuthenticationToken::class.java)
-        val searchService = request.bodyToMono(ServiceDTO::class.java).defaultIfEmpty(ServiceDTO())
+        val searchService = request.bodyToMono(ServicePostDTO::class.java).defaultIfEmpty(ServicePostDTO())
 
         return Mono.zip(principalMono, searchService)
             .flatMap { tuple -> serviceHandler.searchServices(tuple.t1.user.id, tuple.t2).collectList() }

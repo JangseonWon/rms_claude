@@ -1,6 +1,9 @@
 package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.OrganizationDTO
+import com.gcgenome.rms.entity.OrganizationEntity
+import com.gcgenome.rms.organization.dto.request.OrganizationPostDTO
+import com.gcgenome.rms.organization.dto.response.OrganizationResponseDTO
 import com.gcgenome.rms.tables.references.ORGANIZATION
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository
@@ -10,15 +13,15 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 interface OrganizationDao {
-    fun DSLContext.selectOrganizationByUserIdAndSerial(userId: UUID, serial: String): Mono<OrganizationDTO> {
+    fun DSLContext.selectOrganizationByUserIdAndSerial(userId: UUID, serial: String): Mono<OrganizationResponseDTO> {
         return Mono.from(
             selectFrom(ORGANIZATION).where(
                 ORGANIZATION.USER_ID.eq(userId),
                 ORGANIZATION.SERIAL.eq(serial)
             )
-        ).map { it.into(OrganizationDTO::class.java) }
+        ).map { it.into(OrganizationResponseDTO::class.java) }
     }
-    fun DSLContext.searchOrganizations(userId: UUID, organization: OrganizationDTO): Flux<OrganizationDTO> {
+    fun DSLContext.searchOrganizations(userId: UUID, organization: OrganizationPostDTO): Flux<OrganizationResponseDTO> {
         return Flux.from(
             selectFrom(ORGANIZATION)
                 .where(
@@ -36,13 +39,13 @@ interface OrganizationDao {
                         organization.type?.let { ORGANIZATION.TYPE.like("%$it%") }
                     )
                 )
-        ).map { it.into(OrganizationDTO::class.java) }
+        ).map { it.into(OrganizationResponseDTO::class.java) }
     }
-    fun DSLContext.insertOrganization(userId: UUID, organization: OrganizationDTO, serial: String): Mono<OrganizationDTO> {
+    fun DSLContext.insertOrganization(organization: OrganizationEntity): Mono<OrganizationResponseDTO> {
         return Mono.from(
             insertInto(ORGANIZATION)
-                .set(ORGANIZATION.ID, UUID.randomUUID())
-                .set(ORGANIZATION.SERIAL, serial)
+                .set(ORGANIZATION.ID, organization.id)
+                .set(ORGANIZATION.SERIAL, organization.serial)
                 .set(ORGANIZATION.NAME, organization.name)
                 .set(ORGANIZATION.REGISTRATION_NUMBER, organization.registrationNumber)
                 .set(ORGANIZATION.NURSING_NUMBER, organization.nursingNumber)
@@ -52,10 +55,10 @@ interface OrganizationDao {
                 .set(ORGANIZATION.EMPLOYEE_NAME, organization.employeeName)
                 .set(ORGANIZATION.EMPLOYEE_PHONE, organization.employeePhone)
                 .set(ORGANIZATION.TYPE, organization.type)
-                .set(ORGANIZATION.CREATE_AT, LocalDateTime.now())
-                .set(ORGANIZATION.USER_ID, userId)
+                .set(ORGANIZATION.CREATE_AT, organization.createAt)
+                .set(ORGANIZATION.USER_ID, organization.userId)
                 .returning()
-        ).map { it.into(OrganizationDTO::class.java) }
+        ).map { it.into(OrganizationResponseDTO::class.java) }
     }
     fun DSLContext.deleteOrganizationBySerial(userId: UUID, serial: String): Mono<OrganizationDTO> {
         return Mono.from(
