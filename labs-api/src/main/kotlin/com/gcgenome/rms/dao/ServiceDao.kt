@@ -6,7 +6,7 @@ import com.gcgenome.rms.tables.references.*
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import reactor.core.publisher.Flux
-import java.util.UUID
+import java.util.*
 
 interface ServiceDao {
     fun DSLContext.searchServices(userId: UUID, service: ServicePostDTO): Flux<ServiceResponseDTO> {
@@ -24,7 +24,7 @@ interface ServiceDao {
                         DSL.key("name_en").value(SAMPLE_TYPE.NAME_EN)
                     )
                 ).filterWhere(SAMPLE_TYPE.CODE.isNotNull)
-                .`as`("sample_types"),
+                    .`as`("sample_types"),
                 DSL.jsonArrayAggDistinct(
                     DSL.jsonbObject(
                         DSL.key("code").value(EXTENSION.CODE),
@@ -34,7 +34,7 @@ interface ServiceDao {
                         DSL.key("regex").value(EXTENSION.REGEX)
                     )
                 ).filterWhere(EXTENSION.CODE.isNotNull)
-                .`as`("extensions")
+                    .`as`("extensions")
             ).from(SERVICE)
                 .join(USER_SERVICE).on(
                     USER_SERVICE.SERVICE_ID.eq(SERVICE.ID),

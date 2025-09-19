@@ -2,11 +2,9 @@ package com.gcgenome.rms.organization.handler
 
 import com.gcgenome.rms.dao.OrganizationDao
 import com.gcgenome.rms.data.FieldError
-import com.gcgenome.rms.data.OrganizationDTO
-import com.gcgenome.rms.exception.ErrorCode
-import com.gcgenome.rms.exception.mapUniqueViolation
-import com.gcgenome.rms.exception.orNotFound
+import com.gcgenome.rms.exception.*
 import com.gcgenome.rms.organization.dto.mapper.toOrganizationEntity
+import com.gcgenome.rms.organization.dto.request.OrganizationPatchDTO
 import com.gcgenome.rms.organization.dto.request.OrganizationPostDTO
 import com.gcgenome.rms.organization.dto.request.OrganizationPutDTO
 import com.gcgenome.rms.organization.dto.response.OrganizationResponseDTO
@@ -39,8 +37,46 @@ class OrganizationHandler(
 
     fun searchOrganization(userId: UUID, organizationDTO: OrganizationPostDTO): Flux<OrganizationResponseDTO> {
         return dsl.searchOrganizations(userId, organizationDTO)
+
     }
-    fun deleteOrganizationBySerial(userId: UUID, organizationSerial: String): Mono<OrganizationDTO> {
-        return dsl.deleteOrganizationBySerial(userId, organizationSerial)
+    fun deleteOrganizationBySerial(userId: UUID, organizationSerial: String): Mono<Void> {
+        val serial = organizationSerial.trim()
+
+        if (serial.isEmpty()) {
+            return Mono.error(
+                UnprocessableEntityException(
+                    listOf(FieldError("organization.serial", "must not be blank"))
+                )
+            )
+        }
+        return dsl.deleteOrganizationBySerial(userId, serial)
+            .onErrorMap { _ ->
+                ConflictException(
+                    code = ErrorCode.DELETE_NOT_ALLOWED,
+                    fieldErrors = listOf(FieldError("organization.serial", "in use", serial))
+                )
+            }
+            .flatMap { affected ->
+                if (affected == 0) {
+                    Mono.error(
+                        NotFoundException(
+                            listOf(FieldError("organization.serial", "not found", serial))
+                        )
+                    )
+                } else {
+                    Mono.empty()
+                }
+            }
+    }
+
+    fun patchOrganization(userId: UUID, organizationSerial: String, patch: OrganizationPatchDTO): Mono<OrganizationResponseDTO> {
+        if (organizationSerial.trim() != patch.serial.trim()) {
+            return Mono.error(UnprocessableEntityException(listOf(FieldError("serial", "must equal path variable"))))
+        }
+
+        return dsl.updateOrganizationById(userId, organizationSerial, patch)
+            .orUnprocessable(
+                listOf(FieldError("organization.serial", "not found", organizationSerial))
+            )
     }
 }

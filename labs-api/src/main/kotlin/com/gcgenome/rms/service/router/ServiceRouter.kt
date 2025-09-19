@@ -1,8 +1,8 @@
 package com.gcgenome.rms.service.router
 
 import com.gcgenome.rms.config.CustomAuthenticationToken
-import com.gcgenome.rms.data.*
 import com.gcgenome.rms.service.dto.request.ServicePostDTO
+import com.gcgenome.rms.service.dto.response.ServiceResponseDTO
 import com.gcgenome.rms.service.handler.ServiceHandler
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -36,7 +36,7 @@ class ServiceRouter (
 
         return Mono.zip(principalMono, searchService)
             .flatMap { tuple -> serviceHandler.searchServices(tuple.t1.user.id, tuple.t2).collectList() }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), ServiceDTO::class.java) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), ServiceResponseDTO::class.java) }
             .onErrorResume { e ->
                 logger.error(e.stackTraceToString())
                 ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue("Please contact Genome")

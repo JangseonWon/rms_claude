@@ -1,8 +1,8 @@
 package com.gcgenome.rms.dao
 
-import com.gcgenome.rms.data.PatientDTO
 import com.gcgenome.rms.entity.PatientEntity
 import com.gcgenome.rms.request.dto.request.PatientPatchDTO
+import com.gcgenome.rms.request.dto.response.PatientResponseDTO
 import com.gcgenome.rms.tables.references.PATIENT
 import org.jooq.DSLContext
 import org.jooq.Field
@@ -11,7 +11,7 @@ import java.time.LocalDate
 import java.util.*
 
 interface PatientDao {
-    fun DSLContext.insertPatient(patient: PatientEntity): Mono<PatientDTO> {
+    fun DSLContext.insertPatient(patient: PatientEntity): Mono<PatientResponseDTO> {
         return Mono.from(
             insertInto(PATIENT)
                 .set(PATIENT.ID, patient.id)
@@ -21,13 +21,13 @@ interface PatientDao {
                 .set(PATIENT.AGE, patient.age)
                 .set(PATIENT.BIRTH, patient.birth)
                 .returning()
-        ).map { it.into(PatientDTO::class.java) }
+        ).map { it.into(PatientResponseDTO::class.java) }
     }
-    fun DSLContext.deletePatientById(id: UUID): Mono<PatientDTO> {
+    fun DSLContext.deletePatientById(id: UUID): Mono<PatientResponseDTO> {
         return Mono.from(
             deleteFrom(PATIENT).where(PATIENT.ID.eq(id))
                 .returning()
-        ).map { it.into(PatientDTO::class.java) }
+        ).map { it.into(PatientResponseDTO::class.java) }
     }
 
     fun DSLContext.updatePatientFields(

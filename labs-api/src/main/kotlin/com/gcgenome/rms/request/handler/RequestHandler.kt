@@ -1,7 +1,7 @@
 package com.gcgenome.rms.request.handler
 
 import com.gcgenome.rms.dao.*
-import com.gcgenome.rms.data.*
+import com.gcgenome.rms.data.FieldError
 import com.gcgenome.rms.entity.RequestExtensionEntity
 import com.gcgenome.rms.entity.SampleEntity
 import com.gcgenome.rms.exception.*
@@ -12,6 +12,8 @@ import com.gcgenome.rms.request.dto.request.RequestExtensionRefDTO
 import com.gcgenome.rms.request.dto.request.RequestPatchDTO
 import com.gcgenome.rms.request.dto.request.RequestPostDTO
 import com.gcgenome.rms.request.dto.request.RequestPutDTO
+import com.gcgenome.rms.request.dto.response.RequestResponseDTO
+import com.gcgenome.rms.request.dto.response.RequestSampleDTO
 import org.jooq.DSLContext
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
@@ -23,8 +25,7 @@ import java.util.*
 class RequestHandler(
     private val dsl: DSLContext
 ): PatientDao, RequestDao, UserServiceDao, OrganizationDao, UserSampleTypeDao, SampleDao, ServiceExtensionDao, RequestExtensionDao, ExtensionDao  {
-
-    fun searchRequests(userId: UUID, requestPostDTO: RequestPostDTO): Flux<RequestDTO> {
+    fun searchRequests(userId: UUID, requestPostDTO: RequestPostDTO): Flux<RequestResponseDTO> {
         val from = requestPostDTO.requestDateFrom
         val to   = requestPostDTO.requestDateTo
         val errors = mutableListOf<FieldError>()
@@ -40,17 +41,18 @@ class RequestHandler(
         return dsl.searchRequests(userId, startTs, endTsExclusive, requestPostDTO)
     }
 
-    fun getRequestBySerial(userId: UUID, serviceSerial: String, sampleSerial: String): Mono<RequestDTO> {
+    fun getRequestBySerial(userId: UUID, serviceSerial: String, sampleSerial: String): Mono<RequestResponseDTO> {
         return Mono.from(dsl.transactionPublisher { trx ->
             val trxDsl = trx.dsl()
             Mono.zip(
                 trxDsl.selectUserServiceByUserIdAndSerial(userId, serviceSerial).orUnprocessable(listOf(FieldError(field = "service.serial", message = "not found"))),
-                trxDsl.selectSampleByUserIdAndSerial(userId, sampleSerial)
+                trxDsl.selectSampleByUserIdAndSerial(userId, sampleSerial).orUnprocessable(listOf(FieldError(field = "sample.serial", message = "not found")))
             ).flatMap { tuple ->
                 val userService = tuple.t1
                 val sample = tuple.t2
 
-                trxDsl.selectRequestByServiceIdAndSampleId(userService.serviceId!!, sample.id!!)
+                trxDsl.selectRequestByServiceIdAndSampleId(userService.serviceId!!, sample.id)
+                    .orNotFound(listOf(FieldError(field = "sample.serial", message = "not found"), FieldError(field = "service.serial", message = "not found")))
             }
         })
     }
@@ -65,14 +67,14 @@ class RequestHandler(
                 val userService = tuple.t1
                 val sample = tuple.t2
 
-                trxDsl.selectRequestByServiceIdAndSampleId(userService.serviceId!!, sample.id!!)
+                trxDsl.selectRequestByServiceIdAndSampleId(userService.serviceId!!, sample.id)
                     .orNotFound(listOf(FieldError(field = "sample.serial", message = "not found"), FieldError(field = "service.serial", message = "not found")))
                     .flatMap { request ->
-                        if(request.isDeletable == true){
-                            trxDsl.deleteRequestExtensionByRequestId(request.id!!)
-                                .then(trxDsl.deleteRequestById(request.id!!))
-                                .then(trxDsl.deletePatientById(request.patientId!!))
-                                .then(trxDsl.deleteSampleById(request.sampleId!!))
+                        if(request.isDeletable){
+                            trxDsl.deleteRequestExtensionByRequestId(request.id)
+                                .then(trxDsl.deleteRequestById(request.id))
+                                .then(trxDsl.deletePatientById(request.patientId))
+                                .then(trxDsl.deleteSampleById(request.sampleId))
                         } else { Mono.error(ConflictException(code = ErrorCode.DELETE_NOT_ALLOWED)) }
 
                     }
@@ -80,7 +82,7 @@ class RequestHandler(
         }).then()
     }
 
-    fun saveRequest(userId: UUID, requestPutDTO: RequestPutDTO, serviceSerial: String, sampleSerial: String): Mono<RequestDTO> {
+    fun saveRequest(userId: UUID, requestPutDTO: RequestPutDTO, serviceSerial: String, sampleSerial: String): Mono<RequestResponseDTO> {
         return Mono.from(dsl.transactionPublisher { trx ->
             val trxDsl  = trx.dsl()
             Mono.zip(
@@ -106,10 +108,9 @@ class RequestHandler(
                     .flatMap { ensuredSample ->
                         val requestEntity = requestPutDTO.toRequestEntity(
                             serviceId = userService.serviceId!!,
-                            sampleId = ensuredSample.id!!,
+                            sampleId = ensuredSample.id,
                             organizationId = organizationRes.id,
                             patientId = patientEntity.id
-
                         )
                         trxDsl.insertRequest(requestEntity)
                             .mapUniqueViolation(
@@ -120,7 +121,7 @@ class RequestHandler(
                                 ),
                                 code = ErrorCode.DUPLICATE_KEY
                             )
-                            .then(validateExtensions(trxDsl, userService.serviceId!!, requestPutDTO.extensions))
+                         //   .then(validateExtensions(trxDsl, userService.serviceId!!, requestPutDTO.extensions))
                             .then(insertExtensions(trxDsl, requestEntity.id, requestPutDTO.extensions))
                             .then(trxDsl.selectRequestById(requestEntity.id))
                     }
@@ -142,19 +143,19 @@ class RequestHandler(
                 }
             }.then()
     }
-
+/*
     fun validateExtensions(trxDsl: DSLContext, serviceId: UUID, requestExtensions: List<RequestExtensionRefDTO>?): Mono<Void> {
         val requiredAndAllowedMono = trxDsl.selectServiceExtensionByServiceId(serviceId)
             .collectList()
             .map { rows ->
-                val required = rows.filter { it.isRequired == true }
-                    .map { it.extension!!.code }
+                val required = rows.filter { it.isRequired }
+                    .map { it.extension.code }
                     .toSet()
-                val allowed = rows.map { it.extension!!.code }.toSet()
+                val allowed = rows.map { it.extension.code }.toSet()
 
                 required to allowed
             }
-        val providedMap = (requestExtensions ?: emptyList()).associate { it.code to (it.value ?: "") }
+        val providedMap = (requestExtensions ?: emptyList()).associate { it.code to it.value }
         val providedCodes = providedMap.keys
 
         return requiredAndAllowedMono.flatMap { (requiredCodes, allowedCodes) ->
@@ -172,7 +173,9 @@ class RequestHandler(
             }
         }
     }
-    private fun diffSample(existing: SampleDTO, incoming: SampleEntity): List<FieldError> {
+*/
+
+    private fun diffSample(existing: RequestSampleDTO, incoming: SampleEntity): List<FieldError> {
         val errs = mutableListOf<FieldError>()
 
         if (existing.sampleTypeId != incoming.sampleTypeId) {
@@ -198,7 +201,7 @@ class RequestHandler(
         }
         return errs
     }
-    fun patchRequest(userId: UUID, serviceSerial: String, sampleSerial: String, patch: RequestPatchDTO): Mono<RequestDTO> {
+    fun patchRequest(userId: UUID, serviceSerial: String, sampleSerial: String, patch: RequestPatchDTO): Mono<RequestResponseDTO> {
         return Mono.from(dsl.transactionPublisher { trx ->
             val trxDsl = trx.dsl()
             Mono.zip(
@@ -208,14 +211,14 @@ class RequestHandler(
                 val userService = tuple.t1
                 val sample = tuple.t2
 
-                trxDsl.selectRequestByServiceIdAndSampleId(userService.serviceId!!, sample.id!!)
+                trxDsl.selectRequestByServiceIdAndSampleId(userService.serviceId!!, sample.id)
                     .orNotFound(listOf(FieldError(field = "sample.serial", message = "not found"), FieldError(field = "service.serial", message = "not found")))
                     .flatMap { current ->
-                        if (current.isEditable == false) {
+                        if (!current.isEditable) {
                             return@flatMap  Mono.error(ConflictException(code = ErrorCode.EDIT_NOT_ALLOWED))
                         }
 
-                        val reqUpd = trxDsl.updateRequestById(current.id!!, patch)
+                        val reqUpd = trxDsl.updateRequestById(current.id, patch)
 
                         val orgUpd: Mono<Boolean> =
                             if (patch.organization.isPresent && patch.organization.get().serial.isPresent) {
@@ -225,11 +228,11 @@ class RequestHandler(
                                     )))
                                 trxDsl.selectOrganizationByUserIdAndSerial(userId, orgSerial)
                                     .orUnprocessable(listOf(FieldError("organization.serial", "not found", orgSerial)))
-                                    .flatMap { org -> trxDsl.updateRequestOrganizationById(current.id!!, org.id!!) }
+                                    .flatMap { org -> trxDsl.updateRequestOrganizationById(current.id, org.id) }
                             } else Mono.just(false)
 
                         val patientUpd =
-                            if (patch.patient.isPresent) trxDsl.updatePatientFields(current.patientId!!, patch.patient.get())
+                            if (patch.patient.isPresent) trxDsl.updatePatientFields(current.patientId, patch.patient.get())
                             else Mono.just(false)
 
                         if (patch.sample.isPresent) {
@@ -241,24 +244,31 @@ class RequestHandler(
                             }
                         }
                         val sampleUpd =
-                            if (patch.sample.isPresent) trxDsl.updateSampleById(current.sampleId!!, patch.sample.get())
+                            if (patch.sample.isPresent) trxDsl.updateSampleById(current.sampleId, patch.sample.get())
                             else Mono.just(false)
 
+                        if (patch.extensions.isPresent) {
+                            return@flatMap Mono.error(UnprocessableEntityException(
+                                    listOf(FieldError("extensions","This cannot be changed. Please contact your representative."))
+                                )
+                            )
+                        }
+                        /* Extensions의 경우 재단에서 직접 API로 변경이 불가, 담당자가 메시지 조회 후 담당자에게 컨택 [로그쌓는거랑은 다른데...태용님께 문의예정]
                         val extsUpd =
                             if (patch.extensions.isPresent) {
                                 val list = patch.extensions.orElse(null) // null → 전체 삭제
                                 if (list == null) {
-                                    trxDsl.deleteRequestExtensionByRequestId(current.id!!).thenReturn(true)
+                                    trxDsl.deleteRequestExtensionByRequestId(current.id).thenReturn(true)
                                 } else {
-                                    validateExtensions(trxDsl, current.serviceId!!, list)
-                                        .then(trxDsl.deleteRequestExtensionByRequestId(current.id!!))
-                                        .then(insertExtensions(trxDsl, current.id!!, list))
+                                    validateExtensions(trxDsl, current.serviceId, list)
+                                        .then(trxDsl.deleteRequestExtensionByRequestId(current.id))
+                                        .then(insertExtensions(trxDsl, current.id, list))
                                         .thenReturn(true)
                                 }
                             } else Mono.just(false)
-
-                        Mono.`when`(reqUpd, orgUpd, patientUpd, sampleUpd, extsUpd)
-                        .then(trxDsl.selectRequestById(current.id!!))
+                          */
+                        Mono.`when`(reqUpd, orgUpd, patientUpd, sampleUpd)//, extsUpd)
+                            .then(trxDsl.selectRequestById(current.id))
                     }
             }
         })

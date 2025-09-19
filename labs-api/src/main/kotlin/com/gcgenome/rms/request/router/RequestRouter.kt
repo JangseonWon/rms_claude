@@ -1,12 +1,13 @@
 package com.gcgenome.rms.request.router
 
 import com.gcgenome.rms.config.CustomAuthenticationToken
-import com.gcgenome.rms.data.*
+import com.gcgenome.rms.data.FieldError
 import com.gcgenome.rms.exception.ErrorResponseMapper
 import com.gcgenome.rms.exception.UnprocessableEntityException
 import com.gcgenome.rms.request.dto.request.RequestPatchDTO
 import com.gcgenome.rms.request.dto.request.RequestPostDTO
 import com.gcgenome.rms.request.dto.request.RequestPutDTO
+import com.gcgenome.rms.request.dto.response.RequestResponseDTO
 import com.gcgenome.rms.request.handler.RequestHandler
 import jakarta.validation.Validator
 import org.springframework.context.annotation.Bean
@@ -46,7 +47,7 @@ class RequestRouter (
 
         return Mono.zip(principalMono, requestBody)
             .flatMap { tuple -> requestHandler.saveRequest(tuple.t1.user.id, tuple.t2, serviceSerial, sampleSerial) }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), RequestDTO::class.java) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), RequestResponseDTO::class.java) }
             .onErrorResume { e -> errorResponseMapper.toResponse(e, request) }
     }
 
@@ -56,7 +57,7 @@ class RequestRouter (
 
         return request.principal().cast(CustomAuthenticationToken::class.java)
             .flatMap { requestHandler.getRequestBySerial(it.user.id, serviceSerial, sampleSerial) }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), RequestDTO::class.java) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), RequestResponseDTO::class.java) }
             .onErrorResume { e -> errorResponseMapper.toResponse(e, request) }
     }
 
@@ -78,7 +79,7 @@ class RequestRouter (
 
         return Mono.zip(principalMono, requestBody)
             .flatMap { requestHandler.searchRequests(it.t1.user.id, it.t2).collectList() }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), RequestDTO::class.java) }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(it), RequestResponseDTO::class.java) }
             .onErrorResume { e -> errorResponseMapper.toResponse(e, request) }
     }
     private fun patchRequest(request: ServerRequest): Mono<ServerResponse> {

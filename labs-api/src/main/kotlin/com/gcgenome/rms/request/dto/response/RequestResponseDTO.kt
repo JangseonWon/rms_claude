@@ -1,58 +1,71 @@
 package com.gcgenome.rms.request.dto.response
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.gcgenome.rms.organization.dto.response.OrganizationResponseDTO
 import com.gcgenome.rms.service.dto.response.ServiceResponseDTO
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
 data class RequestResponseDTO(
-    val id: UUID,
-    val department: String? = null,
-    val ward: String? = null,
-    val physician: String? = null,
-    val genomePrice: Long? = null,
-    val labsPrice: Long? = null,
-    val createAt: LocalDateTime,
-    val organization: OrganizationResponseDTO,
-    val patient: PatientResponseDTO,
-    val service: ServiceResponseDTO
+    @JsonProperty("id") val id: UUID,
+    @JsonProperty("department") val department: String? = null,
+    @JsonProperty("ward") val ward: String? = null,
+    @JsonProperty("physician") val physician: String? = null,
+    @JsonProperty("memo") val memo: String? = null,
+    @JsonProperty("genomePrice") val genomePrice: Long? = null,
+    @JsonProperty("labsPrice") val labsPrice: Long? = null,
+    @JsonProperty("createAt") val createAt: LocalDateTime,
+    @JsonIgnore val isDeletable: Boolean,
+    @JsonIgnore val isEditable: Boolean,
+    @JsonIgnore val serviceId: UUID,
+    @JsonIgnore val sampleId: UUID,
+    @JsonIgnore val organizationId: UUID,
+    @JsonIgnore val patientId: UUID,
+    var organization: OrganizationResponseDTO? = null,
+    var patient: PatientResponseDTO? = null,
+    var service: ServiceResponseDTO? = null,
+    var sample: RequestSampleDTO? = null,
+    var extensions: List<RequestExtensionDTO>? = null
 )
 
-data class OrganizationResponseDTO(
-    @JsonIgnore
-    val id: UUID,
-    val serial: String,
-    val name: String,
-    val registrationNumber: String? = null,
-    val nursingNumber: String? = null,
-    val branchCode: String? = null,
-    val branchName: String? = null,
-    val employeeId: String? = null,
-    val employeeName: String? = null,
-    val employeePhone: String? = null,
-    val type: String? = null,
-    val createAt: LocalDateTime? = null,
-    @JsonIgnore
-    val userId: LocalDateTime? = null,
+data class RequestExtensionDTO(
+    @JsonIgnore val id: UUID? = null,
+    @JsonProperty("value") val value: String,
+    @JsonProperty("code") val code: String,
+    @JsonProperty("name_kr")val nameKr: String? = null,
+    @JsonProperty("name_en")val nameEn: String? = null,
+    @JsonIgnore var extensionId: UUID? = null ,
+    @JsonIgnore var requestId: UUID? = null,
+)
+
+data class RequestSampleDTO(
+    @JsonIgnore val id: UUID,
+    @JsonProperty("barcode") val barcode: String? = null,
+    @JsonProperty("serial")val serial: String,
+    @JsonProperty("count")val count: Int,
+    @JsonProperty("sampling_on")val samplingOn: LocalDate,
+
+    @JsonIgnore var sampleTypeId: UUID,
+    @JsonIgnore var userId: UUID,
+    @JsonProperty("type") var type: SampleTypeResponseDTO? = null
+
+)
+
+data class SampleTypeResponseDTO(
+    @JsonIgnore val id: UUID?,
+    @JsonProperty("code") val code: String,
+    @JsonProperty("serial") val serial: String,
+    @JsonProperty("name_kr") val nameKr: String? = null,
+    @JsonProperty("name_en") val nameEn: String? = null
 )
 
 data class PatientResponseDTO(
-    @JsonIgnore
-    val id: UUID,
-    val serial: String? = null,
-    val name: String? = null,
-    val sex: String? = null,
-    val birth: LocalDate? = null,
-    val age: Int? = null
-)
-
-
-
-data class ExtensionResponseDTO(
-    val id: UUID,
-    val code: String,
-    val nameKr: String? = null,
-    val nameEn: String? = null,
-    val regex: String? = null
+    @JsonIgnore val id: UUID,
+    @JsonProperty("serial") val serial: String,
+    @JsonProperty("name") val name: String,
+    @JsonProperty("sex") val sex: String? = null,
+    @JsonProperty("birth") val birth: LocalDate? = null,
+    @JsonProperty("age") val age: Int? = null
 )

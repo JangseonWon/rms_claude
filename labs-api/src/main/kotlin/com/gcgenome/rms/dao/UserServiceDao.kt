@@ -1,11 +1,10 @@
 package com.gcgenome.rms.dao
 
 import com.gcgenome.rms.data.UserServiceDTO
-import com.gcgenome.rms.tables.references.*
+import com.gcgenome.rms.tables.references.USER_SERVICE
 import org.jooq.DSLContext
-import org.springframework.stereotype.Repository
 import reactor.core.publisher.Mono
-import java.util.UUID
+import java.util.*
 
 interface UserServiceDao {
     fun DSLContext.selectUserServiceByUserIdAndSerial(userId: UUID, serial: String): Mono<UserServiceDTO> {

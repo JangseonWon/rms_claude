@@ -1,7 +1,6 @@
 package com.gcgenome.rms.service.handler
 
 import com.gcgenome.rms.dao.ServiceDao
-import com.gcgenome.rms.data.ServiceDTO
 import com.gcgenome.rms.service.dto.request.ServicePostDTO
 import com.gcgenome.rms.service.dto.response.ServiceResponseDTO
 import org.jooq.DSLContext

@@ -19,5 +19,5 @@ data class OrganizationResponseDTO(
     val type: String? = null,
     val createAt: LocalDateTime? = null,
     @JsonIgnore
-    val userId: LocalDateTime? = null,
+    val userId: UUID? = null,
 )

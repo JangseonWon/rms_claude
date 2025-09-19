@@ -1,7 +1,7 @@
 package com.gcgenome.rms.dao
 
-import com.gcgenome.rms.request.dto.response.ExtensionResponseDTO
-import com.gcgenome.rms.tables.references.*
+import com.gcgenome.rms.service.dto.response.ExtensionResponseDTO
+import com.gcgenome.rms.tables.references.EXTENSION
 import org.jooq.DSLContext
 import reactor.core.publisher.Mono
 

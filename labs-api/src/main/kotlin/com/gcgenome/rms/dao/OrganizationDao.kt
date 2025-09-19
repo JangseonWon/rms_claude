@@ -1,16 +1,15 @@
 package com.gcgenome.rms.dao
 
-import com.gcgenome.rms.data.OrganizationDTO
 import com.gcgenome.rms.entity.OrganizationEntity
+import com.gcgenome.rms.organization.dto.request.OrganizationPatchDTO
 import com.gcgenome.rms.organization.dto.request.OrganizationPostDTO
 import com.gcgenome.rms.organization.dto.response.OrganizationResponseDTO
 import com.gcgenome.rms.tables.references.ORGANIZATION
 import org.jooq.DSLContext
-import org.springframework.stereotype.Repository
+import org.jooq.Field
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 interface OrganizationDao {
     fun DSLContext.selectOrganizationByUserIdAndSerial(userId: UUID, serial: String): Mono<OrganizationResponseDTO> {
@@ -58,14 +57,41 @@ interface OrganizationDao {
                 .set(ORGANIZATION.CREATE_AT, organization.createAt)
                 .set(ORGANIZATION.USER_ID, organization.userId)
                 .returning()
-        ).map { it.into(OrganizationResponseDTO::class.java) }
+        ).flatMap { rec ->
+            selectOrganizationByUserIdAndSerial(organization.userId, organization.serial)
+        }
     }
-    fun DSLContext.deleteOrganizationBySerial(userId: UUID, serial: String): Mono<OrganizationDTO> {
+    fun DSLContext.deleteOrganizationBySerial(userId: UUID, serial: String): Mono<Int> {
         return Mono.from(
             deleteFrom(ORGANIZATION).where(
                 ORGANIZATION.USER_ID.eq(userId),
                 ORGANIZATION.SERIAL.eq(serial)
-            ).returning()
-        ).map { it.into(OrganizationDTO::class.java) }
+            )
+        )
+    }
+
+    fun DSLContext.updateOrganizationById(userId: UUID, organizationSerial: String, patch: OrganizationPatchDTO): Mono<OrganizationResponseDTO> {
+
+        val updates = mutableMapOf<Field<*>, Any?>()
+
+        if (patch.name.isPresent)                 updates[ORGANIZATION.NAME]                   = patch.name.orElse(null)
+        if (patch.registrationNumber.isPresent)   updates[ORGANIZATION.REGISTRATION_NUMBER]    = patch.registrationNumber.orElse(null)
+        if (patch.nursingNumber.isPresent)        updates[ORGANIZATION.NURSING_NUMBER]         = patch.nursingNumber.orElse(null)
+        if (patch.branchCode.isPresent)           updates[ORGANIZATION.BRANCH_CODE]            = patch.branchCode.orElse(null)
+        if (patch.branchName.isPresent)           updates[ORGANIZATION.BRANCH_NAME]            = patch.branchName.orElse(null)
+        if (patch.employeeId.isPresent)           updates[ORGANIZATION.EMPLOYEE_ID]            = patch.employeeId.orElse(null)
+        if (patch.employeeName.isPresent)         updates[ORGANIZATION.EMPLOYEE_NAME]          = patch.employeeName.orElse(null)
+        if (patch.employeePhone.isPresent)        updates[ORGANIZATION.EMPLOYEE_PHONE]         = patch.employeePhone.orElse(null)
+        if (patch.type.isPresent)                 updates[ORGANIZATION.TYPE]                   = patch.type.orElse(null)
+
+        if (updates.isEmpty()) {
+            return selectOrganizationByUserIdAndSerial(userId, organizationSerial)
+        }
+
+        return Mono.from(update(ORGANIZATION).set(updates)
+            .where(
+            ORGANIZATION.USER_ID.eq(userId),
+            ORGANIZATION.SERIAL.eq(organizationSerial)
+        )).then(selectOrganizationByUserIdAndSerial(userId, organizationSerial))
     }
 }
