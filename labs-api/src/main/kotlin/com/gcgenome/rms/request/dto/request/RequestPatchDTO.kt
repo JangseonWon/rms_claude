@@ -2,6 +2,7 @@ package com.gcgenome.rms.request.dto.request
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Pattern
 import org.openapitools.jackson.nullable.JsonNullable
 
 data class RequestPatchDTO(
@@ -26,8 +27,11 @@ data class OrganizationPatchDTO(
 data class PatientPatchDTO(
     @field:NotBlank(message = "must not be blank")
     @JsonProperty("name")  val name:  JsonNullable<String> = JsonNullable.undefined(),
+    @field:Pattern(regexp = "^[MF]$", message = "sex must be 'M' or 'F'")
     @JsonProperty("sex")   val sex:   JsonNullable<String> = JsonNullable.undefined(),
     @JsonProperty("age")   val age:   JsonNullable<Int> = JsonNullable.undefined(),
+
+
     @JsonProperty("birth") val birth: JsonNullable<String> = JsonNullable.undefined()
 )
 data class SamplePatchDTO(

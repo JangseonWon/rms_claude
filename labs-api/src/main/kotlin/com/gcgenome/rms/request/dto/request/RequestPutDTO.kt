@@ -2,10 +2,7 @@ package com.gcgenome.rms.request.dto.request
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.validation.Valid
-import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.NotNull
-import jakarta.validation.constraints.PastOrPresent
-import jakarta.validation.constraints.Positive
+import jakarta.validation.constraints.*
 import java.time.LocalDate
 
 data class RequestPutDTO(
@@ -48,6 +45,7 @@ data class PatientRefDTO (
     val serial: String,
     @field:NotBlank(message = "must not be blank")
     val name: String,
+    @field:Pattern(regexp = "^[MF]$", message = "sex must be 'M' or 'F'")
     val sex: String? = null,
     val age: Int? = null,
     val birth: LocalDate? = null

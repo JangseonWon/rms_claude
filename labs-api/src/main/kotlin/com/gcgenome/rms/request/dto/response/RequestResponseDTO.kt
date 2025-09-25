@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.gcgenome.rms.organization.dto.response.OrganizationResponseDTO
 import com.gcgenome.rms.service.dto.response.ServiceResponseDTO
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.PastOrPresent
+import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Positive
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -39,6 +41,7 @@ data class RequestExtensionDTO(
     @JsonProperty("code") val code: String,
     @JsonProperty("name_kr")val nameKr: String? = null,
     @JsonProperty("name_en")val nameEn: String? = null,
+    @JsonProperty("is_required")val isRequired: Boolean,
     @JsonIgnore var extensionId: UUID? = null ,
     @JsonIgnore var requestId: UUID? = null,
 )
@@ -52,6 +55,7 @@ data class RequestSampleDTO(
     @field:Positive(message = "must be > 0")
     @JsonProperty("count")val count: Int,
     @field:NotBlank(message = "must not be blank")
+    @field:PastOrPresent(message = "must be past or today")
     @JsonProperty("sampling_on")val samplingOn: LocalDate,
 
     @JsonIgnore var sampleTypeId: UUID,
@@ -76,7 +80,9 @@ data class PatientResponseDTO(
     @JsonProperty("serial") val serial: String,
     @field:NotBlank(message = "must not be blank")
     @JsonProperty("name") val name: String,
+    @field:Pattern(regexp = "^[MF]$", message = "sex must be 'M' or 'F'")
     @JsonProperty("sex") val sex: String? = null,
+    @field:PastOrPresent(message = "must be past or today")
     @JsonProperty("birth") val birth: LocalDate? = null,
     @JsonProperty("age") val age: Int? = null
 )

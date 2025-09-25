@@ -7,5 +7,6 @@ import org.springframework.web.server.ResponseStatusException
 class ConflictException(
     val fieldErrors: List<FieldError> = emptyList(),
     val rejectValue: Any? = null,
-    val code: ErrorCode = ErrorCode.CONFLICT
-) : ResponseStatusException(HttpStatus.CONFLICT, "Conflict")
+    val code: ErrorCode = ErrorCode.CONFLICT,
+    reason: String = "Conflict"
+) : ResponseStatusException(HttpStatus.CONFLICT, reason)

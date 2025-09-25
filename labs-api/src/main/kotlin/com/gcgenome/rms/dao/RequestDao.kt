@@ -23,14 +23,15 @@ interface RequestDao {
                 REQUEST_EXTENSION.VALUE.`as`("value"),
                 EXTENSION.NAME_KR.`as`("nameKr"),
                 EXTENSION.NAME_EN.`as`("nameEn"),
-
+                SERVICE_EXTENSION.IS_REQUIRED.`as`("isRequired"),
                 REQUEST_EXTENSION.EXTENSION_ID.`as`("extensionId"),
                 REQUEST_EXTENSION.REQUEST_ID.`as`("requestId")
             )
                 .from(REQUEST_EXTENSION)
                 .join(EXTENSION).on(EXTENSION.ID.eq(REQUEST_EXTENSION.EXTENSION_ID))
+                .join(SERVICE_EXTENSION).on(SERVICE_EXTENSION.EXTENSION_ID.eq(EXTENSION.ID))
                 .where(REQUEST_EXTENSION.REQUEST_ID.eq(REQUEST.ID))
-        ).convertFrom { r: Result<Record7<UUID?, String?, String?, String?, String?, UUID?, UUID?>> ->
+        ).convertFrom { r: Result<Record8<UUID?, String?, String?, String?, String?, Boolean?, UUID?, UUID?>> ->
             r.map { it.into(RequestExtensionDTO::class.java) }
         }
     fun DSLContext.selectRequestByServiceIdAndSampleId(serviceId: UUID, sampleId: UUID): Mono<RequestResponseDTO> {

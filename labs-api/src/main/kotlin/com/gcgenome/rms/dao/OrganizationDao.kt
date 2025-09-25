@@ -92,6 +92,7 @@ interface OrganizationDao {
             .where(
             ORGANIZATION.USER_ID.eq(userId),
             ORGANIZATION.SERIAL.eq(organizationSerial)
-        )).then(selectOrganizationByUserIdAndSerial(userId, organizationSerial))
+        ).returning()
+        ).map { it.into(OrganizationResponseDTO::class.java) }
     }
 }

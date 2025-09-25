@@ -215,7 +215,7 @@ class RequestHandler(
                     .orNotFound(listOf(FieldError(field = "sample.serial", message = "not found"), FieldError(field = "service.serial", message = "not found")))
                     .flatMap { current ->
                         if (!current.isEditable) {
-                            return@flatMap  Mono.error(ConflictException(code = ErrorCode.EDIT_NOT_ALLOWED))
+                            return@flatMap  Mono.error(ConflictException(code = ErrorCode.EDIT_NOT_ALLOWED , reason = "EDIT_NOT_ALLOWED"))
                         }
 
                         val reqUpd = trxDsl.updateRequestById(current.id, patch)
@@ -235,7 +235,7 @@ class RequestHandler(
                             if (patch.patient.isPresent) trxDsl.updatePatientFields(current.patientId, patch.patient.get())
                             else Mono.just(false)
 
-                        if (patch.sample.isPresent) {  //검체 타입 수정 가능해야된다 단, 해당 검사에 지원되는 검체타입이어야함.
+                        if (patch.sample.isPresent) {
                             val s = patch.sample.get()
                             if (s.type.isPresent && s.type.get().serial.isPresent) {
                                 return@flatMap Mono.error(UnprocessableEntityException(listOf(
@@ -246,14 +246,14 @@ class RequestHandler(
                         val sampleUpd =
                             if (patch.sample.isPresent) trxDsl.updateSampleById(current.sampleId, patch.sample.get())
                             else Mono.just(false)
-
+                        /*
                         if (patch.extensions.isPresent) {
                             return@flatMap Mono.error(UnprocessableEntityException(
                                     listOf(FieldError("extensions","This cannot be changed. Please contact your representative."))
                                 )
                             )
                         }
-                        /* Extensions의 경우 재단에서 직접 API로 변경이 불가, 담당자가 메시지 조회 후 담당자에게 컨택 [로그쌓는거랑은 다른데...태용님께 문의예정]
+
                         val extsUpd =
                             if (patch.extensions.isPresent) {
                                 val list = patch.extensions.orElse(null) // null → 전체 삭제
