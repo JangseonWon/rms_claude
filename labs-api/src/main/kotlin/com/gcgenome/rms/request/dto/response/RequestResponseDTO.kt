@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.gcgenome.rms.organization.dto.response.OrganizationResponseDTO
 import com.gcgenome.rms.service.dto.response.ServiceResponseDTO
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Positive
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -33,6 +35,7 @@ data class RequestResponseDTO(
 data class RequestExtensionDTO(
     @JsonIgnore val id: UUID? = null,
     @JsonProperty("value") val value: String,
+    @field:NotBlank(message = "must not be blank")
     @JsonProperty("code") val code: String,
     @JsonProperty("name_kr")val nameKr: String? = null,
     @JsonProperty("name_en")val nameEn: String? = null,
@@ -43,8 +46,12 @@ data class RequestExtensionDTO(
 data class RequestSampleDTO(
     @JsonIgnore val id: UUID,
     @JsonProperty("barcode") val barcode: String? = null,
+    @field:NotBlank(message = "must not be blank")
     @JsonProperty("serial")val serial: String,
+    @field:NotBlank(message = "must not be blank")
+    @field:Positive(message = "must be > 0")
     @JsonProperty("count")val count: Int,
+    @field:NotBlank(message = "must not be blank")
     @JsonProperty("sampling_on")val samplingOn: LocalDate,
 
     @JsonIgnore var sampleTypeId: UUID,
@@ -55,7 +62,9 @@ data class RequestSampleDTO(
 
 data class SampleTypeResponseDTO(
     @JsonIgnore val id: UUID?,
+    @field:NotBlank(message = "must not be blank")
     @JsonProperty("code") val code: String,
+    @field:NotBlank(message = "must not be blank")
     @JsonProperty("serial") val serial: String,
     @JsonProperty("name_kr") val nameKr: String? = null,
     @JsonProperty("name_en") val nameEn: String? = null
@@ -63,7 +72,9 @@ data class SampleTypeResponseDTO(
 
 data class PatientResponseDTO(
     @JsonIgnore val id: UUID,
+    @field:NotBlank(message = "must not be blank")
     @JsonProperty("serial") val serial: String,
+    @field:NotBlank(message = "must not be blank")
     @JsonProperty("name") val name: String,
     @JsonProperty("sex") val sex: String? = null,
     @JsonProperty("birth") val birth: LocalDate? = null,

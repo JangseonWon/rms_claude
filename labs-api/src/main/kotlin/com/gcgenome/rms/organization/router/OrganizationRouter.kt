@@ -87,7 +87,7 @@ class OrganizationRouter (
 
         return request.principal().cast(CustomAuthenticationToken::class.java)
             .flatMap { token -> organizationHandler.deleteOrganizationBySerial(token.user.id, organizationSerial) }
-            .then(ServerResponse.ok().build())
+            .then(ServerResponse.noContent().build())
             .onErrorResume { e -> errorResponseMapper.toResponse(e, request) }
     }
     private fun <T : Any> validateOrThrow(validator: Validator, target: T) {

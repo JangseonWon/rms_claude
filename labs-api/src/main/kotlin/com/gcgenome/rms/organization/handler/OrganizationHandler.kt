@@ -70,9 +70,8 @@ class OrganizationHandler(
     }
 
     fun patchOrganization(userId: UUID, organizationSerial: String, patch: OrganizationPatchDTO): Mono<OrganizationResponseDTO> {
-        if (organizationSerial.trim() != patch.serial.trim()) {
-            return Mono.error(UnprocessableEntityException(listOf(FieldError("serial", "must equal path variable"))))
-        }
+        if (patch.name.isPresent && patch.name.orElse(null)?.isBlank() == true)
+            return Mono.error(UnprocessableEntityException(listOf(FieldError("organization.name", "must not be blank"))))
 
         return dsl.updateOrganizationById(userId, organizationSerial, patch)
             .orUnprocessable(

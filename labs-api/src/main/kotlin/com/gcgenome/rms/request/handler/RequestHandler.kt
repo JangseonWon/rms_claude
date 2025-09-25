@@ -235,7 +235,7 @@ class RequestHandler(
                             if (patch.patient.isPresent) trxDsl.updatePatientFields(current.patientId, patch.patient.get())
                             else Mono.just(false)
 
-                        if (patch.sample.isPresent) {
+                        if (patch.sample.isPresent) {  //검체 타입 수정 가능해야된다 단, 해당 검사에 지원되는 검체타입이어야함.
                             val s = patch.sample.get()
                             if (s.type.isPresent && s.type.get().serial.isPresent) {
                                 return@flatMap Mono.error(UnprocessableEntityException(listOf(

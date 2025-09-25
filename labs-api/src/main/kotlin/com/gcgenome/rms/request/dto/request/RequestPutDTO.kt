@@ -54,6 +54,7 @@ data class PatientRefDTO (
 )
 
 data class RequestExtensionRefDTO(
+    @field:NotBlank(message = "must not be blank")
     val code: String,
     val value: String
 )

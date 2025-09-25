@@ -1,6 +1,7 @@
 package com.gcgenome.rms.request.dto.request
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import jakarta.validation.constraints.NotBlank
 import org.openapitools.jackson.nullable.JsonNullable
 
 data class RequestPatchDTO(
@@ -19,21 +20,26 @@ data class RequestPatchDTO(
 )
 
 data class OrganizationPatchDTO(
+    @field:NotBlank(message = "must not be blank")
     @JsonProperty("serial") val serial: JsonNullable<String> = JsonNullable.undefined()
 )
 data class PatientPatchDTO(
+    @field:NotBlank(message = "must not be blank")
     @JsonProperty("name")  val name:  JsonNullable<String> = JsonNullable.undefined(),
     @JsonProperty("sex")   val sex:   JsonNullable<String> = JsonNullable.undefined(),
     @JsonProperty("age")   val age:   JsonNullable<Int> = JsonNullable.undefined(),
     @JsonProperty("birth") val birth: JsonNullable<String> = JsonNullable.undefined()
 )
 data class SamplePatchDTO(
+    @field:NotBlank(message = "must not be blank")
     @JsonProperty("count")        val count: JsonNullable<Int> = JsonNullable.undefined(),
     @JsonProperty("age")          val age:         JsonNullable<Int>    = JsonNullable.undefined(),
+    @field:NotBlank(message = "must not be blank")
     @JsonProperty("sampling_on")  val samplingOn:  JsonNullable<String> = JsonNullable.undefined(),
     @JsonProperty("type")         val type:        JsonNullable<SampleTypePatchDTO> = JsonNullable.undefined()
 )
 data class SampleTypePatchDTO(
+    @field:NotBlank(message = "must not be blank")
     @JsonProperty("serial") val serial: JsonNullable<String> = JsonNullable.undefined()
 )
 
