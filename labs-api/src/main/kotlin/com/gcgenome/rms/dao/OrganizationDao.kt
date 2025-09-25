@@ -72,7 +72,7 @@ interface OrganizationDao {
 
     fun DSLContext.updateOrganizationById(userId: UUID, organizationSerial: String, patch: OrganizationPatchDTO): Mono<OrganizationResponseDTO> {
 
-        val updates = mutableMapOf<Field<*>, Any?>()
+        val updates = mutableMapOf<Field<*>, Any?>()//
 
         if (patch.name.isPresent)                 updates[ORGANIZATION.NAME]                   = patch.name.orElse(null)
         if (patch.registrationNumber.isPresent)   updates[ORGANIZATION.REGISTRATION_NUMBER]    = patch.registrationNumber.orElse(null)
