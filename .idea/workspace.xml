@@ -1,0 +1,579 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="98473bbf-d7cb-4001-86b7-ced39d4e7e66" name="변경" comment="fix(labs-api): patchDTO">
+      <change afterPath="$PROJECT_DIR$/.gradle/8.6/checksums/md5-checksums.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/8.6/dependencies-accessors/dc3d7dc3f3c48bb041f985d1bf187c7988584a03/classes/org/gradle/accessors/dm/LibrariesForLibs$KotlinLibraryAccessors.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/8.6/dependencies-accessors/dc3d7dc3f3c48bb041f985d1bf187c7988584a03/classes/org/gradle/accessors/dm/LibrariesForLibsInPluginsBlock$TestBundleAccessors.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/8.6/dependencies-accessors/dc3d7dc3f3c48bb041f985d1bf187c7988584a03/classes/org/gradle/accessors/dm/LibrariesForLibsInPluginsBlock$VersionAccessors.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/8.6/fileChanges/last-build.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/8.6/fileHashes/fileHashes.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/IntelliLang.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/classes/kotlin/main/com/gcgenome/rms/model/ExtensionDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab_i.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.keystream.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/proto.tab_i" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab_i.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/subtypes.tab.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/supertypes.tab.values.at" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/file-to-id.tab_i" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/id-to-file.tab.keystream.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/lookups.tab_i.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/kotlin/kaptGenerateStubsKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.keystream" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/kotlin/kaptGenerateStubsKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/kotlin/kaptGenerateStubsKotlin/cacheable/caches-jvm/inputs/source-to-output.tab_i" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/kotlin/kaptGenerateStubsKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab_i.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/kotlin/kaptGenerateStubsKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.values.at" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/kotlin/kaptGenerateStubsKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab_i" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/kotlin/kaptGenerateStubsKotlin/cacheable/caches-jvm/jvm/kotlin/source-to-classes.tab_i" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/kotlin/kaptGenerateStubsKotlin/cacheable/caches-jvm/lookups/file-to-id.tab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/kotlin/kaptGenerateStubsKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.keystream.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/kotlin/kaptGenerateStubsKotlin/cacheable/caches-jvm/lookups/id-to-file.tab_i" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/kotlin/kaptGenerateStubsKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/tmp/kapt3/incApCache/main/java-cache.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/tmp/kapt3/incrementalData/main/META-INF/alis-api.kotlin_module" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/tmp/kapt3/incrementalData/main/com/gcgenome/rms/config/JpaConfig.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/tmp/kapt3/stubs/main/com/gcgenome/rms/ApplicationKt.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/tmp/kapt3/stubs/main/com/gcgenome/rms/config/JpaConfig.kapt_metadata" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/tmp/kapt3/stubs/main/com/gcgenome/rms/entity/LabCustomCode.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/tmp/kapt3/stubs/main/com/gcgenome/rms/entity/LabTestCode.kapt_metadata" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/tmp/kapt3/stubs/main/com/gcgenome/rms/entity/ProgCompCode.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/alis-api/build/tmp/kapt3/stubs/main/com/gcgenome/rms/entity/ProgCompMngCode.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/META-INF/labs-api.kotlin_module" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/config/SecurityConfig.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/dao/ServiceDao$DefaultImpls.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/dao/ServiceDao$searchServices$9.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/dao/UserSampleTypeDao$selectUserSampleTypeByUserIdAndSerial$1.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/organization/router/OrganizationRouter$organizationRoute$1$1$3.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/organization/router/OrganizationRouter$patchOrganization$2.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/organization/router/OrganizationRouter$searchOrganizations$3.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/request/dto/request/SampleRefDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/request/dto/response/RequestExtensionDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/request/handler/RequestHandler$deleteRequestBySerial$1$1.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/request/handler/RequestHandler$getRequestBySerial$1$1.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/request/handler/RequestHandler$insertExtensions$1$1.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/request/handler/RequestHandler$saveRequest$1$1.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/request/router/RequestRouter$getRequestBySerial$3.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/request/router/RequestRouter$requestRoute$1$1$2.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/service/handler/ServiceHandler.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/service/router/ServiceRouter$serviceRoute$1$1$1$1.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/tables/ServiceExtension$Companion.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/tables/ServiceExtension.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/tables/ServiceSampleType.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/tables/UserSampleType.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/tables/UserService$Companion.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/tables/UserService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/tables/pojos/Organization.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/tables/pojos/RequestExtension.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/tables/records/OrganizationRecord.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/tables/records/UserSampleTypeRecord.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/classes/kotlin/main/com/gcgenome/rms/tables/references/TablesKt.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/generated/jooq/com/gcgenome/rms/tables/Sample.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/generated/jooq/com/gcgenome/rms/tables/ServiceSampleType.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/generated/jooq/com/gcgenome/rms/tables/pojos/RequestExtension.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/generated/jooq/com/gcgenome/rms/tables/pojos/ServiceExtension.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/generated/jooq/com/gcgenome/rms/tables/records/UserRecord.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/class-attributes.tab.keystream" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/internal-name-to-source.tab.keystream.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/kotlin/compileKotlin/cacheable/caches-jvm/jvm/kotlin/package-parts.tab.keystream" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/file-to-id.tab.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/lookups.tab.len" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/labs-api/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/lookups.tab_i.len" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <task path="$PROJECT_DIR$/labs-api">
+          <activation />
+        </task>
+        <task path="$PROJECT_DIR$">
+          <activation />
+        </task>
+        <task path="$PROJECT_DIR$/alis-api">
+          <activation />
+        </task>
+        <projects_view>
+          <tree_state>
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="rms" type="f1a62948:ProjectNode" />
+              </path>
+            </expand>
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="SIGN_OFF_COMMIT" value="true" />
+  </component>
+  <component name="GithubDefaultAccount">
+    <option name="defaultAccountId" value="988f2e6f-31eb-4a27-838c-dd08f53c2e2c" />
+  </component>
+  <component name="GradleScriptDefinitionsStorage" workingDir="$PROJECT_DIR$" gradleHome="$USER_HOME$/.gradle/wrapper/dists/gradle-8.6-bin/afr5mpiioh2wthjmwnkmdsd5w/gradle-8.6" javaHome="$USER_HOME$/.jdks/ms-21.0.8" gradleVersion="8.6" />
+  <component name="KubernetesApiPersistence">{}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="32lDEXzZ5Yn9OeTmnawezsY7ndK" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Gradle.rms [:alis-api:bootRun].executor": "Run",
+    "Gradle.rms:alis-api [bootRun].executor": "Run",
+    "Gradle.rms:labs-api [:alis-api:bootRun].executor": "Run",
+    "Gradle.rms:labs-api [build].executor": "Run",
+    "Gradle.rms:labs-api [clean].executor": "Run",
+    "Gradle.소스 다운로드.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "fix/reqno",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/gcgn/IdeaProjects/rms/labs-api/src/main/resources",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "프로젝트",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "application.passwordSafe",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "postgresql"
+    ]
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\gcgn\IdeaProjects\rms\labs-api\src\main\resources" />
+    </key>
+    <key name="CopyKotlinDeclarationDialog.RECENTS_KEY">
+      <recent name="com.gcgenome.rms.organization.dto.request" />
+    </key>
+    <key name="K2MoveDeclarationsDialog.RECENT_PACKAGE_KEY">
+      <recent name="com.gcgenome.rms.request.dto.mapper" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Gradle.rms:alis-api [bootRun]">
+    <configuration name="rms:alis-api [bootRun]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="env">
+          <map>
+            <entry key="POSTGRES_PASSWORD" value="snubi1004" />
+            <entry key="POSTGRES_R2DBC_URL" value="r2dbc:postgresql://172.19.208.111:5432/report_service?schema=labs_dev" />
+            <entry key="POSTGRES_SCHEMA" value="labs_dev" />
+            <entry key="POSTGRES_URL" value="jdbc:postgresql://172.19.208.111:5432/report_service" />
+            <entry key="POSTGRES_USERNAME" value="postgres" />
+            <entry key="S3_ACCESS_KEY" value="1MI7K07L3RZF4G7XXK0J" />
+            <entry key="S3_BUCKET_NAME" value="rms-test-721be7ef-c1c6-459b-8bc6-0fb160f4d167" />
+            <entry key="S3_ENDPOINT" value="https://s3.apps.gcgenome.com" />
+            <entry key="S3_SECRET_KEY" value="xvCHemrdHb9tJj6KhHDyBKlU20piGBoiF1Ok7SED" />
+            <entry key="SECURITY_PRIVATE_KEY" value="-----BEGIN RSA PRIVATE KEY-----MIIEowIBAAKCAQEAilWRp1Z7QJoLdFaCLLdqxW4wUdhyM7bdPKQSOxqp1xpCueAkdIafN4EMnlrDvKI3ojTCzf2pAzZz55BamkLTmFQwyv80QoMw2Rsd5fBdsnELtQqZHwmybGWVfnmFR+CeAjDNsrlKpMr96Q2ClSXSc1ffQp//W4nYDXE/JE3luyBe6qNvulpM6Ws+scMy/yCNN8HwVggDYErrzcv+f5ft5YNOUkxzhtapUM1FRK34qVWL3iuYI0H8iBw1IJukIFoFh1CdW3Z/V/wPHrINz6jSS1NrsuiyUu2Z22bPolvue+zRXZcNAAJKjV7XbVklp0f2gdfvuDzYkRc3ar1sxQPDNwIDAQABAoIBABu3d16K4lkYRFFEAAMLoPX71OyhLIiWDA/ZY9m5xuvVVCc/9K3wRzhsv+V+lBdYfUMfxSRWvaVqJKDx+GVOHG05+SjDJ2poNMJbP4tRtMRLCCh2/iUM4VX8qI5VtNGo/J+9vYkgvQb1sRgf39kYYelAYvhLbHOf080lspwIi44Ja+w/hPBzDdjPbFDLSHJtYytuqXiA2fbQQ8l5/Xd2VkguhG/7QQE8Wcg/A1Q8YeMmcXhcZvPAyXLhtIFerLqvHEGkP8jc+CneG5fwLfnq+Sr8MAgOfoBaHuBycb5v6jPZJIzfDDxuWZ3u59B2rTAWfemYdIpdTFiQTTddujQZWtECgYEAwNYPtee+Yi0m8vqzM6GgsV7DoKFKAGi2uMnxVnux13CQMooa7sRLPU3eNRfeD0xnlOLZSIziAwaWgUBGD0/u1MInKjprdb2PJFJq92cM7umyQCDOCoynb1yr9RklTOkKql9x5o/O3u3w8mXF1+h3avXZiQKpDZxIWn7eVdwakMkCgYEAt6VYOIvb1opVKD92mXdQr8pf8s4ZnQyhRO/RFb+gzfEQaw/YwRcNXIUmjoDYStnzMnKoeffl8jiQ2MLQZznQ/74xKWm/eJilYz4PVMEj/LAS7ZuvksLPqm9rXYfp8QYi2ezmLSys4Ox8doUZgBuVBjaJSXgSMKY6JyYHVlpJs/8CgYA3izD5R2gaJUFLyZRmcc60aERW9z42gfLnpRtDuttN39lZBVien6HAZbZ0eox2wZ4wT2sgr5vGHVaqohXMAU0csVPQoQUk49XgM3EmE+OwyVWTjR9sAHmV5Q6OyZBp59IvotBPBesjYUv+tfvXpdkH0Qq4oTCKgBKDJnnqJzzrqQKBgGB+3PA5bPY6EazoS+UvsJHuAKSQbxz6efLDIFYRLumHdV0MIpSzDC5FOJFAWmZaR1OGs8gC3ix8VH/RPbg/xPXcdfCQxC8V5jFTdrLOGZ641flMCOFQw9WGXh/zPpWK590igX/TLbOyD2QnY9LQq2lsVo7oLIarkXronIpfPsL5AoGBAL9pCkDAFK8LPV9qGbMsfWKjSKKAajAk2WweYZs710PRFIInRbQXH4KDJKN5VlLAh1zpIXOy1SRQLRfB2Wxeo9q0cCj5z8A37e7XOtpHb4oGXnfQAIGCd5VbKSkouHJ9bNsIEXV9MJInSGpBe7wRs41rcWEoBOEOGG6syGpO61Tw-----END RSA PRIVATE KEY-----" />
+            <entry key="SECURITY_PUBLIC_KEY" value="-----BEGIN RSA PUBLIC KEY-----MIIBCgKCAQEAilWRp1Z7QJoLdFaCLLdqxW4wUdhyM7bdPKQSOxqp1xpCueAkdIafN4EMnlrDvKI3ojTCzf2pAzZz55BamkLTmFQwyv80QoMw2Rsd5fBdsnELtQqZHwmybGWVfnmFR+CeAjDNsrlKpMr96Q2ClSXSc1ffQp//W4nYDXE/JE3luyBe6qNvulpM6Ws+scMy/yCNN8HwVggDYErrzcv+f5ft5YNOUkxzhtapUM1FRK34qVWL3iuYI0H8iBw1IJukIFoFh1CdW3Z/V/wPHrINz6jSS1NrsuiyUu2Z22bPolvue+zRXZcNAAJKjV7XbVklp0f2gdfvuDzYkRc3ar1sxQPDNwIDAQAB-----END RSA PUBLIC KEY-----" />
+          </map>
+        </option>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/alis-api" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="bootRun" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration name="rms:labs-api [:alis-api:bootRun]" type="GradleRunConfiguration" factoryName="Gradle" nameIsGenerated="true">
+      <ExternalSystemSettings>
+        <option name="env">
+          <map>
+            <entry key="POSTGRES_PASSWORD" value="snubi1004" />
+            <entry key="POSTGRES_R2DBC_URL" value="r2dbc:postgresql://172.19.208.111:5432/report_service" />
+            <entry key="POSTGRES_SCHEMA" value="labs_dev" />
+            <entry key="POSTGRES_URL" value="jdbc:postgresql://172.19.208.111:5432/report_service" />
+            <entry key="POSTGRES_USERNAME" value="postgres" />
+            <entry key="SPRING_PROFILES_ACTIVE" value="local" />
+          </map>
+        </option>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/labs-api" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":alis-api:bootRun" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration name="rms:labs-api [build]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/labs-api" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="build" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration name="rms:labs-api [clean]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/labs-api" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="clean" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration name="Application (10)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="rms.lims-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.gcgenome.lims.Application" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Application (11)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="rms.login-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.gcgenome.rms.Application" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Application (12)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="rms.management-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.gcgenome.rms.Application" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Application (13)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="rms.order-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.gcgenome.rms.Application" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Application (14)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="rms.post-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.gcgenome.rms.Application" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Application (15)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="rms.profile-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.gcgenome.rms.Application" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Application (16)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="rms.result-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.gcgenome.rms.Application" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Application (1)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="rms.alis-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.gcgenome.rms.Application" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Application (2)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="rms.api.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.gcgenome.rms.Application" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Application (3)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="rms.cart-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.gcgenome.rms.Application" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Application (4)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="rms.catalog-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.gcgenome.rms.Application" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Application (5)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="rms.dashboard-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.gcgenome.rms.Application" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Application (6)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="rms.entity.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.gcgenome.rms.Application" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Application (7)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="rms.entity-labs.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.gcgenome.rms.Application" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Application (8)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="rms.home-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.gcgenome.rms.Application" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Application (9)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="rms.labs-api.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.gcgenome.rms.Application" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Application" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="rms.alis-api.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.gcgenome.rms.Application" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Gradle.rms:labs-api [:alis-api:bootRun]" />
+      <item itemvalue="Gradle.rms:alis-api [bootRun]" />
+      <item itemvalue="Gradle.rms:labs-api [build]" />
+      <item itemvalue="Gradle.rms:labs-api [clean]" />
+      <item itemvalue="Spring Boot.Application (10)" />
+      <item itemvalue="Spring Boot.Application (11)" />
+      <item itemvalue="Spring Boot.Application (12)" />
+      <item itemvalue="Spring Boot.Application (13)" />
+      <item itemvalue="Spring Boot.Application (14)" />
+      <item itemvalue="Spring Boot.Application (15)" />
+      <item itemvalue="Spring Boot.Application (16)" />
+      <item itemvalue="Spring Boot.Application (1)" />
+      <item itemvalue="Spring Boot.Application (2)" />
+      <item itemvalue="Spring Boot.Application (3)" />
+      <item itemvalue="Spring Boot.Application (4)" />
+      <item itemvalue="Spring Boot.Application (5)" />
+      <item itemvalue="Spring Boot.Application (6)" />
+      <item itemvalue="Spring Boot.Application (7)" />
+      <item itemvalue="Spring Boot.Application (8)" />
+      <item itemvalue="Spring Boot.Application (9)" />
+      <item itemvalue="Spring Boot.Application" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Gradle.rms:alis-api [bootRun]" />
+        <item itemvalue="Gradle.rms:labs-api [clean]" />
+        <item itemvalue="Gradle.rms:labs-api [build]" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.23892.409" />
+        <option value="bundled-js-predefined-d6986cc7102b-e03c56caf84a-JavaScript-IU-252.23892.409" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="StructureViewState">
+    <option name="selectedTab" value="논리" />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="디폴트 작업">
+      <changelist id="98473bbf-d7cb-4001-86b7-ced39d4e7e66" name="변경" comment="" />
+      <created>1757986154320</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1757986154320</updated>
+      <workItem from="1758505930201" duration="2680000" />
+      <workItem from="1758523169421" duration="23779000" />
+      <workItem from="1758781647775" duration="8353000" />
+      <workItem from="1758849782987" duration="134000" />
+      <workItem from="1758850939942" duration="592000" />
+      <workItem from="1758867944473" duration="174000" />
+      <workItem from="1759108402131" duration="7000" />
+      <workItem from="1759189136228" duration="6000" />
+      <workItem from="1759297507795" duration="721000" />
+      <workItem from="1759302555000" duration="67000" />
+      <workItem from="1762476566524" duration="1283000" />
+    </task>
+    <task id="LOCAL-00001" summary="fix(labs-api): request, organization api fix">
+      <option name="closed" value="true" />
+      <created>1758255218767</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1758255218767</updated>
+    </task>
+    <task id="LOCAL-00002" summary="fix(labs-api): request, organization validation fix">
+      <option name="closed" value="true" />
+      <created>1758781924043</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1758781924043</updated>
+    </task>
+    <task id="LOCAL-00003" summary="fix(labs-api): request, organization validation fix(1)">
+      <option name="closed" value="true" />
+      <created>1758782037673</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1758782037674</updated>
+    </task>
+    <task id="LOCAL-00004" summary="fix(labs-api): sex,birth,extention changed validation and added is_required">
+      <option name="closed" value="true" />
+      <created>1758843721913</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1758843721913</updated>
+    </task>
+    <task id="LOCAL-00005" summary="fix(labs-api): patchDTO">
+      <option name="closed" value="true" />
+      <created>1762476626094</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1762476626094</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="OPEN_GENERIC_TABS">
+      <map>
+        <entry key="cf4d3ac8-7e99-4b1d-b69c-94fc6646447b" value="TOOL_WINDOW" />
+      </map>
+    </option>
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/fix/reqno" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+        <entry key="cf4d3ac8-7e99-4b1d-b69c-94fc6646447b">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="fix(labs-api): request, organization api fix" />
+    <MESSAGE value="fix(labs-api): request, organization api fix&#10;&#10;Signed-off-by: Jangseon Won &lt;jswon25@gcgenome.com&gt;" />
+    <MESSAGE value="fix(labs-api): request, organization validation fix" />
+    <MESSAGE value="fix(labs-api): request, organization validation fix(1)" />
+    <MESSAGE value="fix(labs-api): sex,birth,extention changed validation and added is_required" />
+    <MESSAGE value="fix(labs-api): patchDTO" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(labs-api): patchDTO" />
+    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
+  </component>
+</project>

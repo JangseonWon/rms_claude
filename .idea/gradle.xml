@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/alis-api" />
+            <option value="$PROJECT_DIR$/alis-service" />
+            <option value="$PROJECT_DIR$/api" />
+            <option value="$PROJECT_DIR$/authentication" />
+            <option value="$PROJECT_DIR$/cart-service" />
+            <option value="$PROJECT_DIR$/catalog-service" />
+            <option value="$PROJECT_DIR$/dashboard-service" />
+            <option value="$PROJECT_DIR$/entity" />
+            <option value="$PROJECT_DIR$/entity-labs" />
+            <option value="$PROJECT_DIR$/home-service" />
+            <option value="$PROJECT_DIR$/labs-api" />
+            <option value="$PROJECT_DIR$/lims-service" />
+            <option value="$PROJECT_DIR$/login-service" />
+            <option value="$PROJECT_DIR$/management-service" />
+            <option value="$PROJECT_DIR$/order-service" />
+            <option value="$PROJECT_DIR$/post-service" />
+            <option value="$PROJECT_DIR$/profile-service" />
+            <option value="$PROJECT_DIR$/result-service" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

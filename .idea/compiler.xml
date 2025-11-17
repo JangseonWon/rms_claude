@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel target="21" />
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="rms.alis-api" options="-parameters -proc:none" />
+      <module name="rms.alis-api.main" options="-parameters -proc:none" />
+      <module name="rms.alis-api.test" options="-parameters -proc:none" />
+      <module name="rms.alis-service" options="-parameters" />
+      <module name="rms.alis-service.main" options="-parameters" />
+      <module name="rms.alis-service.test" options="-parameters" />
+      <module name="rms.api" options="-parameters" />
+      <module name="rms.api.main" options="-parameters" />
+      <module name="rms.api.test" options="-parameters" />
+      <module name="rms.authentication" options="-parameters" />
+      <module name="rms.authentication.main" options="-parameters" />
+      <module name="rms.authentication.test" options="-parameters" />
+      <module name="rms.cart-service" options="-parameters" />
+      <module name="rms.cart-service.main" options="-parameters" />
+      <module name="rms.cart-service.test" options="-parameters" />
+      <module name="rms.catalog-service" options="-parameters" />
+      <module name="rms.catalog-service.main" options="-parameters" />
+      <module name="rms.catalog-service.test" options="-parameters" />
+      <module name="rms.dashboard-service" options="-parameters" />
+      <module name="rms.dashboard-service.main" options="-parameters" />
+      <module name="rms.dashboard-service.test" options="-parameters" />
+      <module name="rms.entity" options="-parameters" />
+      <module name="rms.entity-labs" options="-parameters" />
+      <module name="rms.entity-labs.main" options="-parameters" />
+      <module name="rms.entity-labs.test" options="-parameters" />
+      <module name="rms.entity.main" options="-parameters" />
+      <module name="rms.entity.test" options="-parameters" />
+      <module name="rms.home-service" options="-parameters" />
+      <module name="rms.home-service.main" options="-parameters" />
+      <module name="rms.home-service.test" options="-parameters" />
+      <module name="rms.labs-api" options="-parameters" />
+      <module name="rms.labs-api.main" options="-parameters" />
+      <module name="rms.labs-api.test" options="-parameters" />
+      <module name="rms.lims-service" options="-parameters" />
+      <module name="rms.lims-service.main" options="-parameters" />
+      <module name="rms.lims-service.test" options="-parameters" />
+      <module name="rms.login-service" options="-parameters" />
+      <module name="rms.login-service.main" options="-parameters" />
+      <module name="rms.login-service.test" options="-parameters" />
+      <module name="rms.management-service" options="-parameters" />
+      <module name="rms.management-service.main" options="-parameters" />
+      <module name="rms.management-service.test" options="-parameters" />
+      <module name="rms.order-service" options="-parameters" />
+      <module name="rms.order-service.main" options="-parameters" />
+      <module name="rms.order-service.test" options="-parameters" />
+      <module name="rms.post-service" options="-parameters" />
+      <module name="rms.post-service.main" options="-parameters" />
+      <module name="rms.post-service.test" options="-parameters" />
+      <module name="rms.profile-service" options="-parameters" />
+      <module name="rms.profile-service.main" options="-parameters" />
+      <module name="rms.profile-service.test" options="-parameters" />
+      <module name="rms.result-service" options="-parameters" />
+      <module name="rms.result-service.main" options="-parameters" />
+      <module name="rms.result-service.test" options="-parameters" />
+    </option>
+  </component>
+</project>
