@@ -298,17 +298,25 @@ data class RequestResponse(...)
 class RequestNotFoundException(...)
 ```
 
-## 📝 다음 단계
+## 📝 구현 현황
 
-### 구현 필요 항목
-1. Application Service 구현
-2. Repository 구현체 (R2DBC + jOOQ)
-3. REST Controller 구현
-4. 데이터베이스 스키마 정의
-5. 테스트 코드 작성
-6. API 문서 (Swagger/OpenAPI)
-7. Docker 설정
-8. CI/CD 파이프라인
+### ✅ 완료된 항목
+1. ✅ **UseCase 인터페이스** - 비즈니스 로직 정의
+2. ✅ **Mapper** - Domain ↔ DTO 변환
+3. ✅ **Application Service** - Request, Organization, Patient, Sample
+4. ✅ **데이터베이스 스키마** - PostgreSQL DDL 정의
+5. ✅ **Repository 구현체** - R2dbcOrganizationRepository (예시)
+6. ✅ **REST Controller** - Request, Organization, Patient API
+
+### ⚠️ 부분 구현 (TODO)
+1. **Repository 구현체** - Patient, Request, Sample, Extension Repository 추가 필요
+   - `R2dbcOrganizationRepository` 패턴 참고
+   - 자세한 내용은 `adapter/persistence/RepositoryNote.md` 참조
+2. **Service & Extension Controller** - SampleController, ExtensionController 추가
+3. **테스트 코드** - Unit Test, Integration Test
+4. **API 문서** - Swagger/OpenAPI 설정
+5. **Docker** - Dockerfile, docker-compose.yml
+6. **CI/CD** - GitHub Actions 설정
 
 ## 📚 참고 자료
 
