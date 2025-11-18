@@ -1,0 +1,71 @@
+# Gradle
+.gradle/
+build/
+!gradle-wrapper.jar
+*.sw?
+.#*
+*#
+*~
+.classpath
+.project
+.settings
+bin/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# Eclipse
+.metadata
+.recommenders
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.classpath
+.project
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Application
+*.log
+logs/
+temp/
+*.pid
+*.seed
+*.pid.lock
+
+# Test
+*.class
+*.jar
+*.war
+*.ear
+
+# jOOQ generated files
+src/main/kotlin/**/jooq/
+
+# Spring Boot
+spring-boot-devtools.properties
