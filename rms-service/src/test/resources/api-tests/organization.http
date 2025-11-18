@@ -1,0 +1,78 @@
+### Organization API Tests
+### Base URL
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+### 1. 기관 생성 (Create Organization)
+POST {{baseUrl}}/api/organizations
+Content-Type: {{contentType}}
+
+{
+  "serial": "ORG001",
+  "name": "서울대학교병원",
+  "registrationNumber": "1234567890",
+  "nursingNumber": "NURSE001",
+  "branchCode": "BR001",
+  "branchName": "본관",
+  "employeeId": "EMP001",
+  "employeeName": "홍길동",
+  "employeePhone": "02-1234-5678",
+  "type": "HOSPITAL"
+}
+
+### 2. 기관 목록 조회 (Get All Organizations)
+GET {{baseUrl}}/api/organizations
+Accept: {{contentType}}
+
+### 3. 기관 상세 조회 (Get Organization by ID)
+GET {{baseUrl}}/api/organizations/1
+Accept: {{contentType}}
+
+### 4. 기관 검색 (Search Organizations by Name)
+GET {{baseUrl}}/api/organizations/search?name=서울
+Accept: {{contentType}}
+
+### 5. 기관 정보 수정 (Update Organization)
+PUT {{baseUrl}}/api/organizations/1
+Content-Type: {{contentType}}
+
+{
+  "name": "서울대학교병원 (수정)",
+  "registrationNumber": "1234567890",
+  "nursingNumber": "NURSE001",
+  "branchCode": "BR001",
+  "branchName": "본관",
+  "employeeId": "EMP001",
+  "employeeName": "홍길동",
+  "employeePhone": "02-1234-5678",
+  "type": "UNIVERSITY_HOSPITAL"
+}
+
+### 6. 기관 삭제 (Delete Organization)
+DELETE {{baseUrl}}/api/organizations/1
+
+### 7. 중복 일련번호 체크 (Check Duplicate Serial)
+GET {{baseUrl}}/api/organizations/check-serial/ORG001
+Accept: {{contentType}}
+
+### 8. 기관 생성 - 필수값 누락 (Validation Error)
+POST {{baseUrl}}/api/organizations
+Content-Type: {{contentType}}
+
+{
+  "serial": "",
+  "name": ""
+}
+
+### 9. 기관 생성 - 중복 일련번호 (Duplicate Error)
+POST {{baseUrl}}/api/organizations
+Content-Type: {{contentType}}
+
+{
+  "serial": "ORG001",
+  "name": "중복 병원"
+}
+
+### 10. 존재하지 않는 기관 조회 (Not Found)
+GET {{baseUrl}}/api/organizations/99999
+Accept: {{contentType}}

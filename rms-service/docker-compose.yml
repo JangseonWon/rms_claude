@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: rms-postgres
+    environment:
+      POSTGRES_DB: rms
+      POSTGRES_USER: rms_user
+      POSTGRES_PASSWORD: rms_password
+      TZ: Asia/Seoul
+      LANG: ko_KR.UTF-8
+      LC_ALL: ko_KR.UTF-8
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./src/main/resources/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    networks:
+      - rms-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rms_user -d rms"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rms-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rms-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_R2DBC_URL: r2dbc:postgresql://postgres:5432/rms
+      SPRING_R2DBC_USERNAME: rms_user
+      SPRING_R2DBC_PASSWORD: rms_password
+      TZ: Asia/Seoul
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - rms-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  rms-network:
+    driver: bridge

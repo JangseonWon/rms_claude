@@ -1,0 +1,114 @@
+### Sample API Tests
+### Base URL
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+### 1. 검체 타입 생성 (Create Sample Type)
+POST {{baseUrl}}/api/sample-types
+Content-Type: {{contentType}}
+
+{
+  "code": "BLD",
+  "name": "혈액",
+  "description": "전혈 검체"
+}
+
+### 2. 검체 타입 목록 조회 (Get All Sample Types)
+GET {{baseUrl}}/api/sample-types
+Accept: {{contentType}}
+
+### 3. 검체 타입 상세 조회 (Get Sample Type by ID)
+GET {{baseUrl}}/api/sample-types/1
+Accept: {{contentType}}
+
+### 4. 검체 타입 조회 - 코드로 (Get Sample Type by Code)
+GET {{baseUrl}}/api/sample-types/code/BLD
+Accept: {{contentType}}
+
+### 5. 검체 타입 수정 (Update Sample Type)
+PUT {{baseUrl}}/api/sample-types/1
+Content-Type: {{contentType}}
+
+{
+  "code": "BLD",
+  "name": "혈액 (수정)",
+  "description": "전혈 검체 - 업데이트"
+}
+
+### 6. 검체 타입 삭제 (Delete Sample Type)
+DELETE {{baseUrl}}/api/sample-types/1
+
+### 7. 검체 생성 (Create Sample)
+POST {{baseUrl}}/api/samples
+Content-Type: {{contentType}}
+
+{
+  "serial": "S001",
+  "sampleTypeId": 1,
+  "collectedBy": "김간호사",
+  "note": "정상 채취"
+}
+
+### 8. 검체 목록 조회 (Get All Samples)
+GET {{baseUrl}}/api/samples
+Accept: {{contentType}}
+
+### 9. 검체 상세 조회 (Get Sample by ID)
+GET {{baseUrl}}/api/samples/1
+Accept: {{contentType}}
+
+### 10. 검체 타입별 조회 (Get Samples by Type)
+GET {{baseUrl}}/api/samples/type/1
+Accept: {{contentType}}
+
+### 11. 검체 정보 수정 (Update Sample)
+PUT {{baseUrl}}/api/samples/1
+Content-Type: {{contentType}}
+
+{
+  "sampleTypeId": 1,
+  "collectedBy": "이간호사",
+  "note": "재채취 완료"
+}
+
+### 12. 검체 삭제 (Delete Sample)
+DELETE {{baseUrl}}/api/samples/1
+
+### 13. 중복 검체 일련번호 체크 (Check Duplicate Serial)
+GET {{baseUrl}}/api/samples/check-serial/S001
+Accept: {{contentType}}
+
+### 14. 중복 검체 타입 코드 체크 (Check Duplicate Code)
+GET {{baseUrl}}/api/sample-types/check-code/BLD
+Accept: {{contentType}}
+
+### 15. 검체 타입 생성 - 필수값 누락 (Validation Error)
+POST {{baseUrl}}/api/sample-types
+Content-Type: {{contentType}}
+
+{
+  "code": "",
+  "name": ""
+}
+
+### 16. 검체 생성 - 필수값 누락 (Validation Error)
+POST {{baseUrl}}/api/samples
+Content-Type: {{contentType}}
+
+{
+  "serial": "",
+  "sampleTypeId": null
+}
+
+### 17. 검체 생성 - 존재하지 않는 타입 (Not Found)
+POST {{baseUrl}}/api/samples
+Content-Type: {{contentType}}
+
+{
+  "serial": "S002",
+  "sampleTypeId": 99999
+}
+
+### 18. 존재하지 않는 검체 조회 (Not Found)
+GET {{baseUrl}}/api/samples/99999
+Accept: {{contentType}}

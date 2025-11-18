@@ -1,0 +1,96 @@
+### Extension API Tests
+### Base URL
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+### 1. 확장항목 생성 (Create Extension)
+POST {{baseUrl}}/api/extensions
+Content-Type: {{contentType}}
+
+{
+  "code": "EXT001",
+  "name": "BRCA1/2 유전자 검사",
+  "description": "유방암 관련 유전자 검사",
+  "category": "GENETIC"
+}
+
+### 2. 확장항목 목록 조회 (Get All Extensions)
+GET {{baseUrl}}/api/extensions
+Accept: {{contentType}}
+
+### 3. 확장항목 상세 조회 (Get Extension by ID)
+GET {{baseUrl}}/api/extensions/1
+Accept: {{contentType}}
+
+### 4. 확장항목 조회 - 코드로 (Get Extension by Code)
+GET {{baseUrl}}/api/extensions/code/EXT001
+Accept: {{contentType}}
+
+### 5. 확장항목 수정 (Update Extension)
+PUT {{baseUrl}}/api/extensions/1
+Content-Type: {{contentType}}
+
+{
+  "code": "EXT001",
+  "name": "BRCA1/2 유전자 검사 (업데이트)",
+  "description": "유방암 및 난소암 관련 유전자 검사",
+  "category": "GENETIC"
+}
+
+### 6. 확장항목 삭제 (Delete Extension)
+DELETE {{baseUrl}}/api/extensions/1
+
+### 7. 중복 코드 체크 (Check Duplicate Code)
+GET {{baseUrl}}/api/extensions/check-code/EXT001
+Accept: {{contentType}}
+
+### 8. 확장항목 생성 - 필수값 누락 (Validation Error)
+POST {{baseUrl}}/api/extensions
+Content-Type: {{contentType}}
+
+{
+  "code": "",
+  "name": ""
+}
+
+### 9. 확장항목 생성 - 중복 코드 (Duplicate Error)
+POST {{baseUrl}}/api/extensions
+Content-Type: {{contentType}}
+
+{
+  "code": "EXT001",
+  "name": "중복 코드 테스트"
+}
+
+### 10. 존재하지 않는 확장항목 조회 (Not Found)
+GET {{baseUrl}}/api/extensions/99999
+Accept: {{contentType}}
+
+### 11. 여러 확장항목 일괄 생성 (Bulk Create Extensions)
+POST {{baseUrl}}/api/extensions/bulk
+Content-Type: {{contentType}}
+
+[
+  {
+    "code": "EXT002",
+    "name": "TP53 유전자 검사",
+    "description": "암 억제 유전자 검사",
+    "category": "GENETIC"
+  },
+  {
+    "code": "EXT003",
+    "name": "EGFR 유전자 검사",
+    "description": "폐암 관련 유전자 검사",
+    "category": "GENETIC"
+  },
+  {
+    "code": "EXT004",
+    "name": "면역조직화학검사",
+    "description": "조직 기반 검사",
+    "category": "PATHOLOGY"
+  }
+]
+
+### 12. 카테고리별 확장항목 조회 (Get Extensions by Category)
+GET {{baseUrl}}/api/extensions/category/GENETIC
+Accept: {{contentType}}

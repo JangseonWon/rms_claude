@@ -1,0 +1,131 @@
+### Request API Tests
+### Base URL
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+### 1. 의뢰 생성 (Create Request)
+POST {{baseUrl}}/api/requests
+Content-Type: {{contentType}}
+
+{
+  "serial": "REQ001",
+  "requestDateFrom": "2024-01-01",
+  "requestDateTo": "2024-01-10",
+  "organizationId": 1,
+  "patientId": 1,
+  "sampleId": 1,
+  "testContent": "유전체 분석",
+  "diseaseCode": "C50.9",
+  "sampleCollectedDate": "2024-01-01",
+  "report": "임상 정보",
+  "status": "PENDING",
+  "extensionIds": [1, 2, 3]
+}
+
+### 2. 의뢰 목록 조회 (Get All Requests)
+GET {{baseUrl}}/api/requests
+Accept: {{contentType}}
+
+### 3. 의뢰 상세 조회 (Get Request by ID)
+GET {{baseUrl}}/api/requests/1
+Accept: {{contentType}}
+
+### 4. 기관별 의뢰 조회 (Get Requests by Organization)
+GET {{baseUrl}}/api/requests/organization/1
+Accept: {{contentType}}
+
+### 5. 환자별 의뢰 조회 (Get Requests by Patient)
+GET {{baseUrl}}/api/requests/patient/1
+Accept: {{contentType}}
+
+### 6. 의뢰일 범위 검색 (Search Requests by Date Range)
+GET {{baseUrl}}/api/requests/search/date?from=2024-01-01&to=2024-12-31
+Accept: {{contentType}}
+
+### 7. 의뢰 정보 수정 (Update Request)
+PUT {{baseUrl}}/api/requests/1
+Content-Type: {{contentType}}
+
+{
+  "requestDateFrom": "2024-01-01",
+  "requestDateTo": "2024-01-10",
+  "organizationId": 1,
+  "patientId": 1,
+  "sampleId": 1,
+  "testContent": "유전체 분석 (업데이트)",
+  "diseaseCode": "C50.9",
+  "sampleCollectedDate": "2024-01-01",
+  "report": "임상 정보 수정",
+  "status": "IN_PROGRESS"
+}
+
+### 8. 의뢰 상태 변경 (Change Request Status)
+PATCH {{baseUrl}}/api/requests/1/status
+Content-Type: {{contentType}}
+
+{
+  "status": "COMPLETED"
+}
+
+### 9. 의뢰에 확장항목 추가 (Add Extension to Request)
+POST {{baseUrl}}/api/requests/1/extensions
+Content-Type: {{contentType}}
+
+{
+  "extensionIds": [4, 5]
+}
+
+### 10. 의뢰의 확장항목 조회 (Get Request Extensions)
+GET {{baseUrl}}/api/requests/1/extensions
+Accept: {{contentType}}
+
+### 11. 의뢰 삭제 (Delete Request)
+DELETE {{baseUrl}}/api/requests/1
+
+### 12. 중복 일련번호 체크 (Check Duplicate Serial)
+GET {{baseUrl}}/api/requests/check-serial/REQ001
+Accept: {{contentType}}
+
+### 13. 의뢰 생성 - 필수값 누락 (Validation Error)
+POST {{baseUrl}}/api/requests
+Content-Type: {{contentType}}
+
+{
+  "serial": "",
+  "requestDateFrom": "",
+  "requestDateTo": ""
+}
+
+### 14. 의뢰 생성 - 존재하지 않는 기관 (Not Found)
+POST {{baseUrl}}/api/requests
+Content-Type: {{contentType}}
+
+{
+  "serial": "REQ002",
+  "requestDateFrom": "2024-01-01",
+  "requestDateTo": "2024-01-10",
+  "organizationId": 99999,
+  "patientId": 1,
+  "sampleId": 1
+}
+
+### 15. 의뢰 생성 - 잘못된 날짜 범위 (Invalid Date Range)
+POST {{baseUrl}}/api/requests
+Content-Type: {{contentType}}
+
+{
+  "serial": "REQ003",
+  "requestDateFrom": "2024-01-10",
+  "requestDateTo": "2024-01-01",
+  "organizationId": 1,
+  "patientId": 1,
+  "sampleId": 1
+}
+
+### 16. 존재하지 않는 의뢰 조회 (Not Found)
+GET {{baseUrl}}/api/requests/99999
+Accept: {{contentType}}
+
+### 17. 복잡한 검색 (Complex Search)
+GET {{baseUrl}}/api/requests/search?organizationId=1&status=PENDING&from=2024-01-01&to=2024-12-31
+Accept: {{contentType}}

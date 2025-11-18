@@ -1,0 +1,10 @@
+spring:
+  r2dbc:
+    url: ${SPRING_R2DBC_URL:r2dbc:postgresql://postgres:5432/rms}
+    username: ${SPRING_R2DBC_USERNAME:rms_user}
+    password: ${SPRING_R2DBC_PASSWORD:rms_password}
+
+logging:
+  level:
+    root: INFO
+    com.idrsys.ailis.rms: DEBUG
