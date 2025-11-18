@@ -1,0 +1,18 @@
+spring:
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/rms
+    username: rms_user
+    password: rms_password
+
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
+
+logging:
+  level:
+    root: DEBUG
+    com.idrsys.ailis.rms: DEBUG
+    org.springframework.r2dbc: TRACE
+    io.r2dbc.postgresql.QUERY: DEBUG
