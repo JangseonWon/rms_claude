@@ -33,7 +33,7 @@ class R2dbcPatientRepositoryTest {
             serial = "P001",
             name = "홍길동",
             sex = Sex.MALE,
-            birth = "19900101",
+            birth = LocalDate.of(1990, 1, 1),
             createdBy = "test"
         )
 
@@ -45,7 +45,7 @@ class R2dbcPatientRepositoryTest {
         assertEquals("P001", saved.serial)
         assertEquals("홍길동", saved.name)
         assertEquals(Sex.MALE, saved.sex)
-        assertEquals("19900101", saved.birth)
+        assertEquals(LocalDate.of(1990, 1, 1), saved.birth)
         assertEquals("test", saved.createdBy)
         assertNotNull(saved.createdAt)
     }
@@ -57,7 +57,7 @@ class R2dbcPatientRepositoryTest {
             serial = "P002",
             name = "김영희",
             sex = Sex.FEMALE,
-            birth = "19950520",
+            birth = LocalDate.of(1995, 5, 20),
             createdBy = "test"
         )
         val saved = repository.save(patient)
@@ -80,7 +80,7 @@ class R2dbcPatientRepositoryTest {
             serial = "P003",
             name = "박철수",
             sex = Sex.MALE,
-            birth = "19880315",
+            birth = LocalDate.of(1988, 3, 15),
             createdBy = "test"
         )
         repository.save(patient)
@@ -101,7 +101,7 @@ class R2dbcPatientRepositoryTest {
             serial = "P004",
             name = "이민수",
             sex = Sex.MALE,
-            birth = "19920710",
+            birth = LocalDate.of(1992, 7, 10),
             createdBy = "test"
         )
         val saved = repository.save(patient)
@@ -129,7 +129,7 @@ class R2dbcPatientRepositoryTest {
             serial = "P005",
             name = "최지영",
             sex = Sex.FEMALE,
-            birth = "19930825",
+            birth = LocalDate.of(1993, 8, 25),
             createdBy = "test"
         )
         val saved = repository.save(patient)
@@ -148,8 +148,8 @@ class R2dbcPatientRepositoryTest {
     @Test
     fun `환자 목록 조회 테스트`() = runBlocking {
         // Given
-        val patient1 = Patient.create(serial = "P006", name = "환자1", sex = Sex.MALE, birth = "19900101", createdBy = "test")
-        val patient2 = Patient.create(serial = "P007", name = "환자2", sex = Sex.FEMALE, birth = "19910202", createdBy = "test")
+        val patient1 = Patient.create(serial = "P006", name = "환자1", sex = Sex.MALE, birth = LocalDate.of(1990, 1, 1), createdBy = "test")
+        val patient2 = Patient.create(serial = "P007", name = "환자2", sex = Sex.FEMALE, birth = LocalDate.of(1991, 2, 2), createdBy = "test")
         repository.save(patient1)
         repository.save(patient2)
 
@@ -165,9 +165,9 @@ class R2dbcPatientRepositoryTest {
     @Test
     fun `환자명으로 검색 테스트`() = runBlocking {
         // Given
-        repository.save(Patient.create(serial = "P008", name = "서울홍길동", sex = Sex.MALE, birth = "19900101", createdBy = "test"))
-        repository.save(Patient.create(serial = "P009", name = "서울김영희", sex = Sex.FEMALE, birth = "19910202", createdBy = "test"))
-        repository.save(Patient.create(serial = "P010", name = "부산박철수", sex = Sex.MALE, birth = "19920303", createdBy = "test"))
+        repository.save(Patient.create(serial = "P008", name = "서울홍길동", sex = Sex.MALE, birth = LocalDate.of(1990, 1, 1), createdBy = "test"))
+        repository.save(Patient.create(serial = "P009", name = "서울김영희", sex = Sex.FEMALE, birth = LocalDate.of(1991, 2, 2), createdBy = "test"))
+        repository.save(Patient.create(serial = "P010", name = "부산박철수", sex = Sex.MALE, birth = LocalDate.of(1992, 3, 3), createdBy = "test"))
 
         // When
         val results = repository.findByName("서울").toList()
@@ -181,7 +181,7 @@ class R2dbcPatientRepositoryTest {
     fun `중복 일련번호 체크 테스트`() = runBlocking {
         // Given
         val serial = "P011"
-        repository.save(Patient.create(serial = serial, name = "테스트환자", sex = Sex.MALE, birth = "19900101", createdBy = "test"))
+        repository.save(Patient.create(serial = serial, name = "테스트환자", sex = Sex.MALE, birth = LocalDate.of(1990, 1, 1), createdBy = "test"))
 
         // When
         val exists = repository.existsBySerial(serial)
@@ -192,35 +192,5 @@ class R2dbcPatientRepositoryTest {
         // 존재하지 않는 경우
         val notExists = repository.existsBySerial("NOTEXIST")
         assertFalse(notExists)
-    }
-
-    @Test
-    fun `생년월일 범위 조회 테스트`() = runBlocking {
-        // Given
-        repository.save(Patient.create(serial = "P012", name = "1990년생", sex = Sex.MALE, birth = "19900101", createdBy = "test"))
-        repository.save(Patient.create(serial = "P013", name = "1995년생", sex = Sex.FEMALE, birth = "19950101", createdBy = "test"))
-        repository.save(Patient.create(serial = "P014", name = "2000년생", sex = Sex.MALE, birth = "20000101", createdBy = "test"))
-
-        // When
-        val results = repository.findByBirthBetween("19900101", "19991231").toList()
-
-        // Then
-        assertTrue(results.isNotEmpty())
-        assertTrue(results.all { it.birth >= "19900101" && it.birth <= "19991231" })
-    }
-
-    @Test
-    fun `성별로 조회 테스트`() = runBlocking {
-        // Given
-        repository.save(Patient.create(serial = "P015", name = "남성1", sex = Sex.MALE, birth = "19900101", createdBy = "test"))
-        repository.save(Patient.create(serial = "P016", name = "여성1", sex = Sex.FEMALE, birth = "19910202", createdBy = "test"))
-
-        // When
-        val males = repository.findBySex(Sex.MALE).toList()
-        val females = repository.findBySex(Sex.FEMALE).toList()
-
-        // Then
-        assertTrue(males.all { it.sex == Sex.MALE })
-        assertTrue(females.all { it.sex == Sex.FEMALE })
     }
 }

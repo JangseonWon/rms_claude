@@ -59,18 +59,19 @@ class R2dbcRequestRepositoryTest {
                 serial = "PAT_TEST",
                 name = "테스트환자",
                 sex = Sex.MALE,
-                birth = "19900101",
+                birth = LocalDate.of(1990, 1, 1),
                 createdBy = "test"
             )
         )
 
         // 테스트용 검체 타입 및 검체 생성
         val sampleType = sampleTypeRepository.save(
-            SampleType.create(code = "BLD_TEST", name = "혈액", createdBy = "test")
+            SampleType.create(serial = "BLD_TEST", name = "혈액", createdBy = "test")
         )
         testSample = sampleRepository.save(
             Sample.create(
-                serial = "SMP_TEST",
+                count = 1,
+                samplingOn = LocalDate.now(),
                 sampleTypeId = sampleType.id!!,
                 createdBy = "test"
             )
@@ -282,7 +283,7 @@ class R2dbcRequestRepositoryTest {
     fun `환자별 의뢰 조회 테스트`() = runBlocking {
         // Given
         val patient2 = patientRepository.save(
-            Patient.create(serial = "PAT_TEST2", name = "환자2", sex = Sex.FEMALE, birth = "19950101", createdBy = "test")
+            Patient.create(serial = "PAT_TEST2", name = "환자2", sex = Sex.FEMALE, birth = LocalDate.of(1995, 1, 1), createdBy = "test")
         )
 
         requestRepository.save(
