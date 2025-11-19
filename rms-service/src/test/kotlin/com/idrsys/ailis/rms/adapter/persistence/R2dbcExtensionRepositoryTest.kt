@@ -56,10 +56,15 @@ class R2dbcExtensionRepositoryTest {
             Patient.create(serial = "PAT_EXT", name = "확장테스트환자", sex = Sex.MALE, birth = "19900101", createdBy = "test")
         )
         val sampleType = sampleTypeRepository.save(
-            SampleType.create(code = "BLD_EXT", name = "혈액", createdBy = "test")
+            SampleType.create(serial = "BLD_EXT", name = "혈액", createdBy = "test")
         )
         val sample = sampleRepository.save(
-            Sample.create(serial = "SMP_EXT", sampleTypeId = sampleType.id!!, createdBy = "test")
+            Sample.create(
+                count = 1,
+                samplingOn = LocalDate.now(),
+                sampleTypeId = sampleType.id!!,
+                createdBy = "test"
+            )
         )
         testRequest = requestRepository.save(
             Request.create(
@@ -189,7 +194,8 @@ class R2dbcExtensionRepositoryTest {
 
         val requestExtension = RequestExtension.create(
             requestId = testRequest.id!!,
-            extensionId = extension.id!!,
+            extensionCode = extension.code,
+            value = "테스트값",
             createdBy = "test"
         )
 
@@ -199,7 +205,8 @@ class R2dbcExtensionRepositoryTest {
         // Then
         assertNotNull(saved.id)
         assertEquals(testRequest.id, saved.requestId)
-        assertEquals(extension.id, saved.extensionId)
+        assertEquals(extension.code, saved.extensionCode)
+        assertEquals("테스트값", saved.value)
         assertEquals("test", saved.createdBy)
         assertNotNull(saved.createdAt)
     }
@@ -211,10 +218,10 @@ class R2dbcExtensionRepositoryTest {
         val ext2 = extensionRepository.save(Extension.create(code = "EXT009", name = "확장9", createdBy = "test"))
 
         requestExtensionRepository.save(
-            RequestExtension.create(requestId = testRequest.id!!, extensionId = ext1.id!!, createdBy = "test")
+            RequestExtension.create(requestId = testRequest.id!!, extensionCode = ext1.code, value = "값1", createdBy = "test")
         )
         requestExtensionRepository.save(
-            RequestExtension.create(requestId = testRequest.id!!, extensionId = ext2.id!!, createdBy = "test")
+            RequestExtension.create(requestId = testRequest.id!!, extensionCode = ext2.code, value = "값2", createdBy = "test")
         )
 
         // When
@@ -223,56 +230,49 @@ class R2dbcExtensionRepositoryTest {
         // Then
         assertTrue(requestExtensions.size >= 2)
         assertTrue(requestExtensions.all { it.requestId == testRequest.id })
+        assertTrue(requestExtensions.any { it.extensionCode == ext1.code })
+        assertTrue(requestExtensions.any { it.extensionCode == ext2.code })
     }
 
     @Test
-    fun `확장항목별 의뢰 조회 테스트`() = runBlocking {
+    fun `의뢰 ID와 코드로 확장항목 조회 테스트`() = runBlocking {
         // Given
         val extension = extensionRepository.save(
             Extension.create(code = "EXT010", name = "확장10", createdBy = "test")
         )
 
         requestExtensionRepository.save(
-            RequestExtension.create(requestId = testRequest.id!!, extensionId = extension.id!!, createdBy = "test")
+            RequestExtension.create(
+                requestId = testRequest.id!!,
+                extensionCode = extension.code,
+                value = "조회테스트값",
+                createdBy = "test"
+            )
         )
 
         // When
-        val extensionRequests = requestExtensionRepository.findByExtensionId(extension.id!!).toList()
+        val found = requestExtensionRepository.findByRequestIdAndCode(testRequest.id!!, extension.code)
 
         // Then
-        assertTrue(extensionRequests.isNotEmpty())
-        assertTrue(extensionRequests.all { it.extensionId == extension.id })
-    }
-
-    @Test
-    fun `의뢰-확장항목 연결 존재 확인 테스트`() = runBlocking {
-        // Given
-        val extension = extensionRepository.save(
-            Extension.create(code = "EXT011", name = "확장11", createdBy = "test")
-        )
-        requestExtensionRepository.save(
-            RequestExtension.create(requestId = testRequest.id!!, extensionId = extension.id!!, createdBy = "test")
-        )
-
-        // When
-        val exists = requestExtensionRepository.existsByRequestIdAndExtensionId(testRequest.id!!, extension.id!!)
-
-        // Then
-        assertTrue(exists)
-
-        // 존재하지 않는 경우
-        val notExists = requestExtensionRepository.existsByRequestIdAndExtensionId(testRequest.id!!, 999999L)
-        assertFalse(notExists)
+        assertNotNull(found)
+        assertEquals(testRequest.id, found!!.requestId)
+        assertEquals(extension.code, found.extensionCode)
+        assertEquals("조회테스트값", found.value)
     }
 
     @Test
     fun `의뢰-확장항목 연결 삭제 테스트`() = runBlocking {
         // Given
         val extension = extensionRepository.save(
-            Extension.create(code = "EXT012", name = "확장12", createdBy = "test")
+            Extension.create(code = "EXT011", name = "확장11", createdBy = "test")
         )
         val requestExtension = requestExtensionRepository.save(
-            RequestExtension.create(requestId = testRequest.id!!, extensionId = extension.id!!, createdBy = "test")
+            RequestExtension.create(
+                requestId = testRequest.id!!,
+                extensionCode = extension.code,
+                value = "삭제테스트값",
+                createdBy = "test"
+            )
         )
 
         // When
@@ -287,26 +287,49 @@ class R2dbcExtensionRepositoryTest {
     }
 
     @Test
-    fun `의뢰-확장항목 수정 테스트`() = runBlocking {
+    fun `의뢰 ID로 모든 확장항목 삭제 테스트`() = runBlocking {
         // Given
-        val extension = extensionRepository.save(
-            Extension.create(code = "EXT013", name = "확장13", createdBy = "test")
+        val ext1 = extensionRepository.save(Extension.create(code = "EXT012", name = "확장12", createdBy = "test"))
+        val ext2 = extensionRepository.save(Extension.create(code = "EXT013", name = "확장13", createdBy = "test"))
+
+        requestExtensionRepository.save(
+            RequestExtension.create(requestId = testRequest.id!!, extensionCode = ext1.code, value = "값1", createdBy = "test")
         )
-        val requestExtension = requestExtensionRepository.save(
-            RequestExtension.create(requestId = testRequest.id!!, extensionId = extension.id!!, createdBy = "test")
+        requestExtensionRepository.save(
+            RequestExtension.create(requestId = testRequest.id!!, extensionCode = ext2.code, value = "값2", createdBy = "test")
         )
 
         // When
-        val updated = requestExtension.update(
-            value = "업데이트된 값",
-            updatedBy = "updater"
-        )
-        val result = requestExtensionRepository.save(updated)
+        val deletedCount = requestExtensionRepository.deleteByRequestId(testRequest.id!!)
 
         // Then
-        assertEquals(requestExtension.id, result.id)
-        assertEquals("업데이트된 값", result.value)
-        assertEquals("updater", result.updatedBy)
-        assertNotNull(result.updatedAt)
+        assertTrue(deletedCount >= 2)
+
+        // Verify
+        val remaining = requestExtensionRepository.findByRequestId(testRequest.id!!).toList()
+        assertTrue(remaining.isEmpty())
+    }
+
+    @Test
+    fun `확장항목 값 다양성 테스트`() = runBlocking {
+        // Given
+        val extension = extensionRepository.save(
+            Extension.create(code = "EXT014", name = "다양성테스트", createdBy = "test")
+        )
+
+        // When - 여러 값 저장
+        requestExtensionRepository.save(
+            RequestExtension.create(
+                requestId = testRequest.id!!,
+                extensionCode = extension.code,
+                value = "긴 문자열 값 테스트입니다. 여러 데이터를 포함할 수 있습니다.",
+                createdBy = "test"
+            )
+        )
+
+        // Then
+        val found = requestExtensionRepository.findByRequestIdAndCode(testRequest.id!!, extension.code)
+        assertNotNull(found)
+        assertTrue(found!!.value.length > 10)
     }
 }

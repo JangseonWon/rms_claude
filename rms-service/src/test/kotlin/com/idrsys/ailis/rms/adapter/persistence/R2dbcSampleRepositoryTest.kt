@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 /**
  * R2dbcSampleRepository 통합 테스트
@@ -32,7 +33,7 @@ class R2dbcSampleRepositoryTest {
     fun `검체 타입 생성 테스트`() = runBlocking {
         // Given
         val sampleType = SampleType.create(
-            code = "BLD",
+            serial = "BLD",
             name = "혈액",
             createdBy = "test"
         )
@@ -42,60 +43,64 @@ class R2dbcSampleRepositoryTest {
 
         // Then
         assertNotNull(saved.id)
-        assertEquals("BLD", saved.code)
+        assertEquals("BLD", saved.serial)
         assertEquals("혈액", saved.name)
         assertEquals("test", saved.createdBy)
         assertNotNull(saved.createdAt)
     }
 
     @Test
-    fun `검체 타입 조회 테스트 - 코드로 조회`() = runBlocking {
+    fun `검체 타입 조회 테스트 - 일련번호로 조회`() = runBlocking {
         // Given
-        val sampleType = SampleType.create(code = "URN", name = "소변", createdBy = "test")
+        val sampleType = SampleType.create(serial = "URN", name = "소변", createdBy = "test")
         sampleTypeRepository.save(sampleType)
 
         // When
-        val found = sampleTypeRepository.findByCode("URN")
+        val found = sampleTypeRepository.findBySerial("URN")
 
         // Then
         assertNotNull(found)
-        assertEquals("URN", found!!.code)
+        assertEquals("URN", found!!.serial)
         assertEquals("소변", found.name)
     }
 
     @Test
     fun `검체 타입 목록 조회 테스트`() = runBlocking {
         // Given
-        sampleTypeRepository.save(SampleType.create(code = "ST1", name = "타입1", createdBy = "test"))
-        sampleTypeRepository.save(SampleType.create(code = "ST2", name = "타입2", createdBy = "test"))
+        sampleTypeRepository.save(SampleType.create(serial = "ST1", name = "타입1", createdBy = "test"))
+        sampleTypeRepository.save(SampleType.create(serial = "ST2", name = "타입2", createdBy = "test"))
 
         // When
         val types = sampleTypeRepository.findAll().toList()
 
         // Then
         assertTrue(types.size >= 2)
-        assertTrue(types.any { it.code == "ST1" })
-        assertTrue(types.any { it.code == "ST2" })
+        assertTrue(types.any { it.serial == "ST1" })
+        assertTrue(types.any { it.serial == "ST2" })
     }
 
     @Test
     fun `검체 생성 테스트`() = runBlocking {
         // Given - 먼저 검체 타입 생성
-        val sampleType = SampleType.create(code = "BLD001", name = "전혈", createdBy = "test")
+        val sampleType = SampleType.create(serial = "BLD001", name = "전혈", createdBy = "test")
         val savedType = sampleTypeRepository.save(sampleType)
 
         // When - 검체 생성
         val sample = Sample.create(
-            serial = "S001",
+            count = 2,
+            samplingOn = LocalDate.of(2024, 1, 15),
             sampleTypeId = savedType.id!!,
+            age = 5,
             createdBy = "test"
         )
         val saved = sampleRepository.save(sample)
 
         // Then
         assertNotNull(saved.id)
-        assertEquals("S001", saved.serial)
+        assertEquals(2, saved.count)
+        assertEquals(LocalDate.of(2024, 1, 15), saved.samplingOn)
         assertEquals(savedType.id, saved.sampleTypeId)
+        assertEquals(5, saved.age)
         assertEquals("test", saved.createdBy)
         assertNotNull(saved.createdAt)
     }
@@ -103,8 +108,13 @@ class R2dbcSampleRepositoryTest {
     @Test
     fun `검체 조회 테스트 - ID로 조회`() = runBlocking {
         // Given
-        val sampleType = sampleTypeRepository.save(SampleType.create(code = "BLD002", name = "혈청", createdBy = "test"))
-        val sample = Sample.create(serial = "S002", sampleTypeId = sampleType.id!!, createdBy = "test")
+        val sampleType = sampleTypeRepository.save(SampleType.create(serial = "BLD002", name = "혈청", createdBy = "test"))
+        val sample = Sample.create(
+            count = 1,
+            samplingOn = LocalDate.now(),
+            sampleTypeId = sampleType.id!!,
+            createdBy = "test"
+        )
         val saved = sampleRepository.save(sample)
 
         // When
@@ -113,34 +123,19 @@ class R2dbcSampleRepositoryTest {
         // Then
         assertNotNull(found)
         assertEquals(saved.id, found!!.id)
-        assertEquals("S002", found.serial)
+        assertEquals(1, found.count)
         assertEquals(sampleType.id, found.sampleTypeId)
-    }
-
-    @Test
-    fun `검체 조회 테스트 - 일련번호로 조회`() = runBlocking {
-        // Given
-        val sampleType = sampleTypeRepository.save(SampleType.create(code = "BLD003", name = "혈장", createdBy = "test"))
-        val sample = Sample.create(serial = "S003", sampleTypeId = sampleType.id!!, createdBy = "test")
-        sampleRepository.save(sample)
-
-        // When
-        val found = sampleRepository.findBySerial("S003")
-
-        // Then
-        assertNotNull(found)
-        assertEquals("S003", found!!.serial)
     }
 
     @Test
     fun `검체 타입별 조회 테스트`() = runBlocking {
         // Given
-        val type1 = sampleTypeRepository.save(SampleType.create(code = "TYPE1", name = "타입1", createdBy = "test"))
-        val type2 = sampleTypeRepository.save(SampleType.create(code = "TYPE2", name = "타입2", createdBy = "test"))
+        val type1 = sampleTypeRepository.save(SampleType.create(serial = "TYPE1", name = "타입1", createdBy = "test"))
+        val type2 = sampleTypeRepository.save(SampleType.create(serial = "TYPE2", name = "타입2", createdBy = "test"))
 
-        sampleRepository.save(Sample.create(serial = "S004", sampleTypeId = type1.id!!, createdBy = "test"))
-        sampleRepository.save(Sample.create(serial = "S005", sampleTypeId = type1.id!!, createdBy = "test"))
-        sampleRepository.save(Sample.create(serial = "S006", sampleTypeId = type2.id!!, createdBy = "test"))
+        sampleRepository.save(Sample.create(count = 1, samplingOn = LocalDate.now(), sampleTypeId = type1.id!!, createdBy = "test"))
+        sampleRepository.save(Sample.create(count = 2, samplingOn = LocalDate.now(), sampleTypeId = type1.id!!, createdBy = "test"))
+        sampleRepository.save(Sample.create(count = 1, samplingOn = LocalDate.now(), sampleTypeId = type2.id!!, createdBy = "test"))
 
         // When
         val type1Samples = sampleRepository.findBySampleTypeId(type1.id!!).toList()
@@ -153,22 +148,28 @@ class R2dbcSampleRepositoryTest {
     @Test
     fun `검체 수정 테스트`() = runBlocking {
         // Given
-        val sampleType = sampleTypeRepository.save(SampleType.create(code = "BLD004", name = "타입", createdBy = "test"))
-        val sample = Sample.create(serial = "S007", sampleTypeId = sampleType.id!!, createdBy = "test")
+        val sampleType = sampleTypeRepository.save(SampleType.create(serial = "BLD004", name = "타입", createdBy = "test"))
+        val sample = Sample.create(
+            count = 1,
+            samplingOn = LocalDate.of(2024, 1, 1),
+            sampleTypeId = sampleType.id!!,
+            age = 3,
+            createdBy = "test"
+        )
         val saved = sampleRepository.save(sample)
 
         // When
         val updated = saved.update(
-            collectedBy = "collector",
-            note = "수정된 노트",
+            count = 3,
+            age = 7,
             updatedBy = "updater"
         )
         val result = sampleRepository.save(updated)
 
         // Then
         assertEquals(saved.id, result.id)
-        assertEquals("collector", result.collectedBy)
-        assertEquals("수정된 노트", result.note)
+        assertEquals(3, result.count)
+        assertEquals(7, result.age)
         assertEquals("updater", result.updatedBy)
         assertNotNull(result.updatedAt)
     }
@@ -176,8 +177,13 @@ class R2dbcSampleRepositoryTest {
     @Test
     fun `검체 삭제 테스트`() = runBlocking {
         // Given
-        val sampleType = sampleTypeRepository.save(SampleType.create(code = "BLD005", name = "타입", createdBy = "test"))
-        val sample = Sample.create(serial = "S008", sampleTypeId = sampleType.id!!, createdBy = "test")
+        val sampleType = sampleTypeRepository.save(SampleType.create(serial = "BLD005", name = "타입", createdBy = "test"))
+        val sample = Sample.create(
+            count = 1,
+            samplingOn = LocalDate.now(),
+            sampleTypeId = sampleType.id!!,
+            createdBy = "test"
+        )
         val saved = sampleRepository.save(sample)
 
         // When
@@ -194,51 +200,74 @@ class R2dbcSampleRepositoryTest {
     @Test
     fun `검체 목록 조회 테스트`() = runBlocking {
         // Given
-        val sampleType = sampleTypeRepository.save(SampleType.create(code = "BLD006", name = "타입", createdBy = "test"))
-        sampleRepository.save(Sample.create(serial = "S009", sampleTypeId = sampleType.id!!, createdBy = "test"))
-        sampleRepository.save(Sample.create(serial = "S010", sampleTypeId = sampleType.id!!, createdBy = "test"))
+        val sampleType = sampleTypeRepository.save(SampleType.create(serial = "BLD006", name = "타입", createdBy = "test"))
+        sampleRepository.save(Sample.create(count = 1, samplingOn = LocalDate.now(), sampleTypeId = sampleType.id!!, createdBy = "test"))
+        sampleRepository.save(Sample.create(count = 2, samplingOn = LocalDate.now(), sampleTypeId = sampleType.id!!, createdBy = "test"))
 
         // When
         val samples = sampleRepository.findAll().toList()
 
         // Then
         assertTrue(samples.size >= 2)
-        assertTrue(samples.any { it.serial == "S009" })
-        assertTrue(samples.any { it.serial == "S010" })
     }
 
     @Test
-    fun `중복 검체 일련번호 체크 테스트`() = runBlocking {
+    fun `중복 검체 타입 일련번호 체크 테스트`() = runBlocking {
         // Given
-        val sampleType = sampleTypeRepository.save(SampleType.create(code = "BLD007", name = "타입", createdBy = "test"))
-        val serial = "S011"
-        sampleRepository.save(Sample.create(serial = serial, sampleTypeId = sampleType.id!!, createdBy = "test"))
+        val serial = "DUPSERIAL"
+        sampleTypeRepository.save(SampleType.create(serial = serial, name = "중복테스트", createdBy = "test"))
 
         // When
-        val exists = sampleRepository.existsBySerial(serial)
+        val exists = sampleTypeRepository.existsBySerial(serial)
 
         // Then
         assertTrue(exists)
 
         // 존재하지 않는 경우
-        val notExists = sampleRepository.existsBySerial("NOTEXIST")
+        val notExists = sampleTypeRepository.existsBySerial("NOTEXIST")
         assertFalse(notExists)
     }
 
     @Test
-    fun `중복 검체 타입 코드 체크 테스트`() = runBlocking {
+    fun `검체 나이 업데이트 테스트`() = runBlocking {
         // Given
-        val code = "DUPCODE"
-        sampleTypeRepository.save(SampleType.create(code = code, name = "중복테스트", createdBy = "test"))
+        val sampleType = sampleTypeRepository.save(SampleType.create(serial = "BLD007", name = "타입", createdBy = "test"))
+        val sample = Sample.create(
+            count = 1,
+            samplingOn = LocalDate.now(),
+            sampleTypeId = sampleType.id!!,
+            age = 5,
+            createdBy = "test"
+        )
+        val saved = sampleRepository.save(sample)
 
         // When
-        val exists = sampleTypeRepository.existsByCode(code)
+        val updated = saved.update(age = 10, updatedBy = "updater")
+        val result = sampleRepository.save(updated)
 
         // Then
-        assertTrue(exists)
+        assertEquals(10, result.age)
+    }
 
-        // 존재하지 않는 경우
-        val notExists = sampleTypeRepository.existsByCode("NOTEXIST")
-        assertFalse(notExists)
+    @Test
+    fun `검체 샘플 타입 변경 테스트`() = runBlocking {
+        // Given
+        val type1 = sampleTypeRepository.save(SampleType.create(serial = "TYPE_A", name = "타입A", createdBy = "test"))
+        val type2 = sampleTypeRepository.save(SampleType.create(serial = "TYPE_B", name = "타입B", createdBy = "test"))
+
+        val sample = Sample.create(
+            count = 1,
+            samplingOn = LocalDate.now(),
+            sampleTypeId = type1.id!!,
+            createdBy = "test"
+        )
+        val saved = sampleRepository.save(sample)
+
+        // When - 샘플 타입 변경
+        val updated = saved.update(sampleTypeId = type2.id!!, updatedBy = "updater")
+        val result = sampleRepository.save(updated)
+
+        // Then
+        assertEquals(type2.id, result.sampleTypeId)
     }
 }
